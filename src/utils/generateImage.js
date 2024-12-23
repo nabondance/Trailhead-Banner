@@ -1,18 +1,14 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const path  = require("path")
 
-  // Register the custom fonts
-  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Bold.ttf'))
-  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Extralight.ttf'))
-  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Heavy.ttf'))
-  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Light.ttf'))
-  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Medium.ttf'))
-  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka.ttf'))
-  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Thin.ttf'))
-  // Log the registered fonts
-  console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
-  console.log('GlobalFonts families:', GlobalFonts.families);
-  console.log('GlobalFonts faces:', GlobalFonts.faces);
+// Register the custom fonts
+const fontPath = path.join(process.cwd(), 'public/assets/fonts', 'Roboto-Bold.ttf');
+GlobalFonts.registerFromPath(fontPath, 'CustomFont');
+
+// Log the registered fonts
+console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
+console.log('GlobalFonts families:', GlobalFonts.families);
+console.log('GlobalFonts faces:', GlobalFonts.faces);
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
@@ -38,16 +34,11 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Set font and text color
   ctx.fillStyle = '#111827';
-  ctx.font = '36px Iosevka';
+  ctx.font = '36px CustomFont'; // Use the custom font
   console.log('Font set to:', ctx.font);
 
   // Check if the font is available
   console.log('Available fonts:', GlobalFonts.families[0]);
-
-  // Check if the font is available
-  if (!GlobalFonts.families.some(family => family.family === 'Iosevka')) {
-    console.error('Font "Iosevka" is not loaded');
-  }
 
   // Draw text
   try {
