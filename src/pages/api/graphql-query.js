@@ -7,8 +7,8 @@ export default async function handler(req, res) {
     const { query, variables } = req.body;
 
     try {
-      console.log('GraphQL query:', query);
-      console.log('GraphQL variables:', variables);
+      // console.log('GraphQL query:', query);
+      // console.log('GraphQL variables:', variables);
 
       const response = await axios.post(endpoint, { query, variables }, {
         headers: {
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
         },
       });
 
-      console.log('GraphQL response:', response.data);
+      // console.log('GraphQL response:', response.data);
 
       res.status(200).json(response.data);
     } catch (error) {

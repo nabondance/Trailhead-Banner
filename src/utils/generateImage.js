@@ -1,8 +1,11 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
-const path = require('path');
+const { path, resolve } = require("path")
 
 // Register the custom font
-GlobalFonts.registerFromPath(path.join(__dirname, './public/fonts/Arial.ttf'), 'Arial');
+GlobalFonts.registerFromPath('./public/fonts/Arial.ttf', 'Arial');
+
+console.log('Custom font registered:', JSON.stringify(GlobalFonts, null, 2));
+console.log('GlobalFonts families:', GlobalFonts.families);
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
@@ -77,7 +80,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   const buffer = canvas.toBuffer('image/png');
   const bannerUrl = `data:image/png;base64,${buffer.toString('base64')}`;
 
-  console.log('Banner generation complete. Banner URL:', bannerUrl);
+  console.log('Banner generation complete.');
 
   return bannerUrl;
 };
