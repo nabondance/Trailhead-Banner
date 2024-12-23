@@ -1,6 +1,14 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const { path, resolve } = require("path")
 
+// Register the custom fonts
+GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Arial.ttf'), 'Arial');
+GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Super Sense.ttf'), 'Super Sense');
+
+// Log the registered fonts
+console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
+console.log('GlobalFonts families:', GlobalFonts.families);
+console.log('GlobalFonts faces:', GlobalFonts.faces);
 
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
@@ -8,14 +16,6 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   console.log('Rank Data:', rankData);
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
-
-  // Register the custom font
-  GlobalFonts.registerFromPath('./public/fonts/Arial.ttf', 'Arial');
-  GlobalFonts.registerFromPath('./public/fonts/Super Sense.ttf', 'Super Sense');
-
-  console.log('Custom font registered:', JSON.stringify(GlobalFonts, null, 2));
-  console.log('GlobalFonts families:', GlobalFonts.families);
-  console.log('GlobalFonts faces:', GlobalFonts.faces);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
@@ -39,10 +39,28 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   ctx.font = 'bold 36px Super Sense';
   console.log('Font set to:', ctx.font);
 
+
+  // Check if the font is available
+  if (!GlobalFonts.families.includes('Super Sense')) {
+    console.error('Font "Super Sense" is not loaded');
+    return;
+  }
+
   // Draw text
   try {
-    ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
-    ctx.fillText(`${badgesData.trailheadStats.superbadgeCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+    const text1 = `${rankData.earnedBadgesCount} badges`;
+    const text2 = `${badgesData.trailheadStats.superbadgeCount} superbadges`;
+    console.log('Drawing text:', text1, text2);
+
+    // Verify text metrics
+    const text1Metrics = ctx.measureText(text1);
+    const text2Metrics = ctx.measureText(text2);
+    console.log('Text1 metrics:', text1Metrics);
+    console.log('Text2 metrics:', text2Metrics);
+
+    // Draw the text
+    ctx.fillText(text1, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+    ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
     console.log('Text drawn successfully');
   } catch (error) {
     console.error('Error drawing text:', error);
