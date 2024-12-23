@@ -33,7 +33,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Set font and text color
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 36px Arial'; // Use the registered custom font
+  ctx.font = 'bold 36px sans-serif';
   console.log('Font set to:', ctx.font);
 
   // Draw text
