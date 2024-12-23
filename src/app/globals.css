@@ -21,8 +21,8 @@ body {
 }
 
 @font-face {
-  font-family: 'Super Sense';
-  src: url('/public/fonts/Super Sense.ttf') format('truetype');
+  font-family: 'Iosevka';
+  src: url('/fonts/Iosevka.ttf') format('ttf');
   font-weight: normal;
   font-style: normal;
 }

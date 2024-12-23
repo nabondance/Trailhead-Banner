@@ -1,23 +1,24 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const path  = require("path")
 
-
+  // Register the custom fonts
+  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Bold.ttf'))
+  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Extralight.ttf'))
+  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Heavy.ttf'))
+  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Light.ttf'))
+  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Medium.ttf'))
+  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka.ttf'))
+  GlobalFonts.registerFromPath(path.join(__dirname, 'fonts', 'Iosevka-Thin.ttf'))
+  // Log the registered fonts
+  console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
+  console.log('GlobalFonts families:', GlobalFonts.families);
+  console.log('GlobalFonts faces:', GlobalFonts.faces);
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
 //   console.log('Rank Data:', rankData);
 //   console.log('Certifications Data:', certificationsData);
 //   console.log('Badges Data:', badgesData);
-
-  // Register the custom fonts
-  GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Arial.ttf'), 'Arial');
-  GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Super Sense.ttf'), 'Super Sense');
-
-  // Log the registered fonts
-  console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
-  console.log('GlobalFonts families:', GlobalFonts.families);
-  console.log('GlobalFonts faces:', GlobalFonts.faces);
-
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
@@ -29,7 +30,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Rank Data
   const rankLogoUrl = rankData.rank.imageUrl; // Assuming rankData contains imageUrl for the rank logo
-  console.log('Loading rank logo from URL:', rankLogoUrl);
+  console.debug('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
   const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
@@ -37,15 +38,16 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Set font and text color
   ctx.fillStyle = '#111827';
-  ctx.font = 'normal 36px Super Sense';
+  ctx.font = '36px Iosevka';
   console.log('Font set to:', ctx.font);
 
   // Check if the font is available
   console.log('Available fonts:', GlobalFonts.families[0]);
-//   if (!GlobalFonts.families.includes('Super Sense')) {
-//     console.error('Font "Super Sense" is not loaded');
-//     return;
-//   }
+
+  // Check if the font is available
+  if (!GlobalFonts.families.some(family => family.family === 'Iosevka')) {
+    console.error('Font "Iosevka" is not loaded');
+  }
 
   // Draw text
   try {
