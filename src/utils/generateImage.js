@@ -24,7 +24,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   ctx.fillStyle = '#111827';
   ctx.font = 'bold 36px Arial';
   ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
-  ctx.fillText(`${badgesData.trailheadStats.superbadgeCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+  ctx.fillText(`${rankData.superbadgesCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
 
   // Certifications Data
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
