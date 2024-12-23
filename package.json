@@ -13,6 +13,7 @@
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
     "axios": "^1.7.9",
+    "canvas": "^3.0.0",
     "next": "15.1.2",
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
