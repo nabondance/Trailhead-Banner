@@ -27,7 +27,10 @@ export default function RootLayout({ children }) {
         </header>
         <main>{children}</main>
         <footer className="footer">
-          <p>&copy; 2024 Trailhead-Banner By nabondance</p>
+          <a href="https://github.com/nabondance" target="_blank" rel="noopener noreferrer" className="footer-link">
+            &copy; 2024 Trailhead-Banner By nabondance
+            <img src="/github-logo.svg" alt="GitHub" className="github-logo" />
+          </a>
         </footer>
       </body>
     </html>

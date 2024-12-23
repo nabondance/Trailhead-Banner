@@ -17,7 +17,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   const rankLogoUrl = rankData.rank.imageUrl; // Assuming rankData contains imageUrl for the rank logo
   console.log('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
-  const rankLogoHeight = canvas.height * (1 / 3) * 0.8; // 80% of the top 1/3 height
+  const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 80% of the top 1/3 height
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
   ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
 
@@ -30,7 +30,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
   const availableWidth = canvas.width - 40; // Leave some padding on the sides
   const logoSpacing = 10; // Space between logos
-  const maxLogoHeight = canvas.height * (2 / 3) * 0.8; // 80% of the bottom 2/3 height
+  const maxLogoHeight = canvas.height * (2 / 3) * 0.9; // 80% of the bottom 2/3 height
 
   let totalLogoWidth = 0;
   const logos = [];

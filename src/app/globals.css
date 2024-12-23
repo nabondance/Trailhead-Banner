@@ -80,3 +80,31 @@ body {
 .download-link:hover {
   background-color: #005bb5;
 }
+
+.footer {
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 10px;
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+.github-logo {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+}
