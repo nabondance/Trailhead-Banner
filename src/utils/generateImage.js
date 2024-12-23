@@ -1,4 +1,4 @@
-import { createCanvas, loadImage, registerFont } from '@napi-rs/canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import path from 'path';
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
@@ -6,10 +6,6 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   console.log('Rank Data:', rankData);
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
-
-  // Register the custom font
-  const fontPath = path.join(process.cwd(), 'public', 'Arial.ttf');
-  registerFont(fontPath, { family: 'Arial' });
 
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
@@ -27,7 +23,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
 
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 36px Arial'; // Use the custom font
+  ctx.font = 'bold 36px Arial';
   ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
   ctx.fillText(`${badgesData.trailheadStats.superbadgeCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
 
