@@ -3,9 +3,11 @@ const { path, resolve } = require("path")
 
 // Register the custom font
 GlobalFonts.registerFromPath('./public/fonts/Arial.ttf', 'Arial');
+GlobalFonts.registerFromPath('./public/fonts/Barial.ttf', 'Barial');
 
 console.log('Custom font registered:', JSON.stringify(GlobalFonts, null, 2));
 console.log('GlobalFonts families:', GlobalFonts.families);
+console.log('GlobalFonts faces:', GlobalFonts.faces);
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
