@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
-  console.log('Generating image with the following data:');
+  console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
@@ -67,11 +67,11 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
     logoXPosition += logoWidth + logoSpacing;
   });
 
-  // Convert canvas to image
+  // Convert canvas to banner
   const buffer = canvas.toBuffer('image/png');
-  const imageUrl = `data:image/png;base64,${buffer.toString('base64')}`;
+  const bannerUrl = `data:image/png;base64,${buffer.toString('base64')}`;
 
-  console.log('Image generation complete. Image URL:', imageUrl);
+  console.log('Banner generation complete. Banner URL:', bannerUrl);
 
-  return imageUrl;
+  return bannerUrl;
 };

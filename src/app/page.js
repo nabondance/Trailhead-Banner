@@ -42,7 +42,7 @@ const Page = () => {
           className="input"
         />
         {!loading && (
-          <button type="submit" className="button">Generate Image</button>
+          <button type="submit" className="button">Generate Banner</button>
         )}
       </form>
       {loading && (
@@ -53,9 +53,9 @@ const Page = () => {
       )}
       {imageUrl && (
         <div className="image-container">
-          <h2>Generated Image</h2>
+          <h2>Generated Banner</h2>
           <img src={imageUrl} alt="Generated" className="generated-image" />
-          <a href={imageUrl} download="trailhead-image.png" className="download-link">Download Image</a>
+          <a href={imageUrl} download="trailhead-banner.png" className="download-link">Download Banner</a>
         </div>
       )}
       <SpeedInsights />
