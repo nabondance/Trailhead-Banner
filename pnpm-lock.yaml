@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@napi-rs/canvas':
+        specifier: ^0.1.65
+        version: 0.1.65
       '@vercel/analytics':
         specifier: ^1.4.1
         version: 1.4.1(next@15.1.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
@@ -242,6 +245,70 @@ packages:
   '@mapbox/node-pre-gyp@1.0.11':
     resolution: {integrity: sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==}
     hasBin: true
+
+  '@napi-rs/canvas-android-arm64@0.1.65':
+    resolution: {integrity: sha512-ZYwqFYEKcT5Zr8lbiaJNJj/poLaeK2TncolY914r+gD2TJNeP7ZqvE7A2SX/1C9MB4E3DQEwm3YhL3WEf0x3MQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [android]
+
+  '@napi-rs/canvas-darwin-arm64@0.1.65':
+    resolution: {integrity: sha512-Pg1pfiJEyDIsX+V0QaJPRWvXbw5zmWAk3bivFCvt/5pwZb37/sT6E/RqPHT9NnqpDyKW6SriwY9ypjljysUA1Q==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@napi-rs/canvas-darwin-x64@0.1.65':
+    resolution: {integrity: sha512-3Tr+/HjdJN7Z/VKIcsxV2DvDIibZCExgfYTgljCkUSFuoI7iNkOE6Dc1Q6j212EB9PeO8KmfrViBqHYT6IwWkA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@napi-rs/canvas-linux-arm-gnueabihf@0.1.65':
+    resolution: {integrity: sha512-3KP+dYObH7CVkZMZWwk1WX9jRjL+EKdQtD43H8MOI+illf+dwqLlecdQ4d9bQRIxELKJ8dyPWY4fOp/Ngufrdg==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [linux]
+
+  '@napi-rs/canvas-linux-arm64-gnu@0.1.65':
+    resolution: {integrity: sha512-Ka3StKz7Dq7kjTF3nNJCq43UN/VlANS7qGE3dWkn1d+tQNsCRy/wRmyt1TUFzIjRqcTFMQNRbgYq84+53UBA0A==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@napi-rs/canvas-linux-arm64-musl@0.1.65':
+    resolution: {integrity: sha512-O4xMASm2JrmqYoiDyxVWi+z5C14H+oVEag2rZ5iIA67dhWqYZB+iO7wCFpBYRj31JPBR29FOsu6X9zL+DwBFdw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@napi-rs/canvas-linux-riscv64-gnu@0.1.65':
+    resolution: {integrity: sha512-dblWDaA59ZU8bPbkfM+riSke7sFbNZ70LEevUdI5rgiFEUzYUQlU34gSBzemTACj5rCWt1BYeu0GfkLSjNMBSw==}
+    engines: {node: '>= 10'}
+    cpu: [riscv64]
+    os: [linux]
+
+  '@napi-rs/canvas-linux-x64-gnu@0.1.65':
+    resolution: {integrity: sha512-wsp+atutw13OJXGU3DDkdngtBDoEg01IuK5xMe0L6VFPV8maGkh17CXze078OD5QJOc6kFyw3DDscMLOPF8+oA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@napi-rs/canvas-linux-x64-musl@0.1.65':
+    resolution: {integrity: sha512-odX+nN+IozWzhdj31INcHz3Iy9+EckNw+VqsZcaUxZOTu7/3FmktRNI6aC1qe5minZNv1m05YOS1FVf7fvmjlA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@napi-rs/canvas-win32-x64-msvc@0.1.65':
+    resolution: {integrity: sha512-RZQX3luWnlNWgdMnLMQ1hyfQraeAn9lnxWWVCHuUM4tAWEV8UDdeb7cMwmJW7eyt8kAosmjeHt3cylQMHOxGFg==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [win32]
+
+  '@napi-rs/canvas@0.1.65':
+    resolution: {integrity: sha512-YcFhXQcp+b2d38zFOJNbpyPHnIL7KAEkhJQ+UeeKI5IpE9B8Cpf/M6RiHPQXSsSqnYbrfFylnW49dyh2oeSblQ==}
+    engines: {node: '>= 10'}
 
   '@next/env@15.1.2':
     resolution: {integrity: sha512-Hm3jIGsoUl6RLB1vzY+dZeqb+/kWPZ+h34yiWxW0dV87l8Im/eMOwpOA+a0L78U0HM04syEjXuRlCozqpwuojQ==}
@@ -2099,6 +2166,49 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
+
+  '@napi-rs/canvas-android-arm64@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-darwin-arm64@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-darwin-x64@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-linux-arm-gnueabihf@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-linux-arm64-gnu@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-linux-arm64-musl@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-linux-riscv64-gnu@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-linux-x64-gnu@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-linux-x64-musl@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas-win32-x64-msvc@0.1.65':
+    optional: true
+
+  '@napi-rs/canvas@0.1.65':
+    optionalDependencies:
+      '@napi-rs/canvas-android-arm64': 0.1.65
+      '@napi-rs/canvas-darwin-arm64': 0.1.65
+      '@napi-rs/canvas-darwin-x64': 0.1.65
+      '@napi-rs/canvas-linux-arm-gnueabihf': 0.1.65
+      '@napi-rs/canvas-linux-arm64-gnu': 0.1.65
+      '@napi-rs/canvas-linux-arm64-musl': 0.1.65
+      '@napi-rs/canvas-linux-riscv64-gnu': 0.1.65
+      '@napi-rs/canvas-linux-x64-gnu': 0.1.65
+      '@napi-rs/canvas-linux-x64-musl': 0.1.65
+      '@napi-rs/canvas-win32-x64-msvc': 0.1.65
 
   '@next/env@15.1.2': {}
 
