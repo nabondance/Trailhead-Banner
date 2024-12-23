@@ -37,13 +37,13 @@ const Page = () => {
           required
           className="input"
         />
-        <button type="submit" className="button">Generate Image</button>
+        <button type="submit" className="button">Generate LinkedIn Banner</button>
       </form>
       {imageUrl && (
         <div className="image-container">
           <h2>Generated Image</h2>
-          <img src={imageUrl} alt="Generated" className="generated-image" />
-          <a href={imageUrl} download="trailhead-image.png" className="download-link">Download Image</a>
+          <img src={imageUrl} alt="Generated LinkedIn Banner" className="generated-image" />
+          <a href={imageUrl} download="trailhead-image.png" className="download-link">Download LinkedIn Banner</a>
         </div>
       )}
       <SpeedInsights />

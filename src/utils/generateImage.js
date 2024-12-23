@@ -1,7 +1,7 @@
 import { createCanvas } from 'canvas';
 
 export const generateImage = (rankData, certificationsData) => {
-  const canvas = createCanvas(800, 600);
+  const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
 
   // Background
