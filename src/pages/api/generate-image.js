@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       console.log('Certifications Data:', certificationsData);
 
       // Generate the image
-      const imageUrl = generateImage(rankData, certificationsData);
+      const imageUrl = await generateImage(rankData, certificationsData);
 
       // Send back the combined data and image URL
       res.status(200).json({ rankData, certificationsData, imageUrl });

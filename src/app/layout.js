@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
         </header>
         <main>{children}</main>
         <footer className="footer">
-          <p>&copy; 2023 Trailhead Banner Generator</p>
+          <p>&copy; 2024 Trailhead-Banner By nabondance</p>
         </footer>
       </body>
     </html>
