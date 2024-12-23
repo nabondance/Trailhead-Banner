@@ -1,5 +1,4 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import path from 'path';
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating image with the following data:');
