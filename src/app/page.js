@@ -1,51 +1,58 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import TrailheadBanner from './TrailheadBanner';
 
 const Page = () => {
+  const [username, setUsername] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [rankData, setRankData] = useState(null);
+  const [certificationsData, setCertificationsData] = useState(null);
+
+  const handleImageSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username }),
+    });
+    const data = await response.json();
+    setRankData(data.rankData);
+    setCertificationsData(data.certificationsData);
+  };
+
   return (
     <div>
-      <TrailheadBanner /> {/* Add the TrailheadBanner component here */}
-      <a
-        className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-        href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Image
-          aria-hidden
-          src="/file.svg"
-          alt="File icon"
-          width={16}
-          height={16}
+      <TrailheadBanner />
+      <form onSubmit={handleImageSubmit}>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter Trailhead username"
+          required
         />
-        Learn
-      </a>
-      <a
-        className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-        href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Image
-          aria-hidden
-          src="/window.svg"
-          alt="Window icon"
-          width={16}
-          height={16}
-        />
-        Examples
-      </a>
-      <a
-        className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-        href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-      >
-        {/* Other content */}
-      </a>
-      <SpeedInsights/>
-      <Analytics/>
+        <button type="submit">Generate Image</button>
+      </form>
+      {rankData && (
+        <div>
+          <h2>Rank Data</h2>
+          <pre>{JSON.stringify(rankData, null, 2)}</pre>
+        </div>
+      )}
+      {certificationsData && (
+        <div>
+          <h2>Certifications Data</h2>
+          <pre>{JSON.stringify(certificationsData, null, 2)}</pre>
+        </div>
+      )}
+      <SpeedInsights />
+      <Analytics />
     </div>
   );
 };
