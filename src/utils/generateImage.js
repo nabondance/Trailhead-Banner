@@ -1,15 +1,10 @@
-import { createCanvas, loadImage, registerFont } from 'canvas';
-import path from 'path';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating image with the following data:');
   console.log('Rank Data:', rankData);
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
-
-  // Register the custom font
-  const fontPath = path.join(process.cwd(), 'public', 'Arial.ttf');
-  registerFont(fontPath, { family: 'Arial' });
 
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
@@ -22,12 +17,12 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   const rankLogoUrl = rankData.rank.imageUrl; // Assuming rankData contains imageUrl for the rank logo
   console.log('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
-  const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
+  const rankLogoHeight = canvas.height * (1 / 3) * 0.8; // 80% of the top 1/3 height
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
   ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
 
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 36px Arial';
+  ctx.font = 'bold 36px sans-serif'; // Use a standard font
   ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
   ctx.fillText(`${badgesData.trailheadStats.superbadgeCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
 
@@ -35,7 +30,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
   const availableWidth = canvas.width - 40; // Leave some padding on the sides
   const logoSpacing = 10; // Space between logos
-  const maxLogoHeight = canvas.height * (2 / 3) * 0.9; // 90% of the bottom 2/3 height
+  const maxLogoHeight = canvas.height * (2 / 3) * 0.8; // 80% of the bottom 2/3 height
 
   let totalLogoWidth = 0;
   const logos = [];
