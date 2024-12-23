@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import TrailheadBanner from './TrailheadBanner'; // Import the TrailheadBanner component
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import TrailheadBanner from './TrailheadBanner';
 
 const Page = () => {
   return (
@@ -42,6 +43,7 @@ const Page = () => {
       >
         {/* Other content */}
       </a>
+      <SpeedInsights/>
     </div>
   );
 };
