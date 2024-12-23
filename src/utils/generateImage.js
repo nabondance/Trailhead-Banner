@@ -1,19 +1,21 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const { path, resolve } = require("path")
 
-// Register the custom font
-GlobalFonts.registerFromPath('./public/fonts/Arial.ttf', 'Arial');
-GlobalFonts.registerFromPath('./public/fonts/Barial.ttf', 'Barial', {style: 'italic'});
 
-console.log('Custom font registered:', JSON.stringify(GlobalFonts, null, 2));
-console.log('GlobalFonts families:', GlobalFonts.families);
-console.log('GlobalFonts faces:', GlobalFonts.faces);
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
+
+  // Register the custom font
+  GlobalFonts.registerFromPath('./public/fonts/Arial.ttf', 'Arial');
+  GlobalFonts.registerFromPath('./public/fonts/Barial.ttf', 'Barial');
+
+  console.log('Custom font registered:', JSON.stringify(GlobalFonts, null, 2));
+  console.log('GlobalFonts families:', GlobalFonts.families);
+  console.log('GlobalFonts faces:', GlobalFonts.faces);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
@@ -33,24 +35,13 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Set font and text color
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 36px Arial'; // Use the registered custom font
+  ctx.font = 'bold 36px Arial';
   console.log('Font set to:', ctx.font);
 
   // Draw text
   try {
-    const text1 = `${rankData.earnedBadgesCount} badges`;
-    const text2 = `${badgesData.trailheadStats.superbadgeCount} superbadges`;
-    console.log('Drawing text:', text1, text2);
-
-    // Verify text metrics
-    const text1Metrics = ctx.measureText(text1);
-    const text2Metrics = ctx.measureText(text2);
-    console.log('Text1 metrics:', text1Metrics);
-    console.log('Text2 metrics:', text2Metrics);
-
-    // Draw the text
-    ctx.fillText(text1, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
-    ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+    ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+    ctx.fillText(`${badgesData.trailheadStats.superbadgeCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
     console.log('Text drawn successfully');
   } catch (error) {
     console.error('Error drawing text:', error);
