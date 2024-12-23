@@ -9,9 +9,12 @@ import TrailheadBanner from './TrailheadBanner';
 const Page = () => {
   const [username, setUsername] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleImageSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setImageUrl('');
     const response = await fetch('/api/generate-image', {
       method: 'POST',
       headers: {
@@ -24,6 +27,7 @@ const Page = () => {
     console.log('Certifications Data:', data.certificationsData);
     console.log('Badge Data:', data.badgesData);
     setImageUrl(data.imageUrl);
+    setLoading(false);
   };
 
   return (
@@ -38,13 +42,21 @@ const Page = () => {
           required
           className="input"
         />
-        <button type="submit" className="button">Generate LinkedIn Banner</button>
+        {!loading && (
+          <button type="submit" className="button">Generate Image</button>
+        )}
       </form>
+      {loading && (
+        <div className="loading-container">
+          <p>Generating the banner...</p>
+          <div className="loading-icon"></div>
+        </div>
+      )}
       {imageUrl && (
         <div className="image-container">
           <h2>Generated Image</h2>
-          <img src={imageUrl} alt="Generated LinkedIn Banner" className="generated-image" />
-          <a href={imageUrl} download="trailhead-image.png" className="download-link">Download LinkedIn Banner</a>
+          <img src={imageUrl} alt="Generated" className="generated-image" />
+          <a href={imageUrl} download="trailhead-image.png" className="download-link">Download Image</a>
         </div>
       )}
       <SpeedInsights />

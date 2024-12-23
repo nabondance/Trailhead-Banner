@@ -1,4 +1,4 @@
-import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
+import { createCanvas, loadImage, registerFont } from '@napi-rs/canvas';
 import path from 'path';
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
@@ -9,7 +9,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Register the custom font
   const fontPath = path.join(process.cwd(), 'public', 'Arial.ttf');
-  GlobalFonts.registerFromPath(fontPath, 'Arial');
+  registerFont(fontPath, { family: 'Arial' });
 
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
