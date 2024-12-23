@@ -1,4 +1,8 @@
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
+const path = require('path');
+
+// Register the custom font
+GlobalFonts.registerFromPath(path.join(__dirname, 'public/Arial.ttf'), 'Arial');
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
@@ -6,6 +10,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
 
+  // Create canvas and context
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
 
@@ -21,8 +26,9 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
   ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
 
+  // Set font and text color
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 36px Arial';
+  ctx.font = 'bold 36px Arial'; // Use the registered custom font
   ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
   ctx.fillText(`${badgesData.trailheadStats.superbadgeCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
 
