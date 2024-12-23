@@ -1,6 +1,7 @@
 import axios from 'axios';
 import GET_TRAILBLAZER_RANK from '../../graphql/queries/getTrailblazerRank';
 import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications';
+import { generateImage } from '../../utils/generateImage';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -40,14 +41,17 @@ export default async function handler(req, res) {
       );
 
       // Extract the data from the responses
-      const rankData = rankResponse.data.data;
-      const certificationsData = certificationsResponse.data.data;
+      const rankData = rankResponse.data.data.profile.trailheadStats.rank;
+      const certificationsData = certificationsResponse.data.data.profile.credential;
 
       console.log('Rank Data:', rankData);
       console.log('Certifications Data:', certificationsData);
 
-      // Send back the combined data
-      res.status(200).json({ rankData, certificationsData });
+      // Generate the image
+      const imageUrl = generateImage(rankData, certificationsData);
+
+      // Send back the combined data and image URL
+      res.status(200).json({ rankData, certificationsData, imageUrl });
     } catch (error) {
       console.error('Error fetching data:', error.message);
       res.status(500).json({ error: error.message });

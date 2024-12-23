@@ -9,8 +9,6 @@ import TrailheadBanner from './TrailheadBanner';
 const Page = () => {
   const [username, setUsername] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [rankData, setRankData] = useState(null);
-  const [certificationsData, setCertificationsData] = useState(null);
 
   const handleImageSubmit = async (e) => {
     e.preventDefault();
@@ -22,8 +20,9 @@ const Page = () => {
       body: JSON.stringify({ username }),
     });
     const data = await response.json();
-    setRankData(data.rankData);
-    setCertificationsData(data.certificationsData);
+    console.log('Rank Data:', data.rankData);
+    console.log('Certifications Data:', data.certificationsData);
+    setImageUrl(data.imageUrl);
   };
 
   return (
@@ -37,18 +36,13 @@ const Page = () => {
           placeholder="Enter Trailhead username"
           required
         />
-        <button type="submit">Generate Image</button>
+        <button type="submit">Generate Banner</button>
       </form>
-      {rankData && (
+      {imageUrl && (
         <div>
-          <h2>Rank Data</h2>
-          <pre>{JSON.stringify(rankData, null, 2)}</pre>
-        </div>
-      )}
-      {certificationsData && (
-        <div>
-          <h2>Certifications Data</h2>
-          <pre>{JSON.stringify(certificationsData, null, 2)}</pre>
+          <h2>Generated Image</h2>
+          <img src={imageUrl} alt="Generated Banner" />
+          <a href={imageUrl} download="trailhead-image.png">Download Image</a>
         </div>
       )}
       <SpeedInsights />
