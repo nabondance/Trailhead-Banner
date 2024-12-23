@@ -1,6 +1,6 @@
 import { createCanvas, loadImage } from 'canvas';
 
-export const generateImage = async (rankData, certificationsData) => {
+export const generateImage = async (rankData, certificationsData, badgesData) => {
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
 
@@ -17,7 +17,8 @@ export const generateImage = async (rankData, certificationsData) => {
 
   ctx.fillStyle = '#111827';
   ctx.font = 'bold 36px Arial';
-  ctx.fillText(`${rankData.requiredBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+  ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+  ctx.fillText(`${badgesData.trailheadStats.superbadgesCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
 
   // Certifications Data
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3

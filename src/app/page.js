@@ -22,6 +22,7 @@ const Page = () => {
     const data = await response.json();
     console.log('Rank Data:', data.rankData);
     console.log('Certifications Data:', data.certificationsData);
+    console.log('Badge Data:', data.badgesData);
     setImageUrl(data.imageUrl);
   };
 
