@@ -11,7 +11,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Register the custom font
   GlobalFonts.registerFromPath('./public/fonts/Arial.ttf', 'Arial');
-  GlobalFonts.registerFromPath('./public/fonts/Barial.ttf', 'Barial');
+  GlobalFonts.registerFromPath('./public/fonts/Super Sense.ttf', 'Super Sense');
 
   console.log('Custom font registered:', JSON.stringify(GlobalFonts, null, 2));
   console.log('GlobalFonts families:', GlobalFonts.families);
@@ -20,6 +20,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
+  console.log('Canvas size:', canvas.width, canvas.height);
 
   // Background
   ctx.fillStyle = '#f3f4f6';
@@ -35,7 +36,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Set font and text color
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 36px Arial';
+  ctx.font = 'bold 36px Super Sense';
   console.log('Font set to:', ctx.font);
 
   // Draw text
