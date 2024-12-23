@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         variables: {
           slug: username,
           hasSlug: true,
-          count: 50,
+          count: 20,
           after: null,
           filter: null,
         },

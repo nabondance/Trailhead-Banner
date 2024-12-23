@@ -1,6 +1,11 @@
 import { createCanvas, loadImage } from 'canvas';
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
+  console.log('Generating image with the following data:');
+  console.log('Rank Data:', rankData);
+  console.log('Certifications Data:', certificationsData);
+  console.log('Badges Data:', badgesData);
+
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
 
@@ -9,7 +14,8 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Rank Data
-  const rankLogoUrl = rankData.imageUrl; // Assuming rankData contains imageUrl for the rank logo
+  const rankLogoUrl = rankData.rank.imageUrl; // Assuming rankData contains imageUrl for the rank logo
+  console.log('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
   const rankLogoHeight = canvas.height * (1 / 3) * 0.8; // 80% of the top 1/3 height
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
@@ -18,7 +24,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   ctx.fillStyle = '#111827';
   ctx.font = 'bold 36px Arial';
   ctx.fillText(`${rankData.earnedBadgesCount} badges`, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
-  ctx.fillText(`${badgesData.trailheadStats.superbadgesCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+  ctx.fillText(`${badgesData.trailheadStats.superbadgeCount} superbadges`, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
 
   // Certifications Data
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
@@ -32,6 +38,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   for (const cert of certificationsData.certifications) {
     if (cert.logoUrl) {
       try {
+        console.log('Loading certification logo from URL:', cert.logoUrl);
         const logo = await loadImage(cert.logoUrl);
         const logoHeight = maxLogoHeight;
         const logoWidth = (logo.width / logo.height) * logoHeight; // Maintain aspect ratio
@@ -46,6 +53,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   // Adjust logo sizes if total width exceeds available width
   if (totalLogoWidth > availableWidth) {
     const scaleFactor = availableWidth / totalLogoWidth;
+    console.log('Scaling logos by factor:', scaleFactor);
     logos.forEach(logo => {
       logo.logoWidth *= scaleFactor;
       logo.logoHeight *= scaleFactor;
@@ -62,6 +70,8 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   // Convert canvas to image
   const buffer = canvas.toBuffer('image/png');
   const imageUrl = `data:image/png;base64,${buffer.toString('base64')}`;
+
+  console.log('Image generation complete. Image URL:', imageUrl);
 
   return imageUrl;
 };
