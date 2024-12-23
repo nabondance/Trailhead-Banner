@@ -1,26 +1,27 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
-const { path, resolve } = require("path")
+const path  = require("path")
 
-// Register the custom fonts
-GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Arial.ttf'), 'Arial');
-GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Super Sense.ttf'), 'Super Sense');
-
-// Log the registered fonts
-console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
-console.log('GlobalFonts families:', GlobalFonts.families);
-console.log('GlobalFonts faces:', GlobalFonts.faces);
 
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
-  console.log('Rank Data:', rankData);
-  console.log('Certifications Data:', certificationsData);
-  console.log('Badges Data:', badgesData);
+//   console.log('Rank Data:', rankData);
+//   console.log('Certifications Data:', certificationsData);
+//   console.log('Badges Data:', badgesData);
+
+  // Register the custom fonts
+  GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Arial.ttf'), 'Arial');
+  GlobalFonts.registerFromPath(path.join(__dirname, 'public/fonts/Super Sense.ttf'), 'Super Sense');
+
+  // Log the registered fonts
+  console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
+  console.log('GlobalFonts families:', GlobalFonts.families);
+  console.log('GlobalFonts faces:', GlobalFonts.faces);
+
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
-  console.log('Canvas size:', canvas.width, canvas.height);
 
   // Background
   ctx.fillStyle = '#f3f4f6';
@@ -36,15 +37,15 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
 
   // Set font and text color
   ctx.fillStyle = '#111827';
-  ctx.font = 'bold 36px Super Sense';
+  ctx.font = 'normal 36px Super Sense';
   console.log('Font set to:', ctx.font);
 
-
   // Check if the font is available
-  if (!GlobalFonts.families.includes('Super Sense')) {
-    console.error('Font "Super Sense" is not loaded');
-    return;
-  }
+  console.log('Available fonts:', GlobalFonts.families[0]);
+//   if (!GlobalFonts.families.includes('Super Sense')) {
+//     console.error('Font "Super Sense" is not loaded');
+//     return;
+//   }
 
   // Draw text
   try {

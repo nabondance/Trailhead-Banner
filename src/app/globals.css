@@ -21,8 +21,8 @@ body {
 }
 
 @font-face {
-  font-family: 'Arial';
-  src: local('Arial');
+  font-family: 'Super Sense';
+  src: url('/public/fonts/Super Sense.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
