@@ -26,23 +26,24 @@ const Page = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <TrailheadBanner />
-      <form onSubmit={handleImageSubmit}>
+      <form onSubmit={handleImageSubmit} className="form">
         <input
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Enter Trailhead username"
           required
+          className="input"
         />
-        <button type="submit">Generate Banner</button>
+        <button type="submit" className="button">Generate Image</button>
       </form>
       {imageUrl && (
-        <div>
+        <div className="image-container">
           <h2>Generated Image</h2>
-          <img src={imageUrl} alt="Generated Banner" />
-          <a href={imageUrl} download="trailhead-image.png">Download Image</a>
+          <img src={imageUrl} alt="Generated" className="generated-image" />
+          <a href={imageUrl} download="trailhead-image.png" className="download-link">Download Image</a>
         </div>
       )}
       <SpeedInsights />

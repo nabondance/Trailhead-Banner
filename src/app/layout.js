@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Trailhead Banner",
-  description: "Generated your Linkedin Banner with your Trailhead data",
+  description: "Generate your LinkedIn Banner with your Trailhead data",
 };
 
 export default function RootLayout({ children }) {
@@ -22,7 +22,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <header className="header">
+          <h1>Trailhead Banner Generator</h1>
+        </header>
+        <main>{children}</main>
+        <footer className="footer">
+          <p>&copy; 2023 Trailhead Banner Generator</p>
+        </footer>
       </body>
     </html>
   );
