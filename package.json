@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "npm install --build-from-source"
+    "lint": "next lint"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.65",
