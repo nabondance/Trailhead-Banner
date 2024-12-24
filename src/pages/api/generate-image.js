@@ -56,9 +56,9 @@ export default async function handler(req, res) {
       const certificationsData = certificationsResponse.data.data.profile.credential;
       const badgesData = badgesResponse.data.data.profile;
 
-    //   console.log('Rank Data:', rankData);
-    //   console.log('Certifications Data:', certificationsData);
-    //   console.log('Badges Data:', badgesData);
+      //   console.log('Rank Data:', rankData);
+      //   console.log('Certifications Data:', certificationsData);
+      //   console.log('Badges Data:', badgesData);
 
       // Generate the image
       const imageUrl = await generateImage(rankData, certificationsData, badgesData);

@@ -1,5 +1,5 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
-const path  = require("path")
+const path = require('path');
 
 // Register the custom fonts
 const fontPath = path.join(process.cwd(), 'public/assets/fonts', 'Roboto-Bold.ttf');
@@ -12,9 +12,9 @@ console.log('GlobalFonts faces:', GlobalFonts.faces);
 
 export const generateImage = async (rankData, certificationsData, badgesData) => {
   console.log('Generating banner with the following data:');
-//   console.log('Rank Data:', rankData);
-//   console.log('Certifications Data:', certificationsData);
-//   console.log('Badges Data:', badgesData);
+  //   console.log('Rank Data:', rankData);
+  //   console.log('Certifications Data:', certificationsData);
+  //   console.log('Badges Data:', badgesData);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
@@ -88,7 +88,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   if (totalLogoWidth > availableWidth) {
     const scaleFactor = availableWidth / totalLogoWidth;
     console.log('Scaling logos by factor:', scaleFactor);
-    logos.forEach(logo => {
+    logos.forEach((logo) => {
       logo.logoWidth *= scaleFactor;
       logo.logoHeight *= scaleFactor;
     });

@@ -10,11 +10,15 @@ export default async function handler(req, res) {
       // console.log('GraphQL query:', query);
       // console.log('GraphQL variables:', variables);
 
-      const response = await axios.post(endpoint, { query, variables }, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await axios.post(
+        endpoint,
+        { query, variables },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       // console.log('GraphQL response:', response.data);
 

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import React, { useState } from 'react';
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 import TrailheadBanner from './TrailheadBanner';
 
 const Page = () => {
@@ -30,32 +30,36 @@ const Page = () => {
   };
 
   return (
-    <div className="container">
+    <div className='container'>
       <TrailheadBanner />
-      <form onSubmit={handleImageSubmit} className="form">
+      <form onSubmit={handleImageSubmit} className='form'>
         <input
-          type="text"
+          type='text'
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="Enter Trailhead username"
+          placeholder='Enter Trailhead username'
           required
-          className="input"
+          className='input'
         />
         {!loading && (
-          <button type="submit" className="button">Generate Banner</button>
+          <button type='submit' className='button'>
+            Generate Banner
+          </button>
         )}
       </form>
       {loading && (
-        <div className="loading-container">
+        <div className='loading-container'>
           <p>Generating the banner...</p>
-          <div className="loading-icon"></div>
+          <div className='loading-icon'></div>
         </div>
       )}
       {imageUrl && (
-        <div className="image-container">
+        <div className='image-container'>
           <h2>Generated Banner</h2>
-          <img src={imageUrl} alt="Generated" className="generated-image" />
-          <a href={imageUrl} download="trailhead-banner.png" className="download-link">Download Banner</a>
+          <img src={imageUrl} alt='Generated' className='generated-image' />
+          <a href={imageUrl} download='trailhead-banner.png' className='download-link'>
+            Download Banner
+          </a>
         </div>
       )}
       <SpeedInsights />
