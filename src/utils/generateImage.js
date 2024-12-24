@@ -142,13 +142,18 @@ export const generateImage = async (
     startX += logoWidth + logoSpacing;
   }
 
-
   // Load and draw the "By /nabondance" SVG
   const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'bynabondance.svg');
   const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
   const byNabondanceWidth = 300; // Adjust as needed
   const byNabondanceHeight = 50; // Adjust as needed
-  ctx.drawImage(byNabondanceSvg, canvas.width - byNabondanceWidth, canvas.height - byNabondanceHeight, byNabondanceWidth, byNabondanceHeight);
+  ctx.drawImage(
+    byNabondanceSvg,
+    canvas.width - byNabondanceWidth,
+    canvas.height - byNabondanceHeight,
+    byNabondanceWidth,
+    byNabondanceHeight
+  );
 
   // Convert canvas to banner
   const buffer = canvas.toBuffer('image/png');
