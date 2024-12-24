@@ -9,6 +9,7 @@ export const generateImage = async (
   rankData,
   certificationsData,
   badgesData,
+  superbadgesData,
   backgroundColor,
   backgroundImageUrl,
   displaySuperbadges
@@ -17,6 +18,7 @@ export const generateImage = async (
   console.log('Rank Data:', rankData);
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
+  console.log('Superbadges Data:', superbadgesData);
   console.log('Background Color:', backgroundColor);
   console.log('Background Image Url:', backgroundImageUrl);
   console.log('Display Superbadges:', displaySuperbadges);
@@ -61,6 +63,34 @@ export const generateImage = async (
   } catch (error) {
     console.error('Error drawing text:', error);
   }
+
+     // Display Superbadges if enabled
+  if (displaySuperbadges) {
+    const superbadgeLogos = superbadgesData.earnedAwards.edges
+      .filter(edge => edge.node.award && edge.node.award.icon)
+      .map(edge => edge.node.award.icon);
+
+    const superbadgeLogoHeight = canvas.height * (1 / 3) * 0.8; // 80% of the top 1/3 height
+    const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
+    const superbadgeSpacing = 10;
+    let superbadgeX = canvas.width * (2 / 3);
+    let superbadgeY = 20;
+
+    for (const logoUrl of superbadgeLogos) {
+      try {
+        const logo = await loadImage(logoUrl);
+        ctx.drawImage(logo, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
+        superbadgeX += superbadgeLogoWidth + superbadgeSpacing;
+        if (superbadgeX + superbadgeLogoWidth > canvas.width) {
+          superbadgeX = canvas.width * (2 / 3);
+          superbadgeY += superbadgeLogoHeight + superbadgeSpacing;
+        }
+      } catch (error) {
+        console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
+      }
+    }
+  }
+
 
   // Certifications Data
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3

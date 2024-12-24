@@ -33,6 +33,16 @@ export default async function handler(req, res) {
           filter: null,
         },
       },
+      {
+        query: GET_TRAILHEAD_BADGES,
+        variables: {
+          slug: username,
+          hasSlug: true,
+          count: 100,
+          after: null,
+          filter: "SUPERBADGE",
+        },
+      },
     ];
 
     try {
@@ -41,7 +51,7 @@ export default async function handler(req, res) {
       const url = `${protocol}://${host}/api/graphql-query`;
 
       // Perform the GraphQL queries in parallel
-      const [rankResponse, certificationsResponse, badgesResponse] = await Promise.all(
+      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse] = await Promise.all(
         graphqlQueries.map((graphqlQuery) =>
           axios.post(url, graphqlQuery, {
             headers: {
@@ -55,16 +65,17 @@ export default async function handler(req, res) {
       const rankData = rankResponse.data.data.profile.trailheadStats;
       const certificationsData = certificationsResponse.data.data.profile.credential;
       const badgesData = badgesResponse.data.data.profile;
+      const superbadgesData = superbadgesResponse.data.data.profile;
 
       //   console.log('Rank Data:', rankData);
       //   console.log('Certifications Data:', certificationsData);
       //   console.log('Badges Data:', badgesData);
 
       // Generate the image
-      const imageUrl = await generateImage(rankData, certificationsData, badgesData, backgroundColor, backgroundImageUrl, displaySuperbadges);
+      const imageUrl = await generateImage(rankData, certificationsData, badgesData, superbadgesData, backgroundColor, backgroundImageUrl, displaySuperbadges);
 
       // Send back the combined data and image URL
-      res.status(200).json({ rankData, certificationsData, badgesData, imageUrl });
+      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, imageUrl });
     } catch (error) {
       console.error('Error fetching data:', error.message);
       res.status(500).json({ error: error.message });
