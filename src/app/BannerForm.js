@@ -5,7 +5,7 @@ const BannerForm = ({ onSubmit }) => {
   const [showOptions, setShowOptions] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
   const [backgroundImage, setBackgroundImage] = useState('');
-  const [displaySuperbadges, setDisplaySuperbadges] = useState(true);
+  const [displaySuperbadges, setDisplaySuperbadges] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
