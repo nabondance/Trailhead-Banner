@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <BackgroundWave/>
+        <BackgroundWave />
         <header className='header'>
           <TrailheadBanner />
         </header>

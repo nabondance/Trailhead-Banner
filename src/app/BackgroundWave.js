@@ -1,5 +1,5 @@
 import React from 'react';
-import './BackgroundWave.css'; // Import the CSS styles for the waves
+import './BackgroundWave.css';
 
 const BackgroundWave = () => {
   return (
@@ -8,7 +8,7 @@ const BackgroundWave = () => {
         <div
           className='wave waveTop'
           style={{
-            backgroundImage: "url('/assets/background_wave-top.png')", // Adjust the path if necessary
+            backgroundImage: "url('/assets/background_wave-top.png')",
           }}
         ></div>
       </div>
