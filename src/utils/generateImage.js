@@ -5,24 +5,34 @@ const path = require('path');
 const fontPath = path.join(process.cwd(), 'public/assets/fonts', 'Roboto-Bold.ttf');
 GlobalFonts.registerFromPath(fontPath, 'CustomFont');
 
-// Log the registered fonts
-console.log('Custom fonts registered:', JSON.stringify(GlobalFonts, null, 2));
-console.log('GlobalFonts families:', GlobalFonts.families);
-console.log('GlobalFonts faces:', GlobalFonts.faces);
-
-export const generateImage = async (rankData, certificationsData, badgesData) => {
+export const generateImage = async (
+  rankData,
+  certificationsData,
+  badgesData,
+  backgroundColor,
+  backgroundImageUrl,
+  displaySuperbadges
+) => {
   console.log('Generating banner with the following data:');
-  //   console.log('Rank Data:', rankData);
-  //   console.log('Certifications Data:', certificationsData);
-  //   console.log('Badges Data:', badgesData);
+  console.log('Rank Data:', rankData);
+  console.log('Certifications Data:', certificationsData);
+  console.log('Badges Data:', badgesData);
+  console.log('Background Color:', backgroundColor);
+  console.log('Background Image:', backgroundImageUrl);
+  console.log('Display Superbadges:', displaySuperbadges);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
 
   // Background
-  ctx.fillStyle = '#f3f4f6';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (backgroundImageUrl) {
+    const bgImage = await loadImage(backgroundImageUrl);
+    ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+  } else {
+    ctx.fillStyle = backgroundColor || '#f3f4f6'; // Use the selected background color or default to #f3f4f6
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
   // Rank Data
   const rankLogoUrl = rankData.rank.imageUrl; // Assuming rankData contains imageUrl for the rank logo
