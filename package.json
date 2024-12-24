@@ -2,6 +2,7 @@
   "name": "trailhead-banner",
   "version": "0.1.0",
   "private": true,
+  "author": "nabondance",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
