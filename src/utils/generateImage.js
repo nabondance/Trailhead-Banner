@@ -18,7 +18,7 @@ export const generateImage = async (
   console.log('Certifications Data:', certificationsData);
   console.log('Badges Data:', badgesData);
   console.log('Background Color:', backgroundColor);
-  console.log('Background Image:', backgroundImageUrl);
+  console.log('Background Image Url:', backgroundImageUrl);
   console.log('Display Superbadges:', displaySuperbadges);
 
   // Create canvas and context
@@ -35,7 +35,7 @@ export const generateImage = async (
   }
 
   // Rank Data
-  const rankLogoUrl = rankData.rank.imageUrl; // Assuming rankData contains imageUrl for the rank logo
+  const rankLogoUrl = rankData.rank.imageUrl;
   console.debug('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
   const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
@@ -54,18 +54,10 @@ export const generateImage = async (
   try {
     const text1 = `${rankData.earnedBadgesCount} badges`;
     const text2 = `${badgesData.trailheadStats.superbadgeCount} superbadges`;
-    console.log('Drawing text:', text1, text2);
-
-    // Verify text metrics
-    const text1Metrics = ctx.measureText(text1);
-    const text2Metrics = ctx.measureText(text2);
-    console.log('Text1 metrics:', text1Metrics);
-    console.log('Text2 metrics:', text2Metrics);
 
     // Draw the text
     ctx.fillText(text1, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
     ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
-    console.log('Text drawn successfully');
   } catch (error) {
     console.error('Error drawing text:', error);
   }
