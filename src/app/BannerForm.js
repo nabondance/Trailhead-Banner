@@ -33,7 +33,7 @@ const BannerForm = ({ onSubmit }) => {
             <input type='color' value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} />
           </label>
           <label>
-            Background Image URL:
+            Background Image URL (1584x396):
             <input
               type='text'
               value={backgroundImageUrl}
