@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from 'next/font/google';
+import Image from 'next/image';
 import './globals.css';
 import TrailheadBanner from './TrailheadBanner';
 
@@ -27,8 +28,8 @@ export default function RootLayout({ children }) {
         <main>{children}</main>
         <footer className='footer'>
           <a href='https://github.com/nabondance' target='_blank' rel='noopener noreferrer' className='footer-link'>
-            &copy; 2024 Trailhead-Banner By <img src='/github-logo.svg' alt='GitHub' className='github-logo' />
-            /nabondance
+            &copy; 2024 Trailhead-Banner By{' '}
+            <Image src='/github-logo.svg' alt='GitHub' className='github-logo' width={20} height={20} /> /nabondance
           </a>
         </footer>
       </body>
