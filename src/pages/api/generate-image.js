@@ -40,7 +40,7 @@ export default async function handler(req, res) {
           hasSlug: true,
           count: 100,
           after: null,
-          filter: "SUPERBADGE",
+          filter: 'SUPERBADGE',
         },
       },
     ];
@@ -72,7 +72,15 @@ export default async function handler(req, res) {
       //   console.log('Badges Data:', badgesData);
 
       // Generate the image
-      const imageUrl = await generateImage(rankData, certificationsData, badgesData, superbadgesData, backgroundColor, backgroundImageUrl, displaySuperbadges);
+      const imageUrl = await generateImage(
+        rankData,
+        certificationsData,
+        badgesData,
+        superbadgesData,
+        backgroundColor,
+        backgroundImageUrl,
+        displaySuperbadges
+      );
 
       // Send back the combined data and image URL
       res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, imageUrl });

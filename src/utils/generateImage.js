@@ -64,7 +64,7 @@ export const generateImage = async (
     console.error('Error drawing text:', error);
   }
 
-     // Display Superbadges if enabled
+  // Display Superbadges if enabled
   if (displaySuperbadges) {
     const superbadgeLogos = superbadgesData.earnedAwards.edges
       .filter(edge => edge.node.award && edge.node.award.icon)
@@ -72,9 +72,18 @@ export const generateImage = async (
 
     const superbadgeLogoHeight = canvas.height * (1 / 3) * 0.8; // 80% of the top 1/3 height
     const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
-    const superbadgeSpacing = 10;
-    let superbadgeX = canvas.width * (2 / 3);
+    let superbadgeSpacing = 10;
+    const availableWidth = canvas.width * (2 / 3); // Available width for superbadges
+    let superbadgeX = canvas.width - availableWidth;
     let superbadgeY = 20;
+
+    // Calculate total width required for superbadges
+    const totalSuperbadgeWidth = superbadgeLogos.length * (superbadgeLogoWidth + superbadgeSpacing) - superbadgeSpacing;
+
+    // Adjust spacing if total width exceeds available space
+    if (totalSuperbadgeWidth > availableWidth) {
+      superbadgeSpacing = (availableWidth - superbadgeLogos.length * superbadgeLogoWidth) / (superbadgeLogos.length - 1);
+    }
 
     for (const logoUrl of superbadgeLogos) {
       try {
@@ -82,7 +91,7 @@ export const generateImage = async (
         ctx.drawImage(logo, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
         superbadgeX += superbadgeLogoWidth + superbadgeSpacing;
         if (superbadgeX + superbadgeLogoWidth > canvas.width) {
-          superbadgeX = canvas.width * (2 / 3);
+          superbadgeX = canvas.width - availableWidth;
           superbadgeY += superbadgeLogoHeight + superbadgeSpacing;
         }
       } catch (error) {
@@ -90,7 +99,6 @@ export const generateImage = async (
       }
     }
   }
-
 
   // Certifications Data
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
