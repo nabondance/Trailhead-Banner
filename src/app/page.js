@@ -4,14 +4,13 @@ import React, { useState } from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
+import BannerForm from './BannerForm';
 
 const Page = () => {
-  const [username, setUsername] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleImageSubmit = async (e) => {
-    e.preventDefault();
+  const handleImageSubmit = async ({ username, backgroundColor, backgroundImage, displaySuperbadges }) => {
     setLoading(true);
     setImageUrl('');
     const response = await fetch('/api/generate-image', {
@@ -19,7 +18,7 @@ const Page = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username }),
+      body: JSON.stringify({ username, backgroundColor, backgroundImage, displaySuperbadges }),
     });
     const data = await response.json();
     console.log('Rank Data:', data.rankData);
@@ -31,21 +30,7 @@ const Page = () => {
 
   return (
     <div className='container'>
-      <form onSubmit={handleImageSubmit} className='form'>
-        <input
-          type='text'
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder='Enter Trailhead username'
-          required
-          className='input'
-        />
-        {!loading && (
-          <button type='submit' className='button'>
-            Generate Banner
-          </button>
-        )}
-      </form>
+      <BannerForm onSubmit={handleImageSubmit} />
       {loading && (
         <div className='loading-container'>
           <p>Generating the banner...</p>
@@ -54,7 +39,7 @@ const Page = () => {
       )}
       {imageUrl && (
         <div className='image-container'>
-          <h2>Generated Banner</h2>
+          <h2>Generated Banner:</h2>
           <img src={imageUrl} alt='Generated' className='generated-image' />
           <a href={imageUrl} download='trailhead-banner.png' className='download-link'>
             Download Banner
