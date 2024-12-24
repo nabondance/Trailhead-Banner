@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 50" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+  </defs>
+  <rect x="80" y="10" width="250" height="40" style="stroke-opacity: 0.9; fill: rgb(179, 179, 179);"/>
+  <ellipse style="fill: rgb(179, 179, 179);" cx="80" cy="50" rx="40" ry="40" id="object-0"/>
+  <text style="fill: rgb(51, 51, 51); font-family: Anta; font-size: 28px; white-space: pre;" x="70" y="40">By /nabondance</text>
+</svg>

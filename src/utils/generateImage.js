@@ -2,8 +2,10 @@ const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const path = require('path');
 
 // Register the custom fonts
-const fontPath = path.join(process.cwd(), 'public/assets/fonts', 'Roboto-Bold.ttf');
-GlobalFonts.registerFromPath(fontPath, 'CustomFont');
+const fontPathRobotoBold = path.join(process.cwd(), 'public/assets/fonts', 'Roboto-Bold.ttf');
+GlobalFonts.registerFromPath(fontPathRobotoBold, 'Roboto-Bold');
+const fontPathAnta = path.join(process.cwd(), 'public/assets/fonts', 'Anta.woff2');
+GlobalFonts.registerFromPath(fontPathAnta, 'Anta');
 
 export const generateImage = async (
   rankData,
@@ -48,7 +50,7 @@ export const generateImage = async (
 
   // Set font and text color
   ctx.fillStyle = textColor || '#111827'; // Use the custom text color or default one
-  ctx.font = '36px CustomFont'; // Use the custom font
+  ctx.font = '36px Roboto-Bold'; // Use the custom font
   console.log('Font set to:', ctx.font);
 
   // Check if the font is available
@@ -139,6 +141,14 @@ export const generateImage = async (
     ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
     startX += logoWidth + logoSpacing;
   }
+
+
+  // Load and draw the "By /nabondance" SVG
+  const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'bynabondance.svg');
+  const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
+  const byNabondanceWidth = 300; // Adjust as needed
+  const byNabondanceHeight = 50; // Adjust as needed
+  ctx.drawImage(byNabondanceSvg, canvas.width - byNabondanceWidth, canvas.height - byNabondanceHeight, byNabondanceWidth, byNabondanceHeight);
 
   // Convert canvas to banner
   const buffer = canvas.toBuffer('image/png');
