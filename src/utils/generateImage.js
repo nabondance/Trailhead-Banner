@@ -69,6 +69,7 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
   let totalLogoWidth = 0;
   const logos = [];
 
+  // Load logos and calculate total width
   for (const cert of certificationsData.certifications) {
     if (cert.logoUrl) {
       try {
@@ -84,22 +85,17 @@ export const generateImage = async (rankData, certificationsData, badgesData) =>
     }
   }
 
-  // Adjust logo sizes if total width exceeds available width
-  if (totalLogoWidth > availableWidth) {
-    const scaleFactor = availableWidth / totalLogoWidth;
-    console.log('Scaling logos by factor:', scaleFactor);
-    logos.forEach((logo) => {
-      logo.logoWidth *= scaleFactor;
-      logo.logoHeight *= scaleFactor;
-    });
-  }
+  // Remove the last spacing
+  totalLogoWidth -= logoSpacing;
 
-  // Draw logos
-  let logoXPosition = 20; // Starting X position
-  logos.forEach(({ logo, logoWidth, logoHeight }) => {
-    ctx.drawImage(logo, logoXPosition, logoYPosition, logoWidth, logoHeight);
-    logoXPosition += logoWidth + logoSpacing;
-  });
+  // Calculate starting X position to center the logos
+  let startX = (canvas.width - totalLogoWidth) / 2;
+
+  // Draw logos centered
+  for (const { logo, logoWidth, logoHeight } of logos) {
+    ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
+    startX += logoWidth + logoSpacing;
+  }
 
   // Convert canvas to banner
   const buffer = canvas.toBuffer('image/png');
