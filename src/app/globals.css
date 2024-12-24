@@ -140,3 +140,28 @@ body {
   height: 24px;
   vertical-align: middle;
 }
+
+
+.tutorial {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: left; /* Align text to the left */
+}
+
+.tutorial h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  color: #0073b1;
+}
+
+.tutorial ol {
+  padding-left: 20px;
+  list-style-type: decimal; /* Ensure list items are numbered */
+}
+
+.tutorial li {
+  margin-bottom: 10px;
+}
