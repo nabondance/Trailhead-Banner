@@ -59,9 +59,9 @@ const Page = () => {
           <a href={imageUrl} download='trailhead-banner.png' className='download-link'>
             Download Banner
           </a>
+          <LinkedInBannerTutorial />
         </div>
       )}
-      <LinkedInBannerTutorial />
       <SpeedInsights />
       <Analytics />
     </div>
