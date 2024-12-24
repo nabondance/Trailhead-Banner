@@ -10,11 +10,13 @@ const Page = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleImageSubmit = async ({ username, backgroundColor, backgroundImageUrl, displaySuperbadges }) => {
+  const handleImageSubmit = async ({ username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor }) => {
     console.log('Generating image for:', username);
     console.log('Background Color:', backgroundColor);
     console.log('Background Image URL:', backgroundImageUrl);
     console.log('Display Superbadges:', displaySuperbadges);
+    console.log('Text Color:', textColor);
+
     setLoading(true);
     setImageUrl('');
     const response = await fetch('/api/generate-image', {
@@ -22,7 +24,7 @@ const Page = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, backgroundColor, backgroundImageUrl, displaySuperbadges }),
+      body: JSON.stringify({ username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor }),
     });
     const data = await response.json();
     console.log('Rank Data:', data.rankData);

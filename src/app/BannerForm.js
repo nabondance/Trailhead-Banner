@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import Image from 'next/image';
-import LinkedInBannerTutorial from './LinkedInBannerTutorial';
+
 const BannerForm = ({ onSubmit }) => {
   const [username, setUsername] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
+  const [textColor, setTextColor] = useState('#111827');
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
-  const [displaySuperbadges, setDisplaySuperbadges] = useState(true);
+  const [displaySuperbadges, setDisplaySuperbadges] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ username, backgroundColor, backgroundImageUrl, displaySuperbadges });
+    onSubmit({ username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor });
   };
 
   return (
@@ -40,6 +40,10 @@ const BannerForm = ({ onSubmit }) => {
               onChange={(e) => setBackgroundImageUrl(e.target.value)}
               placeholder='Enter image URL'
             />
+          </label>
+          <label>
+            Text Color:
+            <input type='color' value={textColor} onChange={(e) => setTextColor(e.target.value)} />
           </label>
           <label>
             Display Superbadges:

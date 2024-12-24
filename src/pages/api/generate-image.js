@@ -6,7 +6,7 @@ import { generateImage } from '../../utils/generateImage';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { username, backgroundColor, backgroundImageUrl, displaySuperbadges } = req.body;
+    const { username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor } = req.body;
 
     const graphqlQueries = [
       {
@@ -79,11 +79,12 @@ export default async function handler(req, res) {
         superbadgesData,
         backgroundColor,
         backgroundImageUrl,
-        displaySuperbadges
+        displaySuperbadges,
+        textColor
       );
 
       // Send back the combined data and image URL
-      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, imageUrl });
+      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, imageUrl, textColor });
     } catch (error) {
       console.error('Error fetching data:', error.message);
       res.status(500).json({ error: error.message });

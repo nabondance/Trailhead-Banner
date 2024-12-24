@@ -12,7 +12,8 @@ export const generateImage = async (
   superbadgesData,
   backgroundColor,
   backgroundImageUrl,
-  displaySuperbadges
+  displaySuperbadges,
+  textColor
 ) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
@@ -22,6 +23,7 @@ export const generateImage = async (
   console.log('Background Color:', backgroundColor);
   console.log('Background Image Url:', backgroundImageUrl);
   console.log('Display Superbadges:', displaySuperbadges);
+  console.log('Text Color:', textColor);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
@@ -45,7 +47,7 @@ export const generateImage = async (
   ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
 
   // Set font and text color
-  ctx.fillStyle = '#111827';
+  ctx.fillStyle = textColor || '#111827'; // Use the custom text color or default one
   ctx.font = '36px CustomFont'; // Use the custom font
   console.log('Font set to:', ctx.font);
 
@@ -67,8 +69,8 @@ export const generateImage = async (
   // Display Superbadges if enabled
   if (displaySuperbadges) {
     const superbadgeLogos = superbadgesData.earnedAwards.edges
-      .filter(edge => edge.node.award && edge.node.award.icon)
-      .map(edge => edge.node.award.icon);
+      .filter((edge) => edge.node.award && edge.node.award.icon)
+      .map((edge) => edge.node.award.icon);
 
     const superbadgeLogoHeight = canvas.height * (1 / 3) * 0.8; // 80% of the top 1/3 height
     const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
@@ -82,7 +84,8 @@ export const generateImage = async (
 
     // Adjust spacing if total width exceeds available space
     if (totalSuperbadgeWidth > availableWidth) {
-      superbadgeSpacing = (availableWidth - superbadgeLogos.length * superbadgeLogoWidth) / (superbadgeLogos.length - 1);
+      superbadgeSpacing =
+        (availableWidth - superbadgeLogos.length * superbadgeLogoWidth) / (superbadgeLogos.length - 1);
     }
 
     for (const logoUrl of superbadgeLogos) {
@@ -104,7 +107,7 @@ export const generateImage = async (
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
   const availableWidth = canvas.width - 40; // Leave some padding on the sides
   const logoSpacing = 10; // Space between logos
-  const maxLogoHeight = canvas.height * (2 / 3) * 0.85; // 85% of the bottom 2/3 height
+  const maxLogoHeight = canvas.height * (2 / 3) * 0.80; // 80% of the bottom 2/3 height
 
   let totalLogoWidth = 0;
   const logos = [];
