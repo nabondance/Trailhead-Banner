@@ -6,7 +6,7 @@ import { generateImage } from '../../utils/generateImage';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { username } = req.body;
+    const { username, backgroundColor, backgroundImageUrl, displaySuperbadges } = req.body;
 
     const graphqlQueries = [
       {
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
       //   console.log('Badges Data:', badgesData);
 
       // Generate the image
-      const imageUrl = await generateImage(rankData, certificationsData, badgesData);
+      const imageUrl = await generateImage(rankData, certificationsData, badgesData, backgroundColor, backgroundImageUrl, displaySuperbadges);
 
       // Send back the combined data and image URL
       res.status(200).json({ rankData, certificationsData, badgesData, imageUrl });

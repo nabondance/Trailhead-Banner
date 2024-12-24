@@ -11,6 +11,10 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
 
   const handleImageSubmit = async ({ username, backgroundColor, backgroundImageUrl, displaySuperbadges }) => {
+    console.log('Generating image for:', username);
+    console.log('Background Color:', backgroundColor);
+    console.log('Background Image URL:', backgroundImageUrl);
+    console.log('Display Superbadges:', displaySuperbadges);
     setLoading(true);
     setImageUrl('');
     const response = await fetch('/api/generate-image', {
