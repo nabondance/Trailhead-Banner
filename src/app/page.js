@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
-import TrailheadBanner from './TrailheadBanner';
 
 const Page = () => {
   const [username, setUsername] = useState('');
@@ -31,7 +30,6 @@ const Page = () => {
 
   return (
     <div className='container'>
-      <TrailheadBanner />
       <form onSubmit={handleImageSubmit} className='form'>
         <input
           type='text'

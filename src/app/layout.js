@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import TrailheadBanner from './TrailheadBanner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -21,7 +22,7 @@ export default function RootLayout({ children }) {
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <header className='header'>
-          <h1>Trailhead Banner Generator</h1>
+          <TrailheadBanner />
         </header>
         <main>{children}</main>
         <footer className='footer'>
