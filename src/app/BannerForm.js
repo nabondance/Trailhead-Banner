@@ -25,6 +25,10 @@ const BannerForm = ({ onSubmit }) => {
         placeholder='Enter Trailhead username'
         required
         className='input'
+        name='trailhead-username'
+        autoComplete='off'
+        data-lpignore='true' // LastPass specific attribute to ignore
+        data-form-type='other'
       />
       <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
         {showOptions ? 'Hide Options' : 'More Options'}
