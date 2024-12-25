@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import Image from 'next/image';
 import './globals.css';
 import TrailheadBannerHeader from './TrailheadBannerHeader';
+import TrailheadBannerFooter from './TrailheadBannerFooter';
 import BackgroundWave from './BackgroundWave';
 
 const geistSans = Geist({
@@ -29,10 +30,7 @@ export default function RootLayout({ children }) {
         </header>
         <main>{children}</main>
         <footer className='footer'>
-          <a href='https://github.com/nabondance' target='_blank' rel='noopener noreferrer' className='footer-link'>
-            &copy; 2024 Trailhead-Banner By{' '}
-            <Image src='/github-logo.svg' alt='GitHub' className='github-logo' width={20} height={20} /> /nabondance
-          </a>
+          <TrailheadBannerFooter />
         </footer>
       </body>
     </html>
