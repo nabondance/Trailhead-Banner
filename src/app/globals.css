@@ -103,7 +103,9 @@ body {
   font-weight: bold; /* Make text bold */
   padding: 15px; /* Increase padding */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Add shadow */
-  transition: background-color 0.3s, transform 0.3s;
+  transition:
+    background-color 0.3s,
+    transform 0.3s;
 }
 
 .submit-button:hover {
