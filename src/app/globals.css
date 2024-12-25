@@ -54,6 +54,33 @@ body {
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
+  background: var(--background);
+}
+
+.options {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--middleground);
+  background: var(--middleground);
+}
+
+.options label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.options input[type='color'] {
+  margin-left: 10px;
+}
+.options input[type='text'] {
+  margin-left: 10px;
+  background: var(--background);
+  width: 50%;
+}
+.options input[type='checkbox'] {
+  margin-left: 10px;
 }
 
 .button {
@@ -210,23 +237,4 @@ body {
 .tutorial a:hover {
   color: #005582; /* Darker blue for hover effect */
   text-decoration: none;
-}
-
-.options {
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background-color: var(--middleground);
-}
-
-.options label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.options input[type='color'],
-.options input[type='text'],
-.options input[type='checkbox'] {
-  margin-left: 10px;
 }
