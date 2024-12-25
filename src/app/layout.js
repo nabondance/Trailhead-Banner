@@ -1,5 +1,4 @@
 import { Geist, Geist_Mono } from 'next/font/google';
-import Image from 'next/image';
 import './globals.css';
 import TrailheadBannerHeader from './TrailheadBannerHeader';
 import TrailheadBannerFooter from './TrailheadBannerFooter';
