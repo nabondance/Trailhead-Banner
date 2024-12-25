@@ -25,7 +25,7 @@
   --primary: #48cfcb;
   --secondary: #229799;
   --foreground: #424242;
-  --highlight: #ffcc00;
+  --highlight: #ff914d;
   --border: #424242;
   --text-dark: #424242;
   --text-light: #f5f5f5;
@@ -215,12 +215,12 @@ body {
 .trailhead-banner-header {
   display: flex;
   align-items: center;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Modern gradient background */
+  background: var(--foreground);
   padding: 20px;
   text-align: center;
   color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-  border-bottom: 2px solid #ff7e5f; /* Thin border or separator line */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid var(--highlight);
 }
 
 .logo-container {
