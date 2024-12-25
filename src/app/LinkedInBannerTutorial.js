@@ -15,7 +15,6 @@ const LinkedInBannerTutorial = () => {
         </li>{' '}
         <li>Click on the pencil icon on the banner image.</li>
         <li>Click on "Change photo" and upload the new banner image you have generated.</li>
-        <li>Adjust the positioning of the image if necessary and click "Apply".</li>
         <li>Click "Save".</li>
       </ol>
     </div>
