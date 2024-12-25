@@ -4,9 +4,9 @@ const BannerForm = ({ onSubmit }) => {
   const [username, setUsername] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
-  const [textColor, setTextColor] = useState('#111827');
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
-  const [displaySuperbadges, setDisplaySuperbadges] = useState(false);
+  const [displaySuperbadges, setDisplaySuperbadges] = useState(true);
+  const [textColor, setTextColor] = useState('#111827'); // Default text color
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,8 +23,8 @@ const BannerForm = ({ onSubmit }) => {
         required
         className='input'
       />
-      <button type='button' className='button' onClick={() => setShowOptions(!showOptions)}>
-        More Options
+      <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
+        {showOptions ? 'Hide Options' : 'More Options'}
       </button>
       {showOptions && (
         <div className='options'>
@@ -39,6 +39,7 @@ const BannerForm = ({ onSubmit }) => {
               value={backgroundImageUrl}
               onChange={(e) => setBackgroundImageUrl(e.target.value)}
               placeholder='Enter image URL'
+              className='input-url'
             />
           </label>
           <label>
@@ -55,7 +56,7 @@ const BannerForm = ({ onSubmit }) => {
           </label>
         </div>
       )}
-      <button type='submit' className='button'>
+      <button type='submit' className='button submit-button'>
         Generate Banner
       </button>
     </form>

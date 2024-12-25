@@ -43,29 +43,75 @@ body {
   margin: 0 auto;
   padding: 20px;
 }
-
 .form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .input {
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--background);
+  transition: border-color 0.3s;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.input-url {
+  background: var(--input-url-bg); /* Background color for URL input field */
+}
+
+.button {
+  padding: 12px;
+  font-size: 16px;
+  color: var(--text-light);
+  background-color: var(--primary);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: var(--secondary);
+}
+
+.more-options-button {
+  background-color: var(--secondary);
+}
+
+.more-options-button:hover {
+  background-color: var(--primary);
+}
+
+.submit-button {
+  background-color: var(--primary);
+}
+
+.submit-button:hover {
+  background-color: var(--secondary);
 }
 
 .options {
-  margin-top: 10px;
-  padding: 10px;
+  margin-top: 0px;
+  padding: 15px;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  background-color: var(--middleground);
-  background: var(--middleground);
+  border-radius: 8px;
+  background-color: var(--options-bg); /* Use the light shade of primary color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .options label {
@@ -73,16 +119,21 @@ body {
   margin-bottom: 10px;
 }
 
-.options input[type='color'] {
-  margin-left: 10px;
-}
-.options input[type='text'] {
-  margin-left: 10px;
-  background: var(--background);
-  width: 50%;
-}
+.options input[type='color'],
+.options input[type='text'],
 .options input[type='checkbox'] {
   margin-left: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .button {
