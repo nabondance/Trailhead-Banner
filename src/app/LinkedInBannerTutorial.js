@@ -7,9 +7,9 @@ const LinkedInBannerTutorial = () => {
       <ol>
         <li>Log in to your LinkedIn account.</li>
         <li>
-          Go to your profile by clicking{' '}
+          Go to your{' '}
           <a href='https://www.linkedin.com/in/me/' target='_blank' rel='noopener noreferrer'>
-            here
+            profile
           </a>
           .
         </li>{' '}
