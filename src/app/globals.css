@@ -25,6 +25,7 @@
   --primary: #48cfcb;
   --secondary: #229799;
   --foreground: #424242;
+  --highlight: #ffcc00;
   --border: #424242;
   --text-dark: #424242;
   --text-light: #f5f5f5;
@@ -98,10 +99,16 @@ body {
 
 .submit-button {
   background-color: var(--primary);
+  font-size: 18px; /* Increase font size */
+  font-weight: bold; /* Make text bold */
+  padding: 15px; /* Increase padding */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Add shadow */
+  transition: background-color 0.3s, transform 0.3s;
 }
 
 .submit-button:hover {
   background-color: var(--secondary);
+  transform: scale(1.05); /* Slightly increase size on hover */
 }
 
 .options {

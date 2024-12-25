@@ -7,10 +7,13 @@ const BannerForm = ({ onSubmit }) => {
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
   const [displaySuperbadges, setDisplaySuperbadges] = useState(true);
   const [textColor, setTextColor] = useState('#111827'); // Default text color
+  const [isGenerating, setIsGenerating] = useState(false); // State to manage button visibility
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor });
+    setIsGenerating(true); // Hide the button when clicked
+    await onSubmit({ username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor });
+    setIsGenerating(false); // Show the button again when the banner is generated
   };
 
   return (
@@ -56,9 +59,11 @@ const BannerForm = ({ onSubmit }) => {
           </label>
         </div>
       )}
-      <button type='submit' className='button submit-button'>
-        Generate Banner
-      </button>
+      {!isGenerating && (
+        <button type='submit' className='button submit-button'>
+          Generate Banner
+        </button>
+      )}
     </form>
   );
 };
