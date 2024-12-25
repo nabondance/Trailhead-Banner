@@ -20,8 +20,12 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F5F5F5;
+  --middleground: #F5F5F5;
+  --primary: #48CFCB;
+  --secondary: #229799;
+  --foreground: #424242;
+  --border: #424242;
 }
 
 body {
@@ -48,7 +52,7 @@ body {
 .input {
   padding: 10px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 4px;
 }
 
@@ -56,14 +60,14 @@ body {
   padding: 10px;
   font-size: 16px;
   color: #fff;
-  background-color: #0073b1;
+  background-color: var(--primary);
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
 .button:hover {
-  background-color: #005582;
+  background-color: var(--secondary);
 }
 
 .loading-container {
@@ -76,7 +80,7 @@ body {
 .loading-icon {
   width: 24px;
   height: 24px;
-  border: 4px solid #ccc;
+  border: 4px solid var(--border);
   border-top: 4px solid #0073b1;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -99,7 +103,7 @@ body {
 .generated-image {
   max-width: 100%;
   height: auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 4px;
 }
 
@@ -109,14 +113,14 @@ body {
   padding: 10px;
   font-size: 16px;
   color: #fff;
-  background-color: #0073b1;
+  background-color: var(--primary);
   border: none;
   border-radius: 4px;
   text-decoration: none;
 }
 
 .download-link:hover {
-  background-color: #005582;
+  background-color: var(--secondary);
 }
 
 .trailhead-banner-header {
@@ -174,10 +178,11 @@ body {
 }
 
 .tutorial {
-  margin-top: 40px;
+  margin-top: 20px;
+  margin-bottom: 40px;
   padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
+  background-color: var(--middleground);
+  border: 1px solid var(--border);
   border-radius: 4px;
   text-align: left; /* Align text to the left */
 }
@@ -210,9 +215,9 @@ body {
 .options {
   margin-top: 10px;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 4px;
-  background-color: #f9f9f9;
+  background-color: var(--middleground);
 }
 
 .options label {
