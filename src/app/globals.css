@@ -213,12 +213,22 @@ body {
 }
 
 .trailhead-banner-header {
+  display: flex;
+  align-items: center;
   background: linear-gradient(90deg, #ff7e5f, #feb47b); /* Modern gradient background */
   padding: 20px;
   text-align: center;
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
   border-bottom: 2px solid #ff7e5f; /* Thin border or separator line */
+}
+
+.logo-container {
+  margin-right: 20px;
+}
+
+.header-content {
+  flex: 1;
 }
 
 .trailhead-banner-header h1 {
@@ -231,11 +241,6 @@ body {
   margin: 0;
   font-size: 1.5em; /* Larger font size for the options */
   font-weight: 500; /* Medium weight for the options */
-}
-
-.trailhead-banner-header .highlight {
-  font-weight: bold; /* Bold text for important options */
-  color: #ffcc00; /* Accent color for important options */
 }
 
 .footer {
