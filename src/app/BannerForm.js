@@ -47,6 +47,9 @@ const BannerForm = ({ onSubmit }) => {
               onChange={(e) => setBackgroundImageUrl(e.target.value)}
               placeholder='Enter image URL'
               className='input-url'
+              autoComplete='off'
+              data-lpignore='true' // LastPass specific attribute to ignore
+              data-form-type='other'
             />
           </label>
           <label>
