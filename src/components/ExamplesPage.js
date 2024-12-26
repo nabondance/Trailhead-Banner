@@ -58,7 +58,7 @@ const ExamplesPage = () => {
             height={400}
             onClick={() => handleImageClick('/assets/examples/example4.png')}
           />
-          <p>Banner without superbadges displayed</p>
+          <p>Banner with custom background image from the internet</p>
         </div>
         <div className='example-card'>
           <Image
@@ -68,7 +68,7 @@ const ExamplesPage = () => {
             height={400}
             onClick={() => handleImageClick('/assets/examples/example5.png')}
           />
-          <p>Banner with custom background image from the internet</p>
+          <p>Banner without superbadges displayed</p>
         </div>
       </div>
 
