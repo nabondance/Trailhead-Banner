@@ -5,7 +5,7 @@ const BackgroundLibraryPage = () => {
   return (
     <div className='background-library-container'>
       <h1>Background Library</h1>
-        <p>Choose from a variety of backgrounds for your LinkedIn banner</p>
+      <p>Choose from a variety of backgrounds for your LinkedIn banner</p>
       <div className='background-library'>
         <img src='/path/to/example1.png' alt='Example 1' />
         <p>Description for Example 1</p>
