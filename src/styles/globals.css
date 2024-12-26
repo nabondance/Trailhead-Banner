@@ -375,6 +375,13 @@ body {
   gap: 20px;
 }
 
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .examples-grid {
+    grid-template-columns: 1fr; /* One item per line on mobile */
+  }
+}
+
 .example-card {
   padding: 30px;
   border: 1px solid var(--border);
