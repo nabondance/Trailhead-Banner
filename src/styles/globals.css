@@ -211,7 +211,7 @@ body {
   background-color: var(--secondary);
 }
 
-.header, .footer {
+.header {
   padding: 20px;
   background-color: #f5f5f5;
 }
