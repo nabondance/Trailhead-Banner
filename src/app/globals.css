@@ -166,18 +166,18 @@ body {
 }
 
 .loading-icon {
-  width: 8rem;
-  height: 8rem;
-  border-top: 8px solid var(--primary);
-  border-right: 8px solid transparent;
-  border-radius: 50%;
-  animation: spin 2s linear infinite;
+    width: 75px;
+    height: 75px;
+    display: inline-block;
+    border-width: 5px;
+    border-color: var(--primary);
+    border-top-color: var(--secondary);
+    animation: spin 1s infinite linear;
+    border-radius: 100%;
+    border-style: solid;
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
   100% {
     transform: rotate(360deg);
   }
