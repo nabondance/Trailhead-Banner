@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Mulish } from 'next/font/google';
+import { Geist, Geist_Mono, Inter } from 'next/font/google';
 import './globals.css';
 import TrailheadBannerHeader from './TrailheadBannerHeader';
 import TrailheadBannerFooter from './TrailheadBannerFooter';
@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-const MulishFont = Mulish({
-  variable: '--font-mulish',
-  subsets: ['latin'],
+const InterFont = Inter({
+  variable: '--font-inter',
+  weights: [400, 500, 600, 700],
 });
 
 export const metadata = {
