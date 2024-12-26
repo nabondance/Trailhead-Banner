@@ -28,11 +28,11 @@ export default function RootLayout({ children }) {
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* <BackgroundWave /> */}
-        <header className={`header`}>
+        <header className='header'>
           <TrailheadBannerHeader />
         </header>
         <main>{children}</main>
-        <footer className={`footer`}>
+        <footer className='footer' style={{ backgroundColor: 'red', padding: '20px' }}>
           <TrailheadBannerFooter />
         </footer>
       </body>

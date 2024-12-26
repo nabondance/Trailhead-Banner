@@ -13,10 +13,10 @@ const TrailheadBannerHeader = () => {
         <p>Generate your LinkedIn Banner with your Trailhead data</p>
         <nav className='header-nav'>
           <Link href='/'>
-            <a>Home</a>
+           Home
           </Link>
           <Link href='/examples'>
-            <a>Examples</a>
+            Examples
           </Link>
         </nav>
       </div>
