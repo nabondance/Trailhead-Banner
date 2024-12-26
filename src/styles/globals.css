@@ -310,3 +310,21 @@ body {
   color: #005582; /* Darker blue for hover effect */
   text-decoration: none;
 }
+
+.examples-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.example {
+  margin-bottom: 20px;
+}
+
+.example img {
+  max-width: 100%;
+  height: auto;
+}
+
+.example p {
+  margin-top: 10px;
+}

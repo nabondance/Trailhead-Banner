@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
-import './globals.css';
-import TrailheadBannerHeader from './TrailheadBannerHeader';
-import TrailheadBannerFooter from './TrailheadBannerFooter';
-import BackgroundWave from './BackgroundWave';
+import '../styles/globals.css';
+import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
+import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
+import BackgroundWave from '../components/BackgroundWave';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

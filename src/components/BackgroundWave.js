@@ -1,5 +1,5 @@
 import React from 'react';
-import './BackgroundWave.css';
+import '../styles/BackgroundWave.css';
 
 const BackgroundWave = () => {
   return (

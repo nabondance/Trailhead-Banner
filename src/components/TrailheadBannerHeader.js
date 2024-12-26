@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import './globals.css';
+import '../styles/globals.css';
 
 const TrailheadBannerHeader = () => {
   return (
