@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import '../styles/globals.css';
 
 const TrailheadBannerHeader = () => {
@@ -10,6 +11,14 @@ const TrailheadBannerHeader = () => {
       <div className='header-content'>
         <h1>Welcome to Trailhead-Banner</h1>
         <p>Generate your LinkedIn Banner with your Trailhead data</p>
+        <nav className='header-nav'>
+          <Link href='/'>
+            <a>Home</a>
+          </Link>
+          <Link href='/examples'>
+            <a>Examples</a>
+          </Link>
+        </nav>
       </div>
     </div>
   );

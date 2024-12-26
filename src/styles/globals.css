@@ -166,15 +166,15 @@ body {
 }
 
 .loading-icon {
-    width: 75px;
-    height: 75px;
-    display: inline-block;
-    border-width: 5px;
-    border-color: var(--primary);
-    border-top-color: var(--secondary);
-    animation: spin 1s infinite linear;
-    border-radius: 100%;
-    border-style: solid;
+  width: 75px;
+  height: 75px;
+  display: inline-block;
+  border-width: 5px;
+  border-color: var(--primary);
+  border-top-color: var(--secondary);
+  animation: spin 1s infinite linear;
+  border-radius: 100%;
+  border-style: solid;
 }
 
 @keyframes spin {
@@ -214,20 +214,33 @@ body {
 .trailhead-banner-header {
   display: flex;
   align-items: center;
-  background: var(--foreground);
+  justify-content: space-between;
   padding: 20px;
-  text-align: center;
-  color: var(--text-light);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid var(--highlight);
+  background-color: #f5f5f5;
 }
 
 .logo-container {
-  margin-right: 20px;
+  flex-shrink: 0;
 }
 
 .header-content {
-  flex: 1;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.header-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.header-nav a {
+  text-decoration: none;
+  color: #0070f3;
+  font-weight: bold;
+}
+
+.header-nav a:hover {
+  text-decoration: underline;
 }
 
 .trailhead-banner-header h1 {
@@ -265,6 +278,10 @@ body {
 
 .footer-link:hover {
   text-decoration: underline;
+}
+
+.logo-container {
+  margin-right: 20px;
 }
 
 .github-logo {
