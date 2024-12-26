@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
+import '../styles/globals.css';
 
 const MainPage = () => {
   const [imageUrl, setImageUrl] = useState('');
