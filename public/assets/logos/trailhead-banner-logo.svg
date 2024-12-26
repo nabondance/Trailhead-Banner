@@ -24,9 +24,8 @@
     </g>
   </g>
   <text style="fill: rgb(255, 255, 255); font-family: Anta; font-size: 80px; text-anchor: middle; white-space: pre;" x="250" y="330">Trailhead</text>
-  <text style="fill: rgb(255, 255, 255); font-family: Anta; font-size: 80px; text-anchor: middle; white-space: pre;" x="250" y="400">Banner</text>
+  <text style="fill: rgb(255, 255, 255); font-family: Anta; font-size: 80px; text-anchor: middle; white-space: pre;" x="250" y="395">Banner</text>
   <defs>
-    <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
     <g/>
     <clipPath id="abf0630374">
       <path d="M 16.75 4.003906 L 358.25 4.003906 L 358.25 370.851562 L 16.75 370.851562 Z M 16.75 4.003906 " clip-rule="nonzero"/>
