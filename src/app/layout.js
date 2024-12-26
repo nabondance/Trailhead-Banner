@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Mulish } from 'next/font/google';
 import './globals.css';
 import TrailheadBannerHeader from './TrailheadBannerHeader';
 import TrailheadBannerFooter from './TrailheadBannerFooter';
@@ -11,6 +11,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
+
+const MulishFont = Mulish({
+  variable: '--font-mulish',
   subsets: ['latin'],
 });
 
@@ -28,7 +33,7 @@ export default function RootLayout({ children }) {
           <TrailheadBannerHeader />
         </header>
         <main>{children}</main>
-        <footer className='footer'>
+        <footer className={`footer`}>
           <TrailheadBannerFooter />
         </footer>
       </body>

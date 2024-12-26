@@ -245,6 +245,7 @@ body {
 .footer {
   background-color: #f1f1f1;
   color: var(--text-dark);
+  font-family: Mulish;
   padding: 10px;
   text-align: center;
   position: fixed;
