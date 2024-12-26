@@ -294,6 +294,7 @@ body {
 .tutorial ol {
   padding-left: 20px;
   list-style-type: decimal; /* Ensure list items are numbered */
+  margin-bottom: -20px;
 }
 
 .tutorial li {
