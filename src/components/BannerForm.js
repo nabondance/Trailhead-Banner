@@ -9,8 +9,36 @@ const BannerForm = ({ onSubmit }) => {
   const [includeExpiredCertifications, setIncludeExpiredCertifications] = useState(false);
   const [includeRetiredCertifications, setIncludeRetiredCertifications] = useState(false);
   const [textColor, setTextColor] = useState('#111827'); // Default text color
-  const [isGenerating, setIsGenerating] = useState(false); // State to manage button visibility
-  const [backgroundImageUrlError, setBackgroundImageUrlError] = useState(''); // New state for error message
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+
+  const validateUsername = async (username) => {
+    if (!username) {
+      setUsernameError('Enter an username');
+      return false;
+    }
+
+    try {
+      const response = await fetch(`/api/validate-username?username=${username}`);
+      const data = await response.json();
+      if (data.valid) {
+        setUsernameError('');
+        return true;
+      } else {
+        setUsernameError(data.message); // Display the message from the API
+        return false;
+      }
+    } catch (error) {
+      console.error('Error validating username:', error);
+      setUsernameError('Failed to validate username');
+      return false;
+    }
+  };
+
+  const handleUsernameBlur = async () => {
+    await validateUsername(username);
+  };
 
   const handleUrlChange = (e) => {
     const url = e.target.value;
@@ -47,8 +75,9 @@ const BannerForm = ({ onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
+    const isValidUsername = await validateUsername(username);
     const isValidImageUrl = await validateImageUrl(backgroundImageUrl);
-    if (isValidImageUrl) {
+    if (isValidUsername && isValidImageUrl) {
       await onSubmit({
         username,
         backgroundColor,
@@ -68,6 +97,7 @@ const BannerForm = ({ onSubmit }) => {
         type='text'
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        onBlur={handleUsernameBlur} // Add onBlur event to validate username
         placeholder='Enter Trailhead username'
         required
         className='input'
@@ -76,6 +106,7 @@ const BannerForm = ({ onSubmit }) => {
         data-lpignore='true' // LastPass specific attribute to ignore
         data-form-type='other'
       />
+      {usernameError && <p className='error-message'>{usernameError}</p>}
       <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
         {showOptions ? 'Hide Options' : 'More Options'}
       </button>
