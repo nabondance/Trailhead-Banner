@@ -114,8 +114,11 @@ export const generateImage = async (
   let totalLogoWidth = 0;
   const logos = [];
 
+  // Filter certifications to include only those that are not expired
+  const validCertifications = certificationsData.certifications.filter(cert => cert.status.expired === false);
+
   // Load logos and calculate total width
-  for (const cert of certificationsData.certifications) {
+  for (const cert of validCertifications) {
     if (cert.logoUrl) {
       try {
         console.log('Loading certification logo from URL:', cert.logoUrl);
@@ -145,8 +148,8 @@ export const generateImage = async (
   // Load and draw the "By /nabondance" SVG
   const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'bynabondance.svg');
   const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
-  const byNabondanceWidth = 300; // Adjust as needed
-  const byNabondanceHeight = 50; // Adjust as needed
+  const byNabondanceWidth = 300;
+  const byNabondanceHeight = 50;
   ctx.drawImage(
     byNabondanceSvg,
     canvas.width - byNabondanceWidth,
