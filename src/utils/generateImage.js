@@ -69,12 +69,17 @@ export const generateImage = async (
 
   // Draw text
   try {
-    const text1 = `${rankData.earnedBadgesCount} badges`;
-    const text2 = `${badgesData.trailheadStats.superbadgeCount} superbadges`;
+    const badgeCount = rankData.earnedBadgesCount;
+    const superbadgeCount = badgesData.trailheadStats.superbadgeCount;
+
+    const text1 = `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}`;
+    const text2 = superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
 
     // Draw the text
     ctx.fillText(text1, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
-    ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+    if (text2) {
+      ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+    }
   } catch (error) {
     console.error('Error drawing text:', error);
   }
