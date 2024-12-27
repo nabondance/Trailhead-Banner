@@ -10,19 +10,42 @@ const BannerForm = ({ onSubmit }) => {
   const [includeRetiredCertifications, setIncludeRetiredCertifications] = useState(false);
   const [textColor, setTextColor] = useState('#111827'); // Default text color
   const [isGenerating, setIsGenerating] = useState(false); // State to manage button visibility
+  const [backgroundImageUrlError, setBackgroundImageUrlError] = useState(''); // New state for error message
+
+  const validateImageUrl = async (url) => {
+    try {
+      console.log('Validating image URL:', url);
+      const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+      console.log('Response:', response);
+      if (response.ok && response.headers.get('content-type').startsWith('image/')) {
+        setBackgroundImageUrlError('');
+        return true;
+      } else {
+        setBackgroundImageUrlError('Invalid image URL');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error validating image URL:', error);
+      setBackgroundImageUrlError('Failed to fetch the image URL');
+      return false;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
-    await onSubmit({
-      username,
-      backgroundColor,
-      backgroundImageUrl,
-      displaySuperbadges,
-      textColor,
-      includeExpiredCertifications,
-      includeRetiredCertifications,
-    });
+    const isValidImageUrl = await validateImageUrl(backgroundImageUrl);
+    if (isValidImageUrl) {
+      await onSubmit({
+        username,
+        backgroundColor,
+        backgroundImageUrl,
+        displaySuperbadges,
+        textColor,
+        includeExpiredCertifications,
+        includeRetiredCertifications,
+      });
+    }
     setIsGenerating(false); // Show the button again when the banner is generated
   };
 
@@ -61,6 +84,7 @@ const BannerForm = ({ onSubmit }) => {
               data-lpignore='true' // LastPass specific attribute to ignore
               data-form-type='other'
             />
+            {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
           </label>
           <label>
             Text Color:
