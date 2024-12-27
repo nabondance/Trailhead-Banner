@@ -6,7 +6,8 @@ const BannerForm = ({ onSubmit }) => {
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
   const [displaySuperbadges, setDisplaySuperbadges] = useState(true);
-  const [includeExpiredCertifications, setIncludeExpiredCertifications] = useState(false); // New state
+  const [includeExpiredCertifications, setIncludeExpiredCertifications] = useState(false);
+  const [includeRetiredCertifications, setIncludeRetiredCertifications] = useState(false);
   const [textColor, setTextColor] = useState('#111827'); // Default text color
   const [isGenerating, setIsGenerating] = useState(false); // State to manage button visibility
 
@@ -20,7 +21,8 @@ const BannerForm = ({ onSubmit }) => {
       displaySuperbadges,
       textColor,
       includeExpiredCertifications,
-    }); // Pass the new state
+      includeRetiredCertifications,
+    });
     setIsGenerating(false); // Show the button again when the banner is generated
   };
 
@@ -78,6 +80,14 @@ const BannerForm = ({ onSubmit }) => {
               type='checkbox'
               checked={includeExpiredCertifications}
               onChange={(e) => setIncludeExpiredCertifications(e.target.checked)}
+            />
+          </label>
+          <label>
+            Include Retired Certifications:
+            <input
+              type='checkbox'
+              checked={includeRetiredCertifications}
+              onChange={(e) => setIncludeRetiredCertifications(e.target.checked)}
             />
           </label>
         </div>

@@ -19,6 +19,7 @@ const MainPage = () => {
     displaySuperbadges,
     textColor,
     includeExpiredCertifications,
+    includeRetiredCertifications,
   }) => {
     console.log('Generating image for:', username);
     console.log('Background Color:', backgroundColor);
@@ -41,7 +42,8 @@ const MainPage = () => {
         displaySuperbadges,
         textColor,
         includeExpiredCertifications,
-      }), // Pass the new parameter
+        includeRetiredCertifications, // Pass the new parameter
+      }),
     });
     const data = await response.json();
     console.log('Rank Data:', data.rankData);

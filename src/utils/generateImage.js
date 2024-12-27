@@ -28,7 +28,8 @@ export const generateImage = async (
   backgroundImageUrl,
   displaySuperbadges,
   textColor,
-  includeExpiredCertifications // New parameter
+  includeExpiredCertifications, // Existing parameter
+  includeRetiredCertifications // New parameter
 ) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
@@ -124,9 +125,11 @@ export const generateImage = async (
   let totalLogoWidth = 0;
   const certificationsLogos = [];
 
-  // Filter certifications based on the includeExpiredCertifications flag
+  // Filter certifications based on the includeExpiredCertifications and includeRetiredCertifications flags
   const certifications = certificationsData.certifications.filter(
-    (cert) => includeExpiredCertifications || cert.status.expired === false
+    (cert) =>
+      (includeExpiredCertifications || cert.status.expired === false) &&
+      (includeRetiredCertifications || cert.status.title !== 'Retired')
   );
 
   // Load logos and calculate total width
@@ -138,7 +141,13 @@ export const generateImage = async (
         const logoHeight = maxLogoHeight;
         const logoWidth = (logo.width / logo.height) * logoHeight; // Maintain aspect ratio
         totalLogoWidth += logoWidth + logoSpacing;
-        certificationsLogos.push({ logo, logoWidth, logoHeight, expired: cert.status.expired });
+        certificationsLogos.push({
+          logo,
+          logoWidth,
+          logoHeight,
+          expired: cert.status.expired,
+          retired: cert.status.title == 'Retired',
+        });
       } catch (error) {
         console.error(`Error loading logo for ${cert.title}:`, error);
       }
@@ -152,10 +161,16 @@ export const generateImage = async (
   let startX = (canvas.width - totalLogoWidth) / 2;
 
   // Draw logos centered
-  for (const { logo, logoWidth, logoHeight, expired } of certificationsLogos) {
-    ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
+  for (const { logo, logoWidth, logoHeight, expired, retired } of certificationsLogos) {
     if (expired) {
+      ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
       applyGrayscale(ctx, startX, logoYPosition, logoWidth, logoHeight); // Apply grayscale for expired certifications
+    } else if (retired) {
+      ctx.globalAlpha = 0.5; // Set transparency for retired certifications
+      ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
+    } else {
+      ctx.globalAlpha = 1.0; // Reset transparency
+      ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
     }
     startX += logoWidth + logoSpacing;
   }
@@ -165,6 +180,7 @@ export const generateImage = async (
   const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
   const byNabondanceWidth = 300;
   const byNabondanceHeight = 50;
+  ctx.globalAlpha = 1.0; // Reset transparency
   ctx.drawImage(
     byNabondanceSvg,
     canvas.width - byNabondanceWidth,

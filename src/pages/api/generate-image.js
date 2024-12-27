@@ -13,6 +13,7 @@ export default async function handler(req, res) {
       displaySuperbadges,
       textColor,
       includeExpiredCertifications,
+      includeRetiredCertifications, // New parameter
     } = req.body;
 
     const graphqlQueries = [
@@ -88,7 +89,8 @@ export default async function handler(req, res) {
         backgroundImageUrl,
         displaySuperbadges,
         textColor,
-        includeExpiredCertifications // Pass the new parameter
+        includeExpiredCertifications, // Existing parameter
+        includeRetiredCertifications // Pass the new parameter
       );
 
       // Send back the combined data and image URL

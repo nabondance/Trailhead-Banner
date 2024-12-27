@@ -70,6 +70,16 @@ const ExamplesPage = () => {
           />
           <p>Banner without superbadges displayed</p>
         </div>
+        <div className='example-card'>
+          <Image
+            src='/assets/examples/example6.png'
+            alt='Example 6'
+            width={600}
+            height={400}
+            onClick={() => handleImageClick('/assets/examples/example6.png')}
+          />
+          <p>Banner displaying expired certifications (grey) and retired certifications (faded)</p>
+        </div>
       </div>
 
       {fullscreenImage && (
