@@ -6,13 +6,21 @@ const BannerForm = ({ onSubmit }) => {
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
   const [displaySuperbadges, setDisplaySuperbadges] = useState(true);
+  const [includeExpiredCertifications, setIncludeExpiredCertifications] = useState(false); // New state
   const [textColor, setTextColor] = useState('#111827'); // Default text color
   const [isGenerating, setIsGenerating] = useState(false); // State to manage button visibility
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
-    await onSubmit({ username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor });
+    await onSubmit({
+      username,
+      backgroundColor,
+      backgroundImageUrl,
+      displaySuperbadges,
+      textColor,
+      includeExpiredCertifications,
+    }); // Pass the new state
     setIsGenerating(false); // Show the button again when the banner is generated
   };
 
@@ -62,6 +70,14 @@ const BannerForm = ({ onSubmit }) => {
               type='checkbox'
               checked={displaySuperbadges}
               onChange={(e) => setDisplaySuperbadges(e.target.checked)}
+            />
+          </label>
+          <label>
+            Include Expired Certifications:
+            <input
+              type='checkbox'
+              checked={includeExpiredCertifications}
+              onChange={(e) => setIncludeExpiredCertifications(e.target.checked)}
             />
           </label>
         </div>

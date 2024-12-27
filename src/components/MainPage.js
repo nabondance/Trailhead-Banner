@@ -18,12 +18,14 @@ const MainPage = () => {
     backgroundImageUrl,
     displaySuperbadges,
     textColor,
+    includeExpiredCertifications,
   }) => {
     console.log('Generating image for:', username);
     console.log('Background Color:', backgroundColor);
     console.log('Background Image URL:', backgroundImageUrl);
     console.log('Display Superbadges:', displaySuperbadges);
     console.log('Text Color:', textColor);
+    console.log('Include Expired Certifications:', includeExpiredCertifications); // Log the new parameter
 
     setLoading(true);
     setImageUrl('');
@@ -32,7 +34,14 @@ const MainPage = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, backgroundColor, backgroundImageUrl, displaySuperbadges, textColor }),
+      body: JSON.stringify({
+        username,
+        backgroundColor,
+        backgroundImageUrl,
+        displaySuperbadges,
+        textColor,
+        includeExpiredCertifications,
+      }), // Pass the new parameter
     });
     const data = await response.json();
     console.log('Rank Data:', data.rankData);

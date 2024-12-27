@@ -7,6 +7,18 @@ GlobalFonts.registerFromPath(fontPathRobotoBold, 'Roboto-Bold');
 const fontPathAnta = path.join(process.cwd(), 'public/assets/fonts', 'Anta.woff2');
 GlobalFonts.registerFromPath(fontPathAnta, 'Anta');
 
+const applyGrayscale = (ctx, x, y, width, height) => {
+  const imageData = ctx.getImageData(x, y, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    data[i] = avg; // Red
+    data[i + 1] = avg; // Green
+    data[i + 2] = avg; // Blue
+  }
+  ctx.putImageData(imageData, x, y);
+};
+
 export const generateImage = async (
   rankData,
   certificationsData,
@@ -15,7 +27,8 @@ export const generateImage = async (
   backgroundColor,
   backgroundImageUrl,
   displaySuperbadges,
-  textColor
+  textColor,
+  includeExpiredCertifications // New parameter
 ) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
@@ -52,9 +65,6 @@ export const generateImage = async (
   ctx.fillStyle = textColor || '#111827'; // Use the custom text color or default one
   ctx.font = '36px Roboto-Bold'; // Use the custom font
   console.log('Font set to:', ctx.font);
-
-  // Check if the font is available
-  console.log('Available fonts:', GlobalFonts.families[0]);
 
   // Draw text
   try {
@@ -112,13 +122,15 @@ export const generateImage = async (
   const maxLogoHeight = canvas.height * (2 / 3) * 0.8; // 80% of the bottom 2/3 height
 
   let totalLogoWidth = 0;
-  const logos = [];
+  const certificationsLogos = [];
 
-  // Filter certifications to include only those that are not expired
-  const validCertifications = certificationsData.certifications.filter(cert => cert.status.expired === false);
+  // Filter certifications based on the includeExpiredCertifications flag
+  const certifications = certificationsData.certifications.filter(
+    (cert) => includeExpiredCertifications || cert.status.expired === false
+  );
 
   // Load logos and calculate total width
-  for (const cert of validCertifications) {
+  for (const cert of certifications) {
     if (cert.logoUrl) {
       try {
         console.log('Loading certification logo from URL:', cert.logoUrl);
@@ -126,7 +138,7 @@ export const generateImage = async (
         const logoHeight = maxLogoHeight;
         const logoWidth = (logo.width / logo.height) * logoHeight; // Maintain aspect ratio
         totalLogoWidth += logoWidth + logoSpacing;
-        logos.push({ logo, logoWidth, logoHeight });
+        certificationsLogos.push({ logo, logoWidth, logoHeight, expired: cert.status.expired });
       } catch (error) {
         console.error(`Error loading logo for ${cert.title}:`, error);
       }
@@ -140,8 +152,11 @@ export const generateImage = async (
   let startX = (canvas.width - totalLogoWidth) / 2;
 
   // Draw logos centered
-  for (const { logo, logoWidth, logoHeight } of logos) {
+  for (const { logo, logoWidth, logoHeight, expired } of certificationsLogos) {
     ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
+    if (expired) {
+      applyGrayscale(ctx, startX, logoYPosition, logoWidth, logoHeight); // Apply grayscale for expired certifications
+    }
     startX += logoWidth + logoSpacing;
   }
 
