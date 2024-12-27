@@ -12,7 +12,20 @@ const BannerForm = ({ onSubmit }) => {
   const [isGenerating, setIsGenerating] = useState(false); // State to manage button visibility
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState(''); // New state for error message
 
+  const handleUrlChange = (e) => {
+    const url = e.target.value;
+    setBackgroundImageUrl(url);
+    if (!url) {
+      setBackgroundImageUrlError(''); // Clear error message if input is emptied
+    }
+  };
+
   const validateImageUrl = async (url) => {
+    if (!url) {
+      setBackgroundImageUrlError('');
+      return true;
+    }
+
     try {
       console.log('Validating image URL:', url);
       const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
@@ -77,7 +90,7 @@ const BannerForm = ({ onSubmit }) => {
             <input
               type='text'
               value={backgroundImageUrl}
-              onChange={(e) => setBackgroundImageUrl(e.target.value)}
+              onChange={handleUrlChange}
               placeholder='Enter image URL'
               className='input-url'
               autoComplete='off'
