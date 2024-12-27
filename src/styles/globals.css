@@ -62,6 +62,7 @@ body {
   border-radius: 4px;
   background: var(--background);
   transition: border-color 0.3s;
+  flex: 1; /* Make the input take the remaining space */
 }
 
 .input:focus {
@@ -142,6 +143,43 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+
+.username-validation {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%; /* Make the container take full width */
+}
+
+.validation-icon {
+  margin-left: 10px;
+  position: relative;
+}
+
+.validation-icon .icon {
+  font-size: 20px;
+}
+
+.validation-icon[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  z-index: 10;
 }
 
 .button {

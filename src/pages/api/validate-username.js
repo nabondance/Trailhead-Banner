@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   const { username } = req.query;
 
   if (!username) {
-    return res.status(400).json({ valid: false, message: 'Username is required' });
+    return res.status(400).json({ valid: false, state: 'invalid', message: 'Username is required' });
   }
 
   try {
@@ -27,16 +27,16 @@ export default async function handler(req, res) {
     const responseData = response.data;
 
     if (responseData.errors) {
-      return res.status(200).json({ valid: false, message: 'Trailhead profile does not exist' });
+      return res.status(200).json({ valid: false, state: 'invalid', message: 'Trailhead profile does not exist' });
     }
 
     if (responseData.data.profile.__typename === 'PrivateProfile') {
-      return res.status(200).json({ valid: false, message: 'Trailhead profile is private' });
+      return res.status(200).json({ valid: false, state: 'private', message: 'Trailhead profile is private' });
     }
 
-    return res.status(200).json({ valid: true });
+    return res.status(200).json({ valid: true, state: 'ok', message: 'Username is valid' });
   } catch (error) {
     console.error('Error validating username:', error);
-    return res.status(500).json({ valid: false, message: 'Internal server error' });
+    return res.status(500).json({ valid: false, state: 'invalid', message: 'Internal server error' });
   }
 }

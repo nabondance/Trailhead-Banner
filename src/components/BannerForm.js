@@ -12,16 +12,19 @@ const BannerForm = ({ onSubmit }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [usernameError, setUsernameError] = useState('');
+  const [validationResult, setValidationResult] = useState(null);
 
   const validateUsername = async (username) => {
     if (!username) {
       setUsernameError('Enter an username');
+      setValidationResult({ valid: false, state: 'invalid', message: 'Enter an username' });
       return false;
     }
 
     try {
       const response = await fetch(`/api/validate-username?username=${username}`);
       const data = await response.json();
+      setValidationResult(data);
       if (data.valid) {
         setUsernameError('');
         return true;
@@ -32,6 +35,7 @@ const BannerForm = ({ onSubmit }) => {
     } catch (error) {
       console.error('Error validating username:', error);
       setUsernameError('Failed to validate username');
+      setValidationResult({ valid: false, state: 'invalid', message: 'Failed to validate username' });
       return false;
     }
   };
@@ -93,20 +97,32 @@ const BannerForm = ({ onSubmit }) => {
 
   return (
     <form onSubmit={handleSubmit} className='form'>
-      <input
-        type='text'
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onBlur={handleUsernameBlur} // Add onBlur event to validate username
-        placeholder='Enter Trailhead username'
-        required
-        className='input'
-        name='trailhead-username'
-        autoComplete='off'
-        data-lpignore='true' // LastPass specific attribute to ignore
-        data-form-type='other'
-      />
-      {usernameError && <p className='error-message'>{usernameError}</p>}
+      <div className='input-container'>
+        <input
+          type='text'
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          onBlur={handleUsernameBlur} // Add onBlur event to validate username
+          placeholder='Enter Trailhead username'
+          required
+          className='input'
+          name='trailhead-username'
+          autoComplete='off'
+          data-lpignore='true' // LastPass specific attribute to ignore
+          data-form-type='other'
+        />
+        {validationResult && (
+          <div className='validation-icon' data-tooltip={validationResult.message}>
+            {validationResult.state === 'ok' ? (
+              <span className='icon success'>&#x2714;</span> // Green checkmark
+            ) : validationResult.state === 'private' ? (
+              <span className='icon warning'>&#x26A0;</span> // Yellow warning
+            ) : (
+              <span className='icon error'>&#x2716;</span> // Red cross
+            )}
+          </div>
+        )}
+      </div>
       <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
         {showOptions ? 'Hide Options' : 'More Options'}
       </button>
