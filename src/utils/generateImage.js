@@ -19,6 +19,74 @@ const applyGrayscale = (ctx, x, y, width, height) => {
   ctx.putImageData(imageData, x, y);
 };
 
+const cropImage = (image) => {
+  const tempCanvas = createCanvas(image.width, image.height);
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.drawImage(image, 0, 0);
+
+  const imageData = tempCtx.getImageData(0, 0, image.width, image.height);
+  const data = imageData.data;
+
+  let top = 0, bottom = image.height, left = 0, right = image.width;
+
+  // Find top boundary
+  for (let y = 0; y < image.height; y++) {
+    for (let x = 0; x < image.width; x++) {
+      const alpha = data[(y * image.width + x) * 4 + 3];
+      if (alpha > 0) {
+        top = y;
+        break;
+      }
+    }
+    if (top > 0) break;
+  }
+
+  // Find bottom boundary
+  for (let y = image.height - 1; y >= 0; y--) {
+    for (let x = 0; x < image.width; x++) {
+      const alpha = data[(y * image.width + x) * 4 + 3];
+      if (alpha > 0) {
+        bottom = y;
+        break;
+      }
+    }
+    if (bottom < image.height) break;
+  }
+
+  // Find left boundary
+  for (let x = 0; x < image.width; x++) {
+    for (let y = 0; y < image.height; y++) {
+      const alpha = data[(y * image.width + x) * 4 + 3];
+      if (alpha > 0) {
+        left = x;
+        break;
+      }
+    }
+    if (left > 0) break;
+  }
+
+  // Find right boundary
+  for (let x = image.width - 1; x >= 0; x--) {
+    for (let y = 0; y < image.height; y++) {
+      const alpha = data[(y * image.width + x) * 4 + 3];
+      if (alpha > 0) {
+        right = x;
+        break;
+      }
+    }
+    if (right < image.width) break;
+  }
+
+  const croppedWidth = right - left + 1;
+  const croppedHeight = bottom - top + 1;
+
+  const croppedCanvas = createCanvas(croppedWidth, croppedHeight);
+  const croppedCtx = croppedCanvas.getContext('2d');
+  croppedCtx.drawImage(image, -left, -top);
+
+  return croppedCanvas;
+};
+
 export const generateImage = async (
   rankData,
   certificationsData,
@@ -124,7 +192,7 @@ export const generateImage = async (
   // Certifications Data
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
   const availableWidth = canvas.width - 40; // Leave some padding on the sides
-  const logoSpacing = 10; // Space between logos
+  let logoSpacing = 10; // Space between logos
   const maxLogoHeight = canvas.height * (2 / 3) * 0.8; // 80% of the bottom 2/3 height
 
   let totalLogoWidth = 0;
@@ -142,7 +210,8 @@ export const generateImage = async (
     if (cert.logoUrl) {
       try {
         console.log('Loading certification logo from URL:', cert.logoUrl);
-        const logo = await loadImage(cert.logoUrl);
+        let logo = await loadImage(cert.logoUrl);
+        logo = cropImage(logo); // Crop the logo to remove extra space
         const logoHeight = maxLogoHeight;
         const logoWidth = (logo.width / logo.height) * logoHeight; // Maintain aspect ratio
         totalLogoWidth += logoWidth + logoSpacing;
@@ -162,10 +231,31 @@ export const generateImage = async (
   // Remove the last spacing
   totalLogoWidth -= logoSpacing;
 
+  // Calculate total width required for logos
+  totalLogoWidth = certificationsLogos.reduce((acc, { logoWidth }) => acc + logoWidth + logoSpacing, -logoSpacing);
+
+  // Adjust spacing if total width exceeds available space
+  if (totalLogoWidth > availableWidth) {
+    const excessWidth = totalLogoWidth - availableWidth;
+    const newSpacing = Math.max(0, logoSpacing - excessWidth / (certificationsLogos.length - 1));
+    totalLogoWidth = certificationsLogos.reduce((acc, { logoWidth }) => acc + logoWidth + newSpacing, -newSpacing);
+    logoSpacing = newSpacing;
+  }
+
+  // Scale down logos if total width still exceeds available width
+  if (totalLogoWidth > availableWidth) {
+    const scaleFactor = availableWidth / totalLogoWidth;
+    certificationsLogos.forEach((cert) => {
+      cert.logoWidth *= scaleFactor;
+      cert.logoHeight *= scaleFactor;
+    });
+    totalLogoWidth = availableWidth;
+  }
+
   // Calculate starting X position to center the logos
   let startX = (canvas.width - totalLogoWidth) / 2;
 
-  // Draw logos centered
+  // Draw logos centered with a small space between them
   for (const { logo, logoWidth, logoHeight, expired, retired } of certificationsLogos) {
     if (expired) {
       ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
@@ -178,6 +268,11 @@ export const generateImage = async (
       ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
     }
     startX += logoWidth + logoSpacing;
+
+    // Ensure logos do not go out of the image
+    if (startX + logoWidth > canvas.width) {
+      startX = canvas.width - logoWidth - logoSpacing;
+    }
   }
 
   // Load and draw the "By /nabondance" SVG
