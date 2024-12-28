@@ -27,7 +27,10 @@ const cropImage = (image) => {
   const imageData = tempCtx.getImageData(0, 0, image.width, image.height);
   const data = imageData.data;
 
-  let top = 0, bottom = image.height, left = 0, right = image.width;
+  let top = 0,
+    bottom = image.height,
+    left = 0,
+    right = image.width;
 
   // Find top boundary
   for (let y = 0; y < image.height; y++) {
