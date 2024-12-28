@@ -41,7 +41,12 @@ const BannerForm = ({ onSubmit }) => {
   };
 
   const handleUsernameBlur = async () => {
-    await validateUsername(username);
+    if (!username) {
+      setValidationResult(null); // Clear validation result if username is empty
+      setUsernameError(''); // Clear username error
+    } else {
+      await validateUsername(username);
+    }
   };
 
   const handleUrlChange = (e) => {
