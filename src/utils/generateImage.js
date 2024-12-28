@@ -1,94 +1,7 @@
-const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
-
-// Register the custom fonts
-const fontPathRobotoBold = path.join(process.cwd(), 'public/assets/fonts', 'Roboto-Bold.ttf');
-GlobalFonts.registerFromPath(fontPathRobotoBold, 'Roboto-Bold');
-const fontPathAnta = path.join(process.cwd(), 'public/assets/fonts', 'Anta.woff2');
-GlobalFonts.registerFromPath(fontPathAnta, 'Anta');
-
-const applyGrayscale = (ctx, x, y, width, height) => {
-  const imageData = ctx.getImageData(x, y, width, height);
-  const data = imageData.data;
-  for (let i = 0; i < data.length; i += 4) {
-    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-    data[i] = avg; // Red
-    data[i + 1] = avg; // Green
-    data[i + 2] = avg; // Blue
-  }
-  ctx.putImageData(imageData, x, y);
-};
-
-const cropImage = (image) => {
-  const tempCanvas = createCanvas(image.width, image.height);
-  const tempCtx = tempCanvas.getContext('2d');
-  tempCtx.drawImage(image, 0, 0);
-
-  const imageData = tempCtx.getImageData(0, 0, image.width, image.height);
-  const data = imageData.data;
-
-  let top = 0,
-    bottom = image.height,
-    left = 0,
-    right = image.width;
-
-  // Find top boundary
-  for (let y = 0; y < image.height; y++) {
-    for (let x = 0; x < image.width; x++) {
-      const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
-        top = y;
-        break;
-      }
-    }
-    if (top > 0) break;
-  }
-
-  // Find bottom boundary
-  for (let y = image.height - 1; y >= 0; y--) {
-    for (let x = 0; x < image.width; x++) {
-      const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
-        bottom = y;
-        break;
-      }
-    }
-    if (bottom < image.height) break;
-  }
-
-  // Find left boundary
-  for (let x = 0; x < image.width; x++) {
-    for (let y = 0; y < image.height; y++) {
-      const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
-        left = x;
-        break;
-      }
-    }
-    if (left > 0) break;
-  }
-
-  // Find right boundary
-  for (let x = image.width - 1; x >= 0; x--) {
-    for (let y = 0; y < image.height; y++) {
-      const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
-        right = x;
-        break;
-      }
-    }
-    if (right < image.width) break;
-  }
-
-  const croppedWidth = right - left + 1;
-  const croppedHeight = bottom - top + 1;
-
-  const croppedCanvas = createCanvas(croppedWidth, croppedHeight);
-  const croppedCtx = croppedCanvas.getContext('2d');
-  croppedCtx.drawImage(image, -left, -top);
-
-  return croppedCanvas;
-};
+const { applyGrayscale, cropImage } = require('./imageUtils');
+require('./fonts');
 
 export const generateImage = async (
   rankData,
@@ -99,8 +12,8 @@ export const generateImage = async (
   backgroundImageUrl,
   displaySuperbadges,
   textColor,
-  includeExpiredCertifications, // Existing parameter
-  includeRetiredCertifications // New parameter
+  includeExpiredCertifications,
+  includeRetiredCertifications
 ) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
@@ -111,6 +24,8 @@ export const generateImage = async (
   console.log('Background Image Url:', backgroundImageUrl);
   console.log('Display Superbadges:', displaySuperbadges);
   console.log('Text Color:', textColor);
+    console.log('Include Expired Certifications:', includeExpiredCertifications);
+    console.log('Include Retired Certifications:', includeRetiredCertifications);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
