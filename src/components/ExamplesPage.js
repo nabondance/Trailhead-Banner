@@ -80,6 +80,16 @@ const ExamplesPage = () => {
           />
           <p>Banner displaying expired certifications (grey) and retired certifications (faded)</p>
         </div>
+        <div className='example-card'>
+          <Image
+            src='/assets/examples/example7.png'
+            alt='Example 7'
+            width={600}
+            height={400}
+            onClick={() => handleImageClick('/assets/examples/example7.png')}
+          />
+          <p>Banner displaying many certifications</p>
+        </div>
       </div>
 
       {fullscreenImage && (
