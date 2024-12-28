@@ -88,7 +88,17 @@ const ExamplesPage = () => {
             height={400}
             onClick={() => handleImageClick('/assets/examples/example7.png')}
           />
-          <p>Banner displaying many certifications</p>
+          <p>Banner of a 10x certified</p>
+        </div>
+        <div className='example-card'>
+          <Image
+            src='/assets/examples/example8.png'
+            alt='Example 8'
+            width={600}
+            height={400}
+            onClick={() => handleImageClick('/assets/examples/example8.png')}
+          />
+          <p>Banner of a 15x certified</p>
         </div>
       </div>
 
