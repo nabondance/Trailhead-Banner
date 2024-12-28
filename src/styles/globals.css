@@ -232,6 +232,13 @@ body {
   border-style: solid;
 }
 
+.loading-container p {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
 @keyframes spin {
   100% {
     transform: rotate(360deg);

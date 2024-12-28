@@ -28,8 +28,8 @@ const MainPage = () => {
     console.log('Text Color:', textColor);
     console.log('Include Expired Certifications:', includeExpiredCertifications); // Log the new parameter
 
+    setImageUrl(''); // Clear the previously generated banner
     setLoading(true);
-    setImageUrl('');
     const response = await fetch('/api/generate-image', {
       method: 'POST',
       headers: {
