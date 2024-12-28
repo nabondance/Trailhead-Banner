@@ -110,7 +110,7 @@ const BannerForm = ({ onSubmit }) => {
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username'
           required
-          className='input'
+          className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
           name='trailhead-username'
           autoComplete='off'
           data-lpignore='true' // LastPass specific attribute to ignore
