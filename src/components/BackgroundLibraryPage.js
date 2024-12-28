@@ -5,32 +5,24 @@ import Image from 'next/image';
 import '../styles/globals.css';
 
 const BannerCard = ({ src, alt, description, onClick }) => (
-    <div className='example-card'>
-      <Image
-        src={src}
-        alt={alt}
-        width={600}
-        height={400}
-        onClick={() => onClick(src)}
-      />
-      <p>{description}</p>
-    </div>
-  );
+  <div className='example-card'>
+    <Image src={src} alt={alt} width={600} height={400} onClick={() => onClick(src)} />
+    <p>{description}</p>
+  </div>
+);
 
 const BackgroundLibraryPage = () => {
-    const [fullscreenImage, setFullscreenImage] = useState(null);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
-    const handleImageClick = (src) => {
-        setFullscreenImage(src);
-      };
+  const handleImageClick = (src) => {
+    setFullscreenImage(src);
+  };
 
-      const handleOverlayClick = () => {
-        setFullscreenImage(null);
-      };
+  const handleOverlayClick = () => {
+    setFullscreenImage(null);
+  };
 
-    const banners = [
-        { src: '/assets/banner-library/banner1.png', alt: 'Banner 1', description: 'Banner 1' },
-      ];
+  const banners = [{ src: '/assets/banner-library/banner1.png', alt: 'Banner 1', description: 'Banner 1' }];
 
   return (
     <div className='background-library-container'>
