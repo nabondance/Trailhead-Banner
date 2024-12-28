@@ -37,12 +37,14 @@ const ExamplesPage = () => {
     { src: '/assets/examples/example6.png', alt: 'Example 6', description: 'Banner displaying expired certifications (grey) and retired certifications (faded)' },
     { src: '/assets/examples/example7.png', alt: 'Example 7', description: 'Banner of a 10x certified' },
     { src: '/assets/examples/example8.png', alt: 'Example 8', description: 'Banner of a 15x certified' },
+    { src: '/assets/examples/example9.png', alt: 'Example 9', description: 'Banner with many superbadges' },
   ];
 
   return (
     <div className='examples-container'>
       <h1>Examples</h1>
-      <h2>Check out some examples of LinkedIn banners generated with Trailhead-Banner</h2>
+      <h2>Check out some examples of LinkedIn banners generated with Trailhead-Banner.</h2>
+        <h3>Click on image to see in fullscreen.</h3>
       <div className='examples-grid'>
         {examples.map((example, index) => (
           <ExampleCard
