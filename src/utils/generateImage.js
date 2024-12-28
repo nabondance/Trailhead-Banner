@@ -24,8 +24,8 @@ export const generateImage = async (
   console.log('Background Image Url:', backgroundImageUrl);
   console.log('Display Superbadges:', displaySuperbadges);
   console.log('Text Color:', textColor);
-    console.log('Include Expired Certifications:', includeExpiredCertifications);
-    console.log('Include Retired Certifications:', includeRetiredCertifications);
+  console.log('Include Expired Certifications:', includeExpiredCertifications);
+  console.log('Include Retired Certifications:', includeRetiredCertifications);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
