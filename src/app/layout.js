@@ -33,9 +33,7 @@ export default function RootLayout({ children }) {
           <TrailheadBannerHeader />
         </header>
         <main>{children}</main>
-        <footer className='footer'>
-          <TrailheadBannerFooter />
-        </footer>
+        <TrailheadBannerFooter />
       </body>
     </html>
   );
