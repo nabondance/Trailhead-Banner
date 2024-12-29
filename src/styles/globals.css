@@ -281,9 +281,9 @@ body {
 
 .submit-button {
   background-color: var(--primary);
-  font-size: 18px;
+  font-size: 30px;
   font-weight: bold;
-  padding: 15px;
+  padding: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition:
     background-color 0.3s,
