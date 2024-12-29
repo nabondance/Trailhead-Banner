@@ -2,6 +2,7 @@ import axios from 'axios';
 import GET_TRAILBLAZER_RANK from '../../graphql/queries/getTrailblazerRank';
 import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications';
 import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
+import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import { generateImage } from '../../utils/generateImage';
 
 export default async function handler(req, res) {
@@ -13,7 +14,7 @@ export default async function handler(req, res) {
       displaySuperbadges,
       textColor,
       includeExpiredCertifications,
-      includeRetiredCertifications, // New parameter
+      includeRetiredCertifications,
     } = req.body;
 
     const graphqlQueries = [
@@ -23,6 +24,7 @@ export default async function handler(req, res) {
           slug: username,
           hasSlug: true,
         },
+        url: 'https://profile.api.trailhead.com/graphql',
       },
       {
         query: GET_USER_CERTIFICATIONS,
@@ -30,6 +32,7 @@ export default async function handler(req, res) {
           slug: username,
           hasSlug: true,
         },
+        url: 'https://profile.api.trailhead.com/graphql',
       },
       {
         query: GET_TRAILHEAD_BADGES,
@@ -40,6 +43,7 @@ export default async function handler(req, res) {
           after: null,
           filter: null,
         },
+        url: 'https://profile.api.trailhead.com/graphql',
       },
       {
         query: GET_TRAILHEAD_BADGES,
@@ -50,6 +54,15 @@ export default async function handler(req, res) {
           after: null,
           filter: 'SUPERBADGE',
         },
+        url: 'https://profile.api.trailhead.com/graphql',
+      },
+      {
+        query: GET_MVP_STATUS,
+        variables: {
+          userSlug: username,
+          queryMvp: true,
+        },
+        url: 'https://community.api.trailhead.com/graphql',
       },
     ];
 
@@ -59,7 +72,7 @@ export default async function handler(req, res) {
       const url = `${protocol}://${host}/api/graphql-query`;
 
       // Perform the GraphQL queries in parallel
-      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse] = await Promise.all(
+      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse] = await Promise.all(
         graphqlQueries.map((graphqlQuery) =>
           axios.post(url, graphqlQuery, {
             headers: {
@@ -74,6 +87,8 @@ export default async function handler(req, res) {
       const certificationsData = certificationsResponse.data.data.profile.credential;
       const badgesData = badgesResponse.data.data.profile;
       const superbadgesData = superbadgesResponse.data.data.profile;
+      const mvpData = mvpResponse.data.data.profileData;
+      console.log('MVP Data:', mvpData);
 
       //   console.log('Rank Data:', rankData);
       //   console.log('Certifications Data:', certificationsData);
@@ -89,12 +104,13 @@ export default async function handler(req, res) {
         backgroundImageUrl,
         displaySuperbadges,
         textColor,
-        includeExpiredCertifications, // Existing parameter
-        includeRetiredCertifications // Pass the new parameter
+        includeExpiredCertifications,
+        includeRetiredCertifications,
+        mvpData
       );
 
       // Send back the combined data and image URL
-      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, imageUrl });
+      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl });
     } catch (error) {
       console.error('Error fetching data:', error.message);
       res.status(500).json({ error: error.message });

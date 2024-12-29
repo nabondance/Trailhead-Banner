@@ -13,7 +13,8 @@ export const generateImage = async (
   displaySuperbadges,
   textColor,
   includeExpiredCertifications,
-  includeRetiredCertifications
+  includeRetiredCertifications,
+  mvpData
 ) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
@@ -26,6 +27,7 @@ export const generateImage = async (
   console.log('Text Color:', textColor);
   console.log('Include Expired Certifications:', includeExpiredCertifications);
   console.log('Include Retired Certifications:', includeRetiredCertifications);
+  console.log('MVP Data:', mvpData);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
@@ -191,6 +193,19 @@ export const generateImage = async (
     if (startX + logoWidth > canvas.width) {
       startX = canvas.width - logoWidth - logoSpacing;
     }
+  }
+
+  // Load and draw the MVP SVG in diagonal from the top right corner if the user is an MVP
+  if (mvpData?.isMvp) {
+    const mvpSvgPath = path.join(process.cwd(), 'public', 'assets', 'logos', 'mvp.svg');
+    const mvpSvg = await loadImage(mvpSvgPath);
+    const mvpWidth = 200;
+    const mvpHeight = 40;
+    ctx.save();
+    ctx.translate(canvas.width - mvpWidth / 2, mvpHeight / 2);
+    ctx.rotate(Math.PI / 4); // Rotate 45 degrees clockwise
+    ctx.drawImage(mvpSvg, -45, -45, mvpWidth, mvpHeight);
+    ctx.restore();
   }
 
   // Load and draw the "By /nabondance" SVG
