@@ -48,6 +48,7 @@ const ExamplesPage = () => {
     { src: '/assets/examples/example7.png', alt: 'Example 7', description: 'Banner of a 10x certified' },
     { src: '/assets/examples/example8.png', alt: 'Example 8', description: 'Banner of a 15x certified' },
     { src: '/assets/examples/example9.png', alt: 'Example 9', description: 'Banner with many superbadges' },
+    { src: '/assets/examples/example10.png', alt: 'Example 10', description: 'Banner of a MVP' },
   ];
 
   return (
