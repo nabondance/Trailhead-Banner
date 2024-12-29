@@ -163,11 +163,7 @@ const BannerForm = ({ onSubmit }) => {
           </label>
           <label>
             Display Rank Logo:
-            <input
-              type='checkbox'
-              checked={displayRankLogo}
-              onChange={(e) => setDisplayRankLogo(e.target.checked)}
-            />
+            <input type='checkbox' checked={displayRankLogo} onChange={(e) => setDisplayRankLogo(e.target.checked)} />
           </label>
           <label>
             Display Badge Count:

@@ -72,10 +72,16 @@ const BackgroundLibraryPage = () => {
   const searchQueries = [
     { query: 'linkedin+banner+background', label: 'LinkedIn Banner Background' },
     { query: 'linkedin+banner+background+empty', label: 'Empty LinkedIn Banner Background' },
-    { query: 'LinkedIn+banner+background+technology+digital+design', label: 'Technology & Digital Design LinkedIn Banner' },
+    {
+      query: 'LinkedIn+banner+background+technology+digital+design',
+      label: 'Technology & Digital Design LinkedIn Banner',
+    },
     { query: 'LinkedIn+banner+background+abstract+design', label: 'Abstract Design LinkedIn Banner' },
     { query: 'LinkedIn+banner+background+creative+colorful', label: 'Creative & Colorful LinkedIn Banner' },
-    { query: 'LinkedIn+banner+background+abstract+professional+high+resolution', label: 'Abstract Professional LinkedIn Banner' },
+    {
+      query: 'LinkedIn+banner+background+abstract+professional+high+resolution',
+      label: 'Abstract Professional LinkedIn Banner',
+    },
     { query: 'LinkedIn+banner+background+building', label: 'Building LinkedIn Banner' },
     { query: 'LinkedIn+banner+background+landscape', label: 'Landscape LinkedIn Banner' },
   ];

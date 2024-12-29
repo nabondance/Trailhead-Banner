@@ -54,7 +54,10 @@ export const generateImage = async (options) => {
     const superbadgeCount = options.badgesData.trailheadStats.superbadgeCount;
 
     const text1 = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
-    const text2 = options.displaySuperbadgeCount && superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
+    const text2 =
+      options.displaySuperbadgeCount && superbadgeCount > 0
+        ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
+        : '';
 
     // Draw the text
     if (text1) {

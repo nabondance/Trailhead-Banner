@@ -90,7 +90,7 @@ export default async function handler(req, res) {
         certificationsData,
         badgesData,
         superbadgesData,
-        mvpData
+        mvpData,
       });
 
       // Send back the combined data and image URL
