@@ -69,83 +69,33 @@ const BackgroundLibraryPage = () => {
     },
   ];
 
+  const searchQueries = [
+    { query: 'linkedin+banner+background', label: 'LinkedIn Banner Background' },
+    { query: 'linkedin+banner+background+empty', label: 'Empty LinkedIn Banner Background' },
+    { query: 'LinkedIn+banner+background+technology+digital+design', label: 'Technology & Digital Design LinkedIn Banner' },
+    { query: 'LinkedIn+banner+background+abstract+design', label: 'Abstract Design LinkedIn Banner' },
+    { query: 'LinkedIn+banner+background+creative+colorful', label: 'Creative & Colorful LinkedIn Banner' },
+    { query: 'LinkedIn+banner+background+abstract+professional+high+resolution', label: 'Abstract Professional LinkedIn Banner' },
+    { query: 'LinkedIn+banner+background+building', label: 'Building LinkedIn Banner' },
+    { query: 'LinkedIn+banner+background+landscape', label: 'Landscape LinkedIn Banner' },
+  ];
+
   return (
     <div className='background-library-container'>
       <h1>Background Library</h1>
       <h2>You can find many LinkedIn backgrounds online</h2>
       <ul>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=linkedin+banner+background'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            LinkedIn Banner Background
-          </a>
-        </li>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=linkedin+banner+background+empty'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Empty LinkedIn Banner Background
-          </a>
-        </li>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+technology+digital+design'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Technology & Digital Design LinkedIn Banner
-          </a>
-        </li>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+abstract+design'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Abstract Design LinkedIn Banner
-          </a>
-        </li>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+creative+colorful'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Creative & Colorful LinkedIn Banner
-          </a>
-        </li>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+abstract+professional+high+resolution'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Abstract Professional LinkedIn Banner
-          </a>
-        </li>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+building'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Building LinkedIn Banner
-          </a>
-        </li>
-        <li>
-          <a
-            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+landscape'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Landscape LinkedIn Banner
-          </a>
-        </li>
+        {searchQueries.map((item, index) => (
+          <li key={index}>
+            <a
+              href={`https://www.google.com/search?tbm=isch&q=${item.query}`}
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
       </ul>
       <h2>You can also select an example background for your banner</h2>
       {notification && <div className='notification'>{notification}</div>}
