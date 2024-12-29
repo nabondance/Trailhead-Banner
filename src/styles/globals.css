@@ -432,7 +432,7 @@ body {
 .examples-container {
   padding: 20px;
   text-align: center;
-  margin-bottom: 80px;
+  margin-bottom: 100px; /* Add more space under the cards container */
 }
 
 .examples-container h1 {
@@ -538,6 +538,7 @@ body {
 .background-library-container {
   padding: 20px;
   text-align: center;
+  margin-bottom: 100px; /* Add more space under the cards container */
 }
 
 .library-grid {
