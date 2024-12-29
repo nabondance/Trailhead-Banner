@@ -23,6 +23,7 @@ export default async function handler(req, res) {
         variables: {
           slug: options.username,
           hasSlug: true,
+          count: 100,
         },
         url: 'https://profile.api.trailhead.com/graphql',
       },
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
         variables: {
           slug: options.username,
           hasSlug: true,
-          count: 20,
+          count: 5,
           after: null,
           filter: null,
         },
