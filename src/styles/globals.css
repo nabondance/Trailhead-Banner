@@ -117,6 +117,7 @@ body {
 
 .header-nav .dropdown-content a:hover {
   background-color: var(--middleground);
+  text-decoration: underline; /* Add underline on hover */
 }
 
 .header-nav .dropdown:hover .dropdown-content {
