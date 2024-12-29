@@ -11,6 +11,9 @@
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore ."
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,scss,md}": "prettier --write"
+  },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.65",
     "@vercel/analytics": "^1.4.1",
@@ -28,6 +31,7 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "15.1.3",
     "eslint-config-prettier": "^9.1.0",
+    "lint-staged": "^15.3.0",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
