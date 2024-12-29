@@ -97,8 +97,8 @@ const BannerForm = ({ onSubmit }) => {
         textColor,
         includeExpiredCertifications,
         includeRetiredCertifications,
-        displayBadgeCount, // Pass the new parameter
-        displaySuperbadgeCount // Pass the new parameter
+        displayBadgeCount,
+        displaySuperbadgeCount
       });
     }
     setIsGenerating(false); // Show the button again when the banner is generated

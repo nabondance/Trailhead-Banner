@@ -12,23 +12,9 @@ const MainPage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleImageSubmit = async ({
-    username,
-    backgroundColor,
-    backgroundImageUrl,
-    displaySuperbadges,
-    textColor,
-    includeExpiredCertifications,
-    includeRetiredCertifications,
-    displayBadgeCount, // New parameter
-    displaySuperbadgeCount // New parameter
-  }) => {
-    console.log('Generating image for:', username);
-    console.log('Background Color:', backgroundColor);
-    console.log('Background Image URL:', backgroundImageUrl);
-    console.log('Display Superbadges:', displaySuperbadges);
-    console.log('Text Color:', textColor);
-    console.log('Include Expired Certifications:', includeExpiredCertifications); // Log the new parameter
+  const handleImageSubmit = async (options) => {
+    console.log('Generating image for:', options.username);
+    console.log('Options:', options);
 
     setImageUrl(''); // Clear the previously generated banner
     setLoading(true);
@@ -37,17 +23,7 @@ const MainPage = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        username,
-        backgroundColor,
-        backgroundImageUrl,
-        displaySuperbadges,
-        textColor,
-        includeExpiredCertifications,
-        includeRetiredCertifications, // Pass the new parameter
-        displayBadgeCount, // Pass the new parameter
-        displaySuperbadgeCount // Pass the new parameter
-      }),
+      body: JSON.stringify(options),
     });
     const data = await response.json();
     console.log('Rank Data:', data.rankData);

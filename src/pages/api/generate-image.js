@@ -7,23 +7,13 @@ import { generateImage } from '../../utils/generateImage';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const {
-      username,
-      backgroundColor,
-      backgroundImageUrl,
-      displaySuperbadges,
-      textColor,
-      includeExpiredCertifications,
-      includeRetiredCertifications,
-      displayBadgeCount, // New parameter
-      displaySuperbadgeCount // New parameter
-    } = req.body;
+    const options = req.body;
 
     const graphqlQueries = [
       {
         query: GET_TRAILBLAZER_RANK,
         variables: {
-          slug: username,
+          slug: options.username,
           hasSlug: true,
         },
         url: 'https://profile.api.trailhead.com/graphql',
@@ -31,7 +21,7 @@ export default async function handler(req, res) {
       {
         query: GET_USER_CERTIFICATIONS,
         variables: {
-          slug: username,
+          slug: options.username,
           hasSlug: true,
         },
         url: 'https://profile.api.trailhead.com/graphql',
@@ -39,7 +29,7 @@ export default async function handler(req, res) {
       {
         query: GET_TRAILHEAD_BADGES,
         variables: {
-          slug: username,
+          slug: options.username,
           hasSlug: true,
           count: 20,
           after: null,
@@ -50,7 +40,7 @@ export default async function handler(req, res) {
       {
         query: GET_TRAILHEAD_BADGES,
         variables: {
-          slug: username,
+          slug: options.username,
           hasSlug: true,
           count: 100,
           after: null,
@@ -61,7 +51,7 @@ export default async function handler(req, res) {
       {
         query: GET_MVP_STATUS,
         variables: {
-          userSlug: username,
+          userSlug: options.username,
           queryMvp: true,
         },
         url: 'https://community.api.trailhead.com/graphql',
@@ -93,26 +83,15 @@ export default async function handler(req, res) {
       const mvpData = mvpResponse.data.data.profileData;
       console.log('MVP Data:', mvpData);
 
-      //   console.log('Rank Data:', rankData);
-      //   console.log('Certifications Data:', certificationsData);
-      //   console.log('Badges Data:', badgesData);
-
       // Generate the image
-      const imageUrl = await generateImage(
+      const imageUrl = await generateImage({
+        ...options,
         rankData,
         certificationsData,
         badgesData,
         superbadgesData,
-        backgroundColor,
-        backgroundImageUrl,
-        displaySuperbadges,
-        textColor,
-        includeExpiredCertifications,
-        includeRetiredCertifications,
-        mvpData,
-        displayBadgeCount, // Pass the new parameter
-        displaySuperbadgeCount // Pass the new parameter
-      );
+        mvpData
+      });
 
       // Send back the combined data and image URL
       res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl });

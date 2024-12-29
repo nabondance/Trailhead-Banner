@@ -3,49 +3,35 @@ const path = require('path');
 const { applyGrayscale, cropImage } = require('./imageUtils');
 require('./fonts');
 
-export const generateImage = async (
-  rankData,
-  certificationsData,
-  badgesData,
-  superbadgesData,
-  backgroundColor,
-  backgroundImageUrl,
-  displaySuperbadges,
-  textColor,
-  includeExpiredCertifications,
-  includeRetiredCertifications,
-  mvpData,
-  displayBadgeCount, // New parameter
-  displaySuperbadgeCount // New parameter
-) => {
+export const generateImage = async (options) => {
   console.log('Generating banner with the following data:');
-  console.log('Rank Data:', rankData);
-  console.log('Certifications Data:', certificationsData);
-  console.log('Badges Data:', badgesData);
-  console.log('Superbadges Data:', superbadgesData);
-  console.log('Background Color:', backgroundColor);
-  console.log('Background Image Url:', backgroundImageUrl);
-  console.log('Display Superbadges:', displaySuperbadges);
-  console.log('Text Color:', textColor);
-  console.log('Include Expired Certifications:', includeExpiredCertifications);
-  console.log('Include Retired Certifications:', includeRetiredCertifications);
-  console.log('MVP Data:', mvpData);
+  console.log('Rank Data:', options.rankData);
+  console.log('Certifications Data:', options.certificationsData);
+  console.log('Badges Data:', options.badgesData);
+  console.log('Superbadges Data:', options.superbadgesData);
+  console.log('Background Color:', options.backgroundColor);
+  console.log('Background Image Url:', options.backgroundImageUrl);
+  console.log('Display Superbadges:', options.displaySuperbadges);
+  console.log('Text Color:', options.textColor);
+  console.log('Include Expired Certifications:', options.includeExpiredCertifications);
+  console.log('Include Retired Certifications:', options.includeRetiredCertifications);
+  console.log('MVP Data:', options.mvpData);
 
   // Create canvas and context
   const canvas = createCanvas(1584, 396);
   const ctx = canvas.getContext('2d');
 
   // Background
-  if (backgroundImageUrl) {
-    const bgImage = await loadImage(backgroundImageUrl);
+  if (options.backgroundImageUrl) {
+    const bgImage = await loadImage(options.backgroundImageUrl);
     ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
   } else {
-    ctx.fillStyle = backgroundColor || '#f3f4f6'; // Use the selected background color or default to #f3f4f6
+    ctx.fillStyle = options.backgroundColor || '#f3f4f6'; // Use the selected background color or default to #f3f4f6
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   // Rank Data
-  const rankLogoUrl = rankData.rank.imageUrl;
+  const rankLogoUrl = options.rankData.rank.imageUrl;
   console.debug('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
   const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
@@ -53,17 +39,17 @@ export const generateImage = async (
   ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
 
   // Set font and text color
-  ctx.fillStyle = textColor || '#111827'; // Use the custom text color or default one
+  ctx.fillStyle = options.textColor || '#111827'; // Use the custom text color or default one
   ctx.font = '36px Roboto-Bold'; // Use the custom font
   console.log('Font set to:', ctx.font);
 
   // Draw text
   try {
-    const badgeCount = rankData.earnedBadgesCount;
-    const superbadgeCount = badgesData.trailheadStats.superbadgeCount;
+    const badgeCount = options.rankData.earnedBadgesCount;
+    const superbadgeCount = options.badgesData.trailheadStats.superbadgeCount;
 
-    const text1 = displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
-    const text2 = displaySuperbadgeCount && superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
+    const text1 = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
+    const text2 = options.displaySuperbadgeCount && superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
 
     // Draw the text
     if (text1) {
@@ -77,8 +63,8 @@ export const generateImage = async (
   }
 
   // Display Superbadges if enabled
-  if (displaySuperbadges) {
-    const superbadgeLogos = superbadgesData.earnedAwards.edges
+  if (options.displaySuperbadges) {
+    const superbadgeLogos = options.superbadgesData.earnedAwards.edges
       .filter((edge) => edge.node.award && edge.node.award.icon)
       .map((edge) => edge.node.award.icon);
 
@@ -123,10 +109,10 @@ export const generateImage = async (
   const certificationsLogos = [];
 
   // Filter certifications based on the includeExpiredCertifications and includeRetiredCertifications flags
-  const certifications = certificationsData.certifications.filter(
+  const certifications = options.certificationsData.certifications.filter(
     (cert) =>
-      (includeExpiredCertifications || cert.status.expired === false) &&
-      (includeRetiredCertifications || cert.status.title !== 'Retired')
+      (options.includeExpiredCertifications || cert.status.expired === false) &&
+      (options.includeRetiredCertifications || cert.status.title !== 'Retired')
   );
 
   // Load logos and calculate total width
@@ -200,7 +186,7 @@ export const generateImage = async (
   }
 
   // Load and draw the MVP SVG in diagonal from the top right corner if the user is an MVP
-  if (mvpData?.isMvp) {
+  if (options.mvpData?.isMvp) {
     const mvpSvgPath = path.join(process.cwd(), 'public', 'assets', 'logos', 'mvp.svg');
     const mvpSvg = await loadImage(mvpSvgPath);
     const mvpWidth = 200;
