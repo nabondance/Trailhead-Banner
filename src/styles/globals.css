@@ -474,6 +474,7 @@ body {
   align-items: center;
   overflow: hidden;
   position: relative;
+  z-index: 0; /* Ensure the example card stays below the footer */
 }
 
 .example-card:hover {
