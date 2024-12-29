@@ -125,7 +125,7 @@ const BackgroundLibraryPage = () => {
             target='_blank'
             rel='noopener noreferrer'
           >
-            High Resolution Abstract Professional LinkedIn Banner
+            Abstract Professional LinkedIn Banner
           </a>
         </li>
         <li>
