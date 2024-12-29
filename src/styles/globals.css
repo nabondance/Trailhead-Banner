@@ -59,14 +59,21 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
 .input {
-  padding: 12px;
+  padding: 12px 40px 12px 12px;
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--background);
   transition: border-color 0.3s;
-  flex: 1; /* Make the input take the remaining space */
+  flex: 1;
 }
 
 .input:focus {
@@ -75,7 +82,7 @@ body {
 }
 
 .input-url {
-  background: var(--input-url-bg); /* Background color for URL input field */
+  background: var(--input-url-bg);
 }
 
 .input-error {
@@ -93,93 +100,12 @@ body {
   border-width: 2px;
 }
 
-.button {
-  padding: 12px;
-  font-size: 16px;
-  color: var(--text-light);
-  background-color: var(--primary);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.button:hover {
-  background-color: var(--secondary);
-}
-
-.more-options-button {
-  background-color: var(--secondary);
-}
-
-.more-options-button:hover {
-  background-color: var(--primary);
-}
-
-.submit-button {
-  background-color: var(--primary);
-  font-size: 18px; /* Increase font size */
-  font-weight: bold; /* Make text bold */
-  padding: 15px; /* Increase padding */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Add shadow */
-  transition:
-    background-color 0.3s,
-    transform 0.3s;
-}
-
-.submit-button:hover {
-  background-color: var(--secondary);
-  transform: scale(1.05); /* Slightly increase size on hover */
-}
-
-.options {
-  margin-top: 0px;
-  padding: 15px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background-color: var(--options-bg); /* Use the light shade of primary color */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.options label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.options input[type='color'],
-.options input[type='text'],
-.options input[type='checkbox'] {
-  margin-left: 10px;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.username-validation {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%; /* Make the container take full width */
-}
-
 .validation-icon {
-  margin-left: 10px;
-  position: relative;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
 }
 
 .validation-icon .icon {
@@ -212,6 +138,68 @@ body {
 
 .button:hover {
   background-color: var(--secondary);
+}
+
+.more-options-button {
+  background-color: var(--secondary);
+}
+
+.more-options-button:hover {
+  background-color: var(--primary);
+}
+
+.submit-button {
+  background-color: var(--primary);
+  font-size: 18px;
+  font-weight: bold;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition:
+    background-color 0.3s,
+    transform 0.3s;
+}
+
+.submit-button:hover {
+  background-color: var(--secondary);
+  transform: scale(1.05);
+}
+
+.options {
+  margin-top: 0px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--options-bg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.options label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.options input[type='color'],
+.options input[type='text'],
+.options input[type='checkbox'] {
+  margin-left: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.username-validation {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .loading-container {
@@ -332,14 +320,14 @@ body {
 
 .trailhead-banner-header h1 {
   margin: 0;
-  font-size: 3em; /* Larger font size for the title */
-  font-weight: bold; /* Bold text for the title */
+  font-size: 3em;
+  font-weight: bold;
 }
 
 .trailhead-banner-header h2 {
   margin: 0;
-  font-size: 1.5em; /* Larger font size for the options */
-  font-weight: 500; /* Medium weight for the options */
+  font-size: 1.5em;
+  font-weight: 500;
 }
 
 .footer {
@@ -386,7 +374,7 @@ body {
   background-color: var(--middleground);
   border: 1px solid var(--border);
   border-radius: 4px;
-  text-align: left; /* Align text to the left */
+  text-align: left;
 }
 
 .tutorial h2 {
@@ -397,7 +385,7 @@ body {
 
 .tutorial ol {
   padding-left: 20px;
-  list-style-type: decimal; /* Ensure list items are numbered */
+  list-style-type: decimal;
   margin-bottom: -20px;
 }
 
@@ -406,11 +394,11 @@ body {
 }
 
 .tutorial a {
-  color: #0073b1; /* LinkedIn blue color */
+  color: #0073b1;
   text-decoration: underline;
 }
 .tutorial a:hover {
-  color: #005582; /* Darker blue for hover effect */
+  color: #005582;
   text-decoration: none;
 }
 
@@ -441,7 +429,7 @@ body {
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
   .examples-grid {
-    grid-template-columns: 1fr; /* One item per line on mobile */
+    grid-template-columns: 1fr;
   }
 }
 
