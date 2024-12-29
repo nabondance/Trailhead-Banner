@@ -535,6 +535,23 @@ body {
   margin-top: 5px;
 }
 
+.background-library-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .library-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Media queries for responsiveness */
 @media (max-width: 768px) {
   .trailhead-banner-header {
@@ -552,4 +569,32 @@ body {
     margin-left: 0;
     margin-top: 10px;
   }
+}
+
+.copy-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  color: var(--text-light);
+  background-color: var(--primary);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  background-color: var(--secondary);
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: var(--primary);
+  color: var(--text-light);
+  padding: 10px 20px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: opacity 0.3s;
 }
