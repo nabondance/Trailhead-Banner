@@ -72,15 +72,16 @@ export default async function handler(req, res) {
       const url = `${protocol}://${host}/api/graphql-query`;
 
       // Perform the GraphQL queries in parallel
-      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse] = await Promise.all(
-        graphqlQueries.map((graphqlQuery) =>
-          axios.post(url, graphqlQuery, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-        )
-      );
+      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse] =
+        await Promise.all(
+          graphqlQueries.map((graphqlQuery) =>
+            axios.post(url, graphqlQuery, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+          )
+        );
 
       // Extract the data from the responses
       const rankData = rankResponse.data.data.profile.trailheadStats;
