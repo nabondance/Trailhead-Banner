@@ -9,7 +9,9 @@ const BannerCard = ({ src, alt, description, credit, onClick, onCopy }) => (
     <Image src={src} alt={alt} width={600} height={400} onClick={() => onClick(src)} />
     <p>{description}</p>
     {credit && <p className='credit'>Credit: {credit}</p>}
-    <button className='copy-button' onClick={() => onCopy(src)}>Copy URL</button>
+    <button className='copy-button' onClick={() => onCopy(src)}>
+      Copy URL
+    </button>
   </div>
 );
 
@@ -35,11 +37,36 @@ const BackgroundLibraryPage = () => {
   };
 
   const banners = [
-    { src: '/assets/background-library/banner1.png', alt: 'Banner 1', description: 'Banner 1', credit: 'Photographer 1' },
-    { src: '/assets/background-library/banner2.png', alt: 'Banner 2', description: 'Banner 2', credit: 'Photographer 2' },
-    { src: '/assets/background-library/banner3.png', alt: 'Banner 3', description: 'Banner 3', credit: 'Photographer 3' },
-    { src: '/assets/background-library/banner4.png', alt: 'Banner 4', description: 'Banner 4', credit: 'Photographer 4' },
-    { src: '/assets/background-library/banner5.png', alt: 'Banner 5', description: 'Banner 5', credit: 'Photographer 5' },
+    {
+      src: '/assets/background-library/banner1.png',
+      alt: 'Banner 1',
+      description: 'Banner 1',
+      credit: 'Photographer 1',
+    },
+    {
+      src: '/assets/background-library/banner2.png',
+      alt: 'Banner 2',
+      description: 'Banner 2',
+      credit: 'Photographer 2',
+    },
+    {
+      src: '/assets/background-library/banner3.png',
+      alt: 'Banner 3',
+      description: 'Banner 3',
+      credit: 'Photographer 3',
+    },
+    {
+      src: '/assets/background-library/banner4.png',
+      alt: 'Banner 4',
+      description: 'Banner 4',
+      credit: 'Photographer 4',
+    },
+    {
+      src: '/assets/background-library/banner5.png',
+      alt: 'Banner 5',
+      description: 'Banner 5',
+      credit: 'Photographer 5',
+    },
   ];
 
   return (
@@ -47,14 +74,78 @@ const BackgroundLibraryPage = () => {
       <h1>Background Library</h1>
       <h2>You can find many LinkedIn backgrounds online</h2>
       <ul>
-        <li><a href="https://www.google.com/search?tbm=isch&q=linkedin+banner+background" target="_blank" rel="noopener noreferrer">LinkedIn Banner Background</a></li>
-        <li><a href="https://www.google.com/search?tbm=isch&q=linkedin+banner+background+empty" target="_blank" rel="noopener noreferrer">Empty LinkedIn Banner Background</a></li>
-        <li><a href="https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+technology+digital+design" target="_blank" rel="noopener noreferrer">Technology & Digital Design LinkedIn Banner</a></li>
-        <li><a href="https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+abstract+design" target="_blank" rel="noopener noreferrer">Abstract Design LinkedIn Banner</a></li>
-        <li><a href="https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+creative+colorful" target="_blank" rel="noopener noreferrer">Creative & Colorful LinkedIn Banner</a></li>
-        <li><a href="https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+abstract+professional+high+resolution" target="_blank" rel="noopener noreferrer">High Resolution Abstract Professional LinkedIn Banner</a></li>
-        <li><a href="https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+building" target="_blank" rel="noopener noreferrer">Building LinkedIn Banner</a></li>
-        <li><a href="https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+landscape" target="_blank" rel="noopener noreferrer">Landscape LinkedIn Banner</a></li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=linkedin+banner+background'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            LinkedIn Banner Background
+          </a>
+        </li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=linkedin+banner+background+empty'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Empty LinkedIn Banner Background
+          </a>
+        </li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+technology+digital+design'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Technology & Digital Design LinkedIn Banner
+          </a>
+        </li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+abstract+design'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Abstract Design LinkedIn Banner
+          </a>
+        </li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+creative+colorful'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Creative & Colorful LinkedIn Banner
+          </a>
+        </li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+abstract+professional+high+resolution'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            High Resolution Abstract Professional LinkedIn Banner
+          </a>
+        </li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+building'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Building LinkedIn Banner
+          </a>
+        </li>
+        <li>
+          <a
+            href='https://www.google.com/search?tbm=isch&q=LinkedIn+banner+background+landscape'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Landscape LinkedIn Banner
+          </a>
+        </li>
       </ul>
       <h2>You can also select an example background for your banner</h2>
       {notification && <div className='notification'>{notification}</div>}
