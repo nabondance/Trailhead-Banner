@@ -1,0 +1,65 @@
+ci:
+  - changed-files:
+      - any-glob-to-any-file: '.github/workflows/*'
+
+config:
+  - changed-files:
+      - any-glob-to-any-file: 'config/*'
+      - any-glob-to-any-file: 'next.config.mjs'
+      - any-glob-to-any-file: 'eslint.config.mjs'
+      - any-glob-to-any-file: 'tailwind.config.mjs'
+      - any-glob-to-any-file: 'postcss.config.mjs'
+      - any-glob-to-any-file: 'jsconfig.json'
+      - any-glob-to-any-file: '.env*'
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: 'package.json'
+      - any-glob-to-any-file: 'pnpm-lock.yaml'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: 'CONTRIBUTING.md'
+      - any-glob-to-any-file: '**/README.md'
+      - any-glob-to-any-file: 'docs/*'
+
+source:
+  - changed-files:
+      - any-glob-to-any-file: 'src/**/*'
+
+styles:
+  - changed-files:
+      - any-glob-to-any-file: 'styles/**/*'
+      - any-glob-to-any-file: '**/*.css'
+      - any-glob-to-any-file: '**/*.scss'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: 'tests/**/*'
+      - any-glob-to-any-file: '**/*.test.js'
+      - any-glob-to-any-file: '**/*.spec.js'
+
+assets:
+  - changed-files:
+      - any-glob-to-any-file: 'public/assets/**/*'
+
+fonts:
+  - changed-files:
+      - any-glob-to-any-file: 'public/assets/fonts/*'
+
+logos:
+  - changed-files:
+      - any-glob-to-any-file: 'public/assets/logos/*'
+
+public:
+  - changed-files:
+      - any-glob-to-any-file: 'public/**/*'
+
+images:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.png'
+      - any-glob-to-any-file: '**/*.jpg'
+      - any-glob-to-any-file: '**/*.jpeg'
+      - any-glob-to-any-file: '**/*.gif'
+      - any-glob-to-any-file: '**/*.svg'
+      - any-glob-to-any-file: '**/*.webp'
