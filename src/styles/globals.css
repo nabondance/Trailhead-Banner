@@ -640,3 +640,20 @@ body {
   color: var(--text-dark);
   margin-top: 5px;
 }
+
+.star-repo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--primary);
+  color: var(--text-light);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.star-repo:hover {
+  background-color: var(--secondary);
+}

@@ -5,6 +5,9 @@ import '../styles/globals.css';
 const TrailheadBannerHeader = () => {
   return (
     <div className='trailhead-banner-header'>
+      <a href='https://github.com/nabondance/Trailhead-Banner' className='star-repo' target='_blank' rel='noopener noreferrer'>
+        ⭐ Star the repo to get updates!
+      </a>
       <div className='logo-container'>
         <Image src='/assets/logos/trailhead-banner-logo.svg' alt='Trailhead-Banner Logo' width={120} height={120} />
       </div>
