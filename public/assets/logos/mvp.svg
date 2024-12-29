@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200" width="1000px" height="200px">
-  <rect x="0" y="0" width="1000" height="200" style="fill: rgb(13, 43, 78);"/>
-  <text style="fill: rgb(64, 162, 219); font-family: Arial, sans-serif; font-size: 150px; text-anchor: middle; white-space: pre;" x="500" y="152.015">MVP</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 205" width="1000px" height="205px">
+  <rect x="0" y="0" width="1000" height="200" style="fill: rgb(13, 43, 78);" transform="matrix(1, 0, 0, 1, 0, 0)"/>
+  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 150px; text-anchor: middle; white-space: pre;" x="500" y="152.015" transform="matrix(1, 0, 0, 1, 0, -1.7053025658242404e-13)">MVP</text>
+  <rect x="0" y="0" width="1000" height="15" style="fill: rgb(64, 162, 219);" transform="matrix(1, 0, 0, 1, 0, 0)"/>
+  <rect x="0" y="190" width="1000" height="15" style="fill: rgb(64, 162, 219);" transform="matrix(1, 0, 0, 1, 0, 0)"/>
 </svg>
