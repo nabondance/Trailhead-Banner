@@ -11,6 +11,9 @@ export const generateImage = async (options) => {
   console.log('Superbadges Data:', options.superbadgesData);
   console.log('Background Color:', options.backgroundColor);
   console.log('Background Image Url:', options.backgroundImageUrl);
+  console.log('Display Rank Logo:', options.displayRankLogo);
+  console.log('Display Badge Count:', options.displayBadgeCount);
+  console.log('Display Superbadge Count:', options.displaySuperbadgeCount);
   console.log('Display Superbadges:', options.displaySuperbadges);
   console.log('Text Color:', options.textColor);
   console.log('Include Expired Certifications:', options.includeExpiredCertifications);
@@ -31,12 +34,14 @@ export const generateImage = async (options) => {
   }
 
   // Rank Data
-  const rankLogoUrl = options.rankData.rank.imageUrl;
-  console.debug('Loading rank logo from URL:', rankLogoUrl);
-  const rankLogo = await loadImage(rankLogoUrl);
-  const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
-  const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
-  ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
+  if (options.displayRankLogo) {
+    const rankLogoUrl = options.rankData.rank.imageUrl;
+    console.debug('Loading rank logo from URL:', rankLogoUrl);
+    const rankLogo = await loadImage(rankLogoUrl);
+    const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
+    const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
+    ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
+  }
 
   // Set font and text color
   ctx.fillStyle = options.textColor || '#111827'; // Use the custom text color or default one

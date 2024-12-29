@@ -15,6 +15,7 @@ const BannerForm = ({ onSubmit }) => {
   const [validationResult, setValidationResult] = useState(null);
   const [displayBadgeCount, setDisplayBadgeCount] = useState(true); // New state
   const [displaySuperbadgeCount, setDisplaySuperbadgeCount] = useState(true); // New state
+  const [displayRankLogo, setDisplayRankLogo] = useState(true); // New state
 
   const validateUsername = async (username) => {
     if (!username) {
@@ -98,7 +99,8 @@ const BannerForm = ({ onSubmit }) => {
         includeExpiredCertifications,
         includeRetiredCertifications,
         displayBadgeCount,
-        displaySuperbadgeCount
+        displaySuperbadgeCount,
+        displayRankLogo,
       });
     }
     setIsGenerating(false); // Show the button again when the banner is generated
@@ -158,6 +160,14 @@ const BannerForm = ({ onSubmit }) => {
           <label>
             Text Color:
             <input type='color' value={textColor} onChange={(e) => setTextColor(e.target.value)} />
+          </label>
+          <label>
+            Display Rank Logo:
+            <input
+              type='checkbox'
+              checked={displayRankLogo}
+              onChange={(e) => setDisplayRankLogo(e.target.checked)}
+            />
           </label>
           <label>
             Display Badge Count:
