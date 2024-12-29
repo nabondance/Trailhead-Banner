@@ -72,6 +72,7 @@ body {
   align-items: center;
   gap: 20px;
   margin-left: auto;
+  justify-content: center; /* Center the links */
 }
 
 .header-nav a {
