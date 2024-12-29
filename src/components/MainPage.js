@@ -20,6 +20,8 @@ const MainPage = () => {
     textColor,
     includeExpiredCertifications,
     includeRetiredCertifications,
+    displayBadgeCount, // New parameter
+    displaySuperbadgeCount // New parameter
   }) => {
     console.log('Generating image for:', username);
     console.log('Background Color:', backgroundColor);
@@ -43,6 +45,8 @@ const MainPage = () => {
         textColor,
         includeExpiredCertifications,
         includeRetiredCertifications, // Pass the new parameter
+        displayBadgeCount, // Pass the new parameter
+        displaySuperbadgeCount // Pass the new parameter
       }),
     });
     const data = await response.json();

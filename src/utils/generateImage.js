@@ -14,7 +14,9 @@ export const generateImage = async (
   textColor,
   includeExpiredCertifications,
   includeRetiredCertifications,
-  mvpData
+  mvpData,
+  displayBadgeCount, // New parameter
+  displaySuperbadgeCount // New parameter
 ) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', rankData);
@@ -60,11 +62,13 @@ export const generateImage = async (
     const badgeCount = rankData.earnedBadgesCount;
     const superbadgeCount = badgesData.trailheadStats.superbadgeCount;
 
-    const text1 = `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}`;
-    const text2 = superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
+    const text1 = displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
+    const text2 = displaySuperbadgeCount && superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
 
     // Draw the text
-    ctx.fillText(text1, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+    if (text1) {
+      ctx.fillText(text1, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+    }
     if (text2) {
       ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
     }

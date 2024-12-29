@@ -15,6 +15,8 @@ export default async function handler(req, res) {
       textColor,
       includeExpiredCertifications,
       includeRetiredCertifications,
+      displayBadgeCount, // New parameter
+      displaySuperbadgeCount // New parameter
     } = req.body;
 
     const graphqlQueries = [
@@ -107,7 +109,9 @@ export default async function handler(req, res) {
         textColor,
         includeExpiredCertifications,
         includeRetiredCertifications,
-        mvpData
+        mvpData,
+        displayBadgeCount, // Pass the new parameter
+        displaySuperbadgeCount // Pass the new parameter
       );
 
       // Send back the combined data and image URL
