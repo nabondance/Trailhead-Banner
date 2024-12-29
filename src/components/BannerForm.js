@@ -16,6 +16,7 @@ const BannerForm = ({ onSubmit }) => {
   const [displayBadgeCount, setDisplayBadgeCount] = useState(true); // New state
   const [displaySuperbadgeCount, setDisplaySuperbadgeCount] = useState(true); // New state
   const [displayRankLogo, setDisplayRankLogo] = useState(true); // New state
+  const [backgroundImageFile, setBackgroundImageFile] = useState(null); // New state for file upload
 
   const validateUsername = async (username) => {
     if (!username) {
@@ -55,9 +56,16 @@ const BannerForm = ({ onSubmit }) => {
   const handleUrlChange = (e) => {
     const url = e.target.value;
     setBackgroundImageUrl(url);
+    setBackgroundImageFile(null); // Clear file input if URL is entered
     if (!url) {
       setBackgroundImageUrlError(''); // Clear error message if input is emptied
     }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setBackgroundImageFile(file);
+    setBackgroundImageUrl(''); // Clear URL input if file is selected
   };
 
   const validateImageUrl = async (url) => {
@@ -89,11 +97,12 @@ const BannerForm = ({ onSubmit }) => {
     setIsGenerating(true); // Hide the button when clicked
     const isValidUsername = await validateUsername(username);
     const isValidImageUrl = await validateImageUrl(backgroundImageUrl);
-    if (isValidUsername && isValidImageUrl) {
+    if (isValidUsername && (isValidImageUrl || backgroundImageFile)) {
       await onSubmit({
         username,
         backgroundColor,
         backgroundImageUrl,
+        backgroundImageFile,
         displaySuperbadges,
         textColor,
         includeExpiredCertifications,
@@ -144,7 +153,7 @@ const BannerForm = ({ onSubmit }) => {
             <input type='color' value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} />
           </label>
           <label>
-            Background Image (4:1 ratio):
+            Custom Background Image (URL or Upload):
             <input
               type='text'
               value={backgroundImageUrl}
@@ -156,6 +165,7 @@ const BannerForm = ({ onSubmit }) => {
               data-form-type='other'
             />
             {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+            <input type='file' onChange={handleFileChange} accept='image/*' />
           </label>
           <label>
             Text Color:

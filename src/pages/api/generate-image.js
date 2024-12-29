@@ -8,6 +8,7 @@ import { generateImage } from '../../utils/generateImage';
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const options = req.body;
+    const backgroundImageFile = req.files?.backgroundImageFile;
 
     const graphqlQueries = [
       {
@@ -77,12 +78,11 @@ export default async function handler(req, res) {
         );
 
       // Extract the data from the responses
-      const rankData = rankResponse.data.data.profile.trailheadStats;
-      const certificationsData = certificationsResponse.data.data.profile.credential;
-      const badgesData = badgesResponse.data.data.profile;
-      const superbadgesData = superbadgesResponse.data.data.profile;
-      const mvpData = mvpResponse.data.data.profileData;
-      console.log('MVP Data:', mvpData);
+      const rankData = rankResponse.data?.data?.profile?.trailheadStats || {};
+      const certificationsData = certificationsResponse.data?.data?.profile?.credential || {};
+      const badgesData = badgesResponse.data?.data?.profile || {};
+      const superbadgesData = superbadgesResponse.data?.data?.profile || {};
+      const mvpData = mvpResponse.data?.data?.profileData || {};
 
       // Generate the image
       const imageUrl = await generateImage({

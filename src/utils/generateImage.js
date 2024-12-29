@@ -1,7 +1,8 @@
-const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const { createCanvas, loadImage, Image } = require('@napi-rs/canvas');
 const path = require('path');
 const { applyGrayscale, cropImage } = require('./imageUtils');
 require('./fonts');
+const fs = require('fs');
 
 export const generateImage = async (options) => {
   console.log('Generating banner with the following data:');
@@ -11,6 +12,8 @@ export const generateImage = async (options) => {
   console.log('Superbadges Data:', options.superbadgesData);
   console.log('Background Color:', options.backgroundColor);
   console.log('Background Image Url:', options.backgroundImageUrl);
+  console.log('Background Image File:', options.backgroundImageFile);
+  console.log('Background Image File path:', options.backgroundImageFile.path);
   console.log('Display Rank Logo:', options.displayRankLogo);
   console.log('Display Badge Count:', options.displayBadgeCount);
   console.log('Display Superbadge Count:', options.displaySuperbadgeCount);
@@ -25,7 +28,11 @@ export const generateImage = async (options) => {
   const ctx = canvas.getContext('2d');
 
   // Background
-  if (options.backgroundImageUrl) {
+  if (options.backgroundImageFile && options.backgroundImageFile.path) {
+    const bgImage = new Image();
+    bgImage.src = fs.readFileSync(options.backgroundImageFile.path);
+    ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+  } else if (options.backgroundImageUrl) {
     const bgImage = await loadImage(options.backgroundImageUrl);
     ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
   } else {
