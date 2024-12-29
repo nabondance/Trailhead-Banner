@@ -34,12 +34,12 @@ export const generateImage = async (options) => {
   }
 
   // Rank Data
+  const rankLogoUrl = options.rankData.rank.imageUrl;
+  console.debug('Loading rank logo from URL:', rankLogoUrl);
+  const rankLogo = await loadImage(rankLogoUrl);
+  const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
+  const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
   if (options.displayRankLogo) {
-    const rankLogoUrl = options.rankData.rank.imageUrl;
-    console.debug('Loading rank logo from URL:', rankLogoUrl);
-    const rankLogo = await loadImage(rankLogoUrl);
-    const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
-    const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
     ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
   }
 
@@ -50,8 +50,8 @@ export const generateImage = async (options) => {
 
   // Draw text
   try {
-    const badgeCount = options.rankData.earnedBadgesCount;
-    const superbadgeCount = options.badgesData.trailheadStats.superbadgeCount;
+    const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount;
+    const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount;
 
     const text1 = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
     const text2 =
