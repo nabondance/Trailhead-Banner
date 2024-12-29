@@ -598,3 +598,41 @@ body {
   z-index: 1000;
   transition: opacity 0.3s;
 }
+
+.background-library-container h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.background-library-container h2 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  color: var(--secondary);
+}
+
+.background-library-container ul {
+  list-style-type: none; /* Remove the dot */
+  padding-left: 0; /* Remove padding */
+  margin-bottom: 20px;
+}
+
+.background-library-container ul li {
+  font-size: 1.2em;
+  margin-bottom: 5px; /* Make the space between them smaller */
+}
+
+.background-library-container ul li a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.background-library-container ul li a:hover {
+  text-decoration: underline;
+}
+
+.credit {
+  font-size: 0.9em;
+  color: var(--text-dark);
+  margin-top: 5px;
+}
