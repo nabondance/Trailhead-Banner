@@ -5,7 +5,12 @@ import '../styles/globals.css';
 const TrailheadBannerHeader = () => {
   return (
     <div className='trailhead-banner-header'>
-      <a href='https://github.com/nabondance/Trailhead-Banner' className='star-repo' target='_blank' rel='noopener noreferrer'>
+      <a
+        href='https://github.com/nabondance/Trailhead-Banner'
+        className='star-repo'
+        target='_blank'
+        rel='noopener noreferrer'
+      >
         ⭐ Star the repo to get updates!
       </a>
       <div className='logo-container'>
@@ -21,7 +26,9 @@ const TrailheadBannerHeader = () => {
           <div className='dropdown'>
             <button className='dropbtn'>More fun</button>
             <div className='dropdown-content'>
-              <Link href='https://github.com/nabondance/Trailhead-Stats' target='_blank' rel='noopener noreferrer'>Trailhead Stats</Link>
+              <Link href='https://github.com/nabondance/Trailhead-Stats' target='_blank' rel='noopener noreferrer'>
+                Trailhead Stats
+              </Link>
             </div>
           </div>
         </nav>
