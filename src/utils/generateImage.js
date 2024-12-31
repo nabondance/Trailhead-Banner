@@ -61,14 +61,19 @@ export const generateImage = async (options) => {
     const certificationText = options.displayCertificationCount ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}` : '';
 
     // Draw the text
+    const textYPosition = 40; // Adjusted to make the top of the text almost at the top of the image
+    let currentYPosition = textYPosition;
+
     if (badgeText) {
-      ctx.fillText(badgeText, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+      ctx.fillText(badgeText, rankLogoWidth + 40, currentYPosition);
+      currentYPosition += 40;
     }
     if (superbadgeText) {
-      ctx.fillText(superbadgeText, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+      ctx.fillText(superbadgeText, rankLogoWidth + 40, currentYPosition);
+      currentYPosition += 40;
     }
     if (certificationText) {
-      ctx.fillText(certificationText, rankLogoWidth + 40, 100 + rankLogoHeight / 2);
+      ctx.fillText(certificationText, rankLogoWidth + 40, currentYPosition);
     }
   } catch (error) {
     console.error('Error drawing text:', error);
