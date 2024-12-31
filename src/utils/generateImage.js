@@ -10,16 +10,24 @@ export const generateImage = async (options) => {
   console.log('Certifications Data:', options.certificationsData);
   console.log('Badges Data:', options.badgesData);
   console.log('Superbadges Data:', options.superbadgesData);
-  console.log('Background Color:', options.backgroundColor);
-  console.log('Background Image Url:', options.backgroundImageUrl);
-  console.log('Display Rank Logo:', options.displayRankLogo);
-  console.log('Display Superbadges:', options.displaySuperbadges);
-  console.log('Display Badge Count:', options.displayBadgeCount);
-  console.log('Display Superbadge Count:', options.displaySuperbadgeCount);
-  console.log('Display Certification Count:', options.displayCertificationCount);
-  console.log('Text Color:', options.textColor);
-  console.log('Include Expired Certifications:', options.includeExpiredCertifications);
-  console.log('Include Retired Certifications:', options.includeRetiredCertifications);
+  console.log('Background Options:', {
+    color: options.backgroundColor,
+    imageUrl: options.backgroundImageUrl,
+  });
+  console.log('Display Options:', {
+    rankLogo: options.displayRankLogo,
+    superbadges: options.displaySuperbadges,
+    badgeCount: options.displayBadgeCount,
+    superbadgeCount: options.displaySuperbadgeCount,
+    certificationCount: options.displayCertificationCount,
+  });
+  console.log('Text Options:', {
+    color: options.textColor,
+  });
+  console.log('Certification Options:', {
+    includeExpired: options.includeExpiredCertifications,
+    includeRetired: options.includeRetiredCertifications,
+  });
   console.log('MVP Data:', options.mvpData);
 
   // Create canvas and context
@@ -57,8 +65,13 @@ export const generateImage = async (options) => {
     const certificationCount = options.certificationsData.certifications.length;
 
     const badgeText = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
-    const superbadgeText = options.displaySuperbadgeCount && superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
-    const certificationText = options.displayCertificationCount ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}` : '';
+    const superbadgeText =
+      options.displaySuperbadgeCount && superbadgeCount > 0
+        ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
+        : '';
+    const certificationText = options.displayCertificationCount
+      ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}`
+      : '';
 
     // Draw the text
     const textYPosition = 50; // Adjusted to make the top of the text almost at the top of the image
@@ -67,11 +80,11 @@ export const generateImage = async (options) => {
 
     if (badgeText) {
       ctx.fillText(badgeText, rankLogoWidth + 40, currentYPosition);
-      currentYPosition += rankLogoHeight/3;
+      currentYPosition += rankLogoHeight / 3;
     }
     if (superbadgeText) {
       ctx.fillText(superbadgeText, rankLogoWidth + 40, currentYPosition);
-      currentYPosition += rankLogoHeight/3;
+      currentYPosition += rankLogoHeight / 3;
     }
     if (certificationText) {
       ctx.fillText(certificationText, rankLogoWidth + 40, currentYPosition);

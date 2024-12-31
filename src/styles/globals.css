@@ -317,6 +317,19 @@ body {
   margin-left: 10px;
 }
 
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+legend {
+  padding: 0 10px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

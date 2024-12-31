@@ -141,77 +141,92 @@ const BannerForm = ({ onSubmit }) => {
       </button>
       {showOptions && (
         <div className='options'>
-          <label>
-            Background Color:
-            <input type='color' value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} />
-          </label>
-          <label>
-            Custom Background Image (URL or Upload):
-            <input
-              type='text'
-              value={backgroundImageUrl}
-              onChange={handleUrlChange}
-              placeholder='Enter image URL'
-              className='input-url'
-              autoComplete='off'
-              data-lpignore='true' // LastPass specific attribute to ignore
-              data-form-type='other'
-            />
-            {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
-          </label>
-          <label>
-            Text Color:
-            <input type='color' value={textColor} onChange={(e) => setTextColor(e.target.value)} />
-          </label>
-          <label>
-            Display Rank Logo:
-            <input type='checkbox' checked={displayRankLogo} onChange={(e) => setDisplayRankLogo(e.target.checked)} />
-          </label>
-          <label>
-            Display Superbadges:
-            <input
-              type='checkbox'
-              checked={displaySuperbadges}
-              onChange={(e) => setDisplaySuperbadges(e.target.checked)}
-            />
-          </label>
-          <label>
-            Display Badge Count:
-            <input
-              type='checkbox'
-              checked={displayBadgeCount}
-              onChange={(e) => setDisplayBadgeCount(e.target.checked)}
-            />
-          </label>
-          <label>
-            Display Superbadge Count:
-            <input
-              type='checkbox'
-              checked={displaySuperbadgeCount}
-              onChange={(e) => setDisplaySuperbadgeCount(e.target.checked)}
-            />
-          </label>
-          <label>
-            Display Certification Count:
-            <input type='checkbox' checked={displayCertificationCount} onChange={(e) => setDisplayCertificationCount(e.target.checked)} />
-          </label>
-
-          <label>
-            Include Expired Certifications:
-            <input
-              type='checkbox'
-              checked={includeExpiredCertifications}
-              onChange={(e) => setIncludeExpiredCertifications(e.target.checked)}
-            />
-          </label>
-          <label>
-            Include Retired Certifications:
-            <input
-              type='checkbox'
-              checked={includeRetiredCertifications}
-              onChange={(e) => setIncludeRetiredCertifications(e.target.checked)}
-            />
-          </label>
+          <fieldset>
+            <legend>Background Options</legend>
+            <label>
+              Background Color:
+              <input type='color' value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} />
+            </label>
+            <label>
+              Custom Background Image (URL or Upload):
+              <input
+                type='text'
+                value={backgroundImageUrl}
+                onChange={handleUrlChange}
+                placeholder='Enter image URL'
+                className='input-url'
+                autoComplete='off'
+                data-lpignore='true' // LastPass specific attribute to ignore
+                data-form-type='other'
+              />
+              {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Text Options</legend>
+            <label>
+              Text Color:
+              <input type='color' value={textColor} onChange={(e) => setTextColor(e.target.value)} />
+            </label>
+            <label>
+              Display Badge Count:
+              <input
+                type='checkbox'
+                checked={displayBadgeCount}
+                onChange={(e) => setDisplayBadgeCount(e.target.checked)}
+              />
+            </label>
+            <label>
+              Display Superbadge Count:
+              <input
+                type='checkbox'
+                checked={displaySuperbadgeCount}
+                onChange={(e) => setDisplaySuperbadgeCount(e.target.checked)}
+              />
+            </label>
+            <label>
+              Display Certification Count:
+              <input
+                type='checkbox'
+                checked={displayCertificationCount}
+                onChange={(e) => setDisplayCertificationCount(e.target.checked)}
+              />
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Display Options</legend>
+            <label>
+              Display Rank Logo:
+              <input type='checkbox' checked={displayRankLogo} onChange={(e) => setDisplayRankLogo(e.target.checked)} />
+            </label>
+            <label>
+              Display Superbadges:
+              <input
+                type='checkbox'
+                checked={displaySuperbadges}
+                onChange={(e) => setDisplaySuperbadges(e.target.checked)}
+              />
+            </label>
+          </fieldset>
+          <fieldset>
+            <legend>Certification Options</legend>
+            <label>
+              Include Expired Certifications:
+              <input
+                type='checkbox'
+                checked={includeExpiredCertifications}
+                onChange={(e) => setIncludeExpiredCertifications(e.target.checked)}
+              />
+            </label>
+            <label>
+              Include Retired Certifications:
+              <input
+                type='checkbox'
+                checked={includeRetiredCertifications}
+                onChange={(e) => setIncludeRetiredCertifications(e.target.checked)}
+              />
+            </label>
+          </fieldset>
         </div>
       )}
       {!isGenerating && (
