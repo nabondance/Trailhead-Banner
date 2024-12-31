@@ -557,6 +557,16 @@ legend {
   border-radius: 4px;
 }
 
+.error-message a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.error-message a:hover {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
 .background-library-container {
   padding: 20px;
   text-align: center;
