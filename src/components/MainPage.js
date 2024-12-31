@@ -39,7 +39,7 @@ const MainPage = () => {
       setImageUrl(data.imageUrl);
     } catch (error) {
       console.error('Error generating image:', error);
-      setError(`Error generating image: ${error.message}`); // Set error message with more wording
+      setError(`Error generating image: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ const MainPage = () => {
 
   return (
     <div className='container'>
-      <BannerForm onSubmit={handleImageSubmit} setError={setError} /> {/* Pass setError as a prop */}
+      <BannerForm onSubmit={handleImageSubmit} setError={setError} />
       {loading && (
         <div className='loading-container'>
           <p>Generating the banner...</p>
