@@ -169,7 +169,7 @@ const BannerForm = ({ onSubmit }) => {
               <input type='color' value={textColor} onChange={(e) => setTextColor(e.target.value)} />
             </label>
             <label>
-              Display Badge Count:
+              Show Badge Count:
               <input
                 type='checkbox'
                 checked={displayBadgeCount}
@@ -177,7 +177,7 @@ const BannerForm = ({ onSubmit }) => {
               />
             </label>
             <label>
-              Display Superbadge Count:
+              Show Superbadge Count:
               <input
                 type='checkbox'
                 checked={displaySuperbadgeCount}
@@ -185,7 +185,7 @@ const BannerForm = ({ onSubmit }) => {
               />
             </label>
             <label>
-              Display Certification Count:
+              Show Certification Count:
               <input
                 type='checkbox'
                 checked={displayCertificationCount}
@@ -196,11 +196,11 @@ const BannerForm = ({ onSubmit }) => {
           <fieldset>
             <legend>Display Options</legend>
             <label>
-              Display Rank Logo:
+              Show Rank Logo:
               <input type='checkbox' checked={displayRankLogo} onChange={(e) => setDisplayRankLogo(e.target.checked)} />
             </label>
             <label>
-              Display Superbadges:
+              Show Superbadges:
               <input
                 type='checkbox'
                 checked={displaySuperbadges}
