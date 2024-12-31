@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-const BannerForm = ({ onSubmit, setError }) => { // Add setError to the props
+const BannerForm = ({ onSubmit, setError }) => {
+  // Add setError to the props
   const [username, setUsername] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
