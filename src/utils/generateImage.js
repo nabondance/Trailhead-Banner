@@ -61,16 +61,17 @@ export const generateImage = async (options) => {
     const certificationText = options.displayCertificationCount ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}` : '';
 
     // Draw the text
-    const textYPosition = 40; // Adjusted to make the top of the text almost at the top of the image
+    const textYPosition = 50; // Adjusted to make the top of the text almost at the top of the image
     let currentYPosition = textYPosition;
+    let numberOfLines = 3;
 
     if (badgeText) {
       ctx.fillText(badgeText, rankLogoWidth + 40, currentYPosition);
-      currentYPosition += 40;
+      currentYPosition += rankLogoHeight/3;
     }
     if (superbadgeText) {
       ctx.fillText(superbadgeText, rankLogoWidth + 40, currentYPosition);
-      currentYPosition += 40;
+      currentYPosition += rankLogoHeight/3;
     }
     if (certificationText) {
       ctx.fillText(certificationText, rankLogoWidth + 40, currentYPosition);
