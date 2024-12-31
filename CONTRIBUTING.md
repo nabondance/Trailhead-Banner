@@ -65,6 +65,42 @@ Common scope: `core, deps, ui, config, release, util, auth`
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
-## References
+## Develop
+### Init
+First, clone the repository:
 
-This document was adapted from the open-source contribution guidelines for [Facebook's Draft](https://github.com/facebook/draft-js).
+```bash
+git clone https://github.com/yourusername/Trailhead-Banner.git
+cd Trailhead-Banner
+```
+
+Then, install dependencies
+
+```bash
+pnpm install
+```
+
+Then, run the development server:
+
+```bash
+pnpm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+### UI choices
+#### Fonts
+- Anta
+- Geist
+- Roboto
+
+#### Colors
+- primary:
+- secondary:
