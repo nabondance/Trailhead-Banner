@@ -66,7 +66,9 @@ Common scope: `core, deps, ui, config, release, util, auth`
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
 ## Develop
+
 ### Init
+
 First, clone the repository:
 
 ```bash
@@ -96,11 +98,14 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 ### UI choices
+
 #### Fonts
+
 - Anta
 - Geist
 - Roboto
 
 #### Colors
+
 - primary:
 - secondary:
