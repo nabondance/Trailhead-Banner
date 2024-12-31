@@ -16,6 +16,7 @@ const BannerForm = ({ onSubmit }) => {
   const [displayBadgeCount, setDisplayBadgeCount] = useState(true); // New state
   const [displaySuperbadgeCount, setDisplaySuperbadgeCount] = useState(true); // New state
   const [displayRankLogo, setDisplayRankLogo] = useState(true); // New state
+  const [displayCertificationCount, setDisplayCertificationCount] = useState(true); // New state
 
   const validateUsername = async (username) => {
     if (!username) {
@@ -101,6 +102,7 @@ const BannerForm = ({ onSubmit }) => {
         displayBadgeCount,
         displaySuperbadgeCount,
         displayRankLogo,
+        displayCertificationCount,
       });
     }
     setIsGenerating(false); // Show the button again when the banner is generated
@@ -166,6 +168,14 @@ const BannerForm = ({ onSubmit }) => {
             <input type='checkbox' checked={displayRankLogo} onChange={(e) => setDisplayRankLogo(e.target.checked)} />
           </label>
           <label>
+            Display Superbadges:
+            <input
+              type='checkbox'
+              checked={displaySuperbadges}
+              onChange={(e) => setDisplaySuperbadges(e.target.checked)}
+            />
+          </label>
+          <label>
             Display Badge Count:
             <input
               type='checkbox'
@@ -182,13 +192,10 @@ const BannerForm = ({ onSubmit }) => {
             />
           </label>
           <label>
-            Display Superbadges:
-            <input
-              type='checkbox'
-              checked={displaySuperbadges}
-              onChange={(e) => setDisplaySuperbadges(e.target.checked)}
-            />
+            Display Certification Count:
+            <input type='checkbox' checked={displayCertificationCount} onChange={(e) => setDisplayCertificationCount(e.target.checked)} />
           </label>
+
           <label>
             Include Expired Certifications:
             <input

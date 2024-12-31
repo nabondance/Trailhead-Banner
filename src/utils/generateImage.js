@@ -13,9 +13,10 @@ export const generateImage = async (options) => {
   console.log('Background Color:', options.backgroundColor);
   console.log('Background Image Url:', options.backgroundImageUrl);
   console.log('Display Rank Logo:', options.displayRankLogo);
+  console.log('Display Superbadges:', options.displaySuperbadges);
   console.log('Display Badge Count:', options.displayBadgeCount);
   console.log('Display Superbadge Count:', options.displaySuperbadgeCount);
-  console.log('Display Superbadges:', options.displaySuperbadges);
+  console.log('Display Certification Count:', options.displayCertificationCount);
   console.log('Text Color:', options.textColor);
   console.log('Include Expired Certifications:', options.includeExpiredCertifications);
   console.log('Include Retired Certifications:', options.includeRetiredCertifications);
@@ -53,12 +54,14 @@ export const generateImage = async (options) => {
   try {
     const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount;
     const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount;
+    const certificationCount = options.certificationsData.certifications.length;
 
     const text1 = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
     const text2 =
       options.displaySuperbadgeCount && superbadgeCount > 0
         ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
         : '';
+    const text3 = options.displayCertificationCount ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}` : '';
 
     // Draw the text
     if (text1) {
@@ -66,6 +69,9 @@ export const generateImage = async (options) => {
     }
     if (text2) {
       ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+    }
+    if (text3) {
+      ctx.fillText(text3, rankLogoWidth + 40, 100 + rankLogoHeight / 2);
     }
   } catch (error) {
     console.error('Error drawing text:', error);
