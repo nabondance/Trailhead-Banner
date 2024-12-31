@@ -29,7 +29,8 @@ const MainPage = () => {
         body: JSON.stringify(options),
       });
       if (!response.ok) {
-        throw new Error('Failed to generate image');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate image');
       }
       const data = await response.json();
       console.log('Rank Data:', data.rankData);
