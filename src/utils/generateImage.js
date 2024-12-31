@@ -56,22 +56,19 @@ export const generateImage = async (options) => {
     const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount;
     const certificationCount = options.certificationsData.certifications.length;
 
-    const text1 = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
-    const text2 =
-      options.displaySuperbadgeCount && superbadgeCount > 0
-        ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
-        : '';
-    const text3 = options.displayCertificationCount ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}` : '';
+    const badgeText = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
+    const superbadgeText = options.displaySuperbadgeCount && superbadgeCount > 0 ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}` : '';
+    const certificationText = options.displayCertificationCount ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}` : '';
 
     // Draw the text
-    if (text1) {
-      ctx.fillText(text1, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
+    if (badgeText) {
+      ctx.fillText(badgeText, rankLogoWidth + 40, 20 + rankLogoHeight / 2);
     }
-    if (text2) {
-      ctx.fillText(text2, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
+    if (superbadgeText) {
+      ctx.fillText(superbadgeText, rankLogoWidth + 40, 60 + rankLogoHeight / 2);
     }
-    if (text3) {
-      ctx.fillText(text3, rankLogoWidth + 40, 100 + rankLogoHeight / 2);
+    if (certificationText) {
+      ctx.fillText(certificationText, rankLogoWidth + 40, 100 + rankLogoHeight / 2);
     }
   } catch (error) {
     console.error('Error drawing text:', error);
