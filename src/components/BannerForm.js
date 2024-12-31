@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const BannerForm = ({ onSubmit, setError }) => {
-  // Add setError to the props
   const [username, setUsername] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
@@ -14,10 +13,10 @@ const BannerForm = ({ onSubmit, setError }) => {
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
-  const [displayBadgeCount, setDisplayBadgeCount] = useState(true); // New state
-  const [displaySuperbadgeCount, setDisplaySuperbadgeCount] = useState(true); // New state
-  const [displayRankLogo, setDisplayRankLogo] = useState(true); // New state
-  const [displayCertificationCount, setDisplayCertificationCount] = useState(true); // New state
+  const [displayBadgeCount, setDisplayBadgeCount] = useState(true);
+  const [displaySuperbadgeCount, setDisplaySuperbadgeCount] = useState(true);
+  const [displayRankLogo, setDisplayRankLogo] = useState(true);
+  const [displayCertificationCount, setDisplayCertificationCount] = useState(true);
 
   const validateUsername = async (username) => {
     if (!username) {
