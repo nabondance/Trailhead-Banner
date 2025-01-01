@@ -304,7 +304,7 @@ body {
   border-radius: 8px;
   background-color: var(--options-bg);
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fade-in 0.3s ease-in-out;
 }
 
 .options label {
@@ -331,7 +331,7 @@ legend {
   color: var(--primary);
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(-10px);
