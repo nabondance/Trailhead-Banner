@@ -12,19 +12,17 @@ import '../styles/globals.css';
 const MainPage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [formOptions, setFormOptions] = useState('');
-  const issueTitle = 'New Issue';
-  const issueBody = '';
+  const [mainError, setMainError] = useState(null);
+  const [formOptions, setFormOptions] = useState({});
 
   const handleImageSubmit = async (options) => {
     console.log('Generating image for:', options.username);
     console.log('Options:', options);
-    setOptions(options);
+    setFormOptions(options);
+    console.log('Form Options:', formOptions);
 
     setImageUrl(''); // Clear the previously generated banner
     setLoading(true);
-    setError(null); // Clear previous errors
     try {
       const response = await fetch('/api/generate-image', {
         method: 'POST',
@@ -44,11 +42,12 @@ const MainPage = () => {
       setImageUrl(data.imageUrl);
     } catch (error) {
       console.error('Error generating image:', error);
-      setError(`Error generating image: ${error.message}`);
-      const issueTitle = encodeURIComponent(generateIssueTitle(error));
-      const issueBody = encodeURIComponent(generateIssueBody(error, formOptions));
-      document.querySelector('.error-message a').href =
-        `https://github.com/nabondance/Trailhead-Banner/issues/new?title=${issueTitle}&body=${issueBody}`;
+      setMainError(error);
+      console.log('Main Error:', mainError);
+      // const issueTitle = encodeURIComponent(generateIssueTitle(error));
+      // const issueBody = encodeURIComponent(generateIssueBody(error, formOptions));
+      // document.querySelector('.error-message a').href =
+      //   `https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(error))}&body=${encodeURIComponent(generateIssueBody(error, formOptions))}`;
     } finally {
       setLoading(false);
     }
@@ -56,21 +55,21 @@ const MainPage = () => {
 
   return (
     <div className='container'>
-      <BannerForm onSubmit={handleImageSubmit} setError={setError} />
+      <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} />
       {loading && (
         <div className='loading-container'>
           <p>Generating the banner...</p>
           <div className='loading-icon'></div>
         </div>
       )}
-      {error && (
+      {mainError && (
         <div className='error-message'>
-          {error}
+          {mainError.message}
           <p>
             If the error persists, consider writing an{' '}
             <a
-      href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${issueTitle}&body=${issueBody}`}
-      target='_blank'
+              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(mainError))}&body=${encodeURIComponent(generateIssueBody(mainError, formOptions))}`}
+              target='_blank'
               rel='noopener noreferrer'
             >
               issue
@@ -78,7 +77,7 @@ const MainPage = () => {
           </p>
         </div>
       )}
-      {imageUrl && !error && (
+      {imageUrl && !mainError && (
         <div className='image-container'>
           <Image src={imageUrl} alt='Generated' className='generated-image' width={1584} height={396} />
           <a href={imageUrl} download='trailhead-banner.png' className='download-link'>

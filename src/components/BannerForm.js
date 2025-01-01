@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const BannerForm = ({ onSubmit, setError }) => {
+const BannerForm = ({ onSubmit, setMainError }) => {
   const [username, setUsername] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
@@ -86,6 +86,7 @@ const BannerForm = ({ onSubmit, setError }) => {
   };
 
   const handleSubmit = async (e) => {
+    setMainError(null); // Clear previous errors
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
     const isValidUsername = await validateUsername(username);
@@ -105,7 +106,7 @@ const BannerForm = ({ onSubmit, setError }) => {
         displayCertificationCount,
       });
     } else {
-      setError('Validation failed. Please check the input fields.'); // Send the error about the failed validation
+      setMainError('Validation failed. Please check the input fields.'); // Send the error about the failed validation
     }
     setIsGenerating(false); // Show the button again when the banner is generated
   };
