@@ -1,8 +1,6 @@
 {
-    "extends": [
-        "stylelint-config-standard"
-    ],
-    "rules": {
-        "no-descending-specificity": null
-    }
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "no-descending-specificity": null
+  }
 }
