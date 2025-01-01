@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
-  const [username, setUsername] = useState('');
+  const [options, setOptions] = useState({
+    username: '',
+    backgroundColor: '#f3f4f6',
+    backgroundImageUrl: '',
+    textColor: '#111827',
+    displayBadgeCount: true,
+    displaySuperbadgeCount: true,
+    displayCertificationCount: true,
+    displayRankLogo: true,
+    displaySuperbadges: true,
+    includeExpiredCertifications: false,
+    includeRetiredCertifications: false,
+  });
   const [showOptions, setShowOptions] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState('#f3f4f6');
-  const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
-  const [displaySuperbadges, setDisplaySuperbadges] = useState(true);
-  const [includeExpiredCertifications, setIncludeExpiredCertifications] = useState(false);
-  const [includeRetiredCertifications, setIncludeRetiredCertifications] = useState(false);
-  const [textColor, setTextColor] = useState('#111827'); // Default text color
   const [isGenerating, setIsGenerating] = useState(false);
-  const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [usernameError, setUsernameError] = useState('');
+  const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
-  const [displayBadgeCount, setDisplayBadgeCount] = useState(true);
-  const [displaySuperbadgeCount, setDisplaySuperbadgeCount] = useState(true);
-  const [displayRankLogo, setDisplayRankLogo] = useState(true);
-  const [displayCertificationCount, setDisplayCertificationCount] = useState(true);
 
   const validateUsername = async (username) => {
     if (!username) {
@@ -45,17 +47,17 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   };
 
   const handleUsernameBlur = async () => {
-    if (!username) {
+    if (!options.username) {
       setValidationResult(null); // Clear validation result if username is empty
       setUsernameError(''); // Clear username error
     } else {
-      await validateUsername(username);
+      await validateUsername(options.username);
     }
   };
 
   const handleUrlChange = (e) => {
     const url = e.target.value;
-    setBackgroundImageUrl(url);
+    setOptions({ ...options, backgroundImageUrl: url });
     if (!url) {
       setBackgroundImageUrlError(''); // Clear error message if input is emptied
     }
@@ -89,37 +91,13 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setMainError(null); // Clear previous errors
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
-    const isValidUsername = await validateUsername(username);
-    const isValidImageUrl = await validateImageUrl(backgroundImageUrl);
+    const isValidUsername = await validateUsername(options.username);
+    const isValidImageUrl = await validateImageUrl(options.backgroundImageUrl);
     if (isValidUsername && isValidImageUrl) {
-      await onSubmit({
-        username,
-        backgroundColor,
-        backgroundImageUrl,
-        displaySuperbadges,
-        textColor,
-        includeExpiredCertifications,
-        includeRetiredCertifications,
-        displayBadgeCount,
-        displaySuperbadgeCount,
-        displayRankLogo,
-        displayCertificationCount,
-      });
+      await onSubmit(options);
     } else {
       const validationError = new Error('Validation failed. Please check the input fields.');
-      onValidationError(validationError, {
-        username,
-        backgroundColor,
-        backgroundImageUrl,
-        displaySuperbadges,
-        textColor,
-        includeExpiredCertifications,
-        includeRetiredCertifications,
-        displayBadgeCount,
-        displaySuperbadgeCount,
-        displayRankLogo,
-        displayCertificationCount,
-      });
+      onValidationError(validationError, options);
     }
     setIsGenerating(false); // Show the button again when the banner is generated
   };
@@ -129,8 +107,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       <div className='input-container'>
         <input
           type='text'
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={options.username}
+          onChange={(e) => setOptions({ ...options, username: e.target.value })}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username'
           required
@@ -161,13 +139,13 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Background Options</legend>
             <label>
               Background Color:
-              <input type='color' value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} />
+              <input type='color' value={options.backgroundColor} onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })} />
             </label>
             <label>
               Custom Background Image (URL or Upload):
               <input
                 type='text'
-                value={backgroundImageUrl}
+                value={options.backgroundImageUrl}
                 onChange={handleUrlChange}
                 placeholder='Enter image URL'
                 className='input-url'
@@ -182,30 +160,30 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Text Options</legend>
             <label>
               Text Color:
-              <input type='color' value={textColor} onChange={(e) => setTextColor(e.target.value)} />
+              <input type='color' value={options.textColor} onChange={(e) => setOptions({ ...options, textColor: e.target.value })} />
             </label>
             <label>
               Show Badge Count:
               <input
                 type='checkbox'
-                checked={displayBadgeCount}
-                onChange={(e) => setDisplayBadgeCount(e.target.checked)}
+                checked={options.displayBadgeCount}
+                onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
               />
             </label>
             <label>
               Show Superbadge Count:
               <input
                 type='checkbox'
-                checked={displaySuperbadgeCount}
-                onChange={(e) => setDisplaySuperbadgeCount(e.target.checked)}
+                checked={options.displaySuperbadgeCount}
+                onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
               />
             </label>
             <label>
               Show Certification Count:
               <input
                 type='checkbox'
-                checked={displayCertificationCount}
-                onChange={(e) => setDisplayCertificationCount(e.target.checked)}
+                checked={options.displayCertificationCount}
+                onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
               />
             </label>
           </fieldset>
@@ -213,14 +191,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Display Options</legend>
             <label>
               Show Rank Logo:
-              <input type='checkbox' checked={displayRankLogo} onChange={(e) => setDisplayRankLogo(e.target.checked)} />
+              <input type='checkbox' checked={options.displayRankLogo} onChange={(e) => setOptions({ ...options, displayRankLogo: e.target.checked })} />
             </label>
             <label>
               Show Superbadges:
               <input
                 type='checkbox'
-                checked={displaySuperbadges}
-                onChange={(e) => setDisplaySuperbadges(e.target.checked)}
+                checked={options.displaySuperbadges}
+                onChange={(e) => setOptions({ ...options, displaySuperbadges: e.target.checked })}
               />
             </label>
           </fieldset>
@@ -230,16 +208,16 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               Include Expired Certifications:
               <input
                 type='checkbox'
-                checked={includeExpiredCertifications}
-                onChange={(e) => setIncludeExpiredCertifications(e.target.checked)}
+                checked={options.includeExpiredCertifications}
+                onChange={(e) => setOptions({ ...options, includeExpiredCertifications: e.target.checked })}
               />
             </label>
             <label>
               Include Retired Certifications:
               <input
                 type='checkbox'
-                checked={includeRetiredCertifications}
-                onChange={(e) => setIncludeRetiredCertifications(e.target.checked)}
+                checked={options.includeRetiredCertifications}
+                onChange={(e) => setOptions({ ...options, includeRetiredCertifications: e.target.checked })}
               />
             </label>
           </fieldset>
