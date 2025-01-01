@@ -1,4 +1,6 @@
 ---
+extends: default
+
 rules:
   document-end: disable
   document-start:
@@ -9,5 +11,6 @@ rules:
     max: 80
     allow-non-breakable-words: true
     allow-non-breakable-inline-mappings: true
-  ignore:
-    - pnpm-lock.yaml
+
+ignore: |
+  pnpm-lock.yaml
