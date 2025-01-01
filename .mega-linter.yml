@@ -18,6 +18,13 @@ DISABLE:
   - COPYPASTE # Comment to enable checks of excessive copy-pastes
   - SPELL # Comment to enable checks of spelling mistakes
 
+
+DISABLE_LINTERS:
+  - MARKDOWN_MARKDOWN_TABLE_FORMATTER # Disable because of conflict with prettier way to handle tables
+
+
+JAVASCRIPT_DEFAULT_STYLE: prettier
+
 SHOW_ELAPSED_TIME: true
 
 FILEIO_REPORTER: false
