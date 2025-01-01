@@ -10,4 +10,4 @@ rules:
     allow-non-breakable-words: true
     allow-non-breakable-inline-mappings: true
   ignore:
-  - pnpm-lock.yaml
+    - pnpm-lock.yaml

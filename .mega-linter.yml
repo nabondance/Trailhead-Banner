@@ -25,6 +25,8 @@ DISABLE_LINTERS:
 
 JAVASCRIPT_DEFAULT_STYLE: prettier
 
+YAML_YAMLLINT_CONFIG_FILE: .github/linters/.yamllint.yml
+
 SHOW_ELAPSED_TIME: true
 
 FILEIO_REPORTER: false
