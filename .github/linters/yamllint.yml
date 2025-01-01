@@ -1,5 +1,0 @@
----
-extends: default
-
-ignore:
-  - pnpm-lock.yaml
