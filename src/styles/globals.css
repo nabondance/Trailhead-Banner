@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Iosevka';
+  font-family: Iosevka;
   src: url('/fonts/Iosevka.ttf') format('ttf');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Anta';
+  font-family: Anta;
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/Anta.woff2') format('woff2');
@@ -106,7 +106,7 @@ body {
   position: absolute;
   background-color: var(--background);
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
   z-index: 1;
 }
 
@@ -145,7 +145,7 @@ body {
 .footer {
   background-color: #f1f1f1;
   color: var(--text-dark);
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
   font-weight: 300;
   padding: 10px;
   text-align: center;
@@ -176,7 +176,7 @@ body {
   width: 24px;
   height: 24px;
   vertical-align: middle;
-  margin-left: -0px;
+  margin-left: -0;
   margin-right: -8px;
 }
 
@@ -189,7 +189,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--background);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 }
 
 .input-container {
@@ -286,7 +286,7 @@ body {
   font-size: 30px;
   font-weight: bold;
   padding: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
   transition:
     background-color 0.3s,
     transform 0.3s;
@@ -298,12 +298,12 @@ body {
 }
 
 .options {
-  margin-top: 0px;
+  margin-top: 0;
   padding: 15px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background-color: var(--options-bg);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   animation: fadeIn 0.3s ease-in-out;
 }
 
@@ -336,6 +336,7 @@ legend {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -469,7 +470,7 @@ legend {
   margin-top: 20px; /* Increase space on top of the example grid */
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .examples-grid {
     grid-template-columns: 1fr;
   }
@@ -480,7 +481,7 @@ legend {
   border: 1px solid var(--border);
   border-radius: 8px;
   background-color: var(--background);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   transition:
     transform 0.3s,
     box-shadow 0.3s;
@@ -494,7 +495,7 @@ legend {
 
 .example-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 20%);
 }
 
 .example-card img {
@@ -525,7 +526,7 @@ legend {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgb(0 0 0 / 80%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -579,14 +580,14 @@ legend {
   gap: 20px;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .library-grid {
     grid-template-columns: 1fr;
   }
 }
 
 /* Media queries for responsiveness */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .trailhead-banner-header {
     flex-direction: column;
     align-items: center;
@@ -627,7 +628,7 @@ legend {
   color: var(--text-light);
   padding: 10px 20px;
   border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   z-index: 1000;
   transition: opacity 0.3s;
 }
