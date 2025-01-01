@@ -44,18 +44,19 @@ const MainPage = () => {
       console.error('Error generating image:', error);
       setMainError(error);
       console.log('Main Error:', mainError);
-      // const issueTitle = encodeURIComponent(generateIssueTitle(error));
-      // const issueBody = encodeURIComponent(generateIssueBody(error, formOptions));
-      // document.querySelector('.error-message a').href =
-      //   `https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(error))}&body=${encodeURIComponent(generateIssueBody(error, formOptions))}`;
     } finally {
       setLoading(false);
     }
   };
 
+  const handleValidationError = (error, options) => {
+    setMainError(error);
+    setFormOptions(options);
+  };
+
   return (
     <div className='container'>
-      <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} />
+      <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} onValidationError={handleValidationError} />
       {loading && (
         <div className='loading-container'>
           <p>Generating the banner...</p>
