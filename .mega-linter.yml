@@ -20,6 +20,7 @@ DISABLE:
 
 DISABLE_LINTERS:
   - MARKDOWN_MARKDOWN_TABLE_FORMATTER # Disable because of conflict with prettier way to handle tables
+  - JAVASCRIPT_STANDARD # Disable because of conflict with prettier
 
 JAVASCRIPT_DEFAULT_STYLE: prettier
 
