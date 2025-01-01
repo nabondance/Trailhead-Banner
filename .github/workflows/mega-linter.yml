@@ -53,9 +53,22 @@ jobs:
         with:
           token: ${{ secrets.THB_PAT || secrets.GITHUB_TOKEN }}
 
-          # If you use VALIDATE_ALL_CODEBASE = true, you can remove this line to
-          # improve performance
-          # fetch-depth: 0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: Install Dependencies
+        id: pnpm-install
+        run: pnpm install
 
       # MegaLinter
       - name: MegaLinter
