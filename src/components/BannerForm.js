@@ -139,7 +139,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Background Options</legend>
             <label>
               Background Color:
-              <input type='color' value={options.backgroundColor} onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })} />
+              <input
+                type='color'
+                value={options.backgroundColor}
+                onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
+              />
             </label>
             <label>
               Custom Background Image (URL or Upload):
@@ -160,7 +164,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Text Options</legend>
             <label>
               Text Color:
-              <input type='color' value={options.textColor} onChange={(e) => setOptions({ ...options, textColor: e.target.value })} />
+              <input
+                type='color'
+                value={options.textColor}
+                onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
+              />
             </label>
             <label>
               Show Badge Count:
@@ -191,7 +199,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Display Options</legend>
             <label>
               Show Rank Logo:
-              <input type='checkbox' checked={options.displayRankLogo} onChange={(e) => setOptions({ ...options, displayRankLogo: e.target.checked })} />
+              <input
+                type='checkbox'
+                checked={options.displayRankLogo}
+                onChange={(e) => setOptions({ ...options, displayRankLogo: e.target.checked })}
+              />
             </label>
             <label>
               Show Superbadges:
