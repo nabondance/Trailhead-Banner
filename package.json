@@ -8,8 +8,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --check --ignore-path .gitignore .",
-    "format:fix": "prettier --write --ignore-path .gitignore ."
+    "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
+    "format:prettier": "prettier --check --ignore-path .gitignore .",
+    "format:prettier:fix": "prettier --write --ignore-path .gitignore .",
+    "format:stylelint": "stylelint '**/*.{css,scss}'",
+    "format:stylelint:fix": "stylelint '**/*.{css,scss}' --fix"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,scss,md}": "prettier --write"
