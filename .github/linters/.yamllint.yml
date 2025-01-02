@@ -1,4 +1,8 @@
 ---
+
+ignore: |
+    pnpm-lock.yaml
+
 extends: default
 
 rules:
@@ -11,6 +15,3 @@ rules:
     max: 80
     allow-non-breakable-words: true
     allow-non-breakable-inline-mappings: true
-
-ignore: |
-  pnpm-lock.yaml
