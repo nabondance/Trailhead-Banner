@@ -1,5 +1,6 @@
 # Trailhead-Banner
 
+![Vercel](https://vercelbadge.vercel.app/api/nabondance/trailhead-banner)
 
 <img src="public/assets/logos/trailhead-banner-logo.svg" alt="Trailhead Banner Logo" width="200">
 
