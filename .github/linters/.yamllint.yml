@@ -1,4 +1,8 @@
 ---
+
+ignore: |
+    pnpm-lock.yaml
+
 extends: default
 
 rules:
