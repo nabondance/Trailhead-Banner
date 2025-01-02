@@ -1,6 +1,7 @@
 # Trailhead-Banner
 
 ![Vercel](https://vercelbadge.vercel.app/api/nabondance/trailhead-banner)
+[![MegaLinter](https://github.com/nabondance/Trailhead-Banner/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/nabondance/Trailhead-Banner/actions/workflows/mega-linter.yml)
 
 <img src="public/assets/logos/trailhead-banner-logo.svg" alt="Trailhead Banner Logo" width="200">
 
