@@ -1,5 +1,8 @@
 # Trailhead-Banner
 
+
+<img src="public/assets/logos/trailhead-banner-logo.svg" alt="Trailhead Banner Logo" width="200">
+
 Trailhead-Banner is a web application that allows users to generate LinkedIn banners using their Trailhead data. The application fetches user data from Trailhead and generates a personalized banner image.
 
 ## Use it
