@@ -74,6 +74,7 @@ body {
   gap: 20px;
   margin-left: auto;
   justify-content: center; /* Center the links */
+  margin-top: 10px; /* Add space on top of the links */
 }
 
 .header-nav a {
