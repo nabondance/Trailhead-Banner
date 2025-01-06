@@ -1,6 +1,6 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
-const { applyGrayscale, cropImage } = require('./imageUtils');
+const { applyGrayscale, cropImage, calculateCertificationsDesign } = require('./imageUtils');
 require('./fonts');
 const fs = require('fs');
 
@@ -79,19 +79,19 @@ export const generateImage = async (options) => {
 
     // Draw the text
     const textYPosition = 40; // Adjusted to make the top of the text almost at the top of the image
-    let currentYPosition = textYPosition;
+    let certifCurrentYPosition = textYPosition;
     let numberOfLines = 3;
 
     if (badgeText) {
-      ctx.fillText(badgeText, rankLogoWidth + 40, currentYPosition);
-      currentYPosition += rankLogoHeight / 3;
+      ctx.fillText(badgeText, rankLogoWidth + 40, certifCurrentYPosition);
+      certifCurrentYPosition += rankLogoHeight / 3;
     }
     if (superbadgeText) {
-      ctx.fillText(superbadgeText, rankLogoWidth + 40, currentYPosition);
-      currentYPosition += rankLogoHeight / 3;
+      ctx.fillText(superbadgeText, rankLogoWidth + 40, certifCurrentYPosition);
+      certifCurrentYPosition += rankLogoHeight / 3;
     }
     if (certificationText) {
-      ctx.fillText(certificationText, rankLogoWidth + 40, currentYPosition);
+      ctx.fillText(certificationText, rankLogoWidth + 40, certifCurrentYPosition);
     }
   } catch (error) {
     console.error('Error drawing text:', error);
@@ -135,12 +135,11 @@ export const generateImage = async (options) => {
   }
 
   // Certifications Data
-  const logoYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
+  const certifYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
   const availableWidth = canvas.width - 40; // Leave some padding on the sides
-  let logoSpacing = 10; // Space between logos
-  const maxLogoHeight = canvas.height * bottom_part * 0.95; // 95% of the bottom 2/3 height
+  const availableHeight = canvas.height * bottom_part * 0.95; // 95% of the bottom 2/3 height
+  const certifSpacing = 10; // Space between certif logos
 
-  let totalLogoWidth = 0;
   const certificationsLogos = [];
 
   // Filter certifications based on the includeExpiredCertifications and includeRetiredCertifications flags
@@ -150,19 +149,15 @@ export const generateImage = async (options) => {
       (options.includeRetiredCertifications || cert.status.title !== 'Retired')
   );
 
-  // Load logos and calculate total width
+  // Load logos
   for (const cert of certifications) {
     if (cert.logoUrl) {
       try {
         console.log('Loading certification logo from URL:', cert.logoUrl);
         let logo = await loadImage(cert.logoUrl);
         logo = cropImage(logo); // Crop the logo to remove extra space
-        const logoHeight = maxLogoHeight;
-        const logoWidth = (logo.width / logo.height) * logoHeight; // Maintain aspect ratio
         certificationsLogos.push({
           logo,
-          logoWidth,
-          logoHeight,
           expired: cert.status.expired,
           retired: cert.status.title == 'Retired',
         });
@@ -172,47 +167,31 @@ export const generateImage = async (options) => {
     }
   }
 
-  // Calculate total width required for logos
-  totalLogoWidth = certificationsLogos.reduce((acc, { logoWidth }) => acc + logoWidth + logoSpacing, -logoSpacing);
-
-  // Adjust spacing if total width exceeds available space
-  if (totalLogoWidth > availableWidth) {
-    const excessWidth = totalLogoWidth - availableWidth;
-    const newSpacing = Math.max(0, logoSpacing - excessWidth / (certificationsLogos.length - 1));
-    totalLogoWidth = certificationsLogos.reduce((acc, { logoWidth }) => acc + logoWidth + newSpacing, -newSpacing);
-    logoSpacing = newSpacing;
-  }
-
-  // Scale down logos if total width still exceeds available width
-  if (totalLogoWidth > availableWidth) {
-    const scaleFactor = availableWidth / totalLogoWidth;
-    certificationsLogos.forEach((cert) => {
-      cert.logoWidth *= scaleFactor;
-      cert.logoHeight *= scaleFactor;
-    });
-    totalLogoWidth = availableWidth;
-  }
-
-  // Calculate starting X position to center the logos
-  let startX = (canvas.width - totalLogoWidth) / 2;
+  // Calculate design for certifications
+  const design = calculateCertificationsDesign(certificationsLogos.map(({ logo }) => logo), availableWidth, availableHeight, certifSpacing);
 
   // Draw logos centered with a small space between them
-  for (const { logo, logoWidth, logoHeight, expired, retired } of certificationsLogos) {
+  let certifStartX = (canvas.width - (design.maxLogosPerLine * design.logoWidth + (design.maxLogosPerLine - 1) * certifSpacing)) / 2;
+  let certifCurrentYPosition = certifYPosition;
+
+  for (let i = 0; i < certificationsLogos.length; i++) {
+    const { logo, expired, retired } = certificationsLogos[i];
     if (expired) {
-      ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
-      applyGrayscale(ctx, startX, logoYPosition, logoWidth, logoHeight); // Apply grayscale for expired certifications
+      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight);
+      applyGrayscale(ctx, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight); // Apply grayscale for expired certifications
     } else if (retired) {
       ctx.globalAlpha = 0.5; // Set transparency for retired certifications
-      ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
+      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight);
     } else {
       ctx.globalAlpha = 1.0; // Reset transparency
-      ctx.drawImage(logo, startX, logoYPosition, logoWidth, logoHeight);
+      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight);
     }
-    startX += logoWidth + logoSpacing;
+    certifStartX += design.logoWidth + certifSpacing;
 
-    // Ensure logos do not go out of the image
-    if (startX + logoWidth > canvas.width) {
-      startX = canvas.width - logoWidth - logoSpacing;
+    // Move to the next row if the current row is full
+    if ((i + 1) % design.maxLogosPerLine === 0) {
+      certifStartX = (canvas.width - (design.maxLogosPerLine * design.logoWidth + (design.maxLogosPerLine - 1) * certifSpacing)) / 2;
+      certifCurrentYPosition += design.logoHeight + certifSpacing;
     }
   }
 
