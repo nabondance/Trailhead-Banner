@@ -1,5 +1,10 @@
 # Trailhead-Banner
 
+![Vercel](https://vercelbadge.vercel.app/api/nabondance/trailhead-banner)
+[![MegaLinter](https://github.com/nabondance/Trailhead-Banner/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/nabondance/Trailhead-Banner/actions/workflows/mega-linter.yml)
+
+<img src="public/assets/logos/trailhead-banner-logo.svg" alt="Trailhead Banner Logo" width="200">
+
 Trailhead-Banner is a web application that allows users to generate LinkedIn banners using their Trailhead data. The application fetches user data from Trailhead and generates a personalized banner image.
 
 ## Use it
@@ -18,3 +23,10 @@ Trailhead-Banner is a web application that allows users to generate LinkedIn ban
 - Display or hide various elements like badge count, superbadge count, rank logo, and certification count
 - Download the generated banner image
 - Responsive design
+
+## Thanks
+
+Special thanks to:
+
+- @nvuillam for motivating me to extend [Trailhead-Stats](https://github.com/nabondance/Trailhead-Stats) ideas to the LinkedIn world
+- @pozil for convincing me that making a small website to generate images is easy

@@ -25,5 +25,5 @@
     <polygon style="stroke: rgb(0, 0, 0); fill: rgb(164, 115, 182); stroke-width: 4px;" points="495 225 460 225 460 275 495 275 475 250"/>
     <polygon style="transform-box: fill-box; transform-origin: 50% 50%; stroke: rgb(0, 0, 0); fill: rgb(164, 115, 182); stroke-width: 4px;" points="40 275 5 275 5 225 40 225 20 250" transform="matrix(-1, 0, 0, -1, -0.000016, 0.000006)"/>
   </g>
-  <text style="white-space: pre; fill: rgb(51, 51, 51); font-family: Anta, sans-serif; font-size: 45px;" x="87.39" y="265.636">Tailhead Banner</text>
+  <text style="white-space: pre; fill: rgb(51, 51, 51); font-family: Anta, sans-serif; font-size: 45px;" x="87.39" y="265.636">Trailhead Banner</text>
 </svg>

@@ -3,7 +3,7 @@ import { getServerSideSitemap } from 'next-sitemap';
 export const getServerSideProps = async (ctx) => {
   const fields = [
     {
-      loc: 'https://trailhead-banner.vercel.app/',
+      loc: 'https://thb.nabondance.me/',
       lastmod: new Date().toISOString(),
     },
     // Add more URLs here

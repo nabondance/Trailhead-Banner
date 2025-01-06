@@ -74,6 +74,7 @@ body {
   gap: 20px;
   margin-left: auto;
   justify-content: center; /* Center the links */
+  margin-top: 10px; /* Add space on top of the links */
 }
 
 .header-nav a {
@@ -99,6 +100,7 @@ body {
   cursor: pointer;
   padding: 0;
   margin: 0;
+  font-size: 1em;
 }
 
 .header-nav .dropdown-content {

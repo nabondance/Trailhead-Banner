@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
     username: '',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#00A1E0',
     backgroundImageUrl: '',
     textColor: '#111827',
     displayBadgeCount: true,
