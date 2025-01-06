@@ -134,7 +134,7 @@ export const generateImage = async (options) => {
   const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
   const availableWidth = canvas.width - 40; // Leave some padding on the sides
   let logoSpacing = 10; // Space between logos
-  const maxLogoHeight = canvas.height * (2 / 3) * 0.8; // 80% of the bottom 2/3 height
+  const maxLogoHeight = canvas.height * (2 / 3) * 0.95; // 95% of the bottom 2/3 height
 
   let totalLogoWidth = 0;
   const certificationsLogos = [];
