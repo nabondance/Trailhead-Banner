@@ -4,6 +4,10 @@ const { applyGrayscale, cropImage } = require('./imageUtils');
 require('./fonts');
 const fs = require('fs');
 
+const top_part = 1 / 4;
+const bottom_part = 3 / 4;
+const right_part = 7 / 10;
+
 export const generateImage = async (options) => {
   console.log('Generating banner with the following data:');
   console.log('Rank Data:', options.rankData);
@@ -47,15 +51,15 @@ export const generateImage = async (options) => {
   const rankLogoUrl = options.rankData.rank.imageUrl;
   console.debug('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
-  const rankLogoHeight = canvas.height * (1 / 3) * 0.9; // 90% of the top 1/3 height
+  const rankLogoHeight = canvas.height * top_part * 0.99;
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
   if (options.displayRankLogo) {
-    ctx.drawImage(rankLogo, 20, 20, rankLogoWidth, rankLogoHeight);
+    ctx.drawImage(rankLogo, 10, 10, rankLogoWidth, rankLogoHeight);
   }
 
   // Set font and text color
   ctx.fillStyle = options.textColor || '#111827'; // Use the custom text color or default one
-  ctx.font = '36px Roboto-Bold'; // Use the custom font
+  ctx.font = '34px Roboto-Bold';
   console.log('Font set to:', ctx.font);
 
   // Draw text
@@ -74,7 +78,7 @@ export const generateImage = async (options) => {
       : '';
 
     // Draw the text
-    const textYPosition = 50; // Adjusted to make the top of the text almost at the top of the image
+    const textYPosition = 40; // Adjusted to make the top of the text almost at the top of the image
     let currentYPosition = textYPosition;
     let numberOfLines = 3;
 
@@ -99,10 +103,10 @@ export const generateImage = async (options) => {
       .filter((edge) => edge.node.award && edge.node.award.icon)
       .map((edge) => edge.node.award.icon);
 
-    const superbadgeLogoHeight = canvas.height * (1 / 3) * 0.8; // 80% of the top 1/3 height
+    const superbadgeLogoHeight = canvas.height * top_part * 0.9;
     const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
     let superbadgeSpacing = 10;
-    const availableWidth = canvas.width * (2 / 3); // Available width for superbadges
+    const availableWidth = canvas.width * right_part; // Available width for superbadges
     let superbadgeX = canvas.width - availableWidth;
     let superbadgeY = 20;
 
@@ -131,10 +135,10 @@ export const generateImage = async (options) => {
   }
 
   // Certifications Data
-  const logoYPosition = canvas.height * (1 / 3) + 20; // Start just below the top 1/3
+  const logoYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
   const availableWidth = canvas.width - 40; // Leave some padding on the sides
   let logoSpacing = 10; // Space between logos
-  const maxLogoHeight = canvas.height * (2 / 3) * 0.95; // 95% of the bottom 2/3 height
+  const maxLogoHeight = canvas.height * bottom_part * 0.95; // 95% of the bottom 2/3 height
 
   let totalLogoWidth = 0;
   const certificationsLogos = [];
