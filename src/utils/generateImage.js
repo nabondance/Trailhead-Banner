@@ -159,7 +159,6 @@ export const generateImage = async (options) => {
         logo = cropImage(logo); // Crop the logo to remove extra space
         const logoHeight = maxLogoHeight;
         const logoWidth = (logo.width / logo.height) * logoHeight; // Maintain aspect ratio
-        totalLogoWidth += logoWidth + logoSpacing;
         certificationsLogos.push({
           logo,
           logoWidth,
@@ -172,9 +171,6 @@ export const generateImage = async (options) => {
       }
     }
   }
-
-  // Remove the last spacing
-  totalLogoWidth -= logoSpacing;
 
   // Calculate total width required for logos
   totalLogoWidth = certificationsLogos.reduce((acc, { logoWidth }) => acc + logoWidth + logoSpacing, -logoSpacing);
