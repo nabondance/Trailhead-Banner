@@ -23,3 +23,10 @@ Trailhead-Banner is a web application that allows users to generate LinkedIn ban
 - Display or hide various elements like badge count, superbadge count, rank logo, and certification count
 - Download the generated banner image
 - Responsive design
+
+## Thanks
+
+Special thanks to:
+
+- @nvuillam for motivating me to extend [Trailhead-Stats](https://github.com/nabondance/Trailhead-Stats) ideas to the LinkedIn world
+- @pozil for convincing me that making a small website to generate images is easy
