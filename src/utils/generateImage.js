@@ -233,7 +233,7 @@ export const generateImage = async (options) => {
     ctx.restore();
   }
 
-  // Load and draw the "By /nabondance" SVG
+  // Load and draw the "By nabondance.me" SVG
   const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'bynabondance.svg');
   const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
   const byNabondanceWidth = 300;
