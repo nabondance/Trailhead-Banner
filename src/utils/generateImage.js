@@ -124,10 +124,6 @@ export const generateImage = async (options) => {
         const logo = await loadImage(logoUrl);
         ctx.drawImage(logo, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
         superbadgeX += superbadgeLogoWidth + superbadgeSpacing;
-        if (superbadgeX + superbadgeLogoWidth > canvas.width) {
-          superbadgeX = canvas.width - superbadgeAvailableWidth;
-          superbadgeY += superbadgeLogoHeight + superbadgeSpacing;
-        }
       } catch (error) {
         console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
       }
