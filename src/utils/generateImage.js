@@ -167,31 +167,38 @@ export const generateImage = async (options) => {
     }
   }
 
-  // Calculate design for certifications
-  const design = calculateCertificationsDesign(certificationsLogos.map(({ logo }) => logo), availableWidth, availableHeight, certifSpacing);
+  // Calculate certifDesign for certifications
+  const certifDesign = calculateCertificationsDesign(
+    certificationsLogos.map(({ logo }) => logo),
+    availableWidth,
+    availableHeight,
+    certifSpacing
+  );
 
   // Draw logos centered with a small space between them
-  let certifStartX = (canvas.width - (design.maxLogosPerLine * design.logoWidth + (design.maxLogosPerLine - 1) * certifSpacing)) / 2;
+  let certifStartX =
+    (canvas.width - (certifDesign.maxLogosPerLine * certifDesign.logoWidth + (certifDesign.maxLogosPerLine - 1) * certifSpacing)) / 2;
   let certifCurrentYPosition = certifYPosition;
 
   for (let i = 0; i < certificationsLogos.length; i++) {
     const { logo, expired, retired } = certificationsLogos[i];
     if (expired) {
-      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight);
-      applyGrayscale(ctx, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight); // Apply grayscale for expired certifications
+      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
+      applyGrayscale(ctx, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight); // Apply grayscale for expired certifications
     } else if (retired) {
       ctx.globalAlpha = 0.5; // Set transparency for retired certifications
-      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight);
+      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
     } else {
       ctx.globalAlpha = 1.0; // Reset transparency
-      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, design.logoWidth, design.logoHeight);
+      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
     }
-    certifStartX += design.logoWidth + certifSpacing;
+    certifStartX += certifDesign.logoWidth + certifSpacing;
 
     // Move to the next row if the current row is full
-    if ((i + 1) % design.maxLogosPerLine === 0) {
-      certifStartX = (canvas.width - (design.maxLogosPerLine * design.logoWidth + (design.maxLogosPerLine - 1) * certifSpacing)) / 2;
-      certifCurrentYPosition += design.logoHeight + certifSpacing;
+    if ((i + 1) % certifDesign.maxLogosPerLine === 0) {
+      certifStartX =
+        (canvas.width - (certifDesign.maxLogosPerLine * certifDesign.logoWidth + (certifDesign.maxLogosPerLine - 1) * certifSpacing)) / 2;
+      certifCurrentYPosition += certifDesign.logoHeight + certifSpacing;
     }
   }
 
