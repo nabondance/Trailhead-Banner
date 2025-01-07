@@ -43,7 +43,7 @@ export const generateImage = async (options) => {
     const bgImage = await loadImage(options.backgroundImageUrl);
     ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
   } else {
-    ctx.fillStyle = options.backgroundColor || '#f3f4f6'; // Use the selected background color or default to #f3f4f6
+    ctx.fillStyle = options.backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
