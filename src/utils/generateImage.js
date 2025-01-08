@@ -172,11 +172,9 @@ export const generateImage = async (options) => {
   );
 
   // Draw logos centered with a small space between them
-  let certifStartX =
-    (canvas.width -
-      (certifDesign.maxLogosPerLine * certifDesign.logoWidth + (certifDesign.maxLogosPerLine - 1) * certifSpacing)) /
-    2;
   let certifCurrentYPosition = certifYPosition;
+  let currentLine = 0;
+  let certifStartX = certifDesign.logoLineStartX[currentLine];
 
   for (let i = 0; i < certificationsLogos.length; i++) {
     const { logo, expired, retired } = certificationsLogos[i];
@@ -194,11 +192,8 @@ export const generateImage = async (options) => {
 
     // Move to the next row if the current row is full
     if ((i + 1) % certifDesign.maxLogosPerLine === 0) {
-      certifStartX =
-        (canvas.width -
-          (certifDesign.maxLogosPerLine * certifDesign.logoWidth +
-            (certifDesign.maxLogosPerLine - 1) * certifSpacing)) /
-        2;
+      currentLine++;
+      certifStartX = certifDesign.logoLineStartX[currentLine];
       certifCurrentYPosition += certifDesign.logoHeight + certifSpacing;
     }
   }
