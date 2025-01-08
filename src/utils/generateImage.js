@@ -47,14 +47,14 @@ export const generateImage = async (options) => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // Rank Data
+  // Rank Logo
   const rankLogoUrl = options.rankData.rank.imageUrl;
   console.debug('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
-  const rankLogoHeight = canvas.height * top_part * 0.99;
+  const rankLogoHeight = canvas.height * top_part * 1;
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
   if (options.displayRankLogo) {
-    ctx.drawImage(rankLogo, 10, 10, rankLogoWidth, rankLogoHeight);
+    ctx.drawImage(rankLogo, 5, 5, rankLogoWidth, rankLogoHeight);
   }
 
   // Set font and text color
@@ -78,7 +78,7 @@ export const generateImage = async (options) => {
       : '';
 
     // Draw the text
-    const textYPosition = 40; // Adjusted to make the top of the text almost at the top of the image
+    const textYPosition = 30; // Adjusted to make the top of the text almost at the top of the image
     let certifCurrentYPosition = textYPosition;
     let numberOfLines = 3;
 
