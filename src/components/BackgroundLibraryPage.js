@@ -119,7 +119,7 @@ const BackgroundLibraryPage = () => {
       src: '/assets/background-library/vass-company.png',
       alt: 'Vass Company Background',
       description: 'Vass Company Background',
-      credit: 'salesforce.com',
+      credit: 'vasscompany.com',
     },
     {
       src: '/assets/background-library/NYC_desert_1.png',
