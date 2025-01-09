@@ -113,12 +113,21 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
   const finalLogoWidth = logoWidth * scale;
   const finalLogoHeight = logoHeight * scale;
 
+  // Calculate the starting X position for each line
+  const logoLineStartX = [];
+  for (let row = 0; row < numRows; row++) {
+    const logosInLine = row === numRows - 1 ? logos.length % maxLogosPerRow || maxLogosPerRow : maxLogosPerRow;
+    const lineWidth = logosInLine * finalLogoWidth + (logosInLine - 1) * logoSpacing;
+    logoLineStartX.push((canvasWidth - lineWidth) / 2);
+  }
+
   // Return the results
   return {
     logoWidth: finalLogoWidth,
     logoHeight: finalLogoHeight,
     numLines: numRows,
     maxLogosPerLine: maxLogosPerRow,
+    logoLineStartX,
   };
 };
 

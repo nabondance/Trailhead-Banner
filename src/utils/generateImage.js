@@ -43,18 +43,18 @@ export const generateImage = async (options) => {
     const bgImage = await loadImage(options.backgroundImageUrl);
     ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
   } else {
-    ctx.fillStyle = options.backgroundColor || '#f3f4f6'; // Use the selected background color or default to #f3f4f6
+    ctx.fillStyle = options.backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // Rank Data
+  // Rank Logo
   const rankLogoUrl = options.rankData.rank.imageUrl;
   console.debug('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
-  const rankLogoHeight = canvas.height * top_part * 0.99;
+  const rankLogoHeight = canvas.height * top_part * 1;
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
   if (options.displayRankLogo) {
-    ctx.drawImage(rankLogo, 10, 10, rankLogoWidth, rankLogoHeight);
+    ctx.drawImage(rankLogo, 5, 5, rankLogoWidth, rankLogoHeight);
   }
 
   // Set font and text color
@@ -78,7 +78,7 @@ export const generateImage = async (options) => {
       : '';
 
     // Draw the text
-    const textYPosition = 40; // Adjusted to make the top of the text almost at the top of the image
+    const textYPosition = 30; // Adjusted to make the top of the text almost at the top of the image
     let certifCurrentYPosition = textYPosition;
     let numberOfLines = 3;
 
@@ -172,11 +172,9 @@ export const generateImage = async (options) => {
   );
 
   // Draw logos centered with a small space between them
-  let certifStartX =
-    (canvas.width -
-      (certifDesign.maxLogosPerLine * certifDesign.logoWidth + (certifDesign.maxLogosPerLine - 1) * certifSpacing)) /
-    2;
   let certifCurrentYPosition = certifYPosition;
+  let currentLine = 0;
+  let certifStartX = certifDesign.logoLineStartX[currentLine];
 
   for (let i = 0; i < certificationsLogos.length; i++) {
     const { logo, expired, retired } = certificationsLogos[i];
@@ -194,11 +192,8 @@ export const generateImage = async (options) => {
 
     // Move to the next row if the current row is full
     if ((i + 1) % certifDesign.maxLogosPerLine === 0) {
-      certifStartX =
-        (canvas.width -
-          (certifDesign.maxLogosPerLine * certifDesign.logoWidth +
-            (certifDesign.maxLogosPerLine - 1) * certifSpacing)) /
-        2;
+      currentLine++;
+      certifStartX = certifDesign.logoLineStartX[currentLine];
       certifCurrentYPosition += certifDesign.logoHeight + certifSpacing;
     }
   }
