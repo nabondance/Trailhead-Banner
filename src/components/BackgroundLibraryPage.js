@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import '../styles/globals.css';
+import banners from '../data/banners.json';
+import searchQueries from '../data/searchQueries.json';
 
 const BannerCard = ({ src, alt, description, credit, onClick, onCopy }) => (
   <div className='example-card'>
@@ -35,56 +37,6 @@ const BackgroundLibraryPage = () => {
       setNotification('');
     }, 1000);
   };
-
-  const banners = [
-    {
-      src: '/assets/background-library/banner1.png',
-      alt: 'Banner 1',
-      description: 'Banner 1',
-      credit: 'Photographer 1',
-    },
-    {
-      src: '/assets/background-library/banner2.png',
-      alt: 'Banner 2',
-      description: 'Banner 2',
-      credit: 'Photographer 2',
-    },
-    {
-      src: '/assets/background-library/banner3.png',
-      alt: 'Banner 3',
-      description: 'Banner 3',
-      credit: 'Photographer 3',
-    },
-    {
-      src: '/assets/background-library/banner4.png',
-      alt: 'Banner 4',
-      description: 'Banner 4',
-      credit: 'Photographer 4',
-    },
-    {
-      src: '/assets/background-library/banner5.png',
-      alt: 'Banner 5',
-      description: 'Banner 5',
-      credit: 'Photographer 5',
-    },
-  ];
-
-  const searchQueries = [
-    { query: 'linkedin+banner+background', label: 'LinkedIn Banner Background' },
-    { query: 'linkedin+banner+background+empty', label: 'Empty LinkedIn Banner Background' },
-    {
-      query: 'LinkedIn+banner+background+technology+digital+design',
-      label: 'Technology & Digital Design LinkedIn Banner',
-    },
-    { query: 'LinkedIn+banner+background+abstract+design', label: 'Abstract Design LinkedIn Banner' },
-    { query: 'LinkedIn+banner+background+creative+colorful', label: 'Creative & Colorful LinkedIn Banner' },
-    {
-      query: 'LinkedIn+banner+background+abstract+professional+high+resolution',
-      label: 'Abstract Professional LinkedIn Banner',
-    },
-    { query: 'LinkedIn+banner+background+building', label: 'Building LinkedIn Banner' },
-    { query: 'LinkedIn+banner+background+landscape', label: 'Landscape LinkedIn Banner' },
-  ];
 
   return (
     <div className='background-library-container'>
