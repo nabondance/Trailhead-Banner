@@ -9,7 +9,7 @@ Trailhead-Banner is a web application that allows users to generate LinkedIn ban
 
 ## Use it
 
-1. Go to [Trailhead-Banner](https://trailhead-banner.vercel.app/)
+1. Go to [Trailhead-Banner](https://thb.nabondance.me)
 1. Type your Trailhead username
 1. Modify more options if wanted
 1. Click on **Generate Banner**
