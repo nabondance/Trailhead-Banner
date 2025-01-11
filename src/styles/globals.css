@@ -20,6 +20,8 @@
 
 :root {
   --background: #f5f5f5;
+  --header-bg: #f5f5f5;
+  --footer-bg: #f5f5f5;
   --middleground: #f5f5f5;
   --primary: #48cfcb;
   --secondary: #229799;
@@ -50,7 +52,7 @@ body {
 
 .header {
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: var(--header-bg);
   border-bottom: 1px solid var(--border);
 }
 
@@ -145,7 +147,7 @@ body {
 }
 
 .footer {
-  background-color: #f1f1f1;
+  background-color: var(--footer-bg);
   color: var(--text-dark);
   font-family: Inter, sans-serif;
   font-weight: 300;
