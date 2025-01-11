@@ -30,9 +30,9 @@
   --border: #424242;
   --text-dark: #424242;
   --text-light: #f5f5f5;
-  --valid-color: #2E844A;
-  --warning-color: #DD7A01;
-  --error-color: #BA0517;
+  --valid-color: #2e844a;
+  --warning-color: #dd7a01;
+  --error-color: #ba0517;
 }
 
 body {

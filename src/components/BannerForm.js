@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
@@ -123,11 +123,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         {validationResult && (
           <div className='validation-icon' data-tooltip={validationResult.message}>
             {validationResult.state === 'ok' ? (
-              <FontAwesomeIcon icon={faCheck} className="fa-fw" /> // Checkmark
+              <FontAwesomeIcon icon={faCheck} className='fa-fw' /> // Checkmark
             ) : validationResult.state === 'private' ? (
-              <FontAwesomeIcon icon={faTriangleExclamation} className="fa-fw" /> // Yellow warning
+              <FontAwesomeIcon icon={faTriangleExclamation} className='fa-fw' /> // Yellow warning
             ) : (
-              <FontAwesomeIcon icon={faCircleXmark} className="fa-fw" /> // Red cross
+              <FontAwesomeIcon icon={faCircleXmark} className='fa-fw' /> // Red cross
             )}
           </div>
         )}
