@@ -35,6 +35,25 @@
   --error-color: #ba0517;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #121212;
+    --header-bg: #1f1f1f;
+    --footer-bg: #1f1f1f;
+    --middleground: #1f1f1f;
+    --primary: #bb86fc;
+    --secondary: #009edb;
+    --foreground: #b3b3b3;
+    --highlight: #03dac6;
+    --border: #bb86fc;
+    --text-dark: #fff;
+    --text-light: #fff;
+    --valid-color: #2e844a;
+    --warning-color: #dd7a01;
+    --error-color: #ba0517;
+  }
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -211,6 +230,7 @@ body {
   background: var(--background);
   transition: border-color 0.3s;
   flex: 1;
+  color: var(--text-dark);
 }
 
 .input:focus {
@@ -220,6 +240,7 @@ body {
 
 .input-url {
   background: var(--input-url-bg);
+  color: var(--text-dark);
 }
 
 .input-error {
@@ -426,7 +447,7 @@ legend {
 .tutorial h2 {
   font-size: 1.5em;
   margin-bottom: 10px;
-  color: var(--secondary);
+  color: var(--text-dark);
 }
 
 .tutorial ol {
