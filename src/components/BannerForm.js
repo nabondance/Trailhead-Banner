@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
@@ -110,7 +112,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           value={options.username}
           onChange={(e) => setOptions({ ...options, username: e.target.value })}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
-          placeholder='Enter Trailhead username'
+          placeholder='Enter Trailhead username' // Add placeholder
           required
           className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
           name='trailhead-username'
@@ -121,11 +123,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         {validationResult && (
           <div className='validation-icon' data-tooltip={validationResult.message}>
             {validationResult.state === 'ok' ? (
-              <span className='icon success'>&#x2714;</span> // Green checkmark
+              <FontAwesomeIcon icon={faCheck} className='fa-fw icon-valid' /> // Checkmark
             ) : validationResult.state === 'private' ? (
-              <span className='icon warning'>&#x26A0;</span> // Yellow warning
+              <FontAwesomeIcon icon={faTriangleExclamation} className='fa-fw icon-warning' /> // Yellow warning
             ) : (
-              <span className='icon error'>&#x2716;</span> // Red cross
+              <FontAwesomeIcon icon={faCircleXmark} className='fa-fw icon-error' /> // Red cross
             )}
           </div>
         )}
@@ -146,12 +148,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               />
             </label>
             <label>
-              Custom Background Image (URL or Upload):
+              Custom Background Image:
               <input
                 type='text'
                 value={options.backgroundImageUrl}
                 onChange={handleUrlChange}
-                placeholder='Enter image URL'
+                placeholder='Enter image URL' // Add placeholder
                 className='input-url'
                 autoComplete='off'
                 data-lpignore='true' // LastPass specific attribute to ignore

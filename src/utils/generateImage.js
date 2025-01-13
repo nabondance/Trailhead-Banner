@@ -137,7 +137,7 @@ export const generateImage = async (options) => {
       (options.includeRetiredCertifications || cert.status.title !== 'Retired')
   );
 
-  if(certifications.length !== 0) {
+  if (certifications.length !== 0) {
     const certifYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
     const availableWidth = canvas.width - 40; // Leave some padding on the sides
     const availableHeight = canvas.height * bottom_part * 0.95; // 95% of the bottom 2/3 height

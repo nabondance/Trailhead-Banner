@@ -19,18 +19,47 @@
 }
 
 :root {
-  --background: #f5f5f5;
-  --middleground: #f5f5f5;
-  --primary: #48cfcb;
-  --secondary: #229799;
-  --foreground: #424242;
-  --highlight: #ff914d;
-  --border: #424242;
-  --text-dark: #424242;
-  --text-light: #f5f5f5;
-  --valid-color: green;
-  --warning-color: yellow;
-  --error-color: red;
+  --background: #fff;
+  --header-bg: #e6f7ff;
+  --footer-bg: #e6f7ff;
+  --middleground: #f0faff;
+  --primary: #009edb;
+  --secondary: #9b51e0;
+  --foreground: #003e6b;
+  --highlight: #f60;
+  --border: #009edb;
+  --text-color: #fff;
+  --text-contrast: #003e6b;
+  --text-faded: #a0a0a0;
+  --text-header: #003e6b;
+  --text-footer: #003e6b;
+  --text-form: #003e6b;
+  --valid-color: #2e844a;
+  --warning-color: #dd7a01;
+  --error-color: #ba0517;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #121212;
+    --header-bg: #1f1f1f;
+    --footer-bg: #1f1f1f;
+    --middleground: #1f1f1f;
+    --primary: #9b51e0;
+    --secondary: #009edb;
+    --foreground: #b3b3b3;
+    --highlight: #03dac6;
+    --border: #9b51e0;
+    --text-color: #fff;
+    --text-contrast: #fff;
+    --text-faded: #a0a0a0;
+    --text-header: #fff;
+    --text-footer: #fff;
+    --text-form: #fff;
+    --valid-color: #2e844a;
+    --warning-color: #dd7a01;
+    --error-color: #ba0517;
+  }
 }
 
 body {
@@ -50,7 +79,7 @@ body {
 
 .header {
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: var(--header-bg);
   border-bottom: 1px solid var(--border);
 }
 
@@ -136,17 +165,19 @@ body {
   margin: 0;
   font-size: 3em;
   font-weight: bold;
+  color: var(--text-header);
 }
 
 .trailhead-banner-header h2 {
   margin: 0;
   font-size: 1.5em;
   font-weight: 500;
+  color: var(--text-header);
 }
 
 .footer {
-  background-color: #f1f1f1;
-  color: var(--text-dark);
+  background-color: var(--footer-bg);
+  color: var(--text-footer);
   font-family: Inter, sans-serif;
   font-weight: 300;
   padding: 10px;
@@ -192,6 +223,7 @@ body {
   border-radius: 8px;
   background: var(--background);
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+  color: var(--text-form);
 }
 
 .input-container {
@@ -199,6 +231,7 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
+  color: red;
 }
 
 .input {
@@ -209,6 +242,11 @@ body {
   background: var(--background);
   transition: border-color 0.3s;
   flex: 1;
+  color: var(--text-contrast);
+}
+
+::placeholder {
+  color: var(--text-faded);
 }
 
 .input:focus {
@@ -218,16 +256,17 @@ body {
 
 .input-url {
   background: var(--input-url-bg);
+  color: var(--text-contrast);
 }
 
 .input-error {
   border-color: var(--error-color);
-  border-width: 2px;
+  border-width: 4px;
 }
 
 .input-warning {
   border-color: var(--warning-color);
-  border-width: 2px;
+  border-width: 4px;
 }
 
 .input-success {
@@ -247,6 +286,18 @@ body {
   font-size: 20px;
 }
 
+.icon-valid {
+  color: var(--valid-color);
+}
+
+.icon-warning {
+  color: var(--warning-color);
+}
+
+.icon-error {
+  color: var(--error-color);
+}
+
 .validation-icon[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -264,7 +315,7 @@ body {
 .button {
   padding: 10px;
   font-size: 16px;
-  color: var(--text-light);
+  color: var(--text-contrast);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
@@ -400,21 +451,25 @@ legend {
   margin-top: 10px;
   padding: 10px;
   font-size: 16px;
-  color: var(--text-light);
+  color: var(--text-color);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
   text-decoration: none;
+  box-shadow: 0 0 20px var(--primary);
+  transition: box-shadow 0.3s;
 }
 
 .download-link:hover {
   background-color: var(--secondary);
+  box-shadow: 0 0 30px var(--secondary);
 }
 
 .tutorial {
   margin-top: 20px;
   margin-bottom: 40px;
   padding: 20px;
+  padding-top: 10px;
   background-color: var(--middleground);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -424,7 +479,8 @@ legend {
 .tutorial h2 {
   font-size: 1.5em;
   margin-bottom: 10px;
-  color: var(--secondary);
+  margin-top: 0;
+  color: var(--text-contrast);
 }
 
 .tutorial ol {
@@ -456,13 +512,13 @@ legend {
 .examples-container h1 {
   font-size: 2.5em;
   margin-bottom: 10px;
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .examples-container h2 {
   font-size: 1.5em;
   margin-bottom: 30px;
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .examples-grid {
@@ -519,7 +575,7 @@ legend {
 .example-card p {
   margin-top: 10px;
   font-size: 1em;
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .fullscreen-overlay {
@@ -552,7 +608,6 @@ legend {
 .error-message {
   color: var(--error-color);
   font-size: 16px;
-  margin-top: 10px;
   text-align: center;
   background-color: #ffe6e6;
   padding: 10px;
@@ -611,7 +666,7 @@ legend {
   margin-top: 10px;
   padding: 5px 10px;
   font-size: 14px;
-  color: var(--text-light);
+  color: var(--text-color);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
@@ -627,7 +682,7 @@ legend {
   top: 20px;
   right: 20px;
   background-color: var(--primary);
-  color: var(--text-light);
+  color: var(--text-contrast);
   padding: 10px 20px;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
@@ -669,7 +724,7 @@ legend {
 
 .credit {
   font-size: 0.9em;
-  color: var(--text-dark);
+  color: var(--text-contrast);
   margin-top: 5px;
 }
 
@@ -678,7 +733,7 @@ legend {
   top: 10px;
   right: 10px;
   background-color: var(--primary);
-  color: var(--text-light);
+  color: var(--secondary);
   padding: 5px 10px;
   border-radius: 4px;
   font-size: 14px;
@@ -688,4 +743,5 @@ legend {
 
 .star-repo:hover {
   background-color: var(--secondary);
+  color: var(--primary);
 }
