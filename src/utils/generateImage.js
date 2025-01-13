@@ -220,8 +220,8 @@ export const generateImage = async (options) => {
   ctx.globalAlpha = 1.0; // Reset transparency
   ctx.drawImage(
     byNabondanceSvg,
-    canvas.width - byNabondanceWidth,
-    canvas.height - byNabondanceHeight,
+    canvas.width - byNabondanceWidth + 35,
+    canvas.height - byNabondanceHeight - 5,
     byNabondanceWidth,
     byNabondanceHeight
   );

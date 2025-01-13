@@ -1,0 +1,57 @@
+[
+  {
+    "src": "/assets/examples/example1.png",
+    "alt": "Example 1",
+    "description": "Default Banner Generated"
+  },
+  {
+    "src": "/assets/examples/example2.png",
+    "alt": "Example 2",
+    "description": "Banner with custom background and text color"
+  },
+  {
+    "src": "/assets/examples/example3.png",
+    "alt": "Example 3",
+    "description": "Banner with custom background image from the library"
+  },
+  {
+    "src": "/assets/examples/example4.png",
+    "alt": "Example 4",
+    "description": "Banner with custom background image from the internet"
+  },
+  {
+    "src": "/assets/examples/example5.png",
+    "alt": "Example 5",
+    "description": "Banner without superbadges displayed"
+  },
+  {
+    "src": "/assets/examples/example6.png",
+    "alt": "Example 6",
+    "description": "Banner displaying expired certifications (grey) and retired certifications (faded)"
+  },
+  {
+    "src": "/assets/examples/example7.png",
+    "alt": "Example 7",
+    "description": "Banner of a 10x certified"
+  },
+  {
+    "src": "/assets/examples/example8.png",
+    "alt": "Example 8",
+    "description": "Banner of a 15x certified"
+  },
+  {
+    "src": "/assets/examples/example9.png",
+    "alt": "Example 9",
+    "description": "Banner with many superbadges"
+  },
+  {
+    "src": "/assets/examples/example10.png",
+    "alt": "Example 10",
+    "description": "Banner of a MVP"
+  },
+  {
+    "src": "/assets/examples/example11.png",
+    "alt": "Example 11",
+    "description": "Banner without text"
+  }
+]
