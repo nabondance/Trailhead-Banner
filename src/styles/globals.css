@@ -32,6 +32,7 @@
   --text-light: #fff;
   --text-header: #003e6b;
   --text-footer: #003e6b;
+  --text-form: #003e6b;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
   --error-color: #ba0517;
@@ -52,6 +53,7 @@
     --text-light: #fff;
     --text-header: #fff;
     --text-footer: #fff;
+    --text-form: #fff;
     --valid-color: #2e844a;
     --warning-color: #dd7a01;
     --error-color: #ba0517;
@@ -219,6 +221,7 @@ body {
   border-radius: 8px;
   background: var(--background);
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+  color: var(--text-form);
 }
 
 .input-container {
