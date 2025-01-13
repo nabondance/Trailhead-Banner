@@ -112,7 +112,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           value={options.username}
           onChange={(e) => setOptions({ ...options, username: e.target.value })}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
-          placeholder='Enter Trailhead username'
+          placeholder='Enter Trailhead username' // Add placeholder
           required
           className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
           name='trailhead-username'
@@ -153,7 +153,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 type='text'
                 value={options.backgroundImageUrl}
                 onChange={handleUrlChange}
-                placeholder='Enter image URL'
+                placeholder='Enter image URL' // Add placeholder
                 className='input-url'
                 autoComplete='off'
                 data-lpignore='true' // LastPass specific attribute to ignore

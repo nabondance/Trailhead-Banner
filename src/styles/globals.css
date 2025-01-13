@@ -28,8 +28,8 @@
   --foreground: #003e6b;
   --highlight: #f60;
   --border: #009edb;
-  --text-dark: #003e6b;
-  --text-light: #fff;
+  --text-contrast: #003e6b;
+  --text-faded: #fff;
   --text-header: #003e6b;
   --text-footer: #003e6b;
   --text-form: #003e6b;
@@ -49,8 +49,8 @@
     --foreground: #b3b3b3;
     --highlight: #03dac6;
     --border: #9b51e0;
-    --text-dark: #fff;
-    --text-light: #fff;
+    --text-contrast: #fff;
+    --text-faded: #a0a0a0;
     --text-header: #fff;
     --text-footer: #fff;
     --text-form: #fff;
@@ -229,6 +229,7 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
+  color: red;
 }
 
 .input {
@@ -239,7 +240,11 @@ body {
   background: var(--background);
   transition: border-color 0.3s;
   flex: 1;
-  color: var(--text-dark);
+  color: var(--text-contrast);
+}
+
+::placeholder {
+  color: var(--text-faded);
 }
 
 .input:focus {
@@ -249,7 +254,7 @@ body {
 
 .input-url {
   background: var(--input-url-bg);
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .input-error {
@@ -308,7 +313,7 @@ body {
 .button {
   padding: 10px;
   font-size: 16px;
-  color: var(--text-light);
+  color: var(--text-contrast);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
@@ -444,7 +449,7 @@ legend {
   margin-top: 10px;
   padding: 10px;
   font-size: 16px;
-  color: var(--text-light);
+  color: var(--text-faded);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
@@ -470,7 +475,7 @@ legend {
   font-size: 1.5em;
   margin-bottom: 10px;
   margin-top: 0;
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .tutorial ol {
@@ -502,13 +507,13 @@ legend {
 .examples-container h1 {
   font-size: 2.5em;
   margin-bottom: 10px;
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .examples-container h2 {
   font-size: 1.5em;
   margin-bottom: 30px;
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .examples-grid {
@@ -565,7 +570,7 @@ legend {
 .example-card p {
   margin-top: 10px;
   font-size: 1em;
-  color: var(--text-dark);
+  color: var(--text-contrast);
 }
 
 .fullscreen-overlay {
@@ -657,7 +662,7 @@ legend {
   margin-top: 10px;
   padding: 5px 10px;
   font-size: 14px;
-  color: var(--text-light);
+  color: var(--text-faded);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
@@ -673,7 +678,7 @@ legend {
   top: 20px;
   right: 20px;
   background-color: var(--primary);
-  color: var(--text-light);
+  color: var(--text-contrast);
   padding: 10px 20px;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
@@ -715,7 +720,7 @@ legend {
 
 .credit {
   font-size: 0.9em;
-  color: var(--text-dark);
+  color: var(--text-contrast);
   margin-top: 5px;
 }
 
