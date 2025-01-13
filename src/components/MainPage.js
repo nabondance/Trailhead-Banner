@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Analytics } from '@vercel/analytics/react';
 import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
@@ -87,8 +85,6 @@ const MainPage = () => {
           <LinkedInBannerTutorial />
         </div>
       )}
-      <SpeedInsights />
-      <Analytics />
     </div>
   );
 };

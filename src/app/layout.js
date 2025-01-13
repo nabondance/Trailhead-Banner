@@ -1,3 +1,6 @@
+import UmamiProvider from 'next-umami';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
 import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
 import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
@@ -29,6 +32,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang='en'>
+      <head>
+        <UmamiProvider websiteId='b540d5cc-247f-426e-87ec-0c1258767c22' />
+        <SpeedInsights />
+        <Analytics />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <header className='header'>
           <TrailheadBannerHeader />
