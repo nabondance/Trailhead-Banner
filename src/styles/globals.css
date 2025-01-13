@@ -28,8 +28,9 @@
   --foreground: #003e6b;
   --highlight: #f60;
   --border: #009edb;
+  --text-color: #fff;
   --text-contrast: #003e6b;
-  --text-faded: #fff;
+  --text-faded: #a0a0a0;
   --text-header: #003e6b;
   --text-footer: #003e6b;
   --text-form: #003e6b;
@@ -49,6 +50,7 @@
     --foreground: #b3b3b3;
     --highlight: #03dac6;
     --border: #9b51e0;
+    --text-color: #fff;
     --text-contrast: #fff;
     --text-faded: #a0a0a0;
     --text-header: #fff;
@@ -603,7 +605,6 @@ legend {
 .error-message {
   color: var(--error-color);
   font-size: 16px;
-  margin-top: 10px;
   text-align: center;
   background-color: #ffe6e6;
   padding: 10px;
@@ -662,7 +663,7 @@ legend {
   margin-top: 10px;
   padding: 5px 10px;
   font-size: 14px;
-  color: var(--text-faded);
+  color: var(--text-color);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
