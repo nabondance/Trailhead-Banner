@@ -724,7 +724,7 @@ legend {
   top: 10px;
   right: 10px;
   background-color: var(--primary);
-  color: var(--text-light);
+  color: var(--secondary);
   padding: 5px 10px;
   border-radius: 4px;
   font-size: 14px;
@@ -734,4 +734,5 @@ legend {
 
 .star-repo:hover {
   background-color: var(--secondary);
+  color: var(--primary);
 }
