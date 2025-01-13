@@ -123,11 +123,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         {validationResult && (
           <div className='validation-icon' data-tooltip={validationResult.message}>
             {validationResult.state === 'ok' ? (
-              <FontAwesomeIcon icon={faCheck} className='fa-fw' /> // Checkmark
+              <FontAwesomeIcon icon={faCheck} className='fa-fw icon-valid' /> // Checkmark
             ) : validationResult.state === 'private' ? (
-              <FontAwesomeIcon icon={faTriangleExclamation} className='fa-fw' /> // Yellow warning
+              <FontAwesomeIcon icon={faTriangleExclamation} className='fa-fw icon-warning' /> // Yellow warning
             ) : (
-              <FontAwesomeIcon icon={faCircleXmark} className='fa-fw' /> // Red cross
+              <FontAwesomeIcon icon={faCircleXmark} className='fa-fw icon-error' /> // Red cross
             )}
           </div>
         )}

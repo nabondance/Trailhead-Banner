@@ -279,6 +279,18 @@ body {
   font-size: 20px;
 }
 
+.icon-valid {
+  color: var(--valid-color);
+}
+
+.icon-warning {
+  color: var(--warning-color);
+}
+
+.icon-error {
+  color: var(--error-color);
+}
+
 .validation-icon[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
