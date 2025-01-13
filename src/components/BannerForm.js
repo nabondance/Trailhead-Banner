@@ -148,7 +148,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               />
             </label>
             <label>
-              Custom Background Image (URL or Upload):
+              Custom Background Image:
               <input
                 type='text'
                 value={options.backgroundImageUrl}
