@@ -80,7 +80,7 @@ const MainPage = () => {
       )}
       {imageUrl && !mainError && (
         <div className='image-container'>
-          <Image src={imageUrl} alt='Generated' className='generated-image' width={1584} height={396} />
+          <Image src={imageUrl} alt='Generated' className='generated-image' width={1584} height={396} unoptimized />
           <a href={imageUrl} download='trailhead-banner.png' className='download-link'>
             Download Banner
           </a>

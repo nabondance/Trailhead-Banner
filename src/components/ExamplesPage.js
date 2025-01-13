@@ -7,7 +7,7 @@ import examples from '../data/examples.json';
 
 const ExampleCard = ({ src, alt, description, onClick }) => (
   <div className='example-card'>
-    <Image src={src} alt={alt} width={600} height={400} onClick={() => onClick(src)} />
+    <Image src={src} alt={alt} width={600} height={400} onClick={() => onClick(src)} unoptimized />
     <p>{description}</p>
   </div>
 );
@@ -42,7 +42,7 @@ const ExamplesPage = () => {
 
       {fullscreenImage && (
         <div className='fullscreen-overlay visible' onClick={handleOverlayClick}>
-          <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' />
+          <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
     </div>
