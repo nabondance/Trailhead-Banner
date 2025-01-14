@@ -88,7 +88,7 @@ const MainPage = () => {
       {imageUrl && !mainError && (
         <div className='image-container'>
           <Image src={imageUrl} alt='Generated' className='generated-image' width={1584} height={396} unoptimized onClick={() => handleImageClick(imageUrl)} />
-          <a href={imageUrl} download='trailhead-banner.png' className='download-link'>
+          <a href={imageUrl} download={`trailhead-banner-${formOptions.username}.png`} className='download-link'>
             Download Banner
           </a>
           <LinkedInBannerTutorial />
