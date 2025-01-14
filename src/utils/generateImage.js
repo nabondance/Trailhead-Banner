@@ -66,16 +66,21 @@ export const generateImage = async (options) => {
   try {
     const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount;
     const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount;
-    const certificationCount = options.certificationsData.certifications.length;
+    const certificationCount = options.certificationsData.certifications.filter(
+      (cert) =>
+        (options.includeExpiredCertifications || cert.status.expired === false) &&
+        (options.includeRetiredCertifications || cert.status.title !== 'Retired')
+    ).length;
 
     const badgeText = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
     const superbadgeText =
       options.displaySuperbadgeCount && superbadgeCount > 0
         ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
         : '';
-    const certificationText = options.displayCertificationCount
-      ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}`
-      : '';
+    const certificationText =
+      options.displayCertificationCount && certificationCount > 0
+        ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}`
+        : '';
 
     // Draw the text
     const textYPosition = 30; // Adjusted to make the top of the text almost at the top of the image
