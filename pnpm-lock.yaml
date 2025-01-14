@@ -38,9 +38,6 @@ importers:
       next-sitemap:
         specifier: ^4.2.3
         version: 4.2.3(next@15.1.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
-      next-umami:
-        specifier: ^0.0.4
-        version: 0.0.4
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
@@ -1684,9 +1681,6 @@ packages:
     hasBin: true
     peerDependencies:
       next: '*'
-
-  next-umami@0.0.4:
-    resolution: {integrity: sha512-v/sXVwvy+sumq3jPRkjiv1Tf7nk1HQxAjyohrc+x65QI6v5vFK2NG3NyI+C7ML41dYHDPg+UswUDDZu0yeGUWg==}
 
   next@15.1.3:
     resolution: {integrity: sha512-5igmb8N8AEhWDYzogcJvtcRDU6n4cMGtBklxKD4biYv4LXN8+awc/bbQ2IM2NQHdVPgJ6XumYXfo3hBtErg1DA==}
@@ -4136,8 +4130,6 @@ snapshots:
       fast-glob: 3.3.2
       minimist: 1.2.8
       next: 15.1.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-
-  next-umami@0.0.4: {}
 
   next@15.1.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
