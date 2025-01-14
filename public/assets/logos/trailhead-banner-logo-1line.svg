@@ -31,5 +31,5 @@
     <polygon style="stroke:#000000; fill:#8a00c4; stroke-width: 4px;" points="495 225 460 225 460 275 495 275 475 250"/>
     <polygon style="transform-box: fill-box; transform-origin: 50% 50%; stroke:#000000; fill:#8a00c4; stroke-width: 4px;" points="40 275 5 275 5 225 40 225 20 250" transform="matrix(-1, 0, 0, -1, 0, 0)"/>
   </g>
-  <text style="white-space: pre; fill:#000000; font-family: Anta, sans-serif; font-size: 52px;" x="45" y="265">Trailhead Banner</text>
+  <text style="white-space: pre; fill:#fff; font-family: Anta, sans-serif; font-size: 52px;" x="45" y="265">Trailhead Banner</text>
 </svg>

@@ -31,6 +31,6 @@
     <polygon style="stroke:#000000; fill:#8a00c4; stroke-width: 4px;" points="495 230 460 230 460 330 495 330 470 280"/>
     <polygon style="transform-box: fill-box; stroke:#000000; fill:#8a00c4; stroke-width: 4px;" points="5 230 40 230 40 330 5 330 30 280"/>
   </g>
-  <text style="white-space: pre; fill:#000000; font-family: Anta, sans-serif; font-size: 90px;" x="60" y="295">Trailhead</text>
-  <text style="white-space: pre; fill:#000000; font-family: Anta, sans-serif; font-size: 40px;" x="175" y="330">Banner</text>
+  <text style="white-space: pre; fill:#fff; font-family: Anta, sans-serif; font-size: 90px;" x="60" y="295">Trailhead</text>
+  <text style="white-space: pre; fill:#fff; font-family: Anta, sans-serif; font-size: 40px;" x="175" y="330">Banner</text>
 </svg>
