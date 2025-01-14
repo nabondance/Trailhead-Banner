@@ -316,7 +316,7 @@ body {
 .button {
   padding: 10px;
   font-size: 16px;
-  color: var(--text-contrast);
+  color: var(--text-color);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
