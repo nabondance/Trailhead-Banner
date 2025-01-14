@@ -4,10 +4,15 @@ const applyGrayscale = (ctx, x, y, width, height) => {
   const imageData = ctx.getImageData(x, y, width, height);
   const data = imageData.data;
   for (let i = 0; i < data.length; i += 4) {
-    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-    data[i] = avg; // Red
-    data[i + 1] = avg; // Green
-    data[i + 2] = avg; // Blue
+    const isTransparent = data[i + 3] === 0;
+    const isBackgroundColor = data[i] === 0 && data[i + 1] === 136 && data[i + 2] === 204 && data[i + 3] === 255;
+    if (!isTransparent && !isBackgroundColor) {
+      // Only apply grayscale to non-transparent and non-background pixels
+      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i] = avg; // Red
+      data[i + 1] = avg; // Green
+      data[i + 2] = avg; // Blue
+    }
   }
   ctx.putImageData(imageData, x, y);
 };

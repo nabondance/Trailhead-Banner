@@ -93,6 +93,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setMainError(null); // Clear previous errors
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
+    setShowOptions(false); // Hide the options when generating
     const isValidUsername = await validateUsername(options.username);
     const isValidImageUrl = await validateImageUrl(options.backgroundImageUrl);
     if (isValidUsername && isValidImageUrl) {
@@ -132,9 +133,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </div>
         )}
       </div>
-      <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
-        {showOptions ? 'Hide Options' : 'More Options'}
-      </button>
+      {!isGenerating && (
+        <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
+          {showOptions ? 'Hide Options' : 'More Options'}
+        </button>
+      )}
       {showOptions && (
         <div className='options'>
           <fieldset>

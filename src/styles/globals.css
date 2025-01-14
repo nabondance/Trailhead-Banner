@@ -24,7 +24,8 @@
   --footer-bg: #e6f7ff;
   --middleground: #f0faff;
   --primary: #009edb;
-  --secondary: #9b51e0;
+  --primary-faded: #66c4e9;
+  --secondary: #8a00c4;
   --foreground: #003e6b;
   --highlight: #f60;
   --border: #009edb;
@@ -45,11 +46,12 @@
     --header-bg: #1f1f1f;
     --footer-bg: #1f1f1f;
     --middleground: #1f1f1f;
-    --primary: #9b51e0;
+    --primary: #8a00c4;
+    --primary-faded: #9b51e0;
     --secondary: #009edb;
     --foreground: #b3b3b3;
     --highlight: #03dac6;
-    --border: #9b51e0;
+    --border: #8a00c4;
     --text-color: #fff;
     --text-contrast: #fff;
     --text-faded: #a0a0a0;
@@ -78,7 +80,6 @@ body {
 }
 
 .header {
-  padding: 20px;
   background-color: var(--header-bg);
   border-bottom: 1px solid var(--border);
 }
@@ -139,6 +140,7 @@ body {
   min-width: 160px;
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
   z-index: 1;
+  right: 0;
 }
 
 .header-nav .dropdown-content a {
@@ -203,6 +205,7 @@ body {
 
 .logo-container {
   flex-shrink: 0;
+  filter: drop-shadow(0 0 10px var(--primary));
 }
 
 .github-logo {
@@ -315,7 +318,7 @@ body {
 .button {
   padding: 10px;
   font-size: 16px;
-  color: var(--text-contrast);
+  color: var(--text-color);
   background-color: var(--primary);
   border: none;
   border-radius: 4px;
@@ -327,7 +330,7 @@ body {
 }
 
 .more-options-button {
-  background-color: var(--secondary);
+  background-color: var(--primary-faded);
 }
 
 .more-options-button:hover {
@@ -536,6 +539,7 @@ legend {
 
 .example-card {
   padding: 30px;
+  padding-bottom: 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background-color: var(--background);
@@ -558,6 +562,7 @@ legend {
 
 .example-card img {
   max-width: 100%;
+  width: 90%;
   height: auto;
   border-radius: 4px;
   border: 1px solid var(--border);
@@ -565,6 +570,8 @@ legend {
   transform-origin: center; /* Ensure scaling happens from the center */
   z-index: 1;
   cursor: pointer;
+  aspect-ratio: 4/1;
+  object-fit: cover;
 }
 
 .example-card img:hover {
@@ -598,6 +605,8 @@ legend {
   max-width: 90%;
   max-height: 90%;
   border-radius: 8px;
+  object-fit: contain;
+  margin: auto; /* Center the image */
 }
 
 .fullscreen-overlay.visible {
@@ -659,6 +668,20 @@ legend {
   .header-nav {
     margin-left: 0;
     margin-top: 10px;
+  }
+
+  .header-nav .dropdown-content {
+    right: 0;
+    top: 100%;
+  }
+
+  .star-repo {
+    position: static;
+    margin-top: 10px;
+  }
+
+  .logo-container {
+    margin-top: 50px;
   }
 }
 
