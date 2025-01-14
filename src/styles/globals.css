@@ -40,28 +40,26 @@
   --error-color: #ba0517;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #121212;
-    --header-bg: #1f1f1f;
-    --footer-bg: #1f1f1f;
-    --middleground: #1f1f1f;
-    --primary: #8a00c4;
-    --primary-faded: #9b51e0;
-    --secondary: #009edb;
-    --foreground: #b3b3b3;
-    --highlight: #03dac6;
-    --border: #8a00c4;
-    --text-color: #fff;
-    --text-contrast: #fff;
-    --text-faded: #a0a0a0;
-    --text-header: #fff;
-    --text-footer: #fff;
-    --text-form: #fff;
-    --valid-color: #2e844a;
-    --warning-color: #dd7a01;
-    --error-color: #ba0517;
-  }
+[data-theme='dark'] {
+  --background: #121212;
+  --header-bg: #1f1f1f;
+  --footer-bg: #1f1f1f;
+  --middleground: #1f1f1f;
+  --primary: #8a00c4;
+  --primary-faded: #9b51e0;
+  --secondary: #009edb;
+  --foreground: #b3b3b3;
+  --highlight: #03dac6;
+  --border: #8a00c4;
+  --text-color: #fff;
+  --text-contrast: #fff;
+  --text-faded: #a0a0a0;
+  --text-header: #fff;
+  --text-footer: #fff;
+  --text-form: #fff;
+  --valid-color: #2e844a;
+  --warning-color: #dd7a01;
+  --error-color: #ba0517;
 }
 
 body {
@@ -767,4 +765,11 @@ legend {
 .star-repo:hover {
   background-color: var(--secondary);
   color: var(--primary);
+}
+
+.theme-switch-container {
+  position: absolute;
+  top: 50px;
+  right: 30px;
+  z-index: 1;
 }

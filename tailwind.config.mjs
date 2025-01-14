@@ -16,6 +16,7 @@ const config = {
     },
   },
   plugins: [],
+  darkMode: 'selector',
 };
 
 export default config;

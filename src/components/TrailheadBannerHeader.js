@@ -1,5 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import ThemeSwitch from '../components/ThemeSwitch';
 import '../styles/globals.css';
 
 const TrailheadBannerHeader = () => {
@@ -13,6 +16,9 @@ const TrailheadBannerHeader = () => {
       >
         ⭐ Star the repo to get updates!
       </a>
+      <div className='theme-switch-container'>
+        <ThemeSwitch />
+      </div>
       <div className='logo-container'>
         <Image src='/assets/logos/trailhead-banner-logo.svg' alt='Trailhead-Banner Logo' width={120} height={120} />
       </div>
