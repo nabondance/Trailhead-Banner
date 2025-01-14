@@ -667,6 +667,15 @@ legend {
     right: 0;
     top: 100%;
   }
+
+  .star-repo {
+    position: static;
+    margin-top: 10px;
+  }
+
+  .logo-container {
+    margin-top: 50px;
+  }
 }
 
 .copy-button {
@@ -706,7 +715,7 @@ legend {
 .background-library-container h2 {
   font-size: 1.5em;
   margin-bottom: 20px;
-  color: var(--secondary);
+  color: var (--secondary);
 }
 
 .background-library-container ul {
