@@ -562,6 +562,7 @@ legend {
 
 .example-card img {
   max-width: 100%;
+  width: 90%;
   height: auto;
   border-radius: 4px;
   border: 1px solid var(--border);
@@ -569,8 +570,6 @@ legend {
   transform-origin: center; /* Ensure scaling happens from the center */
   z-index: 1;
   cursor: pointer;
-  width: 90%;
-  height: auto;
   aspect-ratio: 4/1;
   object-fit: cover;
 }
