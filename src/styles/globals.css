@@ -539,6 +539,7 @@ legend {
 
 .example-card {
   padding: 30px;
+  padding-bottom: 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background-color: var(--background);
@@ -568,6 +569,10 @@ legend {
   transform-origin: center; /* Ensure scaling happens from the center */
   z-index: 1;
   cursor: pointer;
+  width: 90%;
+  height: auto;
+  aspect-ratio: 4/1;
+  object-fit: cover;
 }
 
 .example-card img:hover {
