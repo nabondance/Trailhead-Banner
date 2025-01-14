@@ -138,6 +138,7 @@ body {
   min-width: 160px;
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
   z-index: 1;
+  right: 0;
 }
 
 .header-nav .dropdown-content a {
@@ -660,6 +661,11 @@ legend {
   .header-nav {
     margin-left: 0;
     margin-top: 10px;
+  }
+
+  .header-nav .dropdown-content {
+    right: 0;
+    top: 100%;
   }
 }
 
