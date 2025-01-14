@@ -12,6 +12,7 @@ const MainPage = () => {
   const [loading, setLoading] = useState(false);
   const [mainError, setMainError] = useState(null);
   const [formOptions, setFormOptions] = useState({});
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const handleImageSubmit = async (options) => {
     console.log('Generating image for:', options.username);
@@ -52,6 +53,14 @@ const MainPage = () => {
     setFormOptions(options);
   };
 
+  const handleImageClick = (src) => {
+    setFullscreenImage(src);
+  };
+
+  const handleOverlayClick = () => {
+    setFullscreenImage(null);
+  };
+
   return (
     <div className='container'>
       <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} onValidationError={handleValidationError} />
@@ -78,11 +87,16 @@ const MainPage = () => {
       )}
       {imageUrl && !mainError && (
         <div className='image-container'>
-          <Image src={imageUrl} alt='Generated' className='generated-image' width={1584} height={396} unoptimized />
+          <Image src={imageUrl} alt='Generated' className='generated-image' width={1584} height={396} unoptimized onClick={() => handleImageClick(imageUrl)} />
           <a href={imageUrl} download='trailhead-banner.png' className='download-link'>
             Download Banner
           </a>
           <LinkedInBannerTutorial />
+        </div>
+      )}
+      {fullscreenImage && (
+        <div className='fullscreen-overlay visible' onClick={handleOverlayClick}>
+          <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
     </div>
