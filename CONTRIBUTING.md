@@ -109,5 +109,7 @@ To learn more about Next.js, take a look at the following resources:
 
 #### Colors
 
-- primary:
-- secondary:
+- primary: #009edb
+- secondary: #8a00c4
+- additional: #003e6b
+-
