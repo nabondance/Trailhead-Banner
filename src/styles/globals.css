@@ -607,6 +607,7 @@ legend {
   max-height: 90%;
   border-radius: 8px;
   object-fit: contain;
+  margin: auto; /* Center the image */
 }
 
 .fullscreen-overlay.visible {
