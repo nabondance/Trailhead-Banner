@@ -717,7 +717,7 @@ legend {
 .background-library-container h2 {
   font-size: 1.5em;
   margin-bottom: 20px;
-  color: var (--secondary);
+  color: var(--secondary);
 }
 
 .background-library-container ul {
