@@ -16,7 +16,7 @@
     "format:stylelint:fix": "stylelint '**/*.{css,scss}' --fix"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,scss,md}": "prettier --write"
+    "*.{js,jsx,ts,tsx,json,css,scss,md,yml}": "prettier --write"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
