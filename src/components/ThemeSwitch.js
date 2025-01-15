@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import "@theme-toggles/react/css/DarkSide.css";
+import { DarkSide } from "@theme-toggles/react";
 
 const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false);
@@ -20,9 +22,13 @@ const ThemeSwitch = () => {
   };
 
   return (
-    <button onClick={toggleTheme} className='theme-toggle-button'>
-      {theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-    </button>
+    <div className='theme-switch-container'>
+      <DarkSide
+        duration={750}
+        toggled={theme === 'dark'}
+        onToggle={toggleTheme}
+      />
+    </div>
   );
 };
 

@@ -768,11 +768,6 @@ legend {
 }
 
 .theme-switch-container {
-  position: absolute;
-  top: 60px;
-  right: 50px;
+  transform: scale(1.3);
   z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
