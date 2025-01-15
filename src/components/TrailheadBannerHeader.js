@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
 import '../styles/globals.css';

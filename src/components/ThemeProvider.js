@@ -12,11 +12,7 @@ const ThemeProvider = ({ children }) => {
 
   if (!mounted) return null;
 
-  return (
-    <NextThemesProvider attribute="class">
-      {children}
-    </NextThemesProvider>
-  );
+  return <NextThemesProvider attribute='class'>{children}</NextThemesProvider>;
 };
 
 export default ThemeProvider;
