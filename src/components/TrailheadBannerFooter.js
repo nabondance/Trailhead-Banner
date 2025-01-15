@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import ThemedImage from './ThemedImage';
 import '../styles/globals.css';
 
 const TrailheadBannerFooter = () => {
@@ -8,7 +8,7 @@ const TrailheadBannerFooter = () => {
     <footer className='footer'>
       <a href='https://github.com/nabondance' target='_blank' rel='noopener noreferrer' className='footer-link'>
         &copy; 2025 Trailhead-Banner by{' '}
-        <Image src='/assets/logos/github-logo.svg' alt='GitHub' className='github-logo' width={15} height={15} />{' '}
+        <ThemedImage basePath='/assets/logos/github-logo' alt='GitHub' className='github-logo' width={15} height={15} />{' '}
         /nabondance
       </a>
     </footer>
