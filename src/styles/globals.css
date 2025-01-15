@@ -770,6 +770,9 @@ legend {
 }
 
 .theme-switch-container {
-  transform: scale(1.3);
+  position: absolute;
+  top: 75px;
+  right: 20px;
   z-index: 1;
+  transform: scale(3);
 }

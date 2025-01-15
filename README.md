@@ -28,5 +28,5 @@ Trailhead-Banner is a web application that allows users to generate LinkedIn ban
 
 Special thanks to:
 
-- @nvuillam for motivating me to extend [Trailhead-Stats](https://github.com/nabondance/Trailhead-Stats) ideas to the LinkedIn world
-- @pozil for convincing me that making a small website to generate images is easy
+- [@nvuillam](https://github.com/nvuillam) for motivating me to extend [Trailhead-Stats](https://github.com/nabondance/Trailhead-Stats) ideas to the LinkedIn world
+- [@pozil](https://github.com/pozil) for convincing me that making a small website to generate images is easy
