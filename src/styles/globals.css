@@ -630,7 +630,7 @@ legend {
 }
 
 .error-message a:hover {
-  color: var (--secondary);
+  color: var(--secondary);
   text-decoration: none;
 }
 
