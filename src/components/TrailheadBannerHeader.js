@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import ThemeSwitch from '../components/ThemeSwitch';
+import dynamic from 'next/dynamic'
+
+const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
 import '../styles/globals.css';
 
 const TrailheadBannerHeader = () => {

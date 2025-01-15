@@ -40,7 +40,7 @@
   --error-color: #ba0517;
 }
 
-[data-theme='dark'] {
+.dark {
   --background: #121212;
   --header-bg: #1f1f1f;
   --footer-bg: #1f1f1f;

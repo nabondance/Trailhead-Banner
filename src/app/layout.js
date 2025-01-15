@@ -4,7 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
 import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
 
-import { ThemeProvider } from 'next-themes'
+import ThemeProvider from '../components/ThemeProvider';
 
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
 import { config } from '@fortawesome/fontawesome-svg-core';
@@ -45,11 +45,13 @@ export default function RootLayout({ children }) {
         <Analytics />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className='header'>
-        <ThemeProvider><TrailheadBannerHeader /></ThemeProvider>
-        </header>
-        <main>{children}</main>
-        <TrailheadBannerFooter />
+        <ThemeProvider>
+          <header className='header'>
+            <TrailheadBannerHeader />
+          </header>
+          <main>{children}</main>
+          <TrailheadBannerFooter />
+        </ThemeProvider>
       </body>
     </html>
   );
