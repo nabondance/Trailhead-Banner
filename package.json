@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint-staged": "lint-staged",
     "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
     "format:prettier": "prettier --check --ignore-path .gitignore .",
     "format:prettier:fix": "prettier --write --ignore-path .gitignore .",
