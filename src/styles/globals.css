@@ -34,6 +34,7 @@
   --text-faded: #a0a0a0;
   --text-header: #003e6b;
   --text-footer: #003e6b;
+  --text-nav: #009edb;
   --text-form: #003e6b;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
@@ -56,6 +57,7 @@
   --text-faded: #a0a0a0;
   --text-header: #fff;
   --text-footer: #fff;
+  --text-nav: #9b51e0;
   --text-form: #fff;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
@@ -107,7 +109,7 @@ body {
 
 .header-nav a {
   text-decoration: none;
-  color: var(--primary);
+  color: var(--text-nav);
   font-weight: bold;
 }
 
@@ -122,7 +124,7 @@ body {
 
 .header-nav .dropbtn {
   background-color: transparent;
-  color: var(--primary);
+  color: var(--text-nav);
   font-weight: bold;
   border: none;
   cursor: pointer;
@@ -142,7 +144,7 @@ body {
 }
 
 .header-nav .dropdown-content a {
-  color: var(--primary);
+  color: var(--text-nav);
   padding: 12px 16px;
   text-decoration: none;
   display: block;
