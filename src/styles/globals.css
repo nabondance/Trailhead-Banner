@@ -628,7 +628,7 @@ legend {
 }
 
 .error-message a:hover {
-  color: var(--secondary);
+  color: var (--secondary);
   text-decoration: none;
 }
 
@@ -769,7 +769,10 @@ legend {
 
 .theme-switch-container {
   position: absolute;
-  top: 50px;
-  right: 30px;
+  top: 60px;
+  right: 50px;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
