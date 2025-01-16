@@ -798,3 +798,12 @@ legend {
   border: 3px solid transparent;
   border-color: var(--primary);
 }
+
+.counter-display {
+  display: flex;
+  align-items: center;
+}
+
+.counter-display select {
+  margin-left: 5px;
+}

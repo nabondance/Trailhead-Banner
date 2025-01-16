@@ -1,4 +1,5 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const { makeBadge, ValidationError } = require('badge-maker');
 const path = require('path');
 const { applyGrayscale, cropImage, calculateCertificationsDesign } = require('./imageUtils');
 require('./fonts');
@@ -24,6 +25,7 @@ export const generateImage = async (options) => {
     badgeCount: options.displayBadgeCount,
     superbadgeCount: options.displaySuperbadgeCount,
     certificationCount: options.displayCertificationCount,
+    counterDisplayType: options.counterDisplayType, // Log counter display type
   });
   console.log('Text Options:', {
     color: options.textColor,
@@ -62,44 +64,87 @@ export const generateImage = async (options) => {
   ctx.font = '34px Roboto-Bold';
   console.log('Font set to:', ctx.font);
 
-  // Draw text
-  try {
-    const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount;
-    const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount;
-    const certificationCount = options.certificationsData.certifications.filter(
-      (cert) =>
-        (options.includeExpiredCertifications || cert.status.expired === false) &&
-        (options.includeRetiredCertifications || cert.status.title !== 'Retired')
-    ).length;
+  // Counters
+  const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount || 0;
+  const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount || 0;
+  const certificationCount = options.certificationsData.certifications.filter(
+    (cert) =>
+      (options.includeExpiredCertifications || cert.status.expired === false) &&
+      (options.includeRetiredCertifications || cert.status.title !== 'Retired')
+  ).length;
+  let numberOfLines = 3;
 
-    const badgeText = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
-    const superbadgeText =
-      options.displaySuperbadgeCount && superbadgeCount > 0
-        ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
-        : '';
-    const certificationText =
-      options.displayCertificationCount && certificationCount > 0
-        ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}`
-        : '';
+  // Draw text if counterDisplayType is 'text'
+  switch (options.counterDisplayType) {
+    case 'text':
+      try {
+        const badgeText = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
+        const superbadgeText =
+          options.displaySuperbadgeCount && superbadgeCount > 0
+            ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
+            : '';
+        const certificationText =
+          options.displayCertificationCount && certificationCount > 0
+            ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}`
+            : '';
 
-    // Draw the text
-    const textYPosition = 30; // Adjusted to make the top of the text almost at the top of the image
-    let certifCurrentYPosition = textYPosition;
-    let numberOfLines = 3;
+        // Draw the text
+        let textCounterYPosition = 30;
 
-    if (badgeText) {
-      ctx.fillText(badgeText, rankLogoWidth + 40, certifCurrentYPosition);
-      certifCurrentYPosition += rankLogoHeight / 3;
-    }
-    if (superbadgeText) {
-      ctx.fillText(superbadgeText, rankLogoWidth + 40, certifCurrentYPosition);
-      certifCurrentYPosition += rankLogoHeight / 3;
-    }
-    if (certificationText) {
-      ctx.fillText(certificationText, rankLogoWidth + 40, certifCurrentYPosition);
-    }
-  } catch (error) {
-    console.error('Error drawing text:', error);
+        if (badgeText) {
+          ctx.fillText(badgeText, rankLogoWidth + 40, textCounterYPosition);
+          textCounterYPosition += rankLogoHeight / numberOfLines;
+        }
+        if (superbadgeText) {
+          ctx.fillText(superbadgeText, rankLogoWidth + 40, textCounterYPosition);
+          textCounterYPosition += rankLogoHeight / numberOfLines;
+        }
+        if (certificationText) {
+          ctx.fillText(certificationText, rankLogoWidth + 40, textCounterYPosition);
+        }
+      } catch (error) {
+        console.error('Error drawing text:', error);
+      }
+      break;
+    case 'badge':
+      // Draw badge counter
+      try {
+        const badgeScale = 1.4;
+        let badgeCounterYPosition = 5;
+        const badgeCounterYDelta = 30;
+        if (options.displayBadgeCount && badgeCount > 0) {
+          const badgeCounter = makeBadge({
+            message: `${badgeCount}`,
+            label: `Badge${badgeCount !== 1 ? 's' : ''}`,
+            color: 'blue',
+          });
+          const badgeCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badgeCounter).toString('base64')}`);
+          ctx.drawImage(badgeCounterImage, rankLogoWidth + 40, badgeCounterYPosition, badgeCounterImage.width * badgeScale, badgeCounterImage.height * badgeScale);
+          badgeCounterYPosition += badgeCounterYDelta;
+        }
+        if (options.displaySuperbadgeCount && superbadgeCount > 0) {
+          const superbadgeCounter = makeBadge({
+            message: `${superbadgeCount}`,
+            label: `Superbadge${superbadgeCount !== 1 ? 's' : ''}`,
+            color: 'blue',
+          });
+          const superbadgeCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(superbadgeCounter).toString('base64')}`);
+          ctx.drawImage(superbadgeCounterImage, rankLogoWidth + 40, badgeCounterYPosition, superbadgeCounterImage.width * badgeScale, superbadgeCounterImage.height * badgeScale);
+          badgeCounterYPosition += badgeCounterYDelta;
+        }
+        if (options.displayCertificationCount && certificationCount > 0) {
+          const certificationCounter = makeBadge({
+            message: `${certificationCount}`,
+            label: `Certification${certificationCount !== 1 ? 's' : ''}`,
+            color: 'blue',
+          });
+          const certificationCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(certificationCounter).toString('base64')}`);
+          ctx.drawImage(certificationCounterImage, rankLogoWidth + 40, badgeCounterYPosition, certificationCounterImage.width * badgeScale, certificationCounterImage.height * badgeScale);
+        }
+      } catch (error) {
+        console.error('Error drawing counter as badges:', error);
+      }
+      break;
   }
 
   // Display Superbadges if enabled
@@ -225,7 +270,7 @@ export const generateImage = async (options) => {
   ctx.globalAlpha = 1.0; // Reset transparency
   ctx.drawImage(
     byNabondanceSvg,
-    canvas.width - byNabondanceWidth ,
+    canvas.width - byNabondanceWidth,
     canvas.height - byNabondanceHeight - 2,
     byNabondanceWidth,
     byNabondanceHeight

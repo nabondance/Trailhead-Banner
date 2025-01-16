@@ -17,6 +17,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displaySuperbadges: true,
     includeExpiredCertifications: false,
     includeRetiredCertifications: false,
+    counterDisplayType: 'text',
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -158,7 +159,10 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
               />
             </label>
-            <label onClick={() => setShowPredefinedImages(!showPredefinedImages)} style={{ cursor: 'pointer', color: 'var(--primary)' }}>
+            <label
+              onClick={() => setShowPredefinedImages(!showPredefinedImages)}
+              style={{ cursor: 'pointer', color: 'var(--primary)' }}
+            >
               {showPredefinedImages ? 'Hide Predefined Backgrounds' : 'Select Predefined Background'}
             </label>
             {showPredefinedImages && (
@@ -192,7 +196,17 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             </label>
           </fieldset>
           <fieldset>
-            <legend>Text Options</legend>
+            <legend>Counter Options</legend>
+            <label className='counter-display'>
+              Display Type:
+              <select
+                value={options.counterDisplayType}
+                onChange={(e) => setOptions({ ...options, counterDisplayType: e.target.value })}
+              >
+                <option value='text'>Text</option>
+                <option value='badge'>Badge</option>
+              </select>
+            </label>
             <label>
               Text Color:
               <input
