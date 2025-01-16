@@ -5,9 +5,9 @@ import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
     username: '',
-    backgroundColor: '#0088CC',
+    backgroundColor: '#3399CC',
     backgroundImageUrl: '',
-    textColor: '#111827',
+    textColor: '#000000',
     displayBadgeCount: true,
     displaySuperbadgeCount: true,
     displayCertificationCount: true,
