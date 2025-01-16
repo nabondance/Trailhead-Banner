@@ -1,13 +1,33 @@
 {
   "name": "trailhead-banner",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "author": "nabondance",
+  "homepage": "https://thb.nabondance.me/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nabondance/Trailhead-Banner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nabondance/Trailhead-Banner/issues"
+  },
+  "keywords": [
+    "Salesforce",
+    "Trailhead",
+    "LinkedIn",
+    "Profile",
+    "Banner",
+    "Image Generator",
+    "Web App",
+    "React",
+    "Next.js",
+    "Vercel"
+  ],
+  "license": "BSD-3-Clause",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "lint-staged": "lint-staged",
     "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
     "format:prettier": "prettier --check --ignore-path .gitignore .",
@@ -47,7 +67,7 @@
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
-    "stylelint": "^16.13.0",
+    "stylelint": "^16.13.2",
     "stylelint-config-standard": "^36.0.1",
     "tailwindcss": "^3.4.17"
   }

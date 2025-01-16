@@ -88,11 +88,11 @@ importers:
         specifier: ^0.6.9
         version: 0.6.9(prettier@3.4.2)
       stylelint:
-        specifier: ^16.13.0
-        version: 16.13.0(typescript@5.7.2)
+        specifier: ^16.13.2
+        version: 16.13.2(typescript@5.7.2)
       stylelint-config-standard:
         specifier: ^36.0.1
-        version: 36.0.1(stylelint@16.13.0(typescript@5.7.2))
+        version: 36.0.1(stylelint@16.13.2(typescript@5.7.2))
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.17
@@ -2327,8 +2327,8 @@ packages:
     peerDependencies:
       stylelint: ^16.1.0
 
-  stylelint@16.13.0:
-    resolution: {integrity: sha512-muxVjMhZB8BrDFSKNva0dmvD2tM0o/szrvuZuXYcAnN9a8nQmbGLqNUOemSgumaCMCPQ+0USYyG3hA5vJjUC1Q==}
+  stylelint@16.13.2:
+    resolution: {integrity: sha512-wDlgh0mRO9RtSa3TdidqHd0nOG8MmUyVKl+dxA6C1j8aZRzpNeEgdhFmU5y4sZx4Fc6r46p0fI7p1vR5O2DZqA==}
     engines: {node: '>=18.12.0'}
     hasBin: true
 
@@ -4705,16 +4705,16 @@ snapshots:
       client-only: 0.0.1
       react: 19.0.0
 
-  stylelint-config-recommended@14.0.1(stylelint@16.13.0(typescript@5.7.2)):
+  stylelint-config-recommended@14.0.1(stylelint@16.13.2(typescript@5.7.2)):
     dependencies:
-      stylelint: 16.13.0(typescript@5.7.2)
+      stylelint: 16.13.2(typescript@5.7.2)
 
-  stylelint-config-standard@36.0.1(stylelint@16.13.0(typescript@5.7.2)):
+  stylelint-config-standard@36.0.1(stylelint@16.13.2(typescript@5.7.2)):
     dependencies:
-      stylelint: 16.13.0(typescript@5.7.2)
-      stylelint-config-recommended: 14.0.1(stylelint@16.13.0(typescript@5.7.2))
+      stylelint: 16.13.2(typescript@5.7.2)
+      stylelint-config-recommended: 14.0.1(stylelint@16.13.2(typescript@5.7.2))
 
-  stylelint@16.13.0(typescript@5.7.2):
+  stylelint@16.13.2(typescript@5.7.2):
     dependencies:
       '@csstools/css-parser-algorithms': 3.0.4(@csstools/css-tokenizer@3.0.3)
       '@csstools/css-tokenizer': 3.0.3
