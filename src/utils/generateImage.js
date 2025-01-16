@@ -220,13 +220,13 @@ export const generateImage = async (options) => {
   // Load and draw the "By nabondance.me" SVG
   const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'bynabondance.svg');
   const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
-  const byNabondanceWidth = 300;
-  const byNabondanceHeight = 50;
+  const byNabondanceWidth = 150;
+  const byNabondanceHeight = 20;
   ctx.globalAlpha = 1.0; // Reset transparency
   ctx.drawImage(
     byNabondanceSvg,
-    canvas.width - byNabondanceWidth + 35,
-    canvas.height - byNabondanceHeight - 5,
+    canvas.width - byNabondanceWidth ,
+    canvas.height - byNabondanceHeight - 2,
     byNabondanceWidth,
     byNabondanceHeight
   );
