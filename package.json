@@ -1,8 +1,29 @@
 {
   "name": "trailhead-banner",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "author": "nabondance",
+  "homepage": "https://thb.nabondance.me/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nabondance/Trailhead-Banner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nabondance/Trailhead-Banner/issues"
+  },
+  "keywords": [
+    "Salesforce",
+    "Trailhead",
+    "LinkedIn",
+    "Profile",
+    "Banner",
+    "Image Generator",
+    "Web App",
+    "React",
+    "Next.js",
+    "Vercel"
+  ],
+  "license": "BSD-3-Clause",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
