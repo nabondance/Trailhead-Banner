@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import Image from 'next/image';
+import bannerBackground from '../data/banners.json';
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
@@ -21,6 +23,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
+  const [showPredefinedImages, setShowPredefinedImages] = useState(false);
 
   const validateUsername = async (username) => {
     if (!username) {
@@ -89,6 +92,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     }
   };
 
+  const handlePredefinedImageChange = (src) => {
+    const baseUrl = window.location.origin;
+    setOptions({ ...options, backgroundImageUrl: `${baseUrl}${src}` });
+  };
+
   const handleSubmit = async (e) => {
     setMainError(null); // Clear previous errors
     e.preventDefault();
@@ -150,6 +158,24 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
               />
             </label>
+            <label onClick={() => setShowPredefinedImages(!showPredefinedImages)} style={{ cursor: 'pointer', color: 'var(--primary)' }}>
+              {showPredefinedImages ? 'Hide Predefined Backgrounds' : 'Select Predefined Background'}
+            </label>
+            {showPredefinedImages && (
+              <div className='predefined-background'>
+                {bannerBackground.map((image) => (
+                  <Image
+                    key={image.src}
+                    src={image.src}
+                    alt={image.description}
+                    width={200}
+                    height={50}
+                    className={`thumbnail ${options.backgroundImageUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
+                    onClick={() => handlePredefinedImageChange(image.src)}
+                  />
+                ))}
+              </div>
+            )}
             <label>
               Custom Background Image:
               <input
