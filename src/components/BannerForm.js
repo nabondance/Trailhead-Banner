@@ -17,7 +17,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displaySuperbadges: true,
     includeExpiredCertifications: false,
     includeRetiredCertifications: false,
-    counterDisplayType: 'text',
+    counterDisplayType: 'badge',
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
