@@ -83,8 +83,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
     try {
       console.log('Validating image URL:', url);
-      const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-      if (response.ok && response.headers.get('content-type').startsWith('image/')) {
+      const response = await fetch(url, { method: 'HEAD', mode: 'no-cors', redirect: 'follow' });
+      if (response.ok || response.type === 'opaque') {
         setBackgroundImageUrlError('');
         return true;
       } else {
