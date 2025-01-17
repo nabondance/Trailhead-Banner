@@ -50,12 +50,12 @@ export const generateImage = async (options) => {
 
   // Rank Logo
   const rankLogoUrl = options.rankData.rank.imageUrl;
-  console.debug('Loading rank logo from URL:', rankLogoUrl);
   const rankLogo = await loadImage(rankLogoUrl);
   const rankLogoHeight = canvas.height * top_part * 1;
   const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
+  const rankLogoScalingFactor = 1.2;
   if (options.displayRankLogo) {
-    ctx.drawImage(rankLogo, 5, 5, rankLogoWidth, rankLogoHeight);
+    ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
   }
 
   // Counters
