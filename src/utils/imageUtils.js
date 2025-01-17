@@ -1,4 +1,5 @@
-const { createCanvas } = require('@napi-rs/canvas');
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const { makeBadge, ValidationError } = require('badge-maker');
 
 const applyGrayscale = (ctx, x, y, width, height) => {
   const imageData = ctx.getImageData(x, y, width, height);
@@ -136,8 +137,21 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
   };
 };
 
+const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor) => {
+  const badge = makeBadge({
+    message: `${message}`,
+    label: `${label}${message !== 1 ? 's' : ''}`,
+    labelColor: labelColor,
+    color: messageColor,
+    style: 'flat-square',
+  });
+  const badgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badge).toString('base64')}`);
+  ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
+};
+
 module.exports = {
   applyGrayscale,
   cropImage,
   calculateCertificationsDesign,
+  drawBadgeCounter
 };
