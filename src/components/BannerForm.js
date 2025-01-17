@@ -265,7 +265,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     />
                   </label>
                 )}
-                {options.counterDisplayType === 'badge' }
+                {options.counterDisplayType === 'badge'}
               </div>
             </div>
           </fieldset>
