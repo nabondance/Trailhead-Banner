@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const top_part = 1 / 4;
 const bottom_part = 3 / 4;
-const right_part = 7 / 10;
+let right_part = 7 / 10;
 
 export const generateImage = async (options) => {
   console.log('Generating banner with the following data:');
@@ -105,6 +105,7 @@ export const generateImage = async (options) => {
       }
       break;
     case 'badge':
+      right_part = 8/10;
       // Draw badge counter
       try {
         const badgeScale = 1.4;
