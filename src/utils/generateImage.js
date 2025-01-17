@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const top_part = 1 / 4;
 const bottom_part = 3 / 4;
-const right_part = 7 / 10;
+const right_part = 7.5 / 10;
 
 export const generateImage = async (options) => {
   console.log('Generating banner with the following data:');
