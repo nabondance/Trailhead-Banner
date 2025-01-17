@@ -265,26 +265,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     />
                   </label>
                 )}
-                {options.counterDisplayType === 'badge' && (
-                  <>
-                    <label>
-                      Counter Badge Label Color:
-                      <input
-                        type='color'
-                        value={options.badgeLabelColor}
-                        onChange={(e) => setOptions({ ...options, badgeLabelColor: e.target.value })}
-                      />
-                    </label>
-                    <label>
-                      Counter Badge Message Color:
-                      <input
-                        type='color'
-                        value={options.badgeMessageColor}
-                        onChange={(e) => setOptions({ ...options, badgeMessageColor: e.target.value })}
-                      />
-                    </label>
-                  </>
-                )}
+                {options.counterDisplayType === 'badge' }
               </div>
             </div>
           </fieldset>

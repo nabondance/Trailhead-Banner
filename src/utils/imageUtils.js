@@ -140,6 +140,7 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
   let labelToDisplay = label;
   let labelTextLength = label === 'Badge' ? 370 : 670;
   let messageTextLength = 130;
+  let messageBackgroundColor = '#1f80c0';
   if (message > 1) {
     labelToDisplay += 's';
     labelTextLength += 20;
@@ -149,6 +150,15 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
       messageTextLength = 330;
     }
   }
+  switch (label) {
+    case 'Superbadge':
+      messageBackgroundColor = '#f9a825';
+      break;
+    case 'Certification':
+      messageBackgroundColor = '#8a00c4';
+      break;
+  }
+
   svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="190" height="35" role="img">
     <linearGradient id="s" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
@@ -159,7 +169,7 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
     </clipPath>
     <g clip-path="url(#r)">
         <rect width="140" height="35" fill="#555" />
-        <rect x="140" width="50" height="35" fill="#1f80c0" />
+        <rect x="140" width="50" height="35" fill="${messageBackgroundColor}" />
         <rect width="190" height="35" fill="url(#s)" />
     </g>
     <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="200">
