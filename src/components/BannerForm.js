@@ -21,7 +21,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     badgeLabelColor: '#555555',
     badgeMessageColor: '#1F80C0',
     backgroundKind: 'library', // Default to library
-    backgroundLibraryUrl: '',
+    backgroundLibraryUrl: `${window.location.origin}${bannerBackground[5].src}`, // Set default background library URL
     customBackgroundImageUrl: '',
   });
   const [showOptions, setShowOptions] = useState(false);
