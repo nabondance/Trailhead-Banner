@@ -105,7 +105,6 @@ export const generateImage = async (options) => {
       }
       break;
     case 'badge':
-      right_part = 8 / 10;
       // Draw badge counter
       try {
         const badgeScale = 1.4;
