@@ -1,4 +1,4 @@
-const { createCanvas } = require('@napi-rs/canvas');
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
 
 const applyGrayscale = (ctx, x, y, width, height) => {
   const imageData = ctx.getImageData(x, y, width, height);
@@ -136,8 +136,61 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
   };
 };
 
+const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
+  let labelToDisplay = label;
+  let labelTextLength = label === 'Badge' ? 370 : 670;
+  let messageTextLength = 130;
+  let messageBackgroundColor = '#1f80c0';
+  if (message > 1) {
+    labelToDisplay += 's';
+    labelTextLength += 20;
+    if (message > 99) {
+      messageTextLength = 230;
+    } else if (message > 999) {
+      messageTextLength = 330;
+    }
+  }
+  switch (label) {
+    case 'Superbadge':
+      messageBackgroundColor = '#f9a825';
+      break;
+    case 'Certification':
+      messageBackgroundColor = '#8a00c4';
+      break;
+  }
+
+  svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="190" height="35" role="img">
+    <linearGradient id="s" x2="0" y2="100%">
+        <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
+        <stop offset="1" stop-opacity=".1" />
+    </linearGradient>
+    <clipPath id="r">
+        <rect width="190" height="30" rx="3" fill="#fff" />
+    </clipPath>
+    <g clip-path="url(#r)">
+        <rect width="140" height="35" fill="#555" />
+        <rect x="140" width="50" height="35" fill="${messageBackgroundColor}" />
+        <rect width="190" height="35" fill="url(#s)" />
+    </g>
+    <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="200">
+    <text x="700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${labelTextLength}">${labelToDisplay}</text>
+    <text x="700" y="220" transform="scale(.1)" fill="#fff" textLength="${labelTextLength}">${labelToDisplay}</text>
+    <text x="1650" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
+    <text x="1650" y="220" transform="scale(.1)" fill="#fff" textLength="${messageTextLength}">${message}</text></g>
+    </svg>`;
+  return svg;
+};
+
+const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor) => {
+  const badge = dynamicBadgeSvg(label, message, labelColor, messageColor);
+  console.log(badge);
+  const badgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badge).toString('base64')}`);
+  ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
+};
+
 module.exports = {
   applyGrayscale,
   cropImage,
   calculateCertificationsDesign,
+  drawBadgeCounter,
 };

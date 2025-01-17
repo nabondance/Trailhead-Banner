@@ -776,3 +776,46 @@ legend {
   z-index: 1;
   transform: scale(3);
 }
+
+.predefined-background {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.thumbnail {
+  width: 200px;
+  height: 50px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.thumbnail.selected {
+  border: 3px solid transparent;
+  border-color: var(--primary);
+}
+
+.picklist {
+  display: flex;
+  align-items: center;
+}
+
+.picklist select {
+  margin-left: 5px;
+}
+
+.counter-options {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-options,
+.right-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

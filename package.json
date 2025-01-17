@@ -30,8 +30,8 @@
     "start": "next start",
     "lint-staged": "lint-staged",
     "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
-    "format:prettier": "prettier --check --ignore-path .gitignore .",
-    "format:prettier:fix": "prettier --write --ignore-path .gitignore .",
+    "format:prettier": "prettier --check --ignore-path .gitignore . !pnpm-lock.yaml",
+    "format:prettier:fix": "prettier --write --ignore-path .gitignore . !pnpm-lock.yaml",
     "format:stylelint": "stylelint '**/*.{css,scss}'",
     "format:stylelint:fix": "stylelint '**/*.{css,scss}' --fix"
   },

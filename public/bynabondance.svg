@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 50" xmlns:bx="https://boxy-svg.com">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 20" xmlns:bx="https://boxy-svg.com">
   <defs>
     <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
   </defs>
-  <rect x="10" y="10" width="250" height="40" rx="15" style="stroke-opacity: 0.9; fill:#333333;"/>
-  <text x="16" y="39" style="fill:#DDDDDD; font-family: Anta; font-size: 27px;" >by nabondance.me</text>
+  <rect x="5" y="0" width="140" height="20" rx="10" style="stroke-opacity: 0.9; fill:#DDDDDD;"/>
+  <text x="10" y="15" style="fill:#000; font-family: Anta; font-size: 15px;" >by nabondance.me</text>
 </svg>

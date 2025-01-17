@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import Image from 'next/image';
+import bannerBackground from '../data/banners.json';
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
     username: '',
-    backgroundColor: '#0088CC',
+    backgroundColor: '#5badd6',
     backgroundImageUrl: '',
-    textColor: '#111827',
     displayBadgeCount: true,
     displaySuperbadgeCount: true,
     displayCertificationCount: true,
@@ -15,12 +16,21 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displaySuperbadges: true,
     includeExpiredCertifications: false,
     includeRetiredCertifications: false,
+    counterDisplayType: 'badge',
+    textColor: '#000000',
+    badgeLabelColor: '#555555',
+    badgeMessageColor: '#1F80C0',
+    backgroundKind: 'library', // Default to library
+    backgroundLibraryUrl: `${window.location.origin}${bannerBackground[5].src}`, // Set default background library URL
+    customBackgroundImageUrl: '',
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
+  const [showPredefinedImages, setShowPredefinedImages] = useState(false);
+  const [predefinedBackgroundImageUrl, setPredefinedBackgroundImageUrl] = useState('');
 
   const validateUsername = async (username) => {
     if (!username) {
@@ -59,7 +69,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
   const handleUrlChange = (e) => {
     const url = e.target.value;
-    setOptions({ ...options, backgroundImageUrl: url });
+    setOptions({ ...options, customBackgroundImageUrl: url });
     if (!url) {
       setBackgroundImageUrlError(''); // Clear error message if input is emptied
     }
@@ -74,7 +84,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     try {
       console.log('Validating image URL:', url);
       const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-      console.log('Response:', response);
       if (response.ok && response.headers.get('content-type').startsWith('image/')) {
         setBackgroundImageUrlError('');
         return true;
@@ -89,15 +98,29 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     }
   };
 
+  const handlePredefinedImageChange = (src) => {
+    const baseUrl = window.location.origin;
+    const newUrl = `${baseUrl}${src}`;
+    setOptions({ ...options, backgroundLibraryUrl: newUrl });
+  };
+
+  const handleBackgroundKindChange = (e) => {
+    setOptions({ ...options, backgroundKind: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     setMainError(null); // Clear previous errors
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
     setShowOptions(false); // Hide the options when generating
     const isValidUsername = await validateUsername(options.username);
-    const isValidImageUrl = await validateImageUrl(options.backgroundImageUrl);
+    const isValidImageUrl = await validateImageUrl(options.customBackgroundImageUrl);
     if (isValidUsername && isValidImageUrl) {
-      await onSubmit(options);
+      await onSubmit({
+        ...options,
+        backgroundImageUrl: options.customBackgroundImageUrl,
+        backgroundLibraryUrl: options.backgroundLibraryUrl,
+      });
     } else {
       const validationError = new Error('Validation failed. Please check the input fields.');
       onValidationError(validationError, options);
@@ -142,63 +165,109 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         <div className='options'>
           <fieldset>
             <legend>Background Options</legend>
-            <label>
-              Background Color:
-              <input
-                type='color'
-                value={options.backgroundColor}
-                onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
-              />
+            <label className='picklist'>
+              Background Kind:
+              <select value={options.backgroundKind} onChange={handleBackgroundKindChange}>
+                <option value='library'>Background Library</option>
+                <option value='custom'>Custom URL</option>
+                <option value='monochromatic'>Monochromatic Background</option>
+              </select>
             </label>
-            <label>
-              Custom Background Image:
-              <input
-                type='text'
-                value={options.backgroundImageUrl}
-                onChange={handleUrlChange}
-                placeholder='Enter image URL' // Add placeholder
-                className='input-url'
-                autoComplete='off'
-                data-lpignore='true' // LastPass specific attribute to ignore
-                data-form-type='other'
-              />
-              {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
-            </label>
+            {options.backgroundKind === 'monochromatic' && (
+              <label>
+                Background Color:
+                <input
+                  type='color'
+                  value={options.backgroundColor}
+                  onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
+                />
+              </label>
+            )}
+            {options.backgroundKind === 'custom' && (
+              <label>
+                Custom Background Image:
+                <input
+                  type='text'
+                  value={options.customBackgroundImageUrl}
+                  onChange={handleUrlChange}
+                  placeholder='Enter image URL'
+                  className='input-url'
+                  autoComplete='off'
+                  data-lpignore='true'
+                  data-form-type='other'
+                />
+                {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+              </label>
+            )}
+            {options.backgroundKind === 'library' && (
+              <div className='predefined-background'>
+                {bannerBackground.map((image) => (
+                  <Image
+                    key={image.src}
+                    src={image.src}
+                    alt={image.description}
+                    width={200}
+                    height={50}
+                    className={`thumbnail ${options.backgroundLibraryUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
+                    onClick={() => handlePredefinedImageChange(image.src)}
+                  />
+                ))}
+              </div>
+            )}
           </fieldset>
           <fieldset>
-            <legend>Text Options</legend>
-            <label>
-              Text Color:
-              <input
-                type='color'
-                value={options.textColor}
-                onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
-              />
-            </label>
-            <label>
-              Show Badge Count:
-              <input
-                type='checkbox'
-                checked={options.displayBadgeCount}
-                onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
-              />
-            </label>
-            <label>
-              Show Superbadge Count:
-              <input
-                type='checkbox'
-                checked={options.displaySuperbadgeCount}
-                onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
-              />
-            </label>
-            <label>
-              Show Certification Count:
-              <input
-                type='checkbox'
-                checked={options.displayCertificationCount}
-                onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
-              />
-            </label>
+            <legend>Counter Options</legend>
+            <div className='counter-options'>
+              <div className='right-options'>
+                <label>
+                  Show Badge Count:
+                  <input
+                    type='checkbox'
+                    checked={options.displayBadgeCount}
+                    onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
+                  />
+                </label>
+                <label>
+                  Show Superbadge Count:
+                  <input
+                    type='checkbox'
+                    checked={options.displaySuperbadgeCount}
+                    onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
+                  />
+                </label>
+                <label>
+                  Show Certification Count:
+                  <input
+                    type='checkbox'
+                    checked={options.displayCertificationCount}
+                    onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
+                  />
+                </label>
+              </div>
+              <div className='left-options'>
+                <label className='picklist'>
+                  Display Type:
+                  <select
+                    value={options.counterDisplayType}
+                    onChange={(e) => setOptions({ ...options, counterDisplayType: e.target.value })}
+                  >
+                    <option value='text'>Text</option>
+                    <option value='badge'>Badge</option>
+                  </select>
+                </label>
+                {options.counterDisplayType === 'text' && (
+                  <label>
+                    Text Color:
+                    <input
+                      type='color'
+                      value={options.textColor}
+                      onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
+                    />
+                  </label>
+                )}
+                {options.counterDisplayType === 'badge'}
+              </div>
+            </div>
           </fieldset>
           <fieldset>
             <legend>Display Options</legend>

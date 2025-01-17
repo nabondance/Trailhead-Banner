@@ -3,7 +3,6 @@ import ThemedImage from './ThemedImage';
 import '../styles/globals.css';
 
 const TrailheadBannerFooter = () => {
-  console.log('Rendering Footer');
   return (
     <footer className='footer'>
       <a href='https://github.com/nabondance' target='_blank' rel='noopener noreferrer' className='footer-link'>
