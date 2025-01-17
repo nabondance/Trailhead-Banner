@@ -7,7 +7,7 @@
   {
     "src": "/assets/examples/example2.png",
     "alt": "Example 2",
-    "description": "Banner with custom background and text color"
+    "description": "Banner with custom monochromatic background"
   },
   {
     "src": "/assets/examples/example3.png",
@@ -52,6 +52,11 @@
   {
     "src": "/assets/examples/example11.png",
     "alt": "Example 11",
-    "description": "Banner without text"
+    "description": "Banner with counters as text"
+  },
+  {
+    "src": "/assets/examples/example12.png",
+    "alt": "Example 12",
+    "description": "Banner without counters"
   }
 ]
