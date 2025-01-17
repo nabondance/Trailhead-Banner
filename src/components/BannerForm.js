@@ -96,7 +96,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
   const handlePredefinedImageChange = (src) => {
     const baseUrl = window.location.origin;
-    setOptions({ ...options, backgroundImageUrl: `${baseUrl}${src}` });
+    const newUrl = `${baseUrl}${src}`;
+    setOptions((prevOptions) => ({
+      ...prevOptions,
+      backgroundImageUrl: prevOptions.backgroundImageUrl === newUrl ? '' : newUrl,
+    }));
   };
 
   const handleSubmit = async (e) => {
