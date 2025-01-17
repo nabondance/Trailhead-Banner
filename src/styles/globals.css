@@ -799,12 +799,12 @@ legend {
   border-color: var(--primary);
 }
 
-.counter-display {
+.picklist {
   display: flex;
   align-items: center;
 }
 
-.counter-display select {
+.picklist select {
   margin-left: 5px;
 }
 

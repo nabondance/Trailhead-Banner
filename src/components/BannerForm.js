@@ -18,8 +18,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     includeRetiredCertifications: false,
     counterDisplayType: 'badge',
     textColor: '#000000',
-    badgeLabelColor: '#555',
+    badgeLabelColor: '#555555',
     badgeMessageColor: '#1F80C0',
+    backgroundKind: 'library', // Default to library
+    backgroundLibraryUrl: '',
+    customBackgroundImageUrl: '',
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -66,7 +69,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
   const handleUrlChange = (e) => {
     const url = e.target.value;
-    setOptions({ ...options, backgroundImageUrl: url });
+    setOptions({ ...options, customBackgroundImageUrl: url });
     if (!url) {
       setBackgroundImageUrlError(''); // Clear error message if input is emptied
     }
@@ -98,7 +101,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const handlePredefinedImageChange = (src) => {
     const baseUrl = window.location.origin;
     const newUrl = `${baseUrl}${src}`;
-    setPredefinedBackgroundImageUrl((prevUrl) => (prevUrl === newUrl ? '' : newUrl));
+    setOptions({ ...options, backgroundLibraryUrl: newUrl });
+  };
+
+  const handleBackgroundKindChange = (e) => {
+    setOptions({ ...options, backgroundKind: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -107,9 +114,13 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setIsGenerating(true); // Hide the button when clicked
     setShowOptions(false); // Hide the options when generating
     const isValidUsername = await validateUsername(options.username);
-    const isValidImageUrl = await validateImageUrl(options.backgroundImageUrl || predefinedBackgroundImageUrl);
+    const isValidImageUrl = await validateImageUrl(options.customBackgroundImageUrl);
     if (isValidUsername && isValidImageUrl) {
-      await onSubmit({ ...options, backgroundImageUrl: options.backgroundImageUrl || predefinedBackgroundImageUrl });
+      await onSubmit({
+        ...options,
+        backgroundImageUrl: options.customBackgroundImageUrl,
+        backgroundLibraryUrl: options.backgroundLibraryUrl,
+      });
     } else {
       const validationError = new Error('Validation failed. Please check the input fields.');
       onValidationError(validationError, options);
@@ -154,21 +165,41 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         <div className='options'>
           <fieldset>
             <legend>Background Options</legend>
-            <label>
-              Background Color:
-              <input
-                type='color'
-                value={options.backgroundColor}
-                onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
-              />
+            <label className='picklist'>
+              Background Kind:
+              <select value={options.backgroundKind} onChange={handleBackgroundKindChange}>
+                <option value='library'>Background Library</option>
+                <option value='custom'>Custom URL</option>
+                <option value='monochromatic'>Monochromatic Background</option>
+              </select>
             </label>
-            <label
-              onClick={() => setShowPredefinedImages(!showPredefinedImages)}
-              style={{ cursor: 'pointer', color: 'var(--primary)' }}
-            >
-              {showPredefinedImages ? 'Hide Predefined Backgrounds' : 'Select Predefined Background'}
-            </label>
-            {showPredefinedImages && (
+            {options.backgroundKind === 'monochromatic' && (
+              <label>
+                Background Color:
+                <input
+                  type='color'
+                  value={options.backgroundColor}
+                  onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
+                />
+              </label>
+            )}
+            {options.backgroundKind === 'custom' && (
+              <label>
+                Custom Background Image:
+                <input
+                  type='text'
+                  value={options.customBackgroundImageUrl}
+                  onChange={handleUrlChange}
+                  placeholder='Enter image URL'
+                  className='input-url'
+                  autoComplete='off'
+                  data-lpignore='true'
+                  data-form-type='other'
+                />
+                {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+              </label>
+            )}
+            {options.backgroundKind === 'library' && (
               <div className='predefined-background'>
                 {bannerBackground.map((image) => (
                   <Image
@@ -177,26 +208,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     alt={image.description}
                     width={200}
                     height={50}
-                    className={`thumbnail ${predefinedBackgroundImageUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
+                    className={`thumbnail ${options.backgroundLibraryUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
                     onClick={() => handlePredefinedImageChange(image.src)}
                   />
                 ))}
               </div>
             )}
-            <label>
-              Custom Background Image:
-              <input
-                type='text'
-                value={options.backgroundImageUrl}
-                onChange={handleUrlChange}
-                placeholder='Enter image URL' // Add placeholder
-                className='input-url'
-                autoComplete='off'
-                data-lpignore='true' // LastPass specific attribute to ignore
-                data-form-type='other'
-              />
-              {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
-            </label>
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
@@ -228,7 +245,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 </label>
               </div>
               <div className='left-options'>
-                <label className='counter-display'>
+                <label className='picklist'>
                   Display Type:
                   <select
                     value={options.counterDisplayType}

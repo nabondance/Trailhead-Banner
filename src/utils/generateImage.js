@@ -40,12 +40,27 @@ export const generateImage = async (options) => {
   const ctx = canvas.getContext('2d');
 
   // Background
-  if (options.backgroundImageUrl) {
-    const bgImage = await loadImage(options.backgroundImageUrl);
-    ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-  } else {
-    ctx.fillStyle = options.backgroundColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  switch (options.backgroundKind) {
+    case 'library':
+      if (options.backgroundLibraryUrl) {
+        const bgImage = await loadImage(options.backgroundLibraryUrl);
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+      }
+      break;
+    case 'custom':
+      if (options.backgroundImageUrl) {
+        const bgImage = await loadImage(options.backgroundImageUrl);
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+      }
+      break;
+    case 'monochromatic':
+      ctx.fillStyle = options.backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      break;
+    default:
+      ctx.fillStyle = options.backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      break;
   }
 
   // Rank Logo
