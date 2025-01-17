@@ -152,7 +152,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         <div className='options'>
           <fieldset>
             <legend>Background Options</legend>
-            <label for="color">
+            <label>
               Background Color:
               <input
                 type='color'
@@ -208,30 +208,36 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 <option value='badge'>Badge</option>
               </select>
             </label>
-            <label for="color">
-              Text Color:
-              <input
-                type='color'
-                value={options.textColor}
-                onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
-              />
-            </label>
-            <label for="color">
-              Counter Badge Label Color:
-              <input
-                type='color'
-                value={options.badgeLabelColor}
-                onChange={(e) => setOptions({ ...options, badgeLabelColor: e.target.value })}
-              />
-            </label>
-            <label for="color">
-              Counter Badge Message Color:
-              <input
-                type='color'
-                value={options.badgeMessageColor}
-                onChange={(e) => setOptions({ ...options, badgeMessageColor: e.target.value })}
-              />
-            </label>
+            {options.counterDisplayType === 'text' && (
+              <label>
+                Text Color:
+                <input
+                  type='color'
+                  value={options.textColor}
+                  onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
+                />
+              </label>
+            )}
+            {options.counterDisplayType === 'badge' && (
+              <>
+                <label>
+                  Counter Badge Label Color:
+                  <input
+                    type='color'
+                    value={options.badgeLabelColor}
+                    onChange={(e) => setOptions({ ...options, badgeLabelColor: e.target.value })}
+                  />
+                </label>
+                <label>
+                  Counter Badge Message Color:
+                  <input
+                    type='color'
+                    value={options.badgeMessageColor}
+                    onChange={(e) => setOptions({ ...options, badgeMessageColor: e.target.value })}
+                  />
+                </label>
+              </>
+            )}
             <label>
               Show Badge Count:
               <input
