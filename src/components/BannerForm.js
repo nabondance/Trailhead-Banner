@@ -152,7 +152,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         <div className='options'>
           <fieldset>
             <legend>Background Options</legend>
-            <label>
+            <label for="color">
               Background Color:
               <input
                 type='color'
@@ -208,7 +208,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 <option value='badge'>Badge</option>
               </select>
             </label>
-            <label>
+            <label for="color">
               Text Color:
               <input
                 type='color'
@@ -216,7 +216,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
               />
             </label>
-            <label>
+            <label for="color">
               Counter Badge Label Color:
               <input
                 type='color'
@@ -224,7 +224,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, badgeLabelColor: e.target.value })}
               />
             </label>
-            <label>
+            <label for="color">
               Counter Badge Message Color:
               <input
                 type='color'
