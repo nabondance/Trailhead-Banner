@@ -145,8 +145,7 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
     labelTextLength += 20;
     if (message > 99) {
       messageTextLength = 230;
-    }
-    else if (message > 999) {
+    } else if (message > 999) {
       messageTextLength = 330;
     }
   }
