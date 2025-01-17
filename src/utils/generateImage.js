@@ -116,7 +116,8 @@ export const generateImage = async (options) => {
           const badgeCounter = makeBadge({
             message: `${badgeCount}`,
             label: `Badge${badgeCount !== 1 ? 's' : ''}`,
-            color: 'blue',
+            labelColor: options.badgeLabelColor,
+            color: options.badgeMessageColor,
           });
           const badgeCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badgeCounter).toString('base64')}`);
           ctx.drawImage(badgeCounterImage, rankLogoWidth + 40, badgeCounterYPosition, badgeCounterImage.width * badgeScale, badgeCounterImage.height * badgeScale);
@@ -126,7 +127,8 @@ export const generateImage = async (options) => {
           const superbadgeCounter = makeBadge({
             message: `${superbadgeCount}`,
             label: `Superbadge${superbadgeCount !== 1 ? 's' : ''}`,
-            color: 'blue',
+            labelColor: options.badgeLabelColor,
+            color: options.badgeMessageColor,
           });
           const superbadgeCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(superbadgeCounter).toString('base64')}`);
           ctx.drawImage(superbadgeCounterImage, rankLogoWidth + 40, badgeCounterYPosition, superbadgeCounterImage.width * badgeScale, superbadgeCounterImage.height * badgeScale);
@@ -136,7 +138,8 @@ export const generateImage = async (options) => {
           const certificationCounter = makeBadge({
             message: `${certificationCount}`,
             label: `Certification${certificationCount !== 1 ? 's' : ''}`,
-            color: 'blue',
+            labelColor: options.badgeLabelColor,
+            color: options.badgeMessageColor,
           });
           const certificationCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(certificationCounter).toString('base64')}`);
           ctx.drawImage(certificationCounterImage, rankLogoWidth + 40, badgeCounterYPosition, certificationCounterImage.width * badgeScale, certificationCounterImage.height * badgeScale);

@@ -9,7 +9,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     username: '',
     backgroundColor: '#5badd6',
     backgroundImageUrl: '',
-    textColor: '#000000',
     displayBadgeCount: true,
     displaySuperbadgeCount: true,
     displayCertificationCount: true,
@@ -18,6 +17,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     includeExpiredCertifications: false,
     includeRetiredCertifications: false,
     counterDisplayType: 'badge',
+    textColor: '#000000',
+    badgeLabelColor: '#555',
+    badgeMessageColor: '#1F80C0',
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -78,7 +80,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     try {
       console.log('Validating image URL:', url);
       const response = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-      console.log('Response:', response);
       if (response.ok && response.headers.get('content-type').startsWith('image/')) {
         setBackgroundImageUrlError('');
         return true;
@@ -213,6 +214,22 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 type='color'
                 value={options.textColor}
                 onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
+              />
+            </label>
+            <label>
+              Counter Badge Label Color:
+              <input
+                type='color'
+                value={options.badgeLabelColor}
+                onChange={(e) => setOptions({ ...options, badgeLabelColor: e.target.value })}
+              />
+            </label>
+            <label>
+              Counter Badge Message Color:
+              <input
+                type='color'
+                value={options.badgeMessageColor}
+                onChange={(e) => setOptions({ ...options, badgeMessageColor: e.target.value })}
               />
             </label>
             <label>
