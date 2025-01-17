@@ -150,24 +150,24 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
       messageTextLength = 330;
     }
   }
-  svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="120" height="20" role="img">
+  svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="190" height="35" role="img">
     <linearGradient id="s" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
         <stop offset="1" stop-opacity=".1" />
     </linearGradient>
     <clipPath id="r">
-        <rect width="120" height="20" rx="3" fill="#fff" />
+        <rect width="190" height="30" rx="3" fill="#fff" />
     </clipPath>
     <g clip-path="url(#r)">
-        <rect width="77" height="20" fill="#555" />
-        <rect x="77" width="43" height="20" fill="#1f80c0" />
-        <rect width="120" height="20" fill="url(#s)" />
+        <rect width="140" height="35" fill="#555" />
+        <rect x="140" width="50" height="35" fill="#1f80c0" />
+        <rect width="190" height="35" fill="url(#s)" />
     </g>
-    <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
-    <text x="395" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${labelTextLength}">${labelToDisplay}</text>
-    <text x="395" y="140" transform="scale(.1)" fill="#fff" textLength="${labelTextLength}">${labelToDisplay}</text>
-    <text x="975" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
-    <text x="975" y="140" transform="scale(.1)" fill="#fff" textLength="${messageTextLength}">${message}</text></g>
+    <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="200">
+    <text x="700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${labelTextLength}">${labelToDisplay}</text>
+    <text x="700" y="220" transform="scale(.1)" fill="#fff" textLength="${labelTextLength}">${labelToDisplay}</text>
+    <text x="1650" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
+    <text x="1650" y="220" transform="scale(.1)" fill="#fff" textLength="${messageTextLength}">${message}</text></g>
     </svg>`;
   return svg;
 };
