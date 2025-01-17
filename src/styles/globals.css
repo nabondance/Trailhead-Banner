@@ -807,3 +807,14 @@ legend {
 .counter-display select {
   margin-left: 5px;
 }
+
+.counter-options {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-options, .right-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

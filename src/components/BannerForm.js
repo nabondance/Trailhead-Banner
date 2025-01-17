@@ -198,70 +198,76 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
-            <label className='counter-display'>
-              Display Type:
-              <select
-                value={options.counterDisplayType}
-                onChange={(e) => setOptions({ ...options, counterDisplayType: e.target.value })}
-              >
-                <option value='text'>Text</option>
-                <option value='badge'>Badge</option>
-              </select>
-            </label>
-            {options.counterDisplayType === 'text' && (
-              <label>
-                Text Color:
-                <input
-                  type='color'
-                  value={options.textColor}
-                  onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
-                />
-              </label>
-            )}
-            {options.counterDisplayType === 'badge' && (
-              <>
+            <div className='counter-options'>
+              <div className='right-options'>
                 <label>
-                  Counter Badge Label Color:
+                  Show Badge Count:
                   <input
-                    type='color'
-                    value={options.badgeLabelColor}
-                    onChange={(e) => setOptions({ ...options, badgeLabelColor: e.target.value })}
+                    type='checkbox'
+                    checked={options.displayBadgeCount}
+                    onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
                   />
                 </label>
                 <label>
-                  Counter Badge Message Color:
+                  Show Superbadge Count:
                   <input
-                    type='color'
-                    value={options.badgeMessageColor}
-                    onChange={(e) => setOptions({ ...options, badgeMessageColor: e.target.value })}
+                    type='checkbox'
+                    checked={options.displaySuperbadgeCount}
+                    onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
                   />
                 </label>
-              </>
-            )}
-            <label>
-              Show Badge Count:
-              <input
-                type='checkbox'
-                checked={options.displayBadgeCount}
-                onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
-              />
-            </label>
-            <label>
-              Show Superbadge Count:
-              <input
-                type='checkbox'
-                checked={options.displaySuperbadgeCount}
-                onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
-              />
-            </label>
-            <label>
-              Show Certification Count:
-              <input
-                type='checkbox'
-                checked={options.displayCertificationCount}
-                onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
-              />
-            </label>
+                <label>
+                  Show Certification Count:
+                  <input
+                    type='checkbox'
+                    checked={options.displayCertificationCount}
+                    onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
+                  />
+                </label>
+              </div>
+              <div className='left-options'>
+                <label className='counter-display'>
+                  Display Type:
+                  <select
+                    value={options.counterDisplayType}
+                    onChange={(e) => setOptions({ ...options, counterDisplayType: e.target.value })}
+                  >
+                    <option value='text'>Text</option>
+                    <option value='badge'>Badge</option>
+                  </select>
+                </label>
+                {options.counterDisplayType === 'text' && (
+                  <label>
+                    Text Color:
+                    <input
+                      type='color'
+                      value={options.textColor}
+                      onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
+                    />
+                  </label>
+                )}
+                {options.counterDisplayType === 'badge' && (
+                  <>
+                    <label>
+                      Counter Badge Label Color:
+                      <input
+                        type='color'
+                        value={options.badgeLabelColor}
+                        onChange={(e) => setOptions({ ...options, badgeLabelColor: e.target.value })}
+                      />
+                    </label>
+                    <label>
+                      Counter Badge Message Color:
+                      <input
+                        type='color'
+                        value={options.badgeMessageColor}
+                        onChange={(e) => setOptions({ ...options, badgeMessageColor: e.target.value })}
+                      />
+                    </label>
+                  </>
+                )}
+              </div>
+            </div>
           </fieldset>
           <fieldset>
             <legend>Display Options</legend>
