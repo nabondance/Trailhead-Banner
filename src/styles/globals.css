@@ -813,7 +813,8 @@ legend {
   justify-content: space-between;
 }
 
-.left-options, .right-options {
+.left-options,
+.right-options {
   display: flex;
   flex-direction: column;
   gap: 10px;
