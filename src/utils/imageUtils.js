@@ -153,5 +153,5 @@ module.exports = {
   applyGrayscale,
   cropImage,
   calculateCertificationsDesign,
-  drawBadgeCounter
+  drawBadgeCounter,
 };
