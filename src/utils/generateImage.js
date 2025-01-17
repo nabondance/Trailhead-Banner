@@ -118,6 +118,7 @@ export const generateImage = async (options) => {
             label: `Badge${badgeCount !== 1 ? 's' : ''}`,
             labelColor: options.badgeLabelColor,
             color: options.badgeMessageColor,
+            style: 'flat-square',
           });
           const badgeCounterImage = await loadImage(
             `data:image/svg+xml;base64,${Buffer.from(badgeCounter).toString('base64')}`
@@ -137,6 +138,7 @@ export const generateImage = async (options) => {
             label: `Superbadge${superbadgeCount !== 1 ? 's' : ''}`,
             labelColor: options.badgeLabelColor,
             color: options.badgeMessageColor,
+            style: 'flat-square',
           });
           const superbadgeCounterImage = await loadImage(
             `data:image/svg+xml;base64,${Buffer.from(superbadgeCounter).toString('base64')}`
@@ -156,6 +158,7 @@ export const generateImage = async (options) => {
             label: `Certification${certificationCount !== 1 ? 's' : ''}`,
             labelColor: options.badgeLabelColor,
             color: options.badgeMessageColor,
+            style: 'flat-square',
           });
           const certificationCounterImage = await loadImage(
             `data:image/svg+xml;base64,${Buffer.from(certificationCounter).toString('base64')}`
