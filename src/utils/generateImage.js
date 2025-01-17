@@ -107,9 +107,9 @@ export const generateImage = async (options) => {
     case 'badge':
       // Draw badge counter
       try {
-        const badgeScale = 1.4;
+        const badgeScale = 1.6;
         let badgeCounterYPosition = 5;
-        const badgeCounterYDelta = 30;
+        const badgeCounterYDelta = 35;
         if (options.displayBadgeCount && badgeCount > 0) {
           await drawBadgeCounter(
             ctx,
