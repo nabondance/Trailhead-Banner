@@ -58,11 +58,6 @@ export const generateImage = async (options) => {
     ctx.drawImage(rankLogo, 5, 5, rankLogoWidth, rankLogoHeight);
   }
 
-  // Set font and text color
-  ctx.fillStyle = options.textColor || '#111827'; // Use the custom text color or default one
-  ctx.font = '34px Roboto-Bold';
-  console.log('Font set to:', ctx.font);
-
   // Counters
   const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount || 0;
   const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount || 0;
@@ -77,6 +72,10 @@ export const generateImage = async (options) => {
   switch (options.counterDisplayType) {
     case 'text':
       try {
+        // Set font and text color
+        ctx.fillStyle = options.textColor || '#111827'; // Use the custom text color or default one
+        ctx.font = '34px Roboto-Bold';
+
         const badgeText = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
         const superbadgeText =
           options.displaySuperbadgeCount && superbadgeCount > 0
