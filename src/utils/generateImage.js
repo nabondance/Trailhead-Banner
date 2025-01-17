@@ -119,8 +119,16 @@ export const generateImage = async (options) => {
             labelColor: options.badgeLabelColor,
             color: options.badgeMessageColor,
           });
-          const badgeCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badgeCounter).toString('base64')}`);
-          ctx.drawImage(badgeCounterImage, rankLogoWidth + 40, badgeCounterYPosition, badgeCounterImage.width * badgeScale, badgeCounterImage.height * badgeScale);
+          const badgeCounterImage = await loadImage(
+            `data:image/svg+xml;base64,${Buffer.from(badgeCounter).toString('base64')}`
+          );
+          ctx.drawImage(
+            badgeCounterImage,
+            rankLogoWidth + 40,
+            badgeCounterYPosition,
+            badgeCounterImage.width * badgeScale,
+            badgeCounterImage.height * badgeScale
+          );
           badgeCounterYPosition += badgeCounterYDelta;
         }
         if (options.displaySuperbadgeCount && superbadgeCount > 0) {
@@ -130,8 +138,16 @@ export const generateImage = async (options) => {
             labelColor: options.badgeLabelColor,
             color: options.badgeMessageColor,
           });
-          const superbadgeCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(superbadgeCounter).toString('base64')}`);
-          ctx.drawImage(superbadgeCounterImage, rankLogoWidth + 40, badgeCounterYPosition, superbadgeCounterImage.width * badgeScale, superbadgeCounterImage.height * badgeScale);
+          const superbadgeCounterImage = await loadImage(
+            `data:image/svg+xml;base64,${Buffer.from(superbadgeCounter).toString('base64')}`
+          );
+          ctx.drawImage(
+            superbadgeCounterImage,
+            rankLogoWidth + 40,
+            badgeCounterYPosition,
+            superbadgeCounterImage.width * badgeScale,
+            superbadgeCounterImage.height * badgeScale
+          );
           badgeCounterYPosition += badgeCounterYDelta;
         }
         if (options.displayCertificationCount && certificationCount > 0) {
@@ -141,8 +157,16 @@ export const generateImage = async (options) => {
             labelColor: options.badgeLabelColor,
             color: options.badgeMessageColor,
           });
-          const certificationCounterImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(certificationCounter).toString('base64')}`);
-          ctx.drawImage(certificationCounterImage, rankLogoWidth + 40, badgeCounterYPosition, certificationCounterImage.width * badgeScale, certificationCounterImage.height * badgeScale);
+          const certificationCounterImage = await loadImage(
+            `data:image/svg+xml;base64,${Buffer.from(certificationCounter).toString('base64')}`
+          );
+          ctx.drawImage(
+            certificationCounterImage,
+            rankLogoWidth + 40,
+            badgeCounterYPosition,
+            certificationCounterImage.width * badgeScale,
+            certificationCounterImage.height * badgeScale
+          );
         }
       } catch (error) {
         console.error('Error drawing counter as badges:', error);
