@@ -27,6 +27,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
   const [showPredefinedImages, setShowPredefinedImages] = useState(false);
+  const [predefinedBackgroundImageUrl, setPredefinedBackgroundImageUrl] = useState('');
 
   const validateUsername = async (username) => {
     if (!username) {
@@ -97,10 +98,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const handlePredefinedImageChange = (src) => {
     const baseUrl = window.location.origin;
     const newUrl = `${baseUrl}${src}`;
-    setOptions((prevOptions) => ({
-      ...prevOptions,
-      backgroundImageUrl: prevOptions.backgroundImageUrl === newUrl ? '' : newUrl,
-    }));
+    setPredefinedBackgroundImageUrl((prevUrl) => (prevUrl === newUrl ? '' : newUrl));
   };
 
   const handleSubmit = async (e) => {
@@ -109,9 +107,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setIsGenerating(true); // Hide the button when clicked
     setShowOptions(false); // Hide the options when generating
     const isValidUsername = await validateUsername(options.username);
-    const isValidImageUrl = await validateImageUrl(options.backgroundImageUrl);
+    const isValidImageUrl = await validateImageUrl(options.backgroundImageUrl || predefinedBackgroundImageUrl);
     if (isValidUsername && isValidImageUrl) {
-      await onSubmit(options);
+      await onSubmit({ ...options, backgroundImageUrl: options.backgroundImageUrl || predefinedBackgroundImageUrl });
     } else {
       const validationError = new Error('Validation failed. Please check the input fields.');
       onValidationError(validationError, options);
@@ -179,7 +177,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     alt={image.description}
                     width={200}
                     height={50}
-                    className={`thumbnail ${options.backgroundImageUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
+                    className={`thumbnail ${predefinedBackgroundImageUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
                     onClick={() => handlePredefinedImageChange(image.src)}
                   />
                 ))}
