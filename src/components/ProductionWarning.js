@@ -18,7 +18,7 @@ const ProductionWarning = () => {
     <div className='warning-message'>
       <p>This version isn&apos;t released yet. Some features may not work as expected.</p>
       <p>
-        Please visit the latest release:{" "}
+        Please visit the latest release:{' '}
         <a href='https://thb.nabondance.me' target='_blank' rel='noopener noreferrer'>
           thb.nabondance.me
         </a>
