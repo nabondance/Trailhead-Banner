@@ -319,5 +319,5 @@ export const generateImage = async (options) => {
   console.log('Banner generation complete.');
   console.log('Warnings:', warnings);
 
-  return {bannerUrl, warnings};
+  return { bannerUrl, warnings };
 };

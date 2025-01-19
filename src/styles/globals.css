@@ -623,7 +623,7 @@ legend {
   border: 1px solid var(--warning-color);
   border-radius: 4px;
   margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 }
 
 .warning-message p {
@@ -634,7 +634,7 @@ legend {
 .warning-message ul {
   list-style-type: disc;
   padding-left: 20px;
-  margin: 10px 0 0 0;
+  margin: 10px 0 0;
   text-align: left;
 }
 
