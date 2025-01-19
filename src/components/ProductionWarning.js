@@ -16,9 +16,9 @@ const ProductionWarning = () => {
 
   return (
     <div className='warning-message'>
-      <p>You are not on the production website. Some features may not work as expected.</p>
+      <p>This version isn&apos;t released yet. Some features may not work as expected.</p>
       <p>
-        Please visit the production site:{" "}
+        Please visit the latest release:{" "}
         <a href='https://thb.nabondance.me' target='_blank' rel='noopener noreferrer'>
           thb.nabondance.me
         </a>
