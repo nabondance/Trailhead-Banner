@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
+import ProductionWarning from './ProductionWarning';
 import '../styles/globals.css';
 import packageJson from '../../package.json';
 
@@ -64,6 +65,7 @@ const MainPage = () => {
 
   return (
     <div className='container'>
+      <ProductionWarning />
       <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} onValidationError={handleValidationError} />
       {loading && (
         <div className='loading-container'>
