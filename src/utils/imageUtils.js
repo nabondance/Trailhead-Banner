@@ -160,7 +160,8 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
   }
 
   const counterBadgeSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="190" height="35" role="img">
-    <linearGradient id="s" x2="0" y2="100%">
+      <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+  <linearGradient id="s" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
         <stop offset="1" stop-opacity=".1" />
     </linearGradient>
@@ -172,7 +173,7 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
         <rect x="140" width="50" height="35" fill="${messageBackgroundColor}" />
         <rect width="190" height="35" fill="url(#s)" />
     </g>
-    <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="200">
+    <g fill="#fff" text-anchor="middle" font-family="Anta" text-rendering="geometricPrecision" font-size="200">
     <text x="700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${labelTextLength}">${labelToDisplay}</text>
     <text x="700" y="220" transform="scale(.1)" fill="#fff" textLength="${labelTextLength}">${labelToDisplay}</text>
     <text x="1650" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
