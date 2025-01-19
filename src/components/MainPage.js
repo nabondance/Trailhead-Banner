@@ -11,6 +11,7 @@ const MainPage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [mainError, setMainError] = useState(null);
+  const [mainWarning, setMainWarning] = useState(null);
   const [formOptions, setFormOptions] = useState({});
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
@@ -35,10 +36,9 @@ const MainPage = () => {
         throw new Error(errorData.error || 'Failed to generate image');
       }
       const data = await response.json();
-      console.log('Rank Data:', data.rankData);
-      console.log('Certifications Data:', data.certificationsData);
-      console.log('Badge Data:', data.badgesData);
+      console.log('Data:', data);
       setImageUrl(data.imageUrl);
+      setMainWarning(data.warnings);
     } catch (error) {
       console.error('Error generating image:', error);
       setMainError(error);
@@ -76,7 +76,7 @@ const MainPage = () => {
           <p>
             If the error persists, consider writing an{' '}
             <a
-              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(mainError))}&body=${encodeURIComponent(generateIssueBody(mainError, formOptions))}`}
+              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(mainError))}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions))}`}
               target='_blank'
               rel='noopener noreferrer'
             >
@@ -99,6 +99,26 @@ const MainPage = () => {
           <a href={imageUrl} download={`trailhead-banner-${formOptions.username}.png`} className='download-link'>
             Download Banner
           </a>
+          {mainWarning.length > 0 && (
+            <div className='warning-message'>
+              <p>Banner generated, with warnings:</p>
+              <ul>
+                {mainWarning.map((warning, index) => (
+                  <li key={index}>{warning}</li>
+                ))}
+              </ul>
+              <p>
+                If the error persists, consider writing an{' '}
+                <a
+                  href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent('Warning happened')}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions))}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  issue
+                </a>
+              </p>
+            </div>
+          )}
           <LinkedInBannerTutorial />
         </div>
       )}

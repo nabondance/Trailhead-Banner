@@ -159,7 +159,7 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
       break;
   }
 
-  svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="190" height="35" role="img">
+  counterBadgeSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="190" height="35" role="img">
     <linearGradient id="s" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
         <stop offset="1" stop-opacity=".1" />
@@ -178,7 +178,8 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
     <text x="1650" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
     <text x="1650" y="220" transform="scale(.1)" fill="#fff" textLength="${messageTextLength}">${message}</text></g>
     </svg>`;
-  return svg;
+  console.log('counterBadgeSvg', counterBadgeSvg);
+  return counterBadgeSvg;
 };
 
 const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor) => {
