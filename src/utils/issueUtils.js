@@ -3,5 +3,34 @@ export const generateIssueTitle = (error) => {
 };
 
 export const generateIssueBody = (error, warning, options) => {
-  return `An error occurred while generating the banner:\n\nError message:\n\`\`\`\n${error?.message}\n\`\`\`\n\nError stack:\n\`\`\`\n${error?.stack}\n\`\`\`\n\nWarnings:\n\`\`\`\n${warning.join('\n')}\n\`\`\`\n\nOptions:\n\`\`\`\n${JSON.stringify(options, null, 2)}\n\`\`\`\n\nPlease provide any additional information that might help resolve the issue.`;
+  const errorMessage = error?.message || 'N/A';
+  const errorStack = error?.stack || 'N/A';
+  const warnings = warning?.join('\n') || 'N/A';
+  const optionsString = JSON.stringify(options, null, 2);
+
+  return `
+An error occurred while generating the banner:
+
+Error message:
+\`\`\`
+${errorMessage}
+\`\`\`
+
+Error stack:
+\`\`\`
+${errorStack}
+\`\`\`
+
+Warnings:
+\`\`\`
+${warnings}
+\`\`\`
+
+Options:
+\`\`\`
+${optionsString}
+\`\`\`
+
+Please provide any additional information that might help resolve the issue.
+  `;
 };
