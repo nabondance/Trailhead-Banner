@@ -84,7 +84,7 @@ export default async function handler(req, res) {
       const mvpData = mvpResponse.data?.data?.profileData || {};
 
       // Generate the image
-      const imageUrl = await generateImage({
+      const generateImageResult = await generateImage({
         ...options,
         rankData,
         certificationsData,
@@ -92,9 +92,11 @@ export default async function handler(req, res) {
         superbadgesData,
         mvpData,
       });
+      const imageUrl = generateImageResult.bannerUrl;
+      const warnings = generateImageResult.warnings;
 
       // Send back the combined data and image URL
-      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl });
+      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings });
     } catch (error) {
       console.error('Error fetching data:', error.message);
       res.status(500).json({ error: error.message });

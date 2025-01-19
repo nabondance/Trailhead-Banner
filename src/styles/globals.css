@@ -614,6 +614,40 @@ legend {
   opacity: 1;
 }
 
+.warning-message {
+  color: var(--warning-color);
+  font-size: 16px;
+  text-align: center;
+  background-color: #fff3cd;
+  padding: 15px;
+  border: 1px solid var(--warning-color);
+  border-radius: 4px;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.warning-message p {
+  margin: 0;
+  font-weight: bold;
+}
+
+.warning-message ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 10px 0 0 0;
+  text-align: left;
+}
+
+.warning-message a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.warning-message a:hover {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
 .error-message {
   color: var(--error-color);
   font-size: 16px;
