@@ -99,7 +99,16 @@ export default async function handler(req, res) {
       res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings });
     } catch (error) {
       console.error('Error fetching data:', error.message);
-      res.status(500).json({ error: error.message });
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Request data:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+      res.status(500).json({ error: 'Failed to fetch data or generate image. Please try again later.' });
     }
   } else {
     res.status(405).end(); // Method Not Allowed
