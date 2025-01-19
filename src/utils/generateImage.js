@@ -15,19 +15,25 @@ export const generateImage = async (options) => {
   console.log('Badges Data:', options.badgesData);
   console.log('Superbadges Data:', options.superbadgesData);
   console.log('Background Options:', {
-    color: options.backgroundColor,
-    imageUrl: options.backgroundImageUrl,
+    kind: options.backgroundKind,
+    libraryUrl: options.backgroundLibraryUrl,
+    customImageUrl: options.customBackgroundImageUrl,
+    backgroundColor: options.backgroundColor,
   });
   console.log('Display Options:', {
     rankLogo: options.displayRankLogo,
     superbadges: options.displaySuperbadges,
+  });
+  console.log('Counter Options:', {
+    counterDisplayType: options.counterDisplayType,
+    textColor: options.textColor,
     badgeCount: options.displayBadgeCount,
     superbadgeCount: options.displaySuperbadgeCount,
     certificationCount: options.displayCertificationCount,
-    counterDisplayType: options.counterDisplayType, // Log counter display type
   });
-  console.log('Text Options:', {
-    color: options.textColor,
+  console.log('Badge Options:', {
+    labelColor: options.badgeLabelColor,
+    messageColor: options.badgeMessageColor,
   });
   console.log('Certification Options:', {
     includeExpired: options.includeExpiredCertifications,
