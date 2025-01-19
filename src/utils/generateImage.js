@@ -116,7 +116,7 @@ export const generateImage = async (options) => {
           ctx.fillText(certificationText, rankLogoWidth + 40, textCounterYPosition);
         }
       } catch (error) {
-        console.error('Error drawing text:', error);
+        console.error('Error drawing counter as text:', error);
       }
       break;
     case 'badge':
