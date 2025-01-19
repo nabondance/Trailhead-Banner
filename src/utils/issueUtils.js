@@ -2,7 +2,7 @@ export const generateIssueTitle = (error) => {
   return `Error: ${error?.message}`;
 };
 
-export const generateIssueBody = (error, warning, options) => {
+export const generateIssueBody = (error, warning, options, version) => {
   const errorMessage = error?.message || 'N/A';
   const errorStack = error?.stack || 'N/A';
   const warnings = warning?.join('\n') || 'N/A';
@@ -30,6 +30,8 @@ Options:
 \`\`\`
 ${optionsString}
 \`\`\`
+
+Version: ${version}
 
 Please provide any additional information that might help resolve the issue.
   `;

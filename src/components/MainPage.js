@@ -6,6 +6,7 @@ import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
 import '../styles/globals.css';
+import packageJson from '../../package.json';
 
 const MainPage = () => {
   const [imageUrl, setImageUrl] = useState('');
@@ -76,7 +77,7 @@ const MainPage = () => {
           <p>
             If the error persists, consider writing an{' '}
             <a
-              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(mainError))}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions))}`}
+              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(mainError))}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions, packageJson.version))}`}
               target='_blank'
               rel='noopener noreferrer'
             >
@@ -110,7 +111,7 @@ const MainPage = () => {
               <p>
                 If the error persists, consider writing an{' '}
                 <a
-                  href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent('Warning happened')}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions))}`}
+                  href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent('Warning happened')}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions, packageJson.version))}`}
                   target='_blank'
                   rel='noopener noreferrer'
                 >
