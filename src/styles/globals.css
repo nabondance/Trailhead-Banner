@@ -806,7 +806,7 @@ legend {
 .theme-switch-container {
   position: absolute;
   top: 75px;
-  right: 20px;
+  right: 30px;
   z-index: 1;
   transform: scale(3);
 }
