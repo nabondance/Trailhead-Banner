@@ -178,6 +178,7 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
     <text x="1650" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
     <text x="1650" y="220" transform="scale(.1)" fill="#fff" textLength="${messageTextLength}">${message}</text></g>
     </svg>`;
+    console.log('counterBadgeSvg', counterBadgeSvg);
   return counterBadgeSvg;
 };
 
