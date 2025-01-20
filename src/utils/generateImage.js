@@ -22,7 +22,6 @@ export const generateImage = async (options) => {
   });
   console.log('Display Options:', {
     rankLogo: options.displayRankLogo,
-    superbadges: options.displaySuperbadges,
   });
   console.log('Counter Options:', {
     counterDisplayType: options.counterDisplayType,
@@ -36,11 +35,14 @@ export const generateImage = async (options) => {
     messageColor: options.badgeMessageColor,
   });
   console.log('Superbadge Options:', {
+    superbadges: options.displaySuperbadges,
+    displayLastXSuperbadges: options.lastXSuperbadges,
     lastXSuperbadges: options.lastXSuperbadges,
   });
   console.log('Certification Options:', {
     includeExpired: options.includeExpiredCertifications,
     includeRetired: options.includeRetiredCertifications,
+    displayLastXCertifications: options.lastXCertifications,
     lastXCertifications: options.lastXCertifications,
   });
   console.log('MVP Data:', options.mvpData);
@@ -192,7 +194,7 @@ export const generateImage = async (options) => {
   );
   const totalCertifications = certifications.length;
 
-  if (options.lastXCertifications) {
+  if (options.displayLastXCertifications && options.lastXCertifications) {
     certifications = certifications.slice(-options.lastXCertifications);
   }
 
@@ -279,7 +281,7 @@ export const generateImage = async (options) => {
       .filter((edge) => edge.node.award && edge.node.award.icon)
       .map((edge) => edge.node.award.icon);
 
-    if (options.lastXSuperbadges) {
+    if (options.displayLastXSuperbadges && options.lastXSuperbadges) {
       superbadgeLogos = superbadgeLogos.slice(-options.lastXSuperbadges);
     }
 
