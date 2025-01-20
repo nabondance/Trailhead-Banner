@@ -199,39 +199,45 @@ export const generateImage = async (options) => {
   const displayedCertifications = certifications.length;
   const hiddenCertifications = totalCertifications - displayedCertifications;
 
-  if (certifications.length !== 0) {
+  const certificationsLogos = [];
+
+  // Load logos
+  for (const cert of certifications) {
+    if (cert.logoUrl) {
+      try {
+        console.log('Loading certification logo from URL:', cert.logoUrl);
+        let logo = await loadImage(cert.logoUrl);
+        logo = cropImage(logo); // Crop the logo to remove extra space
+        if (cert.status.expired) {
+          const tempCanvas = createCanvas(logo.width, logo.height);
+          const tempCtx = tempCanvas.getContext('2d');
+          tempCtx.drawImage(logo, 0, 0);
+          applyGrayscale(tempCtx, 0, 0, logo.width, logo.height); // Apply grayscale for expired certifications
+          logo = tempCanvas;
+        }
+        certificationsLogos.push({
+          logo,
+          expired: cert.status.expired,
+          retired: cert.status.title == 'Retired',
+        });
+      } catch (error) {
+        console.error(`Error loading logo for ${cert.title}:`, error);
+        warnings.push(`Error loading logo for ${cert.title}: ${error.message}`);
+      }
+    }
+  }
+
+  if (hiddenCertifications > 0) {
+    const plusXBadgeSvg = generatePlusXCertificationsSvg(hiddenCertifications);
+    const plusXBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`);
+    certificationsLogos.push({ logo: plusXBadgeImage });
+  }
+
+  if (certificationsLogos.length !== 0) {
     const certifYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
     const availableWidth = canvas.width - 40; // Leave some padding on the sides
     const availableHeight = canvas.height * bottom_part * 0.95; // 95% of the bottom 2/3 height
     const certifSpacing = 10; // Space between certif logos
-
-    const certificationsLogos = [];
-
-    // Load logos
-    for (const cert of certifications) {
-      if (cert.logoUrl) {
-        try {
-          console.log('Loading certification logo from URL:', cert.logoUrl);
-          let logo = await loadImage(cert.logoUrl);
-          logo = cropImage(logo); // Crop the logo to remove extra space
-          if (cert.status.expired) {
-            const tempCanvas = createCanvas(logo.width, logo.height);
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCtx.drawImage(logo, 0, 0);
-            applyGrayscale(tempCtx, 0, 0, logo.width, logo.height); // Apply grayscale for expired certifications
-            logo = tempCanvas;
-          }
-          certificationsLogos.push({
-            logo,
-            expired: cert.status.expired,
-            retired: cert.status.title == 'Retired',
-          });
-        } catch (error) {
-          console.error(`Error loading logo for ${cert.title}:`, error);
-          warnings.push(`Error loading logo for ${cert.title}: ${error.message}`);
-        }
-      }
-    }
 
     // Calculate certifDesign for certifications
     const certifDesign = calculateCertificationsDesign(
@@ -263,12 +269,6 @@ export const generateImage = async (options) => {
         certifCurrentYPosition += certifDesign.logoHeight + certifSpacing;
       }
     }
-
-    if (hiddenCertifications > 0) {
-      const plusXBadgeSvg = generatePlusXCertificationsSvg(hiddenCertifications);
-      const plusXBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`);
-      ctx.drawImage(plusXBadgeImage, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
-    }
   }
 
   // Display Superbadges if enabled
@@ -285,6 +285,12 @@ export const generateImage = async (options) => {
 
     const displayedSuperbadges = superbadgeLogos.length;
     const hiddenSuperbadges = totalSuperbadges - displayedSuperbadges;
+
+    if (hiddenSuperbadges > 0) {
+      const plusXBadgeSvg = generatePlusXSuperbadgesSvg(hiddenSuperbadges);
+      const plusXBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`);
+      superbadgeLogos.push(plusXBadgeImage);
+    }
 
     const superbadgeLogoHeight = canvas.height * top_part * 0.9;
     const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
@@ -311,12 +317,6 @@ export const generateImage = async (options) => {
         console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
         warnings.push(`Error loading superbadge logo from URL: ${logoUrl}: ${error.message}`);
       }
-    }
-
-    if (hiddenSuperbadges > 0) {
-      const plusXBadgeSvg = generatePlusXSuperbadgesSvg(hiddenSuperbadges);
-      const plusXBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`);
-      ctx.drawImage(plusXBadgeImage, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
     }
   }
 
