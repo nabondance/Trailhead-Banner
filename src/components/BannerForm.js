@@ -285,6 +285,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, displayRankLogo: e.target.checked })}
               />
             </label>
+          </fieldset>
+          <fieldset>
+            <legend>Superbadge Options</legend>
             <label>
               Show Superbadges:
               <input
@@ -293,9 +296,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, displaySuperbadges: e.target.checked })}
               />
             </label>
-          </fieldset>
-          <fieldset>
-            <legend>Superbadge Options</legend>
             <label>
               Display Only Lasts Superbadges:
               <input
