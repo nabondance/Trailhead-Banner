@@ -188,9 +188,29 @@ const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, me
   ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
 };
 
+const generatePlusXSuperbadgesSvg = (count) => {
+  const plusXSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" role="img">
+      <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+    <path d="m485.291 129.408-224-128a10.65 10.65 0 0 0-10.581 0l-224 128a10.67 10.67 0 0 0-5.376 9.259v234.667c0 3.819 2.048 7.36 5.376 9.259l224 128c1.643.939 3.456 1.408 5.291 1.408s3.648-.469 5.291-1.408l224-128a10.67 10.67 0 0 0 5.376-9.259V138.667a10.67 10.67 0 0 0-5.377-9.259"/>
+    <text x="256" y="320" fill="#fff" font-family="Anta" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
+    </svg>`;
+  return plusXSvg;
+};
+
+const generatePlusXCertificationsSvg = (count) => {
+  const plusXSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" role="img">
+      <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+    <path d="m485.291 129.408-224-128a10.65 10.65 0 0 0-10.581 0l-224 128a10.67 10.67 0 0 0-5.376 9.259v234.667c0 3.819 2.048 7.36 5.376 9.259l224 128c1.643.939 3.456 1.408 5.291 1.408s3.648-.469 5.291-1.408l224-128a10.67 10.67 0 0 0 5.376-9.259V138.667a10.67 10.67 0 0 0-5.377-9.259"/>
+    <text x="256" y="320" fill="#fff" font-family="Anta" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
+    </svg>`;
+  return plusXSvg;
+};
+
 module.exports = {
   applyGrayscale,
   cropImage,
   calculateCertificationsDesign,
   drawBadgeCounter,
+  generatePlusXSuperbadgesSvg,
+  generatePlusXCertificationsSvg
 };
