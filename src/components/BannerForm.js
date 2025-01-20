@@ -23,6 +23,10 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     backgroundKind: 'library', // Default to library
     backgroundLibraryUrl: `${window.location.origin}${bannerBackground[5].src}`, // Set default background library URL
     customBackgroundImageUrl: '',
+    displayLastXCertifications: false,
+    lastXCertifications: '',
+    displayLastXSuperbadges: false,
+    lastXSuperbadges: '',
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -120,6 +124,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         ...options,
         backgroundImageUrl: options.customBackgroundImageUrl,
         backgroundLibraryUrl: options.backgroundLibraryUrl,
+        lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
+        lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
       });
     } else {
       const validationError = new Error('Validation failed. Please check the input fields.');
@@ -289,6 +295,29 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             </label>
           </fieldset>
           <fieldset>
+            <legend>Superbadge Options</legend>
+            <label>
+              Display Only Lasts Superbadges:
+              <input
+                type='checkbox'
+                checked={options.displayLastXSuperbadges}
+                onChange={(e) => setOptions({ ...options, displayLastXSuperbadges: e.target.checked })}
+              />
+            </label>
+            {options.displayLastXSuperbadges && (
+              <label>
+                Number of Superbadges:
+                <input
+                  type='number'
+                  value={options.lastXSuperbadges}
+                  onChange={(e) => setOptions({ ...options, lastXSuperbadges: e.target.value })}
+                  min='1'
+                  placeholder='Enter number'
+                />
+              </label>
+            )}
+          </fieldset>
+          <fieldset>
             <legend>Certification Options</legend>
             <label>
               Include Expired Certifications:
@@ -306,6 +335,26 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, includeRetiredCertifications: e.target.checked })}
               />
             </label>
+            <label>
+              Display Only Lasts Certifications:
+              <input
+                type='checkbox'
+                checked={options.displayLastXCertifications}
+                onChange={(e) => setOptions({ ...options, displayLastXCertifications: e.target.checked })}
+              />
+            </label>
+            {options.displayLastXCertifications && (
+              <label>
+                Number of Certifications:
+                <input
+                  type='number'
+                  value={options.lastXCertifications}
+                  onChange={(e) => setOptions({ ...options, lastXCertifications: e.target.value })}
+                  min='1'
+                  placeholder='Enter number'
+                />
+              </label>
+            )}
           </fieldset>
         </div>
       )}

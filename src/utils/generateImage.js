@@ -181,46 +181,16 @@ export const generateImage = async (options) => {
       break;
   }
 
-  // Display Superbadges if enabled
-  if (options.displaySuperbadges) {
-    const superbadgeLogos = options.superbadgesData.earnedAwards.edges
-      .filter((edge) => edge.node.award && edge.node.award.icon)
-      .map((edge) => edge.node.award.icon);
-
-    const superbadgeLogoHeight = canvas.height * top_part * 0.9;
-    const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
-    let superbadgeSpacing = 10;
-    const superbadgeAvailableWidth = canvas.width * right_part; // Available width for superbadges
-    let superbadgeX = canvas.width - superbadgeAvailableWidth;
-    let superbadgeY = 10;
-
-    // Calculate total width required for superbadges
-    const totalSuperbadgeWidth = superbadgeLogos.length * (superbadgeLogoWidth + superbadgeSpacing) - superbadgeSpacing;
-
-    // Adjust spacing if total width exceeds available space
-    if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
-      superbadgeSpacing =
-        (superbadgeAvailableWidth - superbadgeLogos.length * superbadgeLogoWidth) / (superbadgeLogos.length - 1);
-    }
-
-    for (const logoUrl of superbadgeLogos) {
-      try {
-        const logo = await loadImage(logoUrl);
-        ctx.drawImage(logo, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
-        superbadgeX += superbadgeLogoWidth + superbadgeSpacing;
-      } catch (error) {
-        console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
-        warnings.push(`Error loading superbadge logo from URL: ${logoUrl}: ${error.message}`);
-      }
-    }
-  }
-
   // Certifications Data
-  const certifications = options.certificationsData.certifications.filter(
+  let certifications = options.certificationsData.certifications.filter(
     (cert) =>
       (options.includeExpiredCertifications || cert.status.expired === false) &&
       (options.includeRetiredCertifications || cert.status.title !== 'Retired')
   );
+
+  if (options.lastXCertifications) {
+    certifications = certifications.slice(-options.lastXCertifications);
+  }
 
   if (certifications.length !== 0) {
     const certifYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
@@ -284,6 +254,44 @@ export const generateImage = async (options) => {
         currentLine++;
         certifStartX = certifDesign.logoLineStartX[currentLine];
         certifCurrentYPosition += certifDesign.logoHeight + certifSpacing;
+      }
+    }
+  }
+
+  // Display Superbadges if enabled
+  if (options.displaySuperbadges) {
+    let superbadgeLogos = options.superbadgesData.earnedAwards.edges
+      .filter((edge) => edge.node.award && edge.node.award.icon)
+      .map((edge) => edge.node.award.icon);
+
+    if (options.lastXSuperbadges) {
+      superbadgeLogos = superbadgeLogos.slice(-options.lastXSuperbadges);
+    }
+
+    const superbadgeLogoHeight = canvas.height * top_part * 0.9;
+    const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
+    let superbadgeSpacing = 10;
+    const superbadgeAvailableWidth = canvas.width * right_part; // Available width for superbadges
+    let superbadgeX = canvas.width - superbadgeAvailableWidth;
+    let superbadgeY = 10;
+
+    // Calculate total width required for superbadges
+    const totalSuperbadgeWidth = superbadgeLogos.length * (superbadgeLogoWidth + superbadgeSpacing) - superbadgeSpacing;
+
+    // Adjust spacing if total width exceeds available space
+    if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
+      superbadgeSpacing =
+        (superbadgeAvailableWidth - superbadgeLogos.length * superbadgeLogoWidth) / (superbadgeLogos.length - 1);
+    }
+
+    for (const logoUrl of superbadgeLogos) {
+      try {
+        const logo = await loadImage(logoUrl);
+        ctx.drawImage(logo, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
+        superbadgeX += superbadgeLogoWidth + superbadgeSpacing;
+      } catch (error) {
+        console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
+        warnings.push(`Error loading superbadge logo from URL: ${logoUrl}: ${error.message}`);
       }
     }
   }

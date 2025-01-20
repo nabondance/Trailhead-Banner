@@ -370,7 +370,8 @@ body {
 
 .options input[type='color'],
 .options input[type='text'],
-.options input[type='checkbox'] {
+.options input[type='checkbox'],
+.options input[type='number'] {
   margin-left: 10px;
 }
 
