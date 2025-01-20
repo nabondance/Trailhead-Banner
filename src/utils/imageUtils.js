@@ -179,13 +179,11 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
     <text x="1650" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
     <text x="1650" y="220" transform="scale(.1)" fill="#fff" textLength="${messageTextLength}">${message}</text></g>
     </svg>`;
-  console.log('counterBadgeSvg', counterBadgeSvg);
   return counterBadgeSvg;
 };
 
 const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor) => {
   const badge = dynamicBadgeSvg(label, message, labelColor, messageColor);
-  console.log(badge);
   const badgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badge).toString('base64')}`);
   ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
 };
