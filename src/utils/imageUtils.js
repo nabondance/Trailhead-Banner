@@ -226,5 +226,5 @@ module.exports = {
   calculateCertificationsDesign,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
-  generatePlusXCertificationsSvg
+  generatePlusXCertificationsSvg,
 };

@@ -1,6 +1,13 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
-const { applyGrayscale, cropImage, calculateCertificationsDesign, drawBadgeCounter, generatePlusXSuperbadgesSvg, generatePlusXCertificationsSvg } = require('./imageUtils');
+const {
+  applyGrayscale,
+  cropImage,
+  calculateCertificationsDesign,
+  drawBadgeCounter,
+  generatePlusXSuperbadgesSvg,
+  generatePlusXCertificationsSvg,
+} = require('./imageUtils');
 require('./fonts');
 
 const top_part = 1 / 4;
@@ -234,7 +241,9 @@ export const generateImage = async (options) => {
 
   if (hiddenCertifications > 0) {
     const plusXBadgeSvg = generatePlusXCertificationsSvg(hiddenCertifications);
-    const plusXBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`);
+    const plusXBadgeImage = await loadImage(
+      `data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`
+    );
     certificationsLogos.push({ logo: plusXBadgeImage });
   }
 
@@ -278,7 +287,9 @@ export const generateImage = async (options) => {
 
   // Display Superbadges if enabled
   if (options.displaySuperbadges) {
-    const totalSuperbadges = options.superbadgesData.earnedAwards.edges.filter((edge) => edge.node.award && edge.node.award.icon).length;
+    const totalSuperbadges = options.superbadgesData.earnedAwards.edges.filter(
+      (edge) => edge.node.award && edge.node.award.icon
+    ).length;
 
     let superbadgeLogos = options.superbadgesData.earnedAwards.edges
       .filter((edge) => edge.node.award && edge.node.award.icon)
@@ -293,7 +304,9 @@ export const generateImage = async (options) => {
 
     if (hiddenSuperbadges > 0) {
       const plusXBadgeSvg = generatePlusXSuperbadgesSvg(hiddenSuperbadges);
-      const plusXBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`);
+      const plusXBadgeImage = await loadImage(
+        `data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`
+      );
       superbadgeLogos.push(plusXBadgeImage);
     }
 
