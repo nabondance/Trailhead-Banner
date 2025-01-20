@@ -237,6 +237,13 @@ export const generateImage = async (options) => {
           console.log('Loading certification logo from URL:', cert.logoUrl);
           let logo = await loadImage(cert.logoUrl);
           logo = cropImage(logo); // Crop the logo to remove extra space
+          if (cert.status.expired) {
+            const tempCanvas = createCanvas(logo.width, logo.height);
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(logo, 0, 0);
+            applyGrayscale(tempCtx, 0, 0, logo.width, logo.height); // Apply grayscale for expired certifications
+            logo = tempCanvas;
+          }
           certificationsLogos.push({
             logo,
             expired: cert.status.expired,
@@ -264,16 +271,12 @@ export const generateImage = async (options) => {
 
     for (let i = 0; i < certificationsLogos.length; i++) {
       const { logo, expired, retired } = certificationsLogos[i];
-      if (expired) {
-        ctx.drawImage(logo, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
-        applyGrayscale(ctx, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight); // Apply grayscale for expired certifications
-      } else if (retired) {
+      if (retired) {
         ctx.globalAlpha = 0.5; // Set transparency for retired certifications
-        ctx.drawImage(logo, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
       } else {
         ctx.globalAlpha = 1.0; // Reset transparency
-        ctx.drawImage(logo, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
       }
+      ctx.drawImage(logo, certifStartX, certifCurrentYPosition, certifDesign.logoWidth, certifDesign.logoHeight);
       certifStartX += certifDesign.logoWidth + certifSpacing;
 
       // Move to the next row if the current row is full
