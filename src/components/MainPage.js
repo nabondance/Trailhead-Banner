@@ -18,10 +18,9 @@ const MainPage = () => {
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const handleImageSubmit = async (options) => {
-    console.log('Generating image for:', options.username);
-    console.log('Options:', options);
+    console.debug('Generating image for:', options.username);
+    console.debug('Options:', options);
     setFormOptions(options);
-    console.log('Form Options:', formOptions);
 
     setImageUrl(''); // Clear the previously generated banner
     setLoading(true);
@@ -38,13 +37,13 @@ const MainPage = () => {
         throw new Error(errorData.error || 'Failed to generate image');
       }
       const data = await response.json();
-      console.log('Data:', data);
+      console.debug('Data:', data);
       setImageUrl(data.imageUrl);
       setMainWarning(data.warnings);
     } catch (error) {
       console.error('Error generating image:', error);
       setMainError(error);
-      console.log('Main Error:', mainError);
+      console.error('Main Error:', mainError);
     } finally {
       setLoading(false);
     }
