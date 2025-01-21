@@ -9,7 +9,7 @@ const BannerCount = forwardRef((props, ref) => {
   const [count, setCount] = useState(null);
 
   const fetchCount = async () => {
-    const { data, error } = await supabase
+    const { count, error } = await supabase
       .from('banners')
       .select('*', { count: 'exact', head: true })
       .eq('source_env', process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development');
@@ -17,7 +17,7 @@ const BannerCount = forwardRef((props, ref) => {
     if (error) {
       console.error('Error fetching banner count:', error);
     } else {
-      setCount(data.length);
+      setCount(count);
     }
   };
 
