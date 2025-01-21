@@ -297,7 +297,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               />
             </label>
             <label>
-              Display Limited Number of Superbadges:
+              Limited Number of Superbadges:
               <input
                 type='checkbox'
                 checked={options.displayLastXSuperbadges}
@@ -336,7 +336,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               />
             </label>
             <label>
-              Display Only Lasts Certifications:
+              Only Lasts Certifications:
               <input
                 type='checkbox'
                 checked={options.displayLastXCertifications}
