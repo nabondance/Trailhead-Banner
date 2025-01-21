@@ -3,5 +3,10 @@
     "deploymentEnabled": {
       "main": false
     }
+  },
+  "functions": {
+    "src/pages/api/generate-image.js": {
+      "maxDuration": 20
+    }
   }
 }
