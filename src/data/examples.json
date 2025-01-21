@@ -58,5 +58,10 @@
     "src": "/assets/examples/example12.png",
     "alt": "Example 12",
     "description": "Banner without counters"
+  },
+  {
+    "src": "/assets/examples/example13.png",
+    "alt": "Example 13",
+    "description": "Banner with limited number of superbadges and certifications displayed"
   }
 ]
