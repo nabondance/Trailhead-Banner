@@ -1,15 +1,30 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { CountUp } from 'countup.js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const BannerCount = forwardRef((props, ref) => {
-  const [count, setCount] = useState(null);
+  const [count, setCount] = useState(0);
+  const countUpRef = useRef(null);
+  const initialLoad = useRef(true);
+
+  const animateCount = (start, end) => {
+    if (countUpRef.current) {
+      countUpRef.current.update(end);
+    } else {
+      countUpRef.current = new CountUp('countup-element', end, {
+        startVal: start,
+        duration: 1,
+      });
+      countUpRef.current.start();
+    }
+  };
 
   const fetchCount = async () => {
-    const { count, error } = await supabase
+    const { count: newCount, error } = await supabase
       .from('banners')
       .select('*', { count: 'exact', head: true })
       .eq('source_env', process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development');
@@ -17,7 +32,13 @@ const BannerCount = forwardRef((props, ref) => {
     if (error) {
       console.error('Error fetching banner count:', error);
     } else {
-      setCount(count);
+      if (initialLoad.current) {
+        animateCount(0, newCount);
+        initialLoad.current = false;
+      } else {
+        animateCount(count, newCount);
+      }
+      setCount(newCount);
     }
   };
 
@@ -34,7 +55,7 @@ const BannerCount = forwardRef((props, ref) => {
           event: '*',
           schema: 'public',
           table: 'banners',
-          filter: `source_env=eq.${process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development'}`, // Filter changes based on `source_env`
+          filter: `source_env=eq.${process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development'}`,
         },
         (payload) => {
           console.log('Change detected:', payload);
@@ -55,11 +76,7 @@ const BannerCount = forwardRef((props, ref) => {
 
   return (
     <div className='banner-count'>
-      {count !== null ? (
-        <p>Already {count} banners generated!</p>
-      ) : (
-        <p>Counting generated banners...</p>
-      )}
+      <p>Already <span id='countup-element'>{count}</span> banners generated!</p>
     </div>
   );
 });

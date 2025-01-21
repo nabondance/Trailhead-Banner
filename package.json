@@ -47,6 +47,7 @@
     "@theme-toggles/react": "^4.1.0",
     "@vercel/speed-insights": "^1.1.0",
     "axios": "^1.7.9",
+    "countup.js": "^2.8.0",
     "i": "^0.3.7",
     "next": "15.1.5",
     "next-sitemap": "^4.2.3",
