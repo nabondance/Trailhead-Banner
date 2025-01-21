@@ -202,7 +202,7 @@ export const generateImage = async (options) => {
   const totalCertifications = certifications.length;
 
   // Order certifications by dateCompleted
-  certifications.sort((a, b) => new Date(b.dateCompleted) - new Date(a.dateCompleted));
+  certifications.sort((a, b) => new Date(a.dateCompleted) - new Date(b.dateCompleted));
 
   if (options.displayLastXCertifications && options.lastXCertifications) {
     certifications = certifications.slice(-options.lastXCertifications);
