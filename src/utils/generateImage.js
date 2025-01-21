@@ -1,5 +1,6 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
+const crypto = require('crypto');
 const {
   applyGrayscale,
   cropImage,
@@ -369,8 +370,12 @@ export const generateImage = async (options) => {
   const buffer = canvas.toBuffer('image/png');
   const bannerUrl = `data:image/png;base64,${buffer.toString('base64')}`;
 
+  // Hash the image
+  const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+
   console.log('Banner generation complete.');
   console.log('Warnings:', warnings);
+  console.log('Image hash:', hash);
 
-  return { bannerUrl, warnings };
+  return { bannerUrl, warnings, hash };
 };

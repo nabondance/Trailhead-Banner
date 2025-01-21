@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
 import ProductionWarning from './ProductionWarning';
+import BannerCount from './BannerCount';
 import '../styles/globals.css';
 import packageJson from '../../package.json';
 
@@ -16,6 +17,7 @@ const MainPage = () => {
   const [mainWarning, setMainWarning] = useState(null);
   const [formOptions, setFormOptions] = useState({});
   const [fullscreenImage, setFullscreenImage] = useState(null);
+  const bannerCountRef = useRef(null);
 
   const handleImageSubmit = async (options) => {
     console.debug('Generating image for:', options.username);
@@ -40,6 +42,7 @@ const MainPage = () => {
       console.debug('Data:', data);
       setImageUrl(data.imageUrl);
       setMainWarning(data.warnings);
+      bannerCountRef.current.fetchCount(); // Refresh the banner count
     } catch (error) {
       console.error('Error generating image:', error);
       setMainError(error);
@@ -65,6 +68,7 @@ const MainPage = () => {
   return (
     <div className='container'>
       <ProductionWarning />
+      <BannerCount ref={bannerCountRef} />
       <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} onValidationError={handleValidationError} />
       {loading && (
         <div className='loading-container'>
