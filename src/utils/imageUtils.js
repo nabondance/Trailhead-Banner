@@ -188,9 +188,43 @@ const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, me
   ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
 };
 
+const generatePlusXSuperbadgesSvg = (count) => {
+  const plusXSuperbadgesSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" role="img">
+      <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+      <path
+        d="M 228.066 9.393 Q 250 -3.27 271.934 9.393 L 447.404 110.702 Q 469.338 123.365 469.338 148.692 L 469.338 351.308 Q 469.338 376.635 447.404 389.299 L 271.934 490.607 Q 250 503.27 228.066 490.607 L 52.596 389.299 Q 30.662 376.635 30.662 351.308 L 30.662 148.692 Q 30.662 123.365 52.596 110.701 Z"
+        bx:shape="n-gon 250 250 253.27 253.27 6 0.1 1@dbd6cdd9" style="fill:#C5CDCD;"
+        transform="matrix(1, 0, 0, 1, 0, 0)" />
+      <path
+        d="M 230.349 34.434 Q 250 23.088 269.651 34.434 L 426.86 125.198 Q 446.512 136.544 446.512 159.235 L 446.512 340.765 Q 446.512 363.456 426.86 374.802 L 269.651 465.566 Q 250 476.912 230.349 465.566 L 73.14 374.802 Q 53.488 363.456 53.488 340.765 L 53.488 159.235 Q 53.488 136.544 73.14 125.198 Z"
+        bx:shape="n-gon 250 250 226.912 226.912 6 0.1 1@9dde08be" style="fill:#8a00c4;"
+        transform="matrix(1, 0, 0, 1, 0, 0)" />
+      <text x="250" y="330" fill="#fff" font-family="Roboto" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
+    </svg>`;
+  return plusXSuperbadgesSvg;
+};
+
+const generatePlusXCertificationsSvg = (count) => {
+  const plusXCertificationsSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="500" height="500" role="img">
+      <style fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+      <g transform="translate(0,500) scale(0.100000,-0.100000)" fill="#0A9DDA" stroke="none">
+      <path d="M1436 4890 c-26 -10 -64 -29 -83 -42 -48 -32 -1250 -1536 -1288
+      -1612 -54 -109 -54 -113 152 -1011 99 -434 195 -855 212 -935 18 -80 43 -168
+      57 -197 53 -109 50 -108 989 -560 473 -228 886 -423 917 -434 64 -21 133 -24
+      193 -8 22 6 436 200 919 432 962 462 956 459 1010 570 14 29 39 113 55 187 16
+      74 114 504 216 955 207 906 204 886 152 998 -30 65 -1209 1547 -1272 1599 -25
+      20 -70 46 -100 57 -55 21 -67 21 -1068 21 -969 -1 -1014 -2 -1061 -20z"/>
+      </g>
+      <text x="250" y="300" fill="#fff" font-family="Anta" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
+    </svg>`;
+  return plusXCertificationsSvg;
+};
+
 module.exports = {
   applyGrayscale,
   cropImage,
   calculateCertificationsDesign,
   drawBadgeCounter,
+  generatePlusXSuperbadgesSvg,
+  generatePlusXCertificationsSvg,
 };
