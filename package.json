@@ -44,7 +44,6 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@napi-rs/canvas": "^0.1.65",
     "@theme-toggles/react": "^4.1.0",
-    "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
     "axios": "^1.7.9",
     "i": "^0.3.7",
