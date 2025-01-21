@@ -22,7 +22,31 @@ const BannerCount = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
+    // Fetch initial count
     fetchCount();
+
+    // Subscribe to changes in the 'banners' table
+    const subscription = supabase
+      .channel('realtime:banners')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'banners',
+          filter: `source_env=eq.${process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development'}`, // Filter changes based on `source_env`
+        },
+        (payload) => {
+          console.log('Change detected:', payload);
+          fetchCount(); // Update the count when a change is detected
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on component unmount
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
 
   useImperativeHandle(ref, () => ({
