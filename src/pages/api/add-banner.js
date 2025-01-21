@@ -8,14 +8,12 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { th_username, thb_banner_hash, source_env } = req.body;
 
-    if (!th_username || !thb_banner_hash ) {
+    if (!th_username || !thb_banner_hash) {
       return res.status(400).json({ error: 'Missing th_username or thb_banner_hash' });
     }
 
     try {
-      const { data, error } = await supabase
-        .from('banners')
-        .insert([{ th_username, thb_banner_hash, source_env }]);
+      const { data, error } = await supabase.from('banners').insert([{ th_username, thb_banner_hash, source_env }]);
 
       if (error) {
         throw error;

@@ -76,7 +76,9 @@ const BannerCount = forwardRef((props, ref) => {
 
   return (
     <div className='banner-count'>
-      <p>Already <span id='countup-element'>{count}</span> banners generated !</p>
+      <p>
+        Already <span id='countup-element'>{count}</span> banners generated !
+      </p>
     </div>
   );
 });

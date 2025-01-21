@@ -1,8 +1,7 @@
 export const updateBannerCounter = async (username, bannerHash, protocol, host) => {
-    const baseUrl =
-        process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}` // Use Vercel's domain in production
-        : `${protocol}://${host}`; // Fallback for local development
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}` // Use Vercel's domain in production
+    : `${protocol}://${host}`; // Fallback for local development
 
   const addBannerUrl = `${baseUrl}/api/add-banner`;
   const response = await fetch(addBannerUrl, {
