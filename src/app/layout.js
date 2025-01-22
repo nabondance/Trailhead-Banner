@@ -34,7 +34,7 @@ export const metadata = {
   authors: [{ name: 'nabondance', url: 'https://nabondance.me' }],
   publisher: 'nabondance',
   icon: {
-    url: '/icon.svg',
+    url: '/favicon.svg',
     type: 'image/svg+xml',
   },
 };
