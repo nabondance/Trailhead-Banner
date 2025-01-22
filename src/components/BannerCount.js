@@ -27,7 +27,7 @@ const BannerCount = forwardRef((props, ref) => {
     const { count: newCount, error } = await supabase
       .from('banners')
       .select('*', { count: 'exact', head: true })
-      .eq('source_env', process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development');
+      .eq('source_env', process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development');
 
     if (error) {
       console.error('Error fetching banner count:', error);
@@ -55,7 +55,7 @@ const BannerCount = forwardRef((props, ref) => {
           event: '*',
           schema: 'public',
           table: 'banners',
-          filter: `source_env=eq.${process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development'}`,
+          filter: `source_env=eq.${process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development'}`,
         },
         (payload) => {
           console.log('Change detected:', payload);
@@ -77,7 +77,7 @@ const BannerCount = forwardRef((props, ref) => {
   return (
     <div className='banner-count'>
       <p>
-        Already <span id='countup-element'>{count}</span> banners generated !
+        Already <span id='countup-element'>{count}</span> banners generated!
       </p>
     </div>
   );
