@@ -18,6 +18,9 @@ const BannerCount = forwardRef((props, ref) => {
       countUpRef.current = new CountUp('countup-element', end, {
         startVal: start,
         duration: 1,
+        useEasing: true,
+        useGrouping: true,
+        separator: ',',
       });
       countUpRef.current.start();
     }
