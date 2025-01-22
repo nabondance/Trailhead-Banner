@@ -29,6 +29,14 @@ const InterFont = Inter({
 export const metadata = {
   title: 'Trailhead Banner',
   description: 'Generate your LinkedIn Banner with your Trailhead data',
+  url: 'https://thb.nabondance.me',
+  keywords: 'Trailhead, LinkedIn, Banner, Generator, Salesforce, Trailblazer, open-source',
+  authors: [{ name: 'nabondance', url: 'https://nabondance.me' }],
+  publisher: 'nabondance',
+  icon: {
+    url: '/icon.svg',
+    type: 'image/svg+xml',
+  },
 };
 
 export default function RootLayout({ children }) {
