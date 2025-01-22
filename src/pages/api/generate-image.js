@@ -4,6 +4,7 @@ import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications
 import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
 import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import { generateImage } from '../../utils/generateImage';
+import { updateBannerCounter } from '../../utils/supabaseUtils';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -94,11 +95,19 @@ export default async function handler(req, res) {
       });
       const imageUrl = generateImageResult.bannerUrl;
       const warnings = generateImageResult.warnings;
+      const imageHash = generateImageResult.hash;
+
+      // Update the counter in the database
+      try {
+        await updateBannerCounter(options.username, imageHash, protocol, host);
+      } catch (error) {
+        console.error('Error updating banner counter:', error.message);
+      }
 
       // Send back the combined data and image URL
       res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings });
     } catch (error) {
-      console.error('Error fetching data:', error.message);
+      console.error('Error generating banner:', error.message);
       if (error.response) {
         console.error('Response data:', error.response.data);
         console.error('Response status:', error.response.status);
