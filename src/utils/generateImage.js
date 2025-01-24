@@ -9,11 +9,14 @@ const {
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
 } = require('./imageUtils');
+import { getImage } from './cacheUtils';
 require('./fonts');
 
 const top_part = 1 / 4;
 const bottom_part = 3 / 4;
-let right_part = 7 / 10;
+const right_part = 7 / 10;
+let rankLogoWidth;
+let rankLogoHeight;
 
 export const generateImage = async (options) => {
   // Options logging
@@ -87,13 +90,20 @@ export const generateImage = async (options) => {
   }
 
   // Rank Logo
-  const rankLogoUrl = options.rankData.rank.imageUrl;
-  const rankLogo = await loadImage(rankLogoUrl);
-  const rankLogoHeight = canvas.height * top_part * 1;
-  const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
-  const rankLogoScalingFactor = 1.2;
-  if (options.displayRankLogo) {
-    ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
+  try {
+    const rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
+    const rankLogo = await loadImage(rankLogoBuffer);
+    rankLogoHeight = canvas.height * top_part * 1;
+    rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
+    const rankLogoScalingFactor = 1.2;
+    if (options.displayRankLogo) {
+      ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
+    }
+  } catch (error) {
+    rankLogoWidth = 180;
+    rankLogoHeight = 40;
+    console.error(`Error loading rank logo ${options.rankData.rank.imageUrl}:`, error);
+    warnings.push(`Error loading rank logo ${options.rankData.rank.imageUrl}: ${error.message}`);
   }
 
   // Counters
@@ -219,7 +229,8 @@ export const generateImage = async (options) => {
     if (cert.logoUrl) {
       try {
         console.log('Loading certification logo from URL:', cert.logoUrl);
-        let logo = await loadImage(cert.logoUrl);
+        const certificationLogoBuffer = await getImage(cert.logoUrl, 'certifications');
+        let logo = await loadImage(certificationLogoBuffer);
         logo = cropImage(logo); // Crop the logo to remove extra space
         if (cert.status.expired) {
           const tempCanvas = createCanvas(logo.width, logo.height);
@@ -329,7 +340,8 @@ export const generateImage = async (options) => {
 
     for (const logoUrl of superbadgeLogos) {
       try {
-        const logo = await loadImage(logoUrl);
+        const logoBuffer = await getImage(logoUrl, 'superbadges');
+        const logo = await loadImage(logoBuffer);
         ctx.drawImage(logo, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
         superbadgeX += superbadgeLogoWidth + superbadgeSpacing;
       } catch (error) {
