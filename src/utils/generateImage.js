@@ -224,8 +224,8 @@ export const generateImage = async (options) => {
 
   const certificationsLogos = [];
 
-  // Load logos
-  for (const cert of certifications) {
+  // Download all certification logos in parallel
+  const logoPromises = certifications.map(async (cert) => {
     if (cert.logoUrl) {
       try {
         console.log('Loading certification logo from URL:', cert.logoUrl);
@@ -249,7 +249,10 @@ export const generateImage = async (options) => {
         warnings.push(`Error loading logo for ${cert.title}: ${error.message}`);
       }
     }
-  }
+  });
+
+  // Wait for all logos to be downloaded
+  await Promise.all(logoPromises);
 
   if (hiddenCertifications > 0) {
     const plusXBadgeSvg = generatePlusXCertificationsSvg(hiddenCertifications);
@@ -314,12 +317,28 @@ export const generateImage = async (options) => {
     const displayedSuperbadges = superbadgeLogos.length;
     const hiddenSuperbadges = totalSuperbadges - displayedSuperbadges;
 
+    // Download all superbadge logos in parallel
+    const superbadgeLogoPromises = superbadgeLogos.map(async (logoUrl) => {
+      try {
+        const logoBuffer = await getImage(logoUrl, 'superbadges');
+        const logo = await loadImage(logoBuffer);
+        return logo;
+      } catch (error) {
+        console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
+        warnings.push(`Error loading superbadge logo from URL: ${logoUrl}: ${error.message}`);
+        return null;
+      }
+    });
+
+    // Wait for all superbadge logos to be downloaded
+    const superbadgeLogosImages = await Promise.all(superbadgeLogoPromises);
+
     if (hiddenSuperbadges > 0) {
       const plusXBadgeSvg = generatePlusXSuperbadgesSvg(hiddenSuperbadges);
       const plusXBadgeImage = await loadImage(
         `data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`
       );
-      superbadgeLogos.push(plusXBadgeImage);
+      superbadgeLogosImages.push(plusXBadgeImage);
     }
 
     const superbadgeLogoHeight = canvas.height * top_part * 0.9;
@@ -330,23 +349,20 @@ export const generateImage = async (options) => {
     let superbadgeY = 10;
 
     // Calculate total width required for superbadges
-    const totalSuperbadgeWidth = superbadgeLogos.length * (superbadgeLogoWidth + superbadgeSpacing) - superbadgeSpacing;
+    const totalSuperbadgeWidth =
+      superbadgeLogosImages.length * (superbadgeLogoWidth + superbadgeSpacing) - superbadgeSpacing;
 
     // Adjust spacing if total width exceeds available space
     if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
       superbadgeSpacing =
-        (superbadgeAvailableWidth - superbadgeLogos.length * superbadgeLogoWidth) / (superbadgeLogos.length - 1);
+        (superbadgeAvailableWidth - superbadgeLogosImages.length * superbadgeLogoWidth) /
+        (superbadgeLogosImages.length - 1);
     }
 
-    for (const logoUrl of superbadgeLogos) {
-      try {
-        const logoBuffer = await getImage(logoUrl, 'superbadges');
-        const logo = await loadImage(logoBuffer);
+    for (const logo of superbadgeLogosImages) {
+      if (logo) {
         ctx.drawImage(logo, superbadgeX, superbadgeY, superbadgeLogoWidth, superbadgeLogoHeight);
         superbadgeX += superbadgeLogoWidth + superbadgeSpacing;
-      } catch (error) {
-        console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
-        warnings.push(`Error loading superbadge logo from URL: ${logoUrl}: ${error.message}`);
       }
     }
   }
