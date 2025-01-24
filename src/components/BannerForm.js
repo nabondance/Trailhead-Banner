@@ -134,7 +134,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
       });
     } else {
-      const validationError = new Error('Validation failed. Please check the input fields.');
+      const validationError = new Error(
+        `Validation failed: ${usernameError ? usernameError : ''} ${backgroundImageUrlError ? backgroundImageUrlError : ''}`
+      );
       onValidationError(validationError, options);
     }
     setIsGenerating(false); // Show the button again when the banner is generated
