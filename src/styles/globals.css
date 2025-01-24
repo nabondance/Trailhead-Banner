@@ -65,11 +65,18 @@
 }
 
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
+}
+
+main {
+  flex: 1;
 }
 
 .container {
@@ -184,11 +191,10 @@ body {
   font-weight: 300;
   padding: 10px;
   text-align: center;
-  position: fixed;
   width: 100%;
-  bottom: 0;
   border-top: 1px solid var(--border);
   left: 0; /* Ensure the footer starts from the left edge */
+  position: relative; /* Change from fixed to relative */
 }
 
 .footer-link {
