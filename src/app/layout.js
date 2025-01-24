@@ -30,7 +30,7 @@ export const metadata = {
   title: 'Trailhead Banner',
   description: 'Generate your LinkedIn Banner with your Trailhead data',
   url: 'https://thb.nabondance.me',
-  keywords: 'Trailhead, LinkedIn, Banner, Generator, Salesforce, Trailblazer, open-source',
+  keywords: 'Trailhead, LinkedIn, Banner, Header, Generator, Salesforce, Trailblazer, open-source',
   authors: [{ name: 'nabondance', url: 'https://nabondance.me' }],
   publisher: 'nabondance',
   icon: {
