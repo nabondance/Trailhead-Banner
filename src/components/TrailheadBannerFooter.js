@@ -5,10 +5,8 @@ import '../styles/globals.css';
 const TrailheadBannerFooter = () => {
   return (
     <footer className='footer'>
-      <a href='https://github.com/nabondance' target='_blank' rel='noopener noreferrer' className='footer-link'>
-        &copy; 2025 Trailhead-Banner by{' '}
-        <ThemedImage basePath='/assets/logos/github-logo' alt='GitHub' className='github-logo' width={15} height={15} />{' '}
-        /nabondance
+      <a href='https://nabondance.me' target='_blank' rel='noopener noreferrer' className='footer-link'>
+        &copy; 2025 Trailhead-Banner by /nabondance.me
       </a>
     </footer>
   );
