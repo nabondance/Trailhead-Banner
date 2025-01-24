@@ -28,9 +28,7 @@ export const getImage = async (imageUrl, folder = 'images') => {
     const imageBuffer = Buffer.from(response.data, 'binary');
     // Upload the image to the blob
     await uploadImage(imageBuffer, fileName, folder);
-    imageDownloaded = await downloadImage(fileName, folder);
-    console.log('Downloaded image from blob:', imageDownloaded);
-    return imageDownloaded;
+    return imageBuffer;
   } catch (error) {
     console.error(`Error downloading or uploading image ${imageUrl}:`, error);
     throw new Error('Failed to get image');
