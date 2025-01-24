@@ -43,6 +43,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return false;
     }
 
+    if (username.includes('@')) {
+      setUsernameError("username shouldn't be an email address");
+      setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't be an email address" });
+      return false;
+    }
+
     try {
       const response = await fetch(`/api/validate-username?username=${username}`);
       const data = await response.json();
