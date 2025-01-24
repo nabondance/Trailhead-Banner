@@ -6,8 +6,7 @@ const TrailheadBannerFooter = () => {
   return (
     <footer className='footer'>
       <a href='https://nabondance.me' target='_blank' rel='noopener noreferrer' className='footer-link'>
-        &copy; 2025 Trailhead-Banner by{' '}
-        /nabondance.me
+        &copy; 2025 Trailhead-Banner by /nabondance.me
       </a>
     </footer>
   );
