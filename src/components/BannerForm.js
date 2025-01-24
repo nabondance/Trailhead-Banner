@@ -37,9 +37,16 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [predefinedBackgroundImageUrl, setPredefinedBackgroundImageUrl] = useState('');
 
   const validateUsername = async (username) => {
+    setUsernameError(''); // Clear username error
     if (!username) {
       setUsernameError('Enter an username');
       setValidationResult({ valid: false, state: 'invalid', message: 'Enter an username' });
+      return false;
+    }
+
+    if (username.includes('@')) {
+      setUsernameError("username shouldn't be an email address");
+      setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't be an email address" });
       return false;
     }
 
@@ -80,6 +87,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   };
 
   const validateImageUrl = async (url) => {
+    setBackgroundImageUrlError(''); // Clear image URL error
     if (!url) {
       setBackgroundImageUrlError('');
       return true;
@@ -128,7 +136,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
       });
     } else {
-      const validationError = new Error('Validation failed. Please check the input fields.');
+      const validationError = new Error(
+        `Validation failed: ${usernameError ? usernameError : ''} ${backgroundImageUrlError ? backgroundImageUrlError : ''}`
+      );
       onValidationError(validationError, options);
     }
     setIsGenerating(false); // Show the button again when the banner is generated
