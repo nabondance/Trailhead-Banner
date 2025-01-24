@@ -27,6 +27,8 @@ const BannerCount = forwardRef((props, ref) => {
   };
 
   const fetchCount = async () => {
+    console.debug('NEXT_PUBLIC_VERCEL_ENV:', process.env.NEXT_PUBLIC_VERCEL_ENV);
+    console.debug('VERCEL_ENV:', process.env.VERCEL_ENV);
     const { count: newCount, error } = await supabase
       .from('banners')
       .select('*', { count: 'exact', head: true })
