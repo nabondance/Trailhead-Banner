@@ -33,8 +33,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
-  const [showPredefinedImages, setShowPredefinedImages] = useState(false);
-  const [predefinedBackgroundImageUrl, setPredefinedBackgroundImageUrl] = useState('');
 
   const validateUsername = async (username) => {
     setUsernameError(''); // Clear username error
