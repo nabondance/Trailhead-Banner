@@ -170,10 +170,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </div>
         )}
         {!validationResult && (
-          <div
-            className='validation-icon'
-            data-tooltip='Check the How-To page to know how to find your trailhead username.'
-          >
+          <div className='validation-icon' data-tooltip='Check the How-To page to get guidance.'>
             <FontAwesomeIcon icon={faQuestionCircle} className='fa-fw icon-help' />
           </div>
         )}
