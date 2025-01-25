@@ -6,9 +6,16 @@ import '../styles/globals.css';
 import banners from '../data/banners.json';
 import searchQueries from '../data/searchQueries.json';
 
-const BannerCard = ({ src, alt, description, credit, onClick, onCopy }) => (
+const BannerCard = ({ src, alt, description, credit, onClick, onCopy, isUnoptimized }) => (
   <div className='example-card'>
-    <Image src={src} alt={alt} width={600} height={400} onClick={() => onClick(src)} unoptimized />
+    <Image
+      src={src}
+      alt={alt}
+      width={600}
+      height={400}
+      onClick={() => onClick(src)}
+      unoptimized={isUnoptimized} // Dynamic optimization toggle
+    />
     <p>{description}</p>
     {credit && <p className='credit'>Credit: {credit}</p>}
     <button className='copy-button' onClick={() => onCopy(src)}>
@@ -20,13 +27,20 @@ const BannerCard = ({ src, alt, description, credit, onClick, onCopy }) => (
 const BackgroundLibraryPage = () => {
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [notification, setNotification] = useState('');
+  const [unoptimizedImages, setUnoptimizedImages] = useState({}); // Track unoptimized state for each image
 
   const handleImageClick = (src) => {
     setFullscreenImage(src);
+    setUnoptimizedImages((prev) => ({ ...prev, [src]: true })); // Mark the clicked image as unoptimized
   };
 
   const handleOverlayClick = () => {
     setFullscreenImage(null);
+    setUnoptimizedImages((prev) => {
+      const updated = { ...prev };
+      delete updated[fullscreenImage]; // Reset optimization for the fullscreen image
+      return updated;
+    });
   };
 
   const handleCopyUrl = (src) => {
@@ -67,13 +81,20 @@ const BackgroundLibraryPage = () => {
             credit={example.credit}
             onClick={handleImageClick}
             onCopy={handleCopyUrl}
+            isUnoptimized={unoptimizedImages[example.src] || false} // Individual unoptimized state
           />
         ))}
       </div>
 
       {fullscreenImage && (
         <div className='fullscreen-overlay visible' onClick={handleOverlayClick}>
-          <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' unoptimized />
+          <Image
+            src={fullscreenImage}
+            alt='Full Screen Example'
+            layout='fill'
+            objectFit='contain'
+            unoptimized // Always unoptimized in fullscreen
+          />
         </div>
       )}
     </div>
