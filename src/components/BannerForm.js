@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import bannerBackground from '../data/banners.json';
 
@@ -167,6 +167,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             ) : (
               <FontAwesomeIcon icon={faCircleXmark} className='fa-fw icon-error' /> // Red cross
             )}
+          </div>
+        )}
+        {!validationResult && (
+          <div
+            className='validation-icon'
+            data-tooltip='Check the How-To page to know how to find your trailhead username.'
+          >
+            <FontAwesomeIcon icon={faQuestionCircle} className='fa-fw icon-help' />
           </div>
         )}
       </div>

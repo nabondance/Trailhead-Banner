@@ -322,6 +322,30 @@ main {
   z-index: 10;
 }
 
+.icon-help {
+  margin-left: 10px;
+  color: var(--text-faded);
+  cursor: pointer;
+}
+
+.icon-help:hover {
+  color: var(--text-contrast);
+}
+
+.icon-help[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  z-index: 10;
+}
+
 .button {
   padding: 10px;
   font-size: 16px;
