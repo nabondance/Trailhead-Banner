@@ -138,17 +138,9 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
 
 const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
   let labelToDisplay = label;
-  let labelTextLength = label === 'Badge' ? 370 : 670;
-  let messageTextLength = 130;
   let messageBackgroundColor = '#1f80c0';
   if (message > 1) {
     labelToDisplay += 's';
-    labelTextLength += 20;
-    if (message > 99) {
-      messageTextLength = 230;
-    } else if (message > 999) {
-      messageTextLength = 330;
-    }
   }
   switch (label) {
     case 'Superbadge':
@@ -159,25 +151,25 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
       break;
   }
 
-  const counterBadgeSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="190" height="35" role="img">
+  const counterBadgeSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="35" role="img">
       <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
   <linearGradient id="s" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
         <stop offset="1" stop-opacity=".1" />
     </linearGradient>
     <clipPath id="r">
-        <rect width="190" height="30" rx="3" fill="#fff" />
+        <rect width="200" height="30" rx="3" fill="#fff" />
     </clipPath>
     <g clip-path="url(#r)">
         <rect width="140" height="35" fill="#555" />
-        <rect x="140" width="50" height="35" fill="${messageBackgroundColor}" />
-        <rect width="190" height="35" fill="url(#s)" />
+        <rect x="140" width="60" height="35" fill="${messageBackgroundColor}" />
+        <rect width="200" height="35" fill="url(#s)" />
     </g>
     <g fill="#fff" text-anchor="middle" font-family="Anta" text-rendering="geometricPrecision" font-size="200">
-    <text x="700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${labelTextLength}">${labelToDisplay}</text>
-    <text x="700" y="220" transform="scale(.1)" fill="#fff" textLength="${labelTextLength}">${labelToDisplay}</text>
-    <text x="1650" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${messageTextLength}">${message}</text>
-    <text x="1650" y="220" transform="scale(.1)" fill="#fff" textLength="${messageTextLength}">${message}</text></g>
+    <text x="700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)">${labelToDisplay}</text>
+    <text x="700" y="220" transform="scale(.1)" fill="#fff">${labelToDisplay}</text>
+    <text x="1700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)">${message}</text>
+    <text x="1700" y="220" transform="scale(.1)" fill="#fff">${message}</text></g>
     </svg>`;
   return counterBadgeSvg;
 };
