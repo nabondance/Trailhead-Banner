@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTriangleExclamation, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import bannerBackground from '../data/banners.json';
 
@@ -33,8 +33,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
-  const [showPredefinedImages, setShowPredefinedImages] = useState(false);
-  const [predefinedBackgroundImageUrl, setPredefinedBackgroundImageUrl] = useState('');
 
   const validateUsername = async (username) => {
     setUsernameError(''); // Clear username error
@@ -169,6 +167,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             ) : (
               <FontAwesomeIcon icon={faCircleXmark} className='fa-fw icon-error' /> // Red cross
             )}
+          </div>
+        )}
+        {!validationResult && (
+          <div className='validation-icon' data-tooltip='Check the How-To page to get guidance.'>
+            <FontAwesomeIcon icon={faQuestionCircle} className='fa-fw icon-help' />
           </div>
         )}
       </div>

@@ -322,6 +322,30 @@ main {
   z-index: 10;
 }
 
+.icon-help {
+  margin-left: 10px;
+  color: var(--text-faded);
+  cursor: pointer;
+}
+
+.icon-help:hover {
+  color: var(--text-contrast);
+}
+
+.icon-help[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
 .button {
   padding: 10px;
   font-size: 16px;
@@ -874,4 +898,80 @@ legend {
   margin-bottom: 10px;
   text-align: center;
   font-weight: bold;
+}
+
+.how-to-page {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.how-to-page h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: var(--text-contrast);
+  text-align: center;
+}
+
+.how-to-section {
+  margin-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 5px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--middleground);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+}
+
+.how-to-page h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  color: var(--text-contrast);
+}
+
+.how-to-page ol,
+.how-to-page ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.how-to-page li {
+  margin-bottom: 10px;
+  font-size: 1em;
+  color: var(--text-contrast);
+}
+
+.how-to-page a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.how-to-page a:hover {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
+.issue-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  color: var(--text-color);
+  background-color: var(--primary);
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  box-shadow: 0 0 20px var(--primary);
+  transition: box-shadow 0.3s;
+}
+
+.issue-link:hover {
+  background-color: var(--secondary);
+  box-shadow: 0 0 30px var(--secondary);
+}
+
+.responsive-image {
+  width: 100%;
+  height: auto;
+  margin-top: 20px;
 }
