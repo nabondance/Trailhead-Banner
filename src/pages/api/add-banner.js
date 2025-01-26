@@ -16,6 +16,7 @@ export default async function handler(req, res) {
       const { data, error } = await supabase.from('banners').insert([
         {
           th_username: thb_data.th_username,
+          thb_processing_time: thb_data.thb_processing_time,
           source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
           thb_options: thb_data.thb_options,
           thb_version: thb_data.thb_version,
