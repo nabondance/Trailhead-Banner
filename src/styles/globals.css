@@ -320,6 +320,18 @@ main {
   border-radius: 3px;
   white-space: nowrap;
   z-index: 10;
+  max-width: 90vw; /* Ensure the tooltip fits within the viewport */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (width <= 768px) {
+  .validation-icon[data-tooltip]:hover::after {
+    left: auto;
+    right: 10px;
+    transform: none;
+    text-size-adjust: 80%;
+  }
 }
 
 .icon-help {
