@@ -730,6 +730,7 @@ legend {
     position: static;
     transform: none;
     margin-top: 10px;
+    text-size-adjust: 80%;
   }
 
   .header-nav {
@@ -991,6 +992,10 @@ legend {
 }
 
 @media (width <= 768px) {
+  .footer-link {
+    text-size-adjust: 80%;
+  }
+
   .footer-buttons .github-btn {
     transform: scale(0.8);
     gap: 5px;
