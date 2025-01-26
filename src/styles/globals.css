@@ -266,16 +266,14 @@ main {
 
 .input-url {
   padding: 1px;
-  padding-inline-start: 2px;
-  padding-inline: 5px;
+  padding-left: 2px;
+  padding-right: 5px;
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--background);
   color: var(--text-contrast);
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .input-url:focus {
@@ -286,16 +284,14 @@ main {
 
 .input-number {
   padding: 1px;
-  padding-inline-start: 2px;
-  padding-inline: 5px;
+  padding-left: 2px;
+  padding-right: 5px;
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--background);
   color: var(--text-contrast);
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .input-number:focus {
@@ -724,7 +720,7 @@ legend {
 }
 
 .warning-message a:hover {
-  color: var (--secondary);
+  color: var(--secondary);
   text-decoration: none;
 }
 
@@ -1042,8 +1038,8 @@ legend {
 
 select {
   padding: 1px;
-  padding-inline-start: 2px;
-  padding-inline: 5px;
+  padding-left: 2px;
+  padding-right: 5px;
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -1051,9 +1047,13 @@ select {
   color: var(--text-contrast);
   appearance: none;
   cursor: pointer;
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 5px var(--primary);
+  outline: none;
 }
 
 select:focus {
