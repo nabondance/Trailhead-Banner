@@ -99,7 +99,7 @@ export default async function handler(req, res) {
 
       // Update the counter in the database
       try {
-        await updateBannerCounter(options.username, imageHash, protocol, host);
+        updateBannerCounter(options.username, imageHash, protocol, host);
       } catch (error) {
         console.error('Error updating banner counter:', error.message);
       }
