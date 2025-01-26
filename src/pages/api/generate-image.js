@@ -8,6 +8,7 @@ import SupabaseUtils from '../../utils/supabaseUtils';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
+    const start_time = new Date().getTime();
     const options = req.body;
 
     const graphqlQueries = [
@@ -101,6 +102,7 @@ export default async function handler(req, res) {
       try {
         const thb_data = {
           th_username: options.username,
+          thb_processing_time: new Date().getTime() - start_time,
           options,
           bannerHash: imageHash,
           certificationsData: certificationsData,

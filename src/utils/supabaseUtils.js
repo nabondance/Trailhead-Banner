@@ -32,6 +32,7 @@ class SupabaseUtils {
     // Clean the data as needed
     const cleanedData = {
       th_username: data.th_username,
+      thb_processing_time: data.thb_processing_time,
       thb_options: data.options,
       thb_version: packageJson.version,
       bannerHash: data.bannerHash,
