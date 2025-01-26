@@ -5,6 +5,7 @@ const endpoint = 'https://profile.api.trailhead.com/graphql';
 
 export default async function handler(req, res) {
   const { username } = req.query;
+  console.log('validating:', username);
 
   if (!username) {
     return res.status(400).json({ valid: false, state: 'invalid', message: 'Username is required' });
