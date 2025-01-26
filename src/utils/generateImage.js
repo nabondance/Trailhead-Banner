@@ -21,6 +21,7 @@ let rankLogoHeight;
 export const generateImage = async (options) => {
   // Options logging
   console.log('Generating banner with the following data:');
+  console.log('Username:', options.username);
   console.log('Rank Data:', options.rankData);
   console.log('Certifications Data:', options.certificationsData);
   console.log('Badges Data:', options.badgesData);

@@ -4,7 +4,7 @@ import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications
 import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
 import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import { generateImage } from '../../utils/generateImage';
-import { updateBannerCounter } from '../../utils/supabaseUtils';
+import SupabaseUtils from '../../utils/supabaseUtils';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -99,7 +99,17 @@ export default async function handler(req, res) {
 
       // Update the counter in the database
       try {
-        await updateBannerCounter(options.username, imageHash, protocol, host);
+        const thb_data = {
+          th_username: options.username,
+          options,
+          bannerHash: imageHash,
+          certificationsData: certificationsData,
+          badgesData: badgesData,
+          superbadgesData: superbadgesData,
+          rankData: rankData,
+          mvpData: mvpData,
+        };
+        SupabaseUtils.updateBannerCounter(thb_data, protocol, host);
       } catch (error) {
         console.error('Error updating banner counter:', error.message);
       }
