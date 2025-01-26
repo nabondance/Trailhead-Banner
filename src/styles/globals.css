@@ -273,7 +273,9 @@ main {
   border-radius: 4px;
   background-color: var(--background);
   color: var(--text-contrast);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .input-url:focus {
@@ -291,7 +293,9 @@ main {
   border-radius: 4px;
   background-color: var(--background);
   color: var(--text-contrast);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .input-number:focus {
@@ -1047,13 +1051,9 @@ select {
   color: var(--text-contrast);
   appearance: none;
   cursor: pointer;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary);
-  outline: none;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 
 select:focus {
