@@ -35,6 +35,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [validationResult, setValidationResult] = useState(null);
 
   const validateUsername = async (username) => {
+    username = username.toLowerCase();
     setUsernameError(''); // Clear username error
     if (!username) {
       setUsernameError('Enter an username');
@@ -72,7 +73,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       setValidationResult(null); // Clear validation result if username is empty
       setUsernameError(''); // Clear username error
     } else {
-      await validateUsername(options.username);
+      await validateUsername(options.username.toLowerCase());
     }
   };
 
@@ -148,7 +149,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         <input
           type='text'
           value={options.username}
-          onChange={(e) => setOptions({ ...options, username: e.target.value })}
+          onChange={(e) => setOptions({ ...options, username: e.target.value.toLowerCase() })}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username' // Add placeholder
           required
