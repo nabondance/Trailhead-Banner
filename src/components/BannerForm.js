@@ -204,7 +204,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             )}
             {options.backgroundKind === 'custom' && (
               <label>
-                Custom Background Image:
+                Custom Background Url:
                 <input
                   type='text'
                   value={options.customBackgroundImageUrl}
@@ -310,7 +310,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               />
             </label>
             <label>
-              Limited Number of Superbadges:
+              Limit Number of Superbadges:
               <input
                 type='checkbox'
                 checked={options.displayLastXSuperbadges}
@@ -326,6 +326,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   onChange={(e) => setOptions({ ...options, lastXSuperbadges: e.target.value })}
                   min='1'
                   placeholder='Enter number'
+                  className='input-number'
                 />
               </label>
             )}
@@ -365,6 +366,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   onChange={(e) => setOptions({ ...options, lastXCertifications: e.target.value })}
                   min='1'
                   placeholder='Enter number'
+                  className='input-number'
                 />
               </label>
             )}
