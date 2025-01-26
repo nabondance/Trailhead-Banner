@@ -919,6 +919,7 @@ legend {
 
 .how-to-page h1 {
   font-size: 2.5em;
+  margin-top: 10px;
   margin-bottom: 20px;
   color: var(--text-contrast);
   text-align: center;

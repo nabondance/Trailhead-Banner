@@ -6,7 +6,7 @@ const HowToPage = () => {
     <div className='how-to-page'>
       <h1>How to Use Trailhead Banner</h1>
       <section className='how-to-section'>
-        <h2>Finding Your Trailhead Username</h2>
+        <h2>Find Your Trailhead Username</h2>
         <ol>
           <li>Log in to Trailhead.</li>
           <li>
@@ -38,7 +38,15 @@ const HowToPage = () => {
         </ol>
       </section>
       <section className='how-to-section'>
-        <h2>Using a Custom Background</h2>
+        <h2>How to Personalize the Banner</h2>
+        <ol>
+          <li>Click on &rdquo;More Options&rdquo;.</li>
+          <li>Try the options, dropdown usually unlock other options.</li>
+          <li>Click on &rdquo;Generate Banner&rdquo;.</li>
+        </ol>
+      </section>
+      <section className='how-to-section'>
+        <h2>How to Use a Custom Background</h2>
         <ol>
           <li>Click on &rdquo;More Options&rdquo; in the banner generator form.</li>
           <li>Select &rdquo;Custom URL&rdquo; from the &rdquo;Background Kind&rdquo; dropdown.</li>
