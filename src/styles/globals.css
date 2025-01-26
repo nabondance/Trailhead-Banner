@@ -983,3 +983,16 @@ legend {
   height: auto;
   margin-top: 20px;
 }
+
+.footer-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+@media (width <= 768px) {
+  .footer-buttons .github-btn {
+    transform: scale(0.8);
+    gap: 5px;
+  }
+}

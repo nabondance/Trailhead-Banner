@@ -56,7 +56,8 @@
     "node-fetch": "^3.3.2",
     "npm": "^11.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-github-btn": "^1.4.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
