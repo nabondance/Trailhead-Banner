@@ -1004,3 +1004,23 @@ legend {
     gap: 5px;
   }
 }
+
+select {
+  padding: 1px;
+  padding-inline-start: 2px;
+  padding-inline: 5px;
+  font-size: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--background);
+  color: var(--text-contrast);
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 5px var(--primary);
+  outline: none;
+}
