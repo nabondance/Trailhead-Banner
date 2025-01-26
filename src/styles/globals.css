@@ -844,6 +844,14 @@ legend {
   transform: scale(3);
 }
 
+.theme-icon-sun {
+  color: #ffea00;
+}
+
+.theme-icon-moon {
+  color: #fff;
+}
+
 .predefined-background {
   display: flex;
   flex-wrap: wrap;

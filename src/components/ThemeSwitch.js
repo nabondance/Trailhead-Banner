@@ -23,7 +23,12 @@ const ThemeSwitch = () => {
 
   return (
     <div className='theme-switch-container'>
-      <Classic duration={750} toggled={theme === 'dark'} onToggle={toggleTheme} />
+      <Classic
+        duration={750}
+        toggled={theme === 'dark'}
+        onToggle={toggleTheme}
+        className={theme === 'dark' ? 'theme-icon-moon' : 'theme-icon-sun'}
+      />
     </div>
   );
 };
