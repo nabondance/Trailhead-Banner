@@ -755,13 +755,8 @@ legend {
     top: 100%;
   }
 
-  .star-repo {
-    position: static;
-    margin-top: 10px;
-  }
-
   .logo-container {
-    margin-top: 50px;
+    margin-top: 10px;
   }
 }
 
@@ -844,14 +839,9 @@ legend {
   text-decoration: none;
 }
 
-.star-repo:hover {
-  background-color: var(--secondary);
-  color: var(--primary);
-}
-
 .theme-switch-container {
   position: absolute;
-  top: 75px;
+  top: 35px;
   right: 30px;
   z-index: 1;
   transform: scale(3);
