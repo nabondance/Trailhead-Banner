@@ -29,6 +29,20 @@ const HowToPage = () => {
         </div>
       </section>
       <section className='how-to-section'>
+        <h2>How to Make Your Trailhead Profile Public</h2>
+        <ol>
+          <li>Log in to Trailhead.</li>
+          <li>
+            Go to{' '}
+            <a href='https://www.salesforce.com/trailblazer/settings' target='_blank' rel='noopener noreferrer'>
+              your Trailhead settings
+            </a>
+            .
+          </li>
+          <li>Under &rdquo;Your Profile Privacy&rdquo;, select &rdquo;Public&rdquo;.</li>
+        </ol>
+      </section>
+      <section className='how-to-section'>
         <h2>Generating Your LinkedIn Banner</h2>
         <ol>
           <li>Enter your Trailhead username in the input field.</li>

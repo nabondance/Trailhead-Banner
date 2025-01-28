@@ -37,16 +37,17 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const validateUsername = async (username) => {
     username = username.toLowerCase();
     setUsernameError(''); // Clear username error
+    setValidationResult(null); // Clear validation result
     if (!username) {
       setUsernameError('Enter an username');
       setValidationResult({ valid: false, state: 'invalid', message: 'Enter an username' });
-      return false;
+      return { valid: false, state: 'invalid', message: 'Enter an username' };
     }
 
     if (username.includes('@')) {
       setUsernameError("username shouldn't be an email address");
       setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't be an email address" });
-      return false;
+      return { valid: false, state: 'invalid', message: "username shouldn't be an email address" };
     }
 
     try {
@@ -55,16 +56,16 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       setValidationResult(data);
       if (data.valid) {
         setUsernameError('');
-        return true;
+        return data;
       } else {
         setUsernameError(data.message); // Display the message from the API
-        return false;
+        return data;
       }
     } catch (error) {
       console.error('Error validating username:', error);
       setUsernameError('Failed to validate username');
       setValidationResult({ valid: false, state: 'invalid', message: 'Failed to validate username' });
-      return false;
+      return { valid: false, state: 'invalid', message: 'Failed to validate username' };
     }
   };
 
@@ -89,7 +90,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setBackgroundImageUrlError(''); // Clear image URL error
     if (!url) {
       setBackgroundImageUrlError('');
-      return true;
+      return { valid: true };
     }
 
     try {
@@ -97,15 +98,15 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       const response = await fetch(url, { method: 'HEAD', mode: 'no-cors', redirect: 'follow' });
       if (response.ok || response.type === 'opaque') {
         setBackgroundImageUrlError('');
-        return true;
+        return { valid: true };
       } else {
         setBackgroundImageUrlError('Invalid image URL');
-        return false;
+        return { valid: false, message: 'Invalid image URL' };
       }
     } catch (error) {
       console.error('Error validating image URL:', error);
       setBackgroundImageUrlError('Failed to fetch the image URL');
-      return false;
+      return { valid: false, message: 'Failed to fetch the image URL' };
     }
   };
 
@@ -124,23 +125,30 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     e.preventDefault();
     setIsGenerating(true); // Hide the button when clicked
     setShowOptions(false); // Hide the options when generating
-    const isValidUsername = await validateUsername(options.username);
-    const isValidImageUrl = await validateImageUrl(options.customBackgroundImageUrl);
-    if (isValidUsername && isValidImageUrl) {
-      await onSubmit({
-        ...options,
-        backgroundImageUrl: options.customBackgroundImageUrl,
-        backgroundLibraryUrl: options.backgroundLibraryUrl,
-        lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
-        lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
-      });
-    } else {
-      const validationError = new Error(
-        `Validation failed: ${usernameError ? usernameError : ''} ${backgroundImageUrlError ? backgroundImageUrlError : ''}`
-      );
-      onValidationError(validationError, options);
+
+    const usernameValidation = await validateUsername(options.username);
+    const imageUrlValidation = await validateImageUrl(options.customBackgroundImageUrl);
+
+    if (!usernameValidation.valid || !imageUrlValidation.valid) {
+      const errorMessages = [];
+      if (!usernameValidation.valid) errorMessages.push(usernameValidation.message);
+      if (!imageUrlValidation.valid) errorMessages.push(imageUrlValidation.message);
+
+      const validationError = new Error(`Validation failed: ${errorMessages.join('. And ')}`);
+      setMainError(validationError);
+      setIsGenerating(false);
+      return;
     }
-    setIsGenerating(false); // Show the button again when the banner is generated
+
+    await onSubmit({
+      ...options,
+      backgroundImageUrl: options.customBackgroundImageUrl,
+      backgroundLibraryUrl: options.backgroundLibraryUrl,
+      lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
+      lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
+    });
+
+    setIsGenerating(false);
   };
 
   return (

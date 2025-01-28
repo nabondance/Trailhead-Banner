@@ -32,7 +32,9 @@ export default async function handler(req, res) {
     }
 
     if (responseData.data.profile.__typename === 'PrivateProfile') {
-      return res.status(200).json({ valid: false, state: 'private', message: 'Trailhead profile is private' });
+      return res
+        .status(200)
+        .json({ valid: false, state: 'private', message: 'Trailhead profile is private, see How-To' });
     }
 
     return res.status(200).json({ valid: true, state: 'ok', message: 'Username is valid' });
