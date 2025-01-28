@@ -4,5 +4,5 @@
     <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
   </defs>
   <rect x="5" y="0" width="150" height="20" rx="10" style="stroke-opacity: 0.9; fill:#DDDDDD;"/>
-  <text x="11" y="15" style="fill:#000; font-family: Anta; font-size: 15px;" >thb.nabondance.me</text>
+  <text x="80" y="15" style="fill:#000; font-family: Anta; font-size: 15px;" text-anchor="middle">thb.nabondance.me</text>
 </svg>
