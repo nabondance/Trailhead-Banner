@@ -130,9 +130,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     const imageUrlValidation = await validateImageUrl(options.customBackgroundImageUrl);
 
     if (!usernameValidation.valid || !imageUrlValidation.valid) {
-      const validationError = new Error(
-        `Validation failed: ${!usernameValidation.valid ? usernameValidation.message : ''} ${!imageUrlValidation.valid ? imageUrlValidation.message : ''}`
-      );
+      const errorMessages = [];
+      if (!usernameValidation.valid) errorMessages.push(usernameValidation.message);
+      if (!imageUrlValidation.valid) errorMessages.push(imageUrlValidation.message);
+
+      const validationError = new Error(`Validation failed: ${errorMessages.join('. And ')}`);
       setMainError(validationError);
       setIsGenerating(false);
       return;
