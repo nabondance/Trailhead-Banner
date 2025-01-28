@@ -136,7 +136,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       });
     } else {
       const validationError = new Error(
-        `Validation failed: ${usernameError ? usernameError : ''} ${backgroundImageUrlError ? backgroundImageUrlError : ''}`
+        `Validation failed: ${usernameError ? usernameError : ''} ${backgroundImageUrlError ? backgroundImageUrlError : ''} ${validationResult?.state === 'private' ? validationResult.message : ''}`
       );
       onValidationError(validationError, options);
     }
