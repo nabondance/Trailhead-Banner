@@ -1,7 +1,12 @@
 import packageJson from '../../package.json';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 class SupabaseUtils {
-  static async updateBannerCounter(thb_data, protocol, host) {
+  static async updateBannerCounterViaAPI(thb_data, protocol, host) {
     const baseUrl = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}` // Use Vercel's domain in production
       : `${protocol}://${host}`; // Fallback for local development
@@ -25,6 +30,38 @@ class SupabaseUtils {
       }
     } catch (error) {
       console.error('Error updating banner counter:', error);
+    }
+  }
+
+  static async updateBannerCounter(thb_data) {
+    thb_data = SupabaseUtils.cleanData(thb_data);
+    try {
+      const { data, error } = await supabase.from('banners').insert([
+        {
+          th_username: thb_data.th_username,
+          thb_processing_time: thb_data.thb_processing_time,
+          source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+          thb_options: thb_data.thb_options,
+          thb_version: thb_data.thb_version,
+          thb_banner_hash: thb_data.bannerHash,
+          th_nb_points: thb_data.rankData.points,
+          th_nb_certif: thb_data.certificationsData.certifications.length,
+          th_nb_sb: thb_data.superbadgesData.earnedAwards.edges.length,
+          th_nb_badge: thb_data.rankData.badges,
+          th_certif: thb_data.certificationsData.certifications,
+          th_sb: thb_data.superbadgesData.earnedAwards.edges,
+          th_mvp: thb_data.mvp,
+        },
+      ]);
+
+      if (error) {
+        throw new Error('Failed to add banner: ' + error.message);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error adding banner:', error.message);
+      throw error;
     }
   }
 

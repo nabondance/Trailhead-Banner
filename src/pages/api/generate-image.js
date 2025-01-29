@@ -1,15 +1,17 @@
-import axios from 'axios';
 import GET_TRAILBLAZER_RANK from '../../graphql/queries/getTrailblazerRank';
 import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications';
 import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
 import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
+import GraphQLUtils from '../../utils/graphqlUtils';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const start_time = new Date().getTime();
     const options = req.body;
+    // const protocol = req.headers['x-forwarded-proto'] || 'http';
+    // const host = req.headers.host;
 
     const graphqlQueries = [
       {
@@ -62,21 +64,9 @@ export default async function handler(req, res) {
     ];
 
     try {
-      const protocol = req.headers['x-forwarded-proto'] || 'http';
-      const host = req.headers.host;
-      const url = `${protocol}://${host}/api/graphql-query`;
-
-      // Perform the GraphQL queries in parallel
+      // Perform the GraphQL queries in parallel using the utils class
       const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse] =
-        await Promise.all(
-          graphqlQueries.map((graphqlQuery) =>
-            axios.post(url, graphqlQuery, {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            })
-          )
-        );
+        await GraphQLUtils.performQueries(graphqlQueries);
 
       // Extract the data from the responses
       const rankData = rankResponse.data?.data?.profile?.trailheadStats || {};
@@ -111,7 +101,8 @@ export default async function handler(req, res) {
           rankData: rankData,
           mvpData: mvpData,
         };
-        SupabaseUtils.updateBannerCounter(thb_data, protocol, host);
+        SupabaseUtils.updateBannerCounter(thb_data);
+
       } catch (error) {
         console.error('Error updating banner counter:', error.message);
       }
