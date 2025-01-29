@@ -10,8 +10,8 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const start_time = new Date().getTime();
     const options = req.body;
-    const protocol = req.headers['x-forwarded-proto'] || 'http';
-    const host = req.headers.host;
+    // const protocol = req.headers['x-forwarded-proto'] || 'http';
+    // const host = req.headers.host;
 
     const graphqlQueries = [
       {
@@ -101,8 +101,8 @@ export default async function handler(req, res) {
           rankData: rankData,
           mvpData: mvpData,
         };
+        SupabaseUtils.updateBannerCounter(thb_data);
 
-        SupabaseUtils.updateBannerCounter(thb_data, protocol, host);
       } catch (error) {
         console.error('Error updating banner counter:', error.message);
       }
