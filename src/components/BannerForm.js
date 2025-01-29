@@ -69,15 +69,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     }
   };
 
-  const handleUsernameBlur = async () => {
-    if (!options.username) {
-      setValidationResult(null); // Clear validation result if username is empty
-      setUsernameError(''); // Clear username error
-    } else {
-      await validateUsername(options.username.toLowerCase());
-    }
-  };
-
   const handleUrlChange = (e) => {
     const url = e.target.value;
     setOptions({ ...options, customBackgroundImageUrl: url });
@@ -158,7 +149,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           type='text'
           value={options.username}
           onChange={(e) => setOptions({ ...options, username: e.target.value.toLowerCase() })}
-          onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username' // Add placeholder
           required
           className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
