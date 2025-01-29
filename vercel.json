@@ -6,7 +6,20 @@
   },
   "functions": {
     "src/pages/api/generate-image.js": {
-      "maxDuration": 20
+      "maxDuration": 20,
+      "memory": 512
+    },
+    "src/pages/api/graphql-query.js": {
+      "maxDuration": 10,
+      "memory": 512
+    },
+    "src/pages/api/validate-username.js": {
+      "maxDuration": 10,
+      "memory": 512
+    },
+    "src/pages/api/add-banner.js": {
+      "maxDuration": 10,
+      "memory": 512
     }
   }
 }
