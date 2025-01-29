@@ -34,7 +34,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
 
-  const validateUsername = async (username) => {
+  const validateUsername = async (username, api_check) => {
     username = username.toLowerCase();
     setUsernameError(''); // Clear username error
     setValidationResult(null); // Clear validation result
@@ -50,23 +50,33 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return { valid: false, state: 'invalid', message: "username shouldn't be an email address" };
     }
 
-    try {
-      const response = await fetch(`/api/validate-username?username=${username}`);
-      const data = await response.json();
-      setValidationResult(data);
-      if (data.valid) {
-        setUsernameError('');
-        return data;
-      } else {
-        setUsernameError(data.message); // Display the message from the API
-        return data;
-      }
-    } catch (error) {
-      console.error('Error validating username:', error);
-      setUsernameError('Failed to validate username');
-      setValidationResult({ valid: false, state: 'invalid', message: 'Failed to validate username' });
-      return { valid: false, state: 'invalid', message: 'Failed to validate username' };
+    if (username.includes(' ')) {
+      setUsernameError("username shouldn't contain spaces");
+      setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't contain spaces" });
+      return { valid: false, state: 'invalid', message: "username shouldn't contain spaces" };
     }
+
+    if (api_check) {
+      try {
+        const response = await fetch(`/api/validate-username?username=${username}`);
+        const data = await response.json();
+        setValidationResult(data);
+        if (data.valid) {
+          setUsernameError('');
+          return data;
+        } else {
+          setUsernameError(data.message); // Display the message from the API
+          return data;
+        }
+      } catch (error) {
+        console.error('Error validating username:', error);
+        setUsernameError('Failed to validate username');
+        setValidationResult({ valid: false, state: 'invalid', message: 'Failed to validate username' });
+        return { valid: false, state: 'invalid', message: 'Failed to validate username' };
+      }
+    }
+
+    return { valid: true, state: 'ok', message: 'looks ok' };
   };
 
   const handleUsernameBlur = async () => {
@@ -74,7 +84,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       setValidationResult(null); // Clear validation result if username is empty
       setUsernameError(''); // Clear username error
     } else {
-      await validateUsername(options.username.toLowerCase());
+      await validateUsername(options.username.toLowerCase(), false);
     }
   };
 
@@ -126,7 +136,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setIsGenerating(true); // Hide the button when clicked
     setShowOptions(false); // Hide the options when generating
 
-    const usernameValidation = await validateUsername(options.username);
+    const usernameValidation = await validateUsername(options.username, true);
     const imageUrlValidation = await validateImageUrl(options.customBackgroundImageUrl);
 
     if (!usernameValidation.valid || !imageUrlValidation.valid) {
