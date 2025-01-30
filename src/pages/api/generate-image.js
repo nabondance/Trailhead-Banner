@@ -102,7 +102,6 @@ export default async function handler(req, res) {
           mvpData: mvpData,
         };
         SupabaseUtils.updateBannerCounter(thb_data);
-
       } catch (error) {
         console.error('Error updating banner counter:', error.message);
       }
