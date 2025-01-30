@@ -25,6 +25,7 @@
   ],
   "license": "BSD-3-Clause",
   "scripts": {
+    "prepare": "husky",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -37,6 +38,11 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,scss,md,yml}": "prettier --write"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
