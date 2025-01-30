@@ -61,7 +61,6 @@ class SupabaseUtils {
       return data;
     } catch (error) {
       console.error('Error adding banner:', error.message);
-      throw error;
     }
   }
 
