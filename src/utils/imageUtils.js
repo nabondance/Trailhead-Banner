@@ -212,6 +212,20 @@ const generatePlusXCertificationsSvg = (count) => {
   return plusXCertificationsSvg;
 };
 
+const sortCertifications = (certifications, sortOption, sortOrder) => {
+  if (sortOption === 'date') {
+    certifications.sort((a, b) => new Date(a.dateCompleted) - new Date(b.dateCompleted));
+  } else if (sortOption === 'salesforceOrder') {
+    certifications.sort((a, b) => a.status.order - b.status.order);
+  }
+
+  if (sortOrder === 'descendant') {
+    certifications.reverse();
+  }
+
+  return certifications;
+};
+
 module.exports = {
   applyGrayscale,
   cropImage,
@@ -219,4 +233,5 @@ module.exports = {
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
+  sortCertifications,
 };

@@ -27,6 +27,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     lastXCertifications: '',
     displayLastXSuperbadges: false,
     lastXSuperbadges: '',
+    certificationSort: 'date',
+    certificationSortOrder: 'descendant',
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -389,6 +391,26 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 />
               </label>
             )}
+            <label className='picklist'>
+              Sort By:
+              <select
+                value={options.certificationSort}
+                onChange={(e) => setOptions({ ...options, certificationSort: e.target.value })}
+              >
+                <option value='date'>Date</option>
+                <option value='salesforceOrder'>Salesforce Order</option>
+              </select>
+            </label>
+            <label className='picklist'>
+              Sort Order:
+              <select
+                value={options.certificationSortOrder}
+                onChange={(e) => setOptions({ ...options, certificationSortOrder: e.target.value })}
+              >
+                <option value='ascendant'>Ascendant</option>
+                <option value='descendant'>Descendant</option>
+              </select>
+            </label>
           </fieldset>
         </div>
       )}
