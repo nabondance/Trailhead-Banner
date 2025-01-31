@@ -1,3 +1,5 @@
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
+
 const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpacing) => {
   let logoWidth = logos[0].width;
   let logoHeight = logos[0].height;
@@ -46,9 +48,14 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
   };
 };
 
+const normalizeDate = (dateString) => {
+  const [year, month, day] = dateString.split('-').map((part) => part.padStart(2, '0'));
+  return `${year}-${month}-${day}`;
+};
+
 const sortCertifications = (certifications, sortOption, sortOrder) => {
   if (sortOption === 'date') {
-    certifications.sort((a, b) => new Date(a.dateCompleted) - new Date(b.dateCompleted));
+    certifications.sort((a, b) => new Date(normalizeDate(a.dateCompleted)) - new Date(normalizeDate(b.dateCompleted)));
   }
 
   if (sortOrder === 'descendant') {
