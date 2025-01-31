@@ -91,7 +91,7 @@ const cropImage = (image) => {
 const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpacing) => {
   let logoWidth = logos[0].width;
   let logoHeight = logos[0].height;
-  let scale = 1.0;
+  let scale = 2.0;
   let numRows = 1;
   let maxLogosPerRow = 0;
 
