@@ -23,11 +23,15 @@ const TrailheadBannerHeader = () => {
           <Link href='/examples'>Examples</Link>
           <Link href='/background-library'>Background Library</Link>
           <div className='dropdown'>
-            <button className='dropbtn'>More fun</button>
+            <button className='dropbtn'>About</button>
             <div className='dropdown-content'>
+              <Link href='https://nabondance.me' target='_blank' rel='noopener noreferrer'>
+                nabondance.me
+              </Link>
               <Link href='https://github.com/nabondance/Trailhead-Stats' target='_blank' rel='noopener noreferrer'>
                 Trailhead Stats
               </Link>
+              <Link href='/legal'>Terms & Privacy</Link>
             </div>
           </div>
         </nav>
