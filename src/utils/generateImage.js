@@ -1,14 +1,14 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
+const { calculateCertificationsDesign, sortCertifications } = require('./imageUtils');
 const {
   applyGrayscale,
   cropImage,
-  calculateCertificationsDesign,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
-} = require('./imageUtils');
+} = require('./drawUtils');
 import { getImage } from './cacheUtils';
 require('./fonts');
 
@@ -213,8 +213,8 @@ export const generateImage = async (options) => {
   );
   const totalCertifications = certifications.length;
 
-  // Order certifications by dateCompleted
-  certifications.sort((a, b) => new Date(a.dateCompleted) - new Date(b.dateCompleted));
+  // Sort certifications
+  certifications = sortCertifications(certifications, options.certificationSort, options.certificationSortOrder);
 
   if (options.displayLastXCertifications && options.lastXCertifications) {
     certifications = certifications.slice(-options.lastXCertifications);
@@ -223,7 +223,7 @@ export const generateImage = async (options) => {
   const displayedCertifications = certifications.length;
   const hiddenCertifications = totalCertifications - displayedCertifications;
 
-  const certificationsLogos = [];
+  let certificationsLogos = [];
 
   // Download all certification logos in parallel
   const logoPromises = certifications.map(async (cert) => {
@@ -244,6 +244,8 @@ export const generateImage = async (options) => {
           logo,
           expired: cert.status.expired,
           retired: cert.status.title == 'Retired',
+          dateCompleted: cert.dateCompleted,
+          status: { order: cert.status.order },
         });
       } catch (error) {
         console.error(`Error loading logo for ${cert.title}:`, error);
@@ -254,6 +256,13 @@ export const generateImage = async (options) => {
 
   // Wait for all logos to be downloaded
   await Promise.all(logoPromises);
+
+  // Sort certification logos
+  certificationsLogos = sortCertifications(
+    certificationsLogos,
+    options.certificationSort,
+    options.certificationSortOrder
+  );
 
   if (hiddenCertifications > 0) {
     const plusXBadgeSvg = generatePlusXCertificationsSvg(hiddenCertifications);
