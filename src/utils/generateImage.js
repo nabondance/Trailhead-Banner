@@ -1,15 +1,14 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
+const { calculateCertificationsDesign, sortCertifications } = require('./imageUtils');
 const {
   applyGrayscale,
   cropImage,
-  calculateCertificationsDesign,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
-  sortCertifications,
-} = require('./imageUtils');
+} = require('./drawUtils');
 import { getImage } from './cacheUtils';
 require('./fonts');
 
