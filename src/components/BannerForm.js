@@ -398,7 +398,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, certificationSort: e.target.value })}
               >
                 <option value='date'>Date</option>
-                <option value='salesforceOrder'>Salesforce Order</option>
               </select>
             </label>
             <label className='picklist'>

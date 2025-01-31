@@ -49,8 +49,6 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
 const sortCertifications = (certifications, sortOption, sortOrder) => {
   if (sortOption === 'date') {
     certifications.sort((a, b) => new Date(a.dateCompleted) - new Date(b.dateCompleted));
-  } else if (sortOption === 'salesforceOrder') {
-    certifications.sort((a, b) => a.status.order - b.status.order);
   }
 
   if (sortOrder === 'descendant') {
