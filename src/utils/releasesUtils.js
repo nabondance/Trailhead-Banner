@@ -12,6 +12,8 @@ function filterReleases(releases, filter) {
       publishedAt: release.published_at,
       url: release.html_url,
       body: release.body,
+      draft: release.draft,
+      prerelease: release.prerelease,
     }));
 }
 
