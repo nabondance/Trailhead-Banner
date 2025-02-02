@@ -1,4 +1,4 @@
-import { extractDisplayContent } from '../../utils/releasesUtils';
+import { extractDisplayContent, filterReleases } from '../../utils/releasesUtils';
 
 export default async function ReleasesPage() {
   const res = await fetch('https://api.github.com/repos/nabondance/trailhead-banner/releases', {
@@ -6,10 +6,10 @@ export default async function ReleasesPage() {
       Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
       Accept: 'application/vnd.github.v3+json',
     },
-    next: { revalidate: 3600 }, // Cache API response for 1 hour
+    next: { revalidate: 1 }, // Cache API response for 1 hour
   });
 
-  const releases = await res.json();
+  const releases = filterReleases(await res.json());
 
   return (
     <div className='releases-container'>
@@ -18,10 +18,10 @@ export default async function ReleasesPage() {
         {releases.length > 0 ? (
           releases.map((release) => (
             <li key={release.id}>
-              <a href={release.html_url} target='_blank' rel='noopener noreferrer'>
+              <a href={release.url} target='_blank' rel='noopener noreferrer'>
                 {release.name || release.tag_name}
               </a>
-              <p>Published on: {new Date(release.published_at).toLocaleDateString()}</p>
+              <p>Published on: {new Date(release.publishedAt).toLocaleDateString()}</p>
               {release.body && (
                 <div className='release-tags'>
                   {' '}
