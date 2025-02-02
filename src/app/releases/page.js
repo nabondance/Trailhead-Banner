@@ -13,13 +13,14 @@ export default async function ReleasesPage() {
 
   return (
     <div className='releases-container'>
-      <h1>Latest Releases</h1>
+      <h1>Trailhead Banner Releases</h1>
       <ul className='releases-list'>
         {releases.length > 0 ? (
-          releases.map((release) => (
+          releases.map((release, index) => (
             <li key={release.id}>
               <a href={release.url} target='_blank' rel='noopener noreferrer'>
                 {release.name || release.tag_name}
+                {index === 0 && <span className='release-tag'>Latest</span>}
               </a>
               <p>Published on: {new Date(release.publishedAt).toLocaleDateString()}</p>
               {release.body && (
