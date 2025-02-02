@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Legal = () => {
+const LegalPage = () => {
   return (
     <div className='legal-container'>
       <h1>Terms and Conditions</h1>
@@ -111,4 +111,4 @@ const Legal = () => {
   );
 };
 
-export default Legal;
+export default LegalPage;
