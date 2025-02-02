@@ -31,6 +31,7 @@ const TrailheadBannerHeader = () => {
           <div className='dropdown'>
             <button className='dropbtn'>About</button>
             <div className='dropdown-content'>
+              <Link href='/releases'>Releases</Link>
               <Link href='https://nabondance.me' target='_blank' rel='noopener noreferrer'>
                 nabondance.me
               </Link>
