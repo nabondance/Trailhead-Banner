@@ -1061,3 +1061,72 @@ select:focus {
   box-shadow: 0 0 5px var(--primary);
   outline: none;
 }
+
+.releases-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: var(--middleground);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+}
+
+.releases-container h1 {
+  font-size: 2em;
+  margin: 10px;
+  color: var(--text-contrast);
+  text-align: center;
+}
+
+.releases-list {
+  list-style: none;
+  padding: 0;
+}
+
+.releases-list li {
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+}
+
+.releases-list li:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 20%);
+}
+
+.releases-list a {
+  font-size: 1.2em;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.releases-list a:hover {
+  text-decoration: underline;
+}
+
+.releases-list p {
+  margin: 5px 0 0;
+  color: var(--text-faded);
+}
+
+.release-tags {
+  margin-top: 10px;
+}
+
+.release-tag {
+  display: inline-block;
+  background-color: var(--primary-faded);
+  color: var(--text-color);
+  padding: 5px 10px;
+  border-radius: 6px;
+  margin-left: 10px;
+  font-size: 0.8em;
+}
