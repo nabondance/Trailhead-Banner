@@ -419,6 +419,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               >
                 <option value='date'>Date</option>
                 <option value='category'>Category</option>
+                <option value='difficulty'>Difficulty</option>
               </select>
             </label>
             <label className='picklist'>

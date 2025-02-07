@@ -80,6 +80,8 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
       const categoryB = b.category || '';
       return categoryOrder.indexOf(categoryA) - categoryOrder.indexOf(categoryB);
     });
+  } else if (sortOption === 'difficulty') {
+    certifications.sort((a, b) => a.difficulty - b.difficulty);
   }
 
   if (sortOrder === 'descendant') {

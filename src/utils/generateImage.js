@@ -281,6 +281,7 @@ export const generateImage = async (options) => {
           dateCompleted: cert.dateCompleted,
           title: cert.title,
           category: certificationsData[cert.title]?.category || '',
+          difficulty: certificationsData[cert.title]?.difficulty || '',
         });
       } catch (error) {
         console.error(`Error loading logo for ${cert.title}:`, error);
