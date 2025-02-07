@@ -418,6 +418,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, certificationSort: e.target.value })}
               >
                 <option value='date'>Date</option>
+                <option value='category'>Category</option>
               </select>
             </label>
             <label className='picklist'>
