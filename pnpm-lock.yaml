@@ -54,8 +54,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2
       npm:
-        specifier: ^11.0.0
-        version: 11.0.0
+        specifier: ^11.1.0
+        version: 11.1.0
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -1846,8 +1846,8 @@ packages:
     resolution: {integrity: sha512-ppwTtiJZq0O/ai0z7yfudtBpWIoxM8yE6nHi1X47eFR2EWORqfbu6CnPlNsjeN683eT0qG6H/Pyf9fCcvjnnnQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  npm@11.0.0:
-    resolution: {integrity: sha512-Ed/ylWXSKXx058WUqXYlgb3pafCqXL5vWzZEvwCKFsBl7OYQlNn/u4ESW+ON+OG6Q+uCRLPTDGHreX6aJEDj7A==}
+  npm@11.1.0:
+    resolution: {integrity: sha512-rPMBrZud26lI/LcjQeLw/K5Hf1apXMKgkpNNEzp0YQYmM877+T1ZNKPcB2hnTi7e6fBNz8xLtMMn/w46fVUqGw==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
     bundledDependencies:
@@ -4512,7 +4512,7 @@ snapshots:
     dependencies:
       path-key: 4.0.0
 
-  npm@11.0.0: {}
+  npm@11.1.0: {}
 
   num2fraction@1.2.2: {}
 
