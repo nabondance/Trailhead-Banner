@@ -114,12 +114,18 @@ export default async function handler(req, res) {
         console.error('Response data:', error.response.data);
         console.error('Response status:', error.response.status);
         console.error('Response headers:', error.response.headers);
+        res.status(500).json({
+          error: `Failed to fetch data or generate image. Response status: ${error.response.status}. Response data: ${error.response.data}`,
+        });
       } else if (error.request) {
         console.error('Request data:', error.request);
+        res
+          .status(500)
+          .json({ error: 'Failed to fetch data or generate image. No response received from the server.' });
       } else {
         console.error('Error message:', error.message);
+        res.status(500).json({ error: `Failed to fetch data or generate image. Error message: ${error.message}` });
       }
-      res.status(500).json({ error: 'Failed to fetch data or generate image. Please try again later.' });
     }
   } else {
     res.status(405).end(); // Method Not Allowed

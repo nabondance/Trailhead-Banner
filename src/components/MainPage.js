@@ -26,6 +26,9 @@ const MainPage = () => {
 
     setImageUrl(''); // Clear the previously generated banner
     setLoading(true);
+    setMainError(null); // Clear previous errors
+    setMainWarning(null); // Clear previous warnings
+
     try {
       const response = await fetch('/api/generate-image', {
         method: 'POST',
