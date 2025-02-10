@@ -20,10 +20,6 @@
     "src/pages/api/add-banner.js": {
       "maxDuration": 10,
       "memory": 512
-    },
-    "src/pages/api/sitemap.xml.js": {
-      "maxDuration": 30,
-      "memory": 512
     }
   }
 }
