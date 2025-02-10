@@ -1,15 +1,23 @@
 import { getServerSideSitemap } from 'next-sitemap';
 
 export const getServerSideProps = async (ctx) => {
-  const fields = [
-    {
-      loc: 'https://thb.nabondance.me/',
-      lastmod: new Date().toISOString(),
-    },
-    // Add more URLs here
-  ];
+  try {
+    console.log('Generating sitemap...');
+    const fields = [
+      {
+        loc: 'https://thb.nabondance.me/',
+        lastmod: new Date().toISOString(),
+      },
+    ];
 
-  return getServerSideSitemap(ctx, fields);
+    console.log('Sitemap fields:', fields);
+    return getServerSideSitemap(ctx, fields);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    return {
+      notFound: true,
+    };
+  }
 };
 
 export default function Sitemap() {
