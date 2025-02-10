@@ -63,5 +63,10 @@
     "src": "/assets/examples/example13.png",
     "alt": "Example 13",
     "description": "Banner with limited number of superbadges and certifications displayed"
+  },
+  {
+    "src": "/assets/examples/example14.png",
+    "alt": "Example 14",
+    "description": "Banner with only accredited professional certifications displayed"
   }
 ]
