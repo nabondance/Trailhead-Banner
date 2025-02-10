@@ -5,19 +5,23 @@ import Image from 'next/image';
 import '../styles/globals.css';
 import examples from '../data/examples.json';
 
-const ExampleCard = ({ src, alt, description, onClick, isUnoptimized }) => (
-  <div className='example-card'>
-    <Image
-      src={src}
-      alt={alt}
-      width={600}
-      height={400}
-      onClick={() => onClick(src)}
-      unoptimized={isUnoptimized} // Toggle optimization for individual images
-    />
-    <p>{description}</p>
-  </div>
-);
+const ExampleCard = ({ number, description, onClick, isUnoptimized }) => {
+  const src = `/assets/examples/example${number}.png`;
+  const alt = `Example ${number}`;
+  return (
+    <div className='example-card'>
+      <Image
+        src={src}
+        alt={alt}
+        width={600}
+        height={400}
+        onClick={() => onClick(src)}
+        unoptimized={isUnoptimized} // Toggle optimization for individual images
+      />
+      <p>{description}</p>
+    </div>
+  );
+};
 
 const ExamplesPage = () => {
   const [fullscreenImage, setFullscreenImage] = useState(null);
@@ -46,11 +50,10 @@ const ExamplesPage = () => {
         {examples.map((example, index) => (
           <ExampleCard
             key={index}
-            src={example.src}
-            alt={example.alt}
+            number={example.number}
             description={example.description}
             onClick={handleImageClick}
-            isUnoptimized={unoptimizedImages[example.src] || false} // Individual unoptimized state
+            isUnoptimized={unoptimizedImages[`/assets/examples/example${example.number}.png`] || false} // Individual unoptimized state
           />
         ))}
       </div>

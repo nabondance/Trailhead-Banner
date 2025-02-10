@@ -1,72 +1,58 @@
 [
   {
-    "src": "/assets/examples/example1.png",
-    "alt": "Example 1",
+    "number": 1,
     "description": "Default Banner Generated"
   },
   {
-    "src": "/assets/examples/example2.png",
-    "alt": "Example 2",
+    "number": 2,
     "description": "Banner with custom monochromatic background"
   },
   {
-    "src": "/assets/examples/example3.png",
-    "alt": "Example 3",
+    "number": 3,
     "description": "Banner with custom background image from the library"
   },
   {
-    "src": "/assets/examples/example4.png",
-    "alt": "Example 4",
+    "number": 4,
     "description": "Banner with custom background image from the internet"
   },
   {
-    "src": "/assets/examples/example5.png",
-    "alt": "Example 5",
+    "number": 5,
     "description": "Banner without superbadges displayed"
   },
   {
-    "src": "/assets/examples/example6.png",
-    "alt": "Example 6",
+    "number": 6,
     "description": "Banner displaying expired certifications (grey) and retired certifications (faded)"
   },
   {
-    "src": "/assets/examples/example7.png",
-    "alt": "Example 7",
+    "number": 7,
     "description": "Banner of a 10x certified"
   },
   {
-    "src": "/assets/examples/example8.png",
-    "alt": "Example 8",
+    "number": 8,
     "description": "Banner of a 15x certified"
   },
   {
-    "src": "/assets/examples/example9.png",
-    "alt": "Example 9",
+    "number": 9,
     "description": "Banner with many superbadges"
   },
   {
-    "src": "/assets/examples/example10.png",
-    "alt": "Example 10",
+    "number": 10,
     "description": "Banner of a MVP"
   },
   {
-    "src": "/assets/examples/example11.png",
-    "alt": "Example 11",
+    "number": 11,
     "description": "Banner with counters as text"
   },
   {
-    "src": "/assets/examples/example12.png",
-    "alt": "Example 12",
+    "number": 12,
     "description": "Banner without counters"
   },
   {
-    "src": "/assets/examples/example13.png",
-    "alt": "Example 13",
+    "number": 13,
     "description": "Banner with limited number of superbadges and certifications displayed"
   },
   {
-    "src": "/assets/examples/example14.png",
-    "alt": "Example 14",
+    "number": 14,
     "description": "Banner with only accredited professional certifications displayed"
   }
 ]
