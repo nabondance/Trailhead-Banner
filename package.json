@@ -28,6 +28,7 @@
     "prepare": "husky",
     "dev": "next dev --turbopack",
     "build": "next build",
+    "postbuild": "next-sitemap",
     "start": "next start",
     "lint-staged": "lint-staged",
     "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
