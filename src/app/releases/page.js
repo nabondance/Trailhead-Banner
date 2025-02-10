@@ -7,7 +7,7 @@ export default async function ReleasesPage() {
         Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
         Accept: 'application/vnd.github.v3+json',
       },
-      next: { revalidate: 3600 }, // Cache API response for 1 hour
+      next: { revalidate: 43200 }, // Cache API response for 12 hours
     });
 
     const releasesData = await res.json();
