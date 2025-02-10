@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://thb.nabondance.me
-
-# Sitemaps
-Sitemap: https://thb.nabondance.me/sitemap.xml
