@@ -18,6 +18,24 @@ const right_part = 7 / 10;
 let rankLogoWidth;
 let rankLogoHeight;
 
+const isValidImageType = (url) => {
+  const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const extension = path.extname(url).toLowerCase();
+  switch (extension) {
+    case '.jpg':
+    case '.jpeg':
+      return validImageTypes.includes('image/jpeg');
+    case '.png':
+      return validImageTypes.includes('image/png');
+    case '.webp':
+      return validImageTypes.includes('image/webp');
+    case '.gif':
+      return validImageTypes.includes('image/gif');
+    default:
+      return false;
+  }
+};
+
 export const generateImage = async (options) => {
   // Options logging
   console.log('Generating banner with the following data:');
@@ -67,27 +85,38 @@ export const generateImage = async (options) => {
   const ctx = canvas.getContext('2d');
 
   // Background
-  switch (options.backgroundKind) {
-    case 'library':
-      if (options.backgroundLibraryUrl) {
-        const bgImage = await loadImage(options.backgroundLibraryUrl);
-        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-      }
-      break;
-    case 'custom':
-      if (options.backgroundImageUrl) {
-        const bgImage = await loadImage(options.backgroundImageUrl);
-        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-      }
-      break;
-    case 'monochromatic':
-      ctx.fillStyle = options.backgroundColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      break;
-    default:
-      ctx.fillStyle = options.backgroundColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      break;
+  try {
+    switch (options.backgroundKind) {
+      case 'library':
+        if (options.backgroundLibraryUrl) {
+          if (!isValidImageType(options.backgroundLibraryUrl)) {
+            throw new Error('Unsupported image type');
+          }
+          const bgImage = await loadImage(options.backgroundLibraryUrl);
+          ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        }
+        break;
+      case 'custom':
+        if (options.backgroundImageUrl) {
+          if (!isValidImageType(options.backgroundImageUrl)) {
+            throw new Error('Unsupported image type');
+          }
+          const bgImage = await loadImage(options.backgroundImageUrl);
+          ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        }
+        break;
+      case 'monochromatic':
+        ctx.fillStyle = options.backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        break;
+      default:
+        ctx.fillStyle = options.backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        break;
+    }
+  } catch (error) {
+    console.error('Error loading background image:', error);
+    throw new Error('Unsupported image type');
   }
 
   // Rank Logo
