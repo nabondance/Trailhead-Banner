@@ -3,6 +3,8 @@ import { getServerSideSitemap } from 'next-sitemap';
 export const getServerSideProps = async (ctx) => {
   try {
     console.log('Generating sitemap...');
+    const startTime = Date.now();
+
     const fields = [
       {
         loc: 'https://thb.nabondance.me/',
@@ -11,7 +13,12 @@ export const getServerSideProps = async (ctx) => {
     ];
 
     console.log('Sitemap fields:', fields);
-    return getServerSideSitemap(ctx, fields);
+    const result = getServerSideSitemap(ctx, fields);
+
+    const endTime = Date.now();
+    console.log(`Sitemap generated in ${endTime - startTime}ms`);
+
+    return result;
   } catch (error) {
     console.error('Error generating sitemap:', error);
     return {
