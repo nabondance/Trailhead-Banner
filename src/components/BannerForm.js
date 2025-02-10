@@ -29,6 +29,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     lastXSuperbadges: '',
     certificationSort: 'date',
     certificationSortOrder: 'descendant',
+    displaySalesforceCertifications: true,
+    displayAccreditedProfessionalCertifications: true,
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -354,6 +356,24 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </fieldset>
           <fieldset>
             <legend>Certification Options</legend>
+            <label>
+              Display Salesforce Certifications:
+              <input
+                type='checkbox'
+                checked={options.displaySalesforceCertifications}
+                onChange={(e) => setOptions({ ...options, displaySalesforceCertifications: e.target.checked })}
+              />
+            </label>
+            <label>
+              Display Accredited Professional Certifications:
+              <input
+                type='checkbox'
+                checked={options.displayAccreditedProfessionalCertifications}
+                onChange={(e) =>
+                  setOptions({ ...options, displayAccreditedProfessionalCertifications: e.target.checked })
+                }
+              />
+            </label>
             <label>
               Include Expired Certifications:
               <input

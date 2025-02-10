@@ -235,10 +235,13 @@ export const generateImage = async (options) => {
   }
 
   // Certifications Data
+  // Filter certifications based on options
   let certifications = options.certificationsData.certifications.filter(
     (cert) =>
       (options.includeExpiredCertifications || cert.status.expired === false) &&
-      (options.includeRetiredCertifications || cert.status.title !== 'Retired')
+      (options.includeRetiredCertifications || cert.status.title !== 'Retired') &&
+      (options.displaySalesforceCertifications || cert.product !== 'Salesforce') &&
+      (options.displayAccreditedProfessionalCertifications || cert.product !== 'Accredited Professional')
   );
   const totalCertifications = certifications.length;
 
