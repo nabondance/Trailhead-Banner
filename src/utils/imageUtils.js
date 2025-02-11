@@ -1,5 +1,3 @@
-const { createCanvas, loadImage } = require('@napi-rs/canvas');
-
 const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpacing) => {
   let logoWidth = logos[0].width;
   let logoHeight = logos[0].height;
@@ -53,9 +51,37 @@ const normalizeDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
+const categoryOrder = [
+  'accredited-marketing',
+  'accredited-commerce',
+  'accredited-service',
+  'accredited-sales',
+  'accredited-industry',
+  'accredited-platform',
+  'associate',
+  'sales',
+  'mobile',
+  'marketer',
+  'tableau',
+  'designer',
+  'consultant',
+  'ai',
+  'admin',
+  'developer',
+  'architect',
+];
+
 const sortCertifications = (certifications, sortOption, sortOrder) => {
   if (sortOption === 'date') {
     certifications.sort((a, b) => new Date(normalizeDate(a.dateCompleted)) - new Date(normalizeDate(b.dateCompleted)));
+  } else if (sortOption === 'category') {
+    certifications.sort((a, b) => {
+      const categoryA = a.category || '';
+      const categoryB = b.category || '';
+      return categoryOrder.indexOf(categoryA) - categoryOrder.indexOf(categoryB);
+    });
+  } else if (sortOption === 'difficulty') {
+    certifications.sort((a, b) => a.difficulty - b.difficulty);
   }
 
   if (sortOrder === 'descendant') {

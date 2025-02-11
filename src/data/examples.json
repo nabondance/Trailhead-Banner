@@ -53,6 +53,14 @@
   },
   {
     "number": 14,
+    "description": "Banner with certifications sorted by difficulty"
+  },
+  {
+    "number": 15,
+    "description": "Banner with certifications sorted by category"
+  },
+  {
+    "number": 16,
     "description": "Banner with only accredited professional certifications displayed"
   }
 ]

@@ -1,0 +1,370 @@
+{
+  "Salesforce Certified Administrator": {
+    "category": "admin",
+    "difficulty": 2
+  },
+  "Salesforce Certified Advanced Administrator": {
+    "category": "admin",
+    "difficulty": 4
+  },
+  "Salesforce Certified AI Associate": {
+    "category": "associate",
+    "difficulty": 2
+  },
+  "Salesforce Certified AI Specialist": {
+    "category": "ai",
+    "difficulty": 5
+  },
+  "Salesforce Certified Application Architect": {
+    "category": "architect",
+    "difficulty": 7
+  },
+  "Salesforce Certified Associate": {
+    "category": "associate",
+    "difficulty": 1
+  },
+  "Salesforce Certified B2B Solution Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified B2C Commerce Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified B2C Commerce Developer": {
+    "category": "developer",
+    "difficulty": 6
+  },
+  "Salesforce Certified B2C Solution Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Business Analyst": {
+    "category": "admin",
+    "difficulty": 3
+  },
+  "Salesforce Certified CPQ Specialist": {
+    "category": "admin",
+    "difficulty": 5
+  },
+  "Salesforce Certified CRM Analytics and Einstein Discovery Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
+  "Salesforce Certified Data Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Data Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
+  "Salesforce Certified Development Lifecycle and Deployment Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Education Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Experience Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Field Service Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Force.com Advanced Developer": {
+    "category": "developer",
+    "difficulty": 7
+  },
+  "Salesforce Certified Force.com Developer": {
+    "category": "developer",
+    "difficulty": 5
+  },
+  "Salesforce Certified Heroku Architect": {
+    "category": "architect",
+    "difficulty": 7
+  },
+  "Salesforce Certified Hyperautomation Specialist": {
+    "category": "developer",
+    "difficulty": 5
+  },
+  "Salesforce Certified Identity and Access Management Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Industries CPQ Developer": {
+    "category": "developer",
+    "difficulty": 7
+  },
+  "Salesforce Certified Integration Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified JavaScript Developer I": {
+    "category": "developer",
+    "difficulty": 5
+  },
+  "Salesforce Certified Marketing Associate": {
+    "category": "associate",
+    "difficulty": 2
+  },
+  "Salesforce Certified Marketing Cloud Account Engagement Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Marketing Cloud Account Engagement Specialist": {
+    "category": "marketer",
+    "difficulty": 3
+  },
+  "Salesforce Certified Marketing Cloud Administrator": {
+    "category": "admin",
+    "difficulty": 4
+  },
+  "Salesforce Certified Marketing Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
+  "Salesforce Certified Marketing Cloud Developer": {
+    "category": "developer",
+    "difficulty": 6
+  },
+  "Salesforce Certified Marketing Cloud Email Specialist": {
+    "category": "marketer",
+    "difficulty": 3
+  },
+  "Salesforce Certified Marketing Cloud Social Specialist": {
+    "category": "marketer",
+    "difficulty": 2
+  },
+  "Salesforce Certified Mobile Solutions Architecture Designer": {
+    "category": "mobile",
+    "difficulty": 7
+  },
+  "Salesforce Certified MuleSoft Associate": {
+    "category": "associate",
+    "difficulty": 3
+  },
+  "Salesforce Certified MuleSoft Developer I": {
+    "category": "developer",
+    "difficulty": 6
+  },
+  "Salesforce Certified MuleSoft Developer II": {
+    "category": "developer",
+    "difficulty": 7
+  },
+  "Salesforce Certified MuleSoft Integration Architect I": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified MuleSoft Platform Architect I": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Nonprofit Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified OmniStudio Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
+  "Salesforce Certified OmniStudio Developer": {
+    "category": "developer",
+    "difficulty": 6
+  },
+  "Salesforce Certified Platform App Builder": {
+    "category": "admin",
+    "difficulty": 3
+  },
+  "Salesforce Certified Platform Developer I": {
+    "category": "developer",
+    "difficulty": 5
+  },
+  "Salesforce Certified Platform Developer II": {
+    "category": "developer",
+    "difficulty": 7
+  },
+  "Salesforce Certified Sales Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Sales Representative": {
+    "category": "sales",
+    "difficulty": 2
+  },
+  "Salesforce Certified Service Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Sharing and Visibility Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Slack Administrator": {
+    "category": "admin",
+    "difficulty": 3
+  },
+  "Salesforce Certified Strategy Designer": {
+    "category": "designer",
+    "difficulty": 4
+  },
+  "Salesforce Certified System Architect": {
+    "category": "architect",
+    "difficulty": 9
+  },
+  "Salesforce Certified Technical Architect": {
+    "category": "architect",
+    "difficulty": 10
+  },
+  "Salesforce Certified User Experience Designer": {
+    "category": "designer",
+    "difficulty": 3
+  },
+  "Tableau Certified Architect": {
+    "category": "architect",
+    "difficulty": 7
+  },
+  "Tableau Certified Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Tableau Desktop Specialist": {
+    "category": "associate",
+    "difficulty": 2
+  },
+  "Tableau Server Certified Associate": {
+    "category": "admin",
+    "difficulty": 5
+  },
+  "Advanced Field Service Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
+  },
+  "B2B Commerce for Administrators Accredited Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 4
+  },
+  "B2B Commerce for Developers Accredited Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 6
+  },
+  "Commerce Cloud Einstein Accredited Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 5
+  },
+  "Communications Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Consumer Goods Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 4
+  },
+  "Digital Engagement Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
+  },
+  "Einstein Prediction Builder Accredited Professional": {
+    "category": "accredited-platform",
+    "difficulty": 4
+  },
+  "Energy and Utilities Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Financial Services Cloud Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
+  },
+  "Headless | API First Accredited Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 6
+  },
+  "Heroku Developer Accredited Professional": {
+    "category": "accredited-platform",
+    "difficulty": 4
+  },
+  "Indirect Sales Accredited Professional": {
+    "category": "accredited-sales",
+    "difficulty": 3
+  },
+  "Manufacturing Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Marketing Cloud Account Engagement Reporting & Analytics Accredited Professional": {
+    "category": "accredited-marketing",
+    "difficulty": 4
+  },
+  "Marketing Cloud Account Engagement: Business Units Accredited Professional": {
+    "category": "accredited-marketing",
+    "difficulty": 4
+  },
+  "Marketing Cloud Advanced Cross Channel Accredited Professional": {
+    "category": "accredited-marketing",
+    "difficulty": 5
+  },
+  "Marketing Cloud Intelligence Accredited Professional": {
+    "category": "accredited-marketing",
+    "difficulty": 5
+  },
+  "Marketing Cloud Personalization Accredited Professional": {
+    "category": "accredited-marketing",
+    "difficulty": 5
+  },
+  "Media Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Order Management Administrator Accredited Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 4
+  },
+  "Order Management Developer Accredited Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 6
+  },
+  "Process Automation Accredited Professional": {
+    "category": "accredited-platform",
+    "difficulty": 5
+  },
+  "Public Sector Solutions Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Revenue Cloud Consultant Accredited Professional": {
+    "category": "accredited-sales",
+    "difficulty": 5
+  },
+  "Sales Business Excellence Accredited Professional": {
+    "category": "accredited-sales",
+    "difficulty": 4
+  },
+  "Salesforce CMS Accredited Professional": {
+    "category": "accredited-platform",
+    "difficulty": 4
+  },
+  "Salesforce Maps Accredited Professional": {
+    "category": "accredited-sales",
+    "difficulty": 3
+  },
+  "Salesforce Mobile Accredited Professional": {
+    "category": "accredited-platform",
+    "difficulty": 4
+  },
+  "Security & Privacy Accredited Professional": {
+    "category": "accredited-platform",
+    "difficulty": 5
+  },
+  "Service Business Excellence Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 4
+  },
+  "Service Cloud Voice Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
+  }
+}
