@@ -28,13 +28,19 @@ export default async function handler(req, res) {
     const responseData = response.data;
 
     if (responseData.errors) {
-      return res.status(200).json({ valid: false, state: 'invalid', message: 'Trailhead profile does not exist' });
+      return res.status(200).json({
+        valid: false,
+        state: 'invalid',
+        message: `Trailhead profile does not exist for username: ${username}`,
+      });
     }
 
     if (responseData.data.profile.__typename === 'PrivateProfile') {
-      return res
-        .status(200)
-        .json({ valid: false, state: 'private', message: 'Trailhead profile is private, see How-To' });
+      return res.status(200).json({
+        valid: false,
+        state: 'private',
+        message: `Trailhead profile is private for username '${username}', see How-To`,
+      });
     }
 
     return res.status(200).json({ valid: true, state: 'ok', message: 'Username is valid' });
