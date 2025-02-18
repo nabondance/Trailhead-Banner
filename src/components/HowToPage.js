@@ -39,33 +39,33 @@ const HowToPage = () => {
             </a>
             .
           </li>
-          <li>Under &rdquo;Your Profile Privacy&rdquo;, select &rdquo;Public&rdquo;.</li>
+          <li>Under &quot;Your Profile Privacy&quot;, select &quot;Public&quot;.</li>
         </ol>
       </section>
       <section className='how-to-section'>
         <h2>Generating Your LinkedIn Banner</h2>
         <ol>
           <li>Enter your Trailhead username in the input field.</li>
-          <li>Personalize it by clicking on &rdquo;More Options&rdquo;.</li>
-          <li>Click on &rdquo;Generate Banner&rdquo;.</li>
+          <li>Personalize it by clicking on &quot;More Options&quot;.</li>
+          <li>Click on &quot;Generate Banner&quot;.</li>
           <li>Download your banner.</li>
         </ol>
       </section>
       <section className='how-to-section'>
         <h2>How to Personalize the Banner</h2>
         <ol>
-          <li>Click on &rdquo;More Options&rdquo;.</li>
+          <li>Click on &quot;More Options&quot;.</li>
           <li>Try the options, dropdown usually unlock other options.</li>
-          <li>Click on &rdquo;Generate Banner&rdquo;.</li>
+          <li>Click on &quot;Generate Banner&quot;.</li>
         </ol>
       </section>
       <section className='how-to-section'>
         <h2>How to Use a Custom Background</h2>
         <ol>
-          <li>Click on &rdquo;More Options&rdquo; in the banner generator form.</li>
-          <li>Select &rdquo;Custom URL&rdquo; from the &rdquo;Background Kind&rdquo; dropdown.</li>
+          <li>Click on &quot;More Options&quot; in the banner generator form.</li>
+          <li>Select &quot;Custom URL&quot; from the &quot;Background Kind&quot; dropdown.</li>
           <li>Enter the URL of the image you want to use as the background.</li>
-          <li>Click on &rdquo;Generate Banner&rdquo; to see your banner with the custom background.</li>
+          <li>Click on &quot;Generate Banner&quot; to see your banner with the custom background.</li>
         </ol>
       </section>
       <section className='how-to-section'>
@@ -80,8 +80,8 @@ const HowToPage = () => {
             .
           </li>{' '}
           <li>Click on the pencil icon on the banner image.</li>
-          <li>Click on &rdquo;Change photo&rdquo; and upload the new banner image you have generated.</li>
-          <li>Click &rdquo;Save&rdquo;.</li>
+          <li>Click on &quot;Change photo&quot; and upload the new banner image you have generated.</li>
+          <li>Click &quot;Save&quot;.</li>
         </ol>
       </section>
       <section className='how-to-section'>
