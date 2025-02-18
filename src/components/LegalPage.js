@@ -35,7 +35,7 @@ const LegalPage = () => {
 
       <h2>3. No Warranty & Limitation of Liability</h2>
       <p>
-        The Service is provided <strong>&rdquo;as is&rdquo;</strong>, without warranties.
+        The Service is provided <strong>&quot;as is&quot;</strong>, without warranties.
       </p>
       <p>
         We <strong>do not guarantee</strong> uptime, performance, or the accuracy of Trailhead data.
