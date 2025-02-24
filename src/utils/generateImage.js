@@ -20,22 +20,62 @@ const right_part = 7 / 10;
 let rankLogoWidth;
 let rankLogoHeight;
 
-const isValidImageType = (url) => {
-  const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-  const extension = path.extname(url).toLowerCase();
-  switch (extension) {
-    case '.jpg':
-    case '.jpeg':
-      return validImageTypes.includes('image/jpeg');
-    case '.png':
-      return validImageTypes.includes('image/png');
-    case '.webp':
-      return validImageTypes.includes('image/webp');
-    case '.gif':
-      return validImageTypes.includes('image/gif');
-    default:
+const isValidImageType = async (url) => {
+  try {
+    // First try to fetch the image
+    const response = await fetch(url);
+    if (!response.ok) {
       return false;
+    }
+
+    // Check the Content-Type header
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.startsWith('image/')) {
+      return true;
+    }
+
+    // Fallback to checking URL patterns if content-type is not reliable
+    const urlWithoutParams = url.split('?')[0];
+    const extension = path.extname(urlWithoutParams).toLowerCase();
+
+    if (extension) {
+      switch (extension) {
+        case '.jpg':
+        case '.jpeg':
+        case '.png':
+        case '.webp':
+        case '.gif':
+          return true;
+        default:
+          break;
+      }
+    }
+
+    // Check common image patterns in URL
+    const imagePatterns = [
+      '/image/', // Common in CDN URLs
+      'profile-displaybackgroundimage', // LinkedIn specific
+      '/img/', // Common pattern
+      '/photo/', // Common pattern
+      'media.licdn.com', // LinkedIn media domain
+    ];
+
+    return imagePatterns.some((pattern) => url.toLowerCase().includes(pattern));
+  } catch (error) {
+    console.error('Error validating image URL:', error);
+    return false;
   }
+
+  // If no valid extension found, check if URL contains image-related patterns
+  const imagePatterns = [
+    '/image/', // Common in CDN URLs
+    'profile-displaybackgroundimage', // LinkedIn specific
+    '/img/', // Common pattern
+    '/photo/', // Common pattern
+    'media.licdn.com', // LinkedIn media domain
+  ];
+
+  return imagePatterns.some((pattern) => url.toLowerCase().includes(pattern));
 };
 
 export const generateImage = async (options) => {
@@ -91,7 +131,7 @@ export const generateImage = async (options) => {
     switch (options.backgroundKind) {
       case 'library':
         if (options.backgroundLibraryUrl) {
-          if (!isValidImageType(options.backgroundLibraryUrl)) {
+          if (!(await isValidImageType(options.backgroundLibraryUrl))) {
             throw new Error('Unsupported image type');
           }
           const bgImage = await loadImage(options.backgroundLibraryUrl);
@@ -100,7 +140,7 @@ export const generateImage = async (options) => {
         break;
       case 'custom':
         if (options.backgroundImageUrl) {
-          if (!isValidImageType(options.backgroundImageUrl)) {
+          if (!(await isValidImageType(options.backgroundImageUrl))) {
             throw new Error('Unsupported image type');
           }
           const bgImage = await loadImage(options.backgroundImageUrl);
