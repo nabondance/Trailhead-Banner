@@ -62,5 +62,9 @@
   {
     "number": 16,
     "description": "Banner with only accredited professional certifications displayed"
+  },
+  {
+    "number": 17,
+    "description": "Banner of an Agentblazer Champion"
   }
 ]

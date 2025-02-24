@@ -31,6 +31,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     certificationSortOrder: 'descendant',
     displaySalesforceCertifications: true,
     displayAccreditedProfessionalCertifications: true,
+    displayAgentblazerRank: true,
   });
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -319,6 +320,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 type='checkbox'
                 checked={options.displayRankLogo}
                 onChange={(e) => setOptions({ ...options, displayRankLogo: e.target.checked })}
+              />
+            </label>
+            <label>
+              Show Agentblazer Rank:
+              <input
+                type='checkbox'
+                checked={options.displayAgentblazerRank}
+                onChange={(e) => setOptions({ ...options, displayAgentblazerRank: e.target.checked })}
               />
             </label>
           </fieldset>

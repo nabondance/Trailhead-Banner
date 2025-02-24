@@ -7,6 +7,16 @@ const GET_TRAILBLAZER_RANK = `
     imageUrl
   }
 
+  fragment LearnerStatusLevel on LearnerStatusLevel {
+    __typename
+    statusName
+    title
+    level
+    imageUrl
+    completedAt
+    progress
+  }
+
   fragment PublicProfile on PublicProfile {
     __typename
     trailheadStats {
@@ -20,8 +30,12 @@ const GET_TRAILBLAZER_RANK = `
       nextRank {
         ...TrailheadRank
       }
+      learnerStatusLevels {
+        ...LearnerStatusLevel
+      }
     }
   }
+
 
   query GetTrailblazerRank($slug: String, $hasSlug: Boolean!) {
     profile(slug: $slug) @include(if: $hasSlug) {

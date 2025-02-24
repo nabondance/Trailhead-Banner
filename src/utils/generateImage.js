@@ -236,6 +236,28 @@ export const generateImage = async (options) => {
       break;
   }
 
+  // learnerStatusLevels
+  console.log('Agentblazer Rank Data:', options.rankData.learnerStatusLevels);
+  if (options.rankData.learnerStatusLevels) {
+    options.rankData.learnerStatusLevels.forEach(async (learnerStatusLevel) => {
+      // Agentblazer Rank
+      if (learnerStatusLevel.statusName === 'Agentblazer' && options.displayAgentblazerRank) {
+        const agentBlazerPath = path.join(
+          process.cwd(),
+          'src',
+          'assets',
+          'logos',
+          learnerStatusLevel.statusName,
+          `${learnerStatusLevel.title}.png`
+        );
+        const agentBlazerImage = await loadImage(agentBlazerPath);
+        const agentBlazerLogoHeight = 100;
+        const agentBlazerLogoWidth = (agentBlazerImage.width / agentBlazerImage.height) * agentBlazerLogoHeight;
+        ctx.drawImage(agentBlazerImage, 370, 5, agentBlazerLogoWidth, agentBlazerLogoHeight);
+      }
+    });
+  }
+
   // Certifications Data
   // Filter certifications based on options
   let certifications = options.certificationsData.certifications.filter(
