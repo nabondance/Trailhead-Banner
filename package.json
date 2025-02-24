@@ -67,16 +67,16 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss7-compat": "^2.2.17",
-    "eslint": "^9.20.1",
+    "eslint": "^9.21.0",
     "eslint-config-next": "15.1.7",
     "eslint-config-prettier": "^10.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
-    "postcss": "^8.5.2",
-    "prettier": "^3.5.1",
+    "postcss": "^8.5.3",
+    "prettier": "^3.5.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "stylelint": "^16.14.1",
     "stylelint-config-standard": "^36.0.1",
-    "tailwindcss": "^4.0.6"
+    "tailwindcss": "^4.0.8"
   }
 }
