@@ -51,6 +51,7 @@ class SupabaseUtils {
           th_certif: thb_data.certificationsData.certifications,
           th_sb: thb_data.superbadgesData.earnedAwards.edges,
           th_mvp: thb_data.mvp,
+          th_agentblazer: `${thb_data.learnerStatusLevels?.statusName}-${thb_data.learnerStatusLevels?.title}`,
         },
       ]);
 
@@ -73,6 +74,11 @@ class SupabaseUtils {
       thb_version: packageJson.version,
       bannerHash: data.bannerHash,
       mvp: data.mvpData.isMvp,
+      learnerStatusLevels: {
+        statusName: data.rankData.learnerStatusLevels[0]?.statusName,
+        title: data.rankData.learnerStatusLevels[0]?.title,
+        level: data.rankData.learnerStatusLevels[0]?.level,
+      },
       rankData: {
         rank: data.rankData.rank.title,
         points: data.rankData.earnedPointsSum,
