@@ -922,18 +922,6 @@ legend {
   margin-left: 5px;
 }
 
-.counter-options {
-  display: flex;
-  justify-content: space-between;
-}
-
-.left-options,
-.right-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .banner-count {
   margin-top: 20px;
   font-size: 18px;
