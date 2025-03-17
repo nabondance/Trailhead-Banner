@@ -77,7 +77,7 @@ const BackgroundLibraryPage = () => {
             key={index}
             src={example.src}
             alt={example.alt}
-            description={example.description}
+            description={example.alt}
             credit={example.credit}
             onClick={handleImageClick}
             onCopy={handleCopyUrl}
