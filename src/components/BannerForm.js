@@ -12,11 +12,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displayBadgeCount: true,
     displaySuperbadgeCount: true,
     displayCertificationCount: true,
+    displayTrailCount: false,
     displayRankLogo: true,
     displaySuperbadges: true,
     includeExpiredCertifications: false,
     includeRetiredCertifications: false,
-    counterDisplayType: 'badge',
     textColor: '#000000',
     badgeLabelColor: '#555555',
     badgeMessageColor: '#1F80C0',
@@ -260,57 +260,38 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
-            <div className='counter-options'>
-              <div className='right-options'>
-                <label>
-                  Show Badge Count:
-                  <input
-                    type='checkbox'
-                    checked={options.displayBadgeCount}
-                    onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
-                  />
-                </label>
-                <label>
-                  Show Superbadge Count:
-                  <input
-                    type='checkbox'
-                    checked={options.displaySuperbadgeCount}
-                    onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
-                  />
-                </label>
-                <label>
-                  Show Certification Count:
-                  <input
-                    type='checkbox'
-                    checked={options.displayCertificationCount}
-                    onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
-                  />
-                </label>
-              </div>
-              <div className='left-options'>
-                <label className='picklist'>
-                  Display Type:
-                  <select
-                    value={options.counterDisplayType}
-                    onChange={(e) => setOptions({ ...options, counterDisplayType: e.target.value })}
-                  >
-                    <option value='text'>Text</option>
-                    <option value='badge'>Badge</option>
-                  </select>
-                </label>
-                {options.counterDisplayType === 'text' && (
-                  <label>
-                    Text Color:
-                    <input
-                      type='color'
-                      value={options.textColor}
-                      onChange={(e) => setOptions({ ...options, textColor: e.target.value })}
-                    />
-                  </label>
-                )}
-                {options.counterDisplayType === 'badge'}
-              </div>
-            </div>
+            <label>
+              Show Badge Count:
+              <input
+                type='checkbox'
+                checked={options.displayBadgeCount}
+                onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
+              />
+            </label>
+            <label>
+              Show Superbadge Count:
+              <input
+                type='checkbox'
+                checked={options.displaySuperbadgeCount}
+                onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
+              />
+            </label>
+            <label>
+              Show Certification Count:
+              <input
+                type='checkbox'
+                checked={options.displayCertificationCount}
+                onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
+              />
+            </label>
+            <label>
+              Show Trails Count:
+              <input
+                type='checkbox'
+                checked={options.displayTrailCount}
+                onChange={(e) => setOptions({ ...options, displayTrailCount: e.target.checked })}
+              />
+            </label>
           </fieldset>
           <fieldset>
             <legend>Display Options</legend>

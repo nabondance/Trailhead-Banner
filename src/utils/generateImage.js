@@ -2,7 +2,7 @@ const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
 const { getLocalCertificationData } = require('./dataUtils');
-const { calculateCertificationsDesign, sortCertifications } = require('./imageUtils');
+const { calculateCertificationsDesign, sortCertifications, getCountersConfig } = require('./imageUtils');
 const {
   applyGrayscale,
   cropImage,
@@ -84,11 +84,11 @@ export const generateImage = async (options) => {
     rankLogo: options.displayRankLogo,
   });
   console.log('Counter Options:', {
-    counterDisplayType: options.counterDisplayType,
     textColor: options.textColor,
     badgeCount: options.displayBadgeCount,
     superbadgeCount: options.displaySuperbadgeCount,
     certificationCount: options.displayCertificationCount,
+    trailCount: options.displayTrailCount,
   });
   console.log('Badge Options:', {
     labelColor: options.badgeLabelColor,
@@ -174,94 +174,69 @@ export const generateImage = async (options) => {
       (options.includeExpiredCertifications || cert.status.expired === false) &&
       (options.includeRetiredCertifications || cert.status.title !== 'Retired')
   ).length;
-  let numberOfLines = 3;
+  const trailCount = options.rankData.completedTrailCount || 0;
 
-  // Draw text if counterDisplayType is 'text'
-  switch (options.counterDisplayType) {
-    case 'text':
-      try {
-        // Set font and text color
-        ctx.fillStyle = options.textColor || '#111827'; // Use the custom text color or default one
-        ctx.font = '34px Roboto-Bold';
-
-        const badgeText = options.displayBadgeCount ? `${badgeCount} badge${badgeCount !== 1 ? 's' : ''}` : '';
-        const superbadgeText =
-          options.displaySuperbadgeCount && superbadgeCount > 0
-            ? `${superbadgeCount} superbadge${superbadgeCount !== 1 ? 's' : ''}`
-            : '';
-        const certificationText =
-          options.displayCertificationCount && certificationCount > 0
-            ? `${certificationCount} certification${certificationCount > 1 ? 's' : ''}`
-            : '';
-
-        // Draw the text
-        let textCounterYPosition = 30;
-
-        if (badgeText) {
-          ctx.fillText(badgeText, rankLogoWidth + 40, textCounterYPosition);
-          textCounterYPosition += rankLogoHeight / numberOfLines;
-        }
-        if (superbadgeText) {
-          ctx.fillText(superbadgeText, rankLogoWidth + 40, textCounterYPosition);
-          textCounterYPosition += rankLogoHeight / numberOfLines;
-        }
-        if (certificationText) {
-          ctx.fillText(certificationText, rankLogoWidth + 40, textCounterYPosition);
-        }
-      } catch (error) {
-        console.error('Error drawing counter as text:', error);
-        warnings.push(`Error drawing counter as text: ${error.message}`);
-      }
-      break;
-    case 'badge':
-      // Draw badge counter
-      try {
-        const badgeScale = 1;
-        let badgeCounterYPosition = 5;
-        const badgeCounterYDelta = 35;
-        if (options.displayBadgeCount && badgeCount > 0) {
-          await drawBadgeCounter(
-            ctx,
-            'Badge',
-            badgeCount,
-            rankLogoWidth + 40,
-            badgeCounterYPosition,
-            badgeScale,
-            options.badgeLabelColor,
-            options.badgeMessageColor
-          );
-          badgeCounterYPosition += badgeCounterYDelta;
-        }
-        if (options.displaySuperbadgeCount && superbadgeCount > 0) {
-          await drawBadgeCounter(
-            ctx,
-            'Superbadge',
-            superbadgeCount,
-            rankLogoWidth + 40,
-            badgeCounterYPosition,
-            badgeScale,
-            options.badgeLabelColor,
-            options.badgeMessageColor
-          );
-          badgeCounterYPosition += badgeCounterYDelta;
-        }
-        if (options.displayCertificationCount && certificationCount > 0) {
-          await drawBadgeCounter(
-            ctx,
-            'Certification',
-            certificationCount,
-            rankLogoWidth + 40,
-            badgeCounterYPosition,
-            badgeScale,
-            options.badgeLabelColor,
-            options.badgeMessageColor
-          );
-        }
-      } catch (error) {
-        console.error('Error drawing counter as badges:', error);
-        warnings.push(`Error drawing counter as badges: ${error.message}`);
-      }
-      break;
+  // Draw badge counter
+  try {
+    const counterConfig = getCountersConfig(options);
+    const badgeScale = counterConfig.badgeScale;
+    let badgeCounterYPosition = 5;
+    const badgeCounterYDelta = counterConfig.badgeCounterYDelta;
+    if (options.displayBadgeCount && badgeCount > 0) {
+      await drawBadgeCounter(
+        ctx,
+        'Badge',
+        badgeCount,
+        rankLogoWidth + 40,
+        badgeCounterYPosition,
+        badgeScale,
+        options.badgeLabelColor,
+        options.badgeMessageColor
+      );
+      badgeCounterYPosition += badgeCounterYDelta;
+    }
+    if (options.displaySuperbadgeCount && superbadgeCount > 0) {
+      await drawBadgeCounter(
+        ctx,
+        'Superbadge',
+        superbadgeCount,
+        rankLogoWidth + 40,
+        badgeCounterYPosition,
+        badgeScale,
+        options.badgeLabelColor,
+        options.badgeMessageColor
+      );
+      badgeCounterYPosition += badgeCounterYDelta;
+    }
+    if (options.displayCertificationCount && certificationCount > 0) {
+      await drawBadgeCounter(
+        ctx,
+        'Certification',
+        certificationCount,
+        rankLogoWidth + 40,
+        badgeCounterYPosition,
+        badgeScale,
+        options.badgeLabelColor,
+        options.badgeMessageColor
+      );
+      badgeCounterYPosition += badgeCounterYDelta;
+    }
+    if (options.displayTrailCount && trailCount > 0) {
+      await drawBadgeCounter(
+        ctx,
+        'Trail',
+        trailCount,
+        rankLogoWidth + 40,
+        badgeCounterYPosition,
+        badgeScale,
+        options.badgeLabelColor,
+        options.badgeMessageColor
+      );
+      badgeCounterYPosition += badgeCounterYDelta;
+    }
+  } catch (error) {
+    console.error('Error drawing counter as badges:', error);
+    warnings.push(`Error drawing counter as badges: ${error.message}`);
   }
 
   // learnerStatusLevels
