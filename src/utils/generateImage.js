@@ -65,17 +65,6 @@ const isValidImageType = async (url) => {
     console.error('Error validating image URL:', error);
     return false;
   }
-
-  // If no valid extension found, check if URL contains image-related patterns
-  const imagePatterns = [
-    '/image/', // Common in CDN URLs
-    'profile-displaybackgroundimage', // LinkedIn specific
-    '/img/', // Common pattern
-    '/photo/', // Common pattern
-    'media.licdn.com', // LinkedIn media domain
-  ];
-
-  return imagePatterns.some((pattern) => url.toLowerCase().includes(pattern));
 };
 
 export const generateImage = async (options) => {
