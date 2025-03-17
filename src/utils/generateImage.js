@@ -1,6 +1,7 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
+const { getLocalCertificationData } = require('./dataUtils');
 const { calculateCertificationsDesign, sortCertifications } = require('./imageUtils');
 const {
   applyGrayscale,
@@ -11,8 +12,6 @@ const {
 } = require('./drawUtils');
 import { getImage } from './cacheUtils';
 require('./fonts');
-
-const certificationsDataJson = require('../data/certifications.json');
 
 const top_part = 1 / 4;
 const bottom_part = 3 / 4;
@@ -325,14 +324,15 @@ export const generateImage = async (options) => {
           applyGrayscale(tempCtx, 0, 0, logo.width, logo.height); // Apply grayscale for expired certifications
           logo = tempCanvas;
         }
+        const certificationLocalData = getLocalCertificationData(cert);
         certificationsLogos.push({
           logo,
           expired: cert.status.expired,
           retired: cert.status.title == 'Retired',
           dateCompleted: cert.dateCompleted,
           title: cert.title,
-          category: certificationsDataJson[cert.title]?.category || '',
-          difficulty: certificationsDataJson[cert.title]?.difficulty || '',
+          category: certificationLocalData?.category || '',
+          difficulty: certificationLocalData?.difficulty || '',
         });
       } catch (error) {
         console.error(`Error loading logo for ${cert.title}:`, error);
