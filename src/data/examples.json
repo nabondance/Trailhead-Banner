@@ -66,5 +66,9 @@
   {
     "number": 17,
     "description": "Banner of an Agentblazer Champion"
+  },
+  {
+    "number": 18,
+    "description": "Banner with the number of trails displayed"
   }
 ]
