@@ -91,7 +91,22 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
   return certifications;
 };
 
+const getCountersConfig = (options) => {
+  const counter = [
+    options.displayBadgeCount,
+    options.displaySuperbadgeCount,
+    options.displayCertificationCount,
+    options.displayTrailCount,
+  ].filter(Boolean).length;
+
+  const badgeScale = counter > 3 ? 0.8 : 1;
+  const badgeCounterYDelta = 35 * badgeScale;
+
+  return { counter, badgeScale, badgeCounterYDelta };
+};
+
 module.exports = {
   calculateCertificationsDesign,
   sortCertifications,
+  getCountersConfig,
 };

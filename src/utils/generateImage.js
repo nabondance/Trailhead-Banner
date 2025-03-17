@@ -2,7 +2,7 @@ const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
 const { getLocalCertificationData } = require('./dataUtils');
-const { calculateCertificationsDesign, sortCertifications } = require('./imageUtils');
+const { calculateCertificationsDesign, sortCertifications, getCountersConfig } = require('./imageUtils');
 const {
   applyGrayscale,
   cropImage,
@@ -88,6 +88,7 @@ export const generateImage = async (options) => {
     badgeCount: options.displayBadgeCount,
     superbadgeCount: options.displaySuperbadgeCount,
     certificationCount: options.displayCertificationCount,
+    trailCount: options.displayTrailCount,
   });
   console.log('Badge Options:', {
     labelColor: options.badgeLabelColor,
@@ -173,12 +174,14 @@ export const generateImage = async (options) => {
       (options.includeExpiredCertifications || cert.status.expired === false) &&
       (options.includeRetiredCertifications || cert.status.title !== 'Retired')
   ).length;
+  const trailCount = options.rankData.completedTrailCount || 0;
 
   // Draw badge counter
   try {
-    const badgeScale = 1;
+    const counterConfig = getCountersConfig(options);
+    const badgeScale = counterConfig.badgeScale;
     let badgeCounterYPosition = 5;
-    const badgeCounterYDelta = 35;
+    const badgeCounterYDelta = counterConfig.badgeCounterYDelta;
     if (options.displayBadgeCount && badgeCount > 0) {
       await drawBadgeCounter(
         ctx,
@@ -216,6 +219,20 @@ export const generateImage = async (options) => {
         options.badgeLabelColor,
         options.badgeMessageColor
       );
+      badgeCounterYPosition += badgeCounterYDelta;
+    }
+    if (options.displayTrailCount && trailCount > 0) {
+      await drawBadgeCounter(
+        ctx,
+        'Trail',
+        trailCount,
+        rankLogoWidth + 40,
+        badgeCounterYPosition,
+        badgeScale,
+        options.badgeLabelColor,
+        options.badgeMessageColor
+      );
+      badgeCounterYPosition += badgeCounterYDelta;
     }
   } catch (error) {
     console.error('Error drawing counter as badges:', error);

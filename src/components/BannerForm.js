@@ -12,6 +12,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displayBadgeCount: true,
     displaySuperbadgeCount: true,
     displayCertificationCount: true,
+    displayTrailCount: false,
     displayRankLogo: true,
     displaySuperbadges: true,
     includeExpiredCertifications: false,
