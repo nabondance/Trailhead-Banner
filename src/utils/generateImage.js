@@ -12,7 +12,7 @@ const {
 import { getImage } from './cacheUtils';
 require('./fonts');
 
-const certificationsData = require('../data/certifications.json');
+const certificationsDataJson = require('../data/certifications.json');
 
 const top_part = 1 / 4;
 const bottom_part = 3 / 4;
@@ -331,8 +331,8 @@ export const generateImage = async (options) => {
           retired: cert.status.title == 'Retired',
           dateCompleted: cert.dateCompleted,
           title: cert.title,
-          category: certificationsData[cert.title]?.category || '',
-          difficulty: certificationsData[cert.title]?.difficulty || '',
+          category: certificationsDataJson[cert.title]?.category || '',
+          difficulty: certificationsDataJson[cert.title]?.difficulty || '',
         });
       } catch (error) {
         console.error(`Error loading logo for ${cert.title}:`, error);
