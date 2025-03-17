@@ -117,6 +117,28 @@ class SupabaseUtils {
     };
     return cleanedData;
   }
+
+  static async updateErrors(errors_data) {
+    try {
+      const { data, error } = await supabase.from('errors').insert([
+        {
+          source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+          type: errors_data.type,
+          error: errors_data.error,
+          error_data: errors_data.error_data,
+          thb_version: packageJson.version,
+        },
+      ]);
+
+      if (error) {
+        throw new Error('Failed to add error: ' + error.message);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error adding error:', error.message);
+    }
+  }
 }
 
 export default SupabaseUtils;
