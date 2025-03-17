@@ -66,18 +66,29 @@
     "credit": "salesforce.com"
   },
   {
-    "src": "/assets/background-library/trailhead-mfe-background.png",
-    "alt": "Trailhead MFE Background",
-    "description": "Trailhead MFE Background",
-    "credit": "Trailblazer.me"
-  },
-  {
     "src": "/assets/background-library/energy-central-background.png",
     "alt": "Energy Central Background",
     "description": "Energy Central Background",
     "credit": "energycentral.com"
   },
-
+  {
+    "src": "/assets/background-library/clouds_mongo.jpg",
+    "alt": "Clouds",
+    "description": "Clouds",
+    "credit": "Trailblazer.me"
+  },
+  {
+    "src": "/assets/background-library/salesforce_canyon_1.png",
+    "alt": "Canyon Background 1",
+    "description": "Canyon Background 1",
+    "credit": "salesforce.com"
+  },
+  {
+    "src": "/assets/background-library/salesforce_canyon_2.png",
+    "alt": "Canyon Background 2",
+    "description": "Canyon Background 2",
+    "credit": "salesforce.com"
+  },
   {
     "src": "/assets/background-library/NYC_desert_1.png",
     "alt": "Desert Background 1",
@@ -109,6 +120,12 @@
     "credit": "salesforce.com"
   },
   {
+    "src": "/assets/background-library/robot_codey.png",
+    "alt": "Robot Codey",
+    "description": "Robot Codey",
+    "credit": "salesforce.com"
+  },
+  {
     "src": "/assets/background-library/SF_Desk-Backdrop.png",
     "alt": "Salesforce Desk Backdrop",
     "description": "Salesforce Desk Backdrop",
@@ -125,6 +142,12 @@
     "alt": "Golden sun",
     "description": "Golden sun",
     "credit": "Salesforce.com"
+  },
+  {
+    "src": "/assets/background-library/trailhead-mfe-background.png",
+    "alt": "Trailhead MFE Background",
+    "description": "Trailhead MFE Background",
+    "credit": "Trailblazer.me"
   },
   {
     "src": "/assets/background-library/marquee-our-story-bg.png",
