@@ -189,16 +189,18 @@ export const generateImage = async (options) => {
     const badgeScale = counterConfig.badgeScale;
     let badgeCounterYPosition = 5;
     const badgeCounterYDelta = counterConfig.badgeCounterYDelta;
+    const badgeCounterX = rankLogoWidth + 40;
+
     if (options.displayBadgeCount && badgeCount > 0) {
       await drawBadgeCounter(
         ctx,
         'Badge',
         badgeCount,
-        rankLogoWidth + 40,
+        badgeCounterX,
         badgeCounterYPosition,
         badgeScale,
         options.badgeLabelColor,
-        options.badgeMessageColor
+        '#1f80c0'
       );
       badgeCounterYPosition += badgeCounterYDelta;
     }
@@ -207,11 +209,11 @@ export const generateImage = async (options) => {
         ctx,
         'Superbadge',
         superbadgeCount,
-        rankLogoWidth + 40,
+        badgeCounterX,
         badgeCounterYPosition,
         badgeScale,
         options.badgeLabelColor,
-        options.badgeMessageColor
+        '#f9a825'
       );
       badgeCounterYPosition += badgeCounterYDelta;
     }
@@ -220,11 +222,11 @@ export const generateImage = async (options) => {
         ctx,
         'Certification',
         certificationCount,
-        rankLogoWidth + 40,
+        badgeCounterX,
         badgeCounterYPosition,
         badgeScale,
         options.badgeLabelColor,
-        options.badgeMessageColor
+        '#8a00c4'
       );
       badgeCounterYPosition += badgeCounterYDelta;
     }
@@ -233,11 +235,11 @@ export const generateImage = async (options) => {
         ctx,
         'Trail',
         trailCount,
-        rankLogoWidth + 40,
+        badgeCounterX,
         badgeCounterYPosition,
         badgeScale,
         options.badgeLabelColor,
-        options.badgeMessageColor
+        '#06482A'
       );
       badgeCounterYPosition += badgeCounterYDelta;
     }
@@ -246,11 +248,11 @@ export const generateImage = async (options) => {
         ctx,
         'Point',
         pointCount,
-        rankLogoWidth + 40,
+        badgeCounterX,
         badgeCounterYPosition,
         badgeScale,
         options.badgeLabelColor,
-        options.badgeMessageColor
+        '#18477D'
       );
       badgeCounterYPosition += badgeCounterYDelta;
     }
