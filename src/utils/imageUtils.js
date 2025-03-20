@@ -97,16 +97,30 @@ const getCountersConfig = (options) => {
     options.displaySuperbadgeCount,
     options.displayCertificationCount,
     options.displayTrailCount,
+    options.displayPointCount,
   ].filter(Boolean).length;
 
-  const badgeScale = counter > 3 ? 0.8 : 1;
+  let badgeScale = 1;
+  if (counter > 4) {
+    badgeScale = 0.6;
+  } else if (counter == 3) {
+    badgeScale = 0.8;
+  }
   const badgeCounterYDelta = 35 * badgeScale;
 
   return { counter, badgeScale, badgeCounterYDelta };
+};
+
+const getCounterPointText = (points) => {
+  if (points < 1000) return points.toString();
+  if (points < 1_000_000) return `${Math.floor(points / 1000)}k`;
+  if (points < 1_000_000_000) return `${Math.floor(points / 1_000_000)}M`;
+  return `${Math.floor(points / 1_000_000_000)}B`;
 };
 
 module.exports = {
   calculateCertificationsDesign,
   sortCertifications,
   getCountersConfig,
+  getCounterPointText,
 };
