@@ -2,7 +2,12 @@ const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
 const { getLocalCertificationData } = require('./dataUtils');
-const { calculateCertificationsDesign, sortCertifications, getCountersConfig } = require('./imageUtils');
+const {
+  calculateCertificationsDesign,
+  sortCertifications,
+  getCountersConfig,
+  getCounterPointText,
+} = require('./imageUtils');
 const {
   applyGrayscale,
   cropImage,
@@ -89,6 +94,7 @@ export const generateImage = async (options) => {
     superbadgeCount: options.displaySuperbadgeCount,
     certificationCount: options.displayCertificationCount,
     trailCount: options.displayTrailCount,
+    pointCount: options.displayPointCount,
   });
   console.log('Badge Options:', {
     labelColor: options.badgeLabelColor,
@@ -175,6 +181,7 @@ export const generateImage = async (options) => {
       (options.includeRetiredCertifications || cert.status.title !== 'Retired')
   ).length;
   const trailCount = options.rankData.completedTrailCount || 0;
+  const pointCount = getCounterPointText(options.rankData.earnedPointsSum || 0);
 
   // Draw badge counter
   try {
@@ -226,6 +233,19 @@ export const generateImage = async (options) => {
         ctx,
         'Trail',
         trailCount,
+        rankLogoWidth + 40,
+        badgeCounterYPosition,
+        badgeScale,
+        options.badgeLabelColor,
+        options.badgeMessageColor
+      );
+      badgeCounterYPosition += badgeCounterYDelta;
+    }
+    if (options.displayPointCount && pointCount != 0) {
+      await drawBadgeCounter(
+        ctx,
+        'Point',
+        pointCount,
         rankLogoWidth + 40,
         badgeCounterYPosition,
         badgeScale,

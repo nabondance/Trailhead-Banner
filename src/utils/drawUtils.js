@@ -91,7 +91,7 @@ const cropImage = (image) => {
 const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
   let labelToDisplay = label;
   let messageBackgroundColor = '#1f80c0';
-  if (message > 1) {
+  if (message != 0) {
     labelToDisplay += 's';
   }
   switch (label) {
@@ -103,6 +103,9 @@ const dynamicBadgeSvg = (label, message, labelColor, messageColor) => {
       break;
     case 'Trail':
       messageBackgroundColor = '#06482A';
+      break;
+    case 'Point':
+      messageBackgroundColor = '#18477D';
       break;
   }
 

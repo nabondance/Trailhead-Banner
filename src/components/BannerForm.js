@@ -13,6 +13,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displaySuperbadgeCount: true,
     displayCertificationCount: true,
     displayTrailCount: false,
+    displayPointCount: false,
     displayRankLogo: true,
     displaySuperbadges: true,
     includeExpiredCertifications: false,
@@ -285,11 +286,19 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               />
             </label>
             <label>
-              Show Trails Count:
+              Show Trail Count:
               <input
                 type='checkbox'
                 checked={options.displayTrailCount}
                 onChange={(e) => setOptions({ ...options, displayTrailCount: e.target.checked })}
+              />
+            </label>
+            <label>
+              Show Point Count:
+              <input
+                type='checkbox'
+                checked={options.displayPointCount}
+                onChange={(e) => setOptions({ ...options, displayPointCount: e.target.checked })}
               />
             </label>
           </fieldset>
