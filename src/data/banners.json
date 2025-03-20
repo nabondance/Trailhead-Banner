@@ -2,176 +2,166 @@
   {
     "src": "/assets/background-library/sf_australia.png",
     "alt": "Australia Background",
-    "description": "Australia Background",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/sf_japan.png",
     "alt": "Japan Background",
-    "description": "Japan Background",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/sf_france.png",
     "alt": "France Background",
-    "description": "France Background",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/highland-waterfalls.png",
     "alt": "Highland Waterfalls",
-    "description": "Highland Waterfalls",
     "credit": "Trailblazer.me"
   },
   {
     "src": "/assets/background-library/tropical-beach.png",
     "alt": "Tropical Beach",
-    "description": "Tropical Beach",
     "credit": "Trailblazer.me"
   },
   {
     "src": "/assets/background-library/NYC_dreamforce_1.png",
     "alt": "Dreamforce Background 1",
-    "description": "Dreamforce Background 1",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/NYC_dreamforce_2.png",
     "alt": "Dreamforce Background 2",
-    "description": "Dreamforce Background 2",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/NYC_dreamforce_3.png",
     "alt": "Dreamforce Background 3",
-    "description": "Dreamforce Background 3",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/NYC_dreamforce_4.png",
     "alt": "Dreamforce Background 4",
-    "description": "Dreamforce Background 4",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/NYC_KOA_2.png",
     "alt": "KOA Background 2",
-    "description": "KOA Background 2",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/NYC_KOA_3.png",
     "alt": "KOA Background 3",
-    "description": "KOA Background 3",
     "credit": "salesforce.com"
-  },
-  {
-    "src": "/assets/background-library/trailhead-mfe-background.png",
-    "alt": "Trailhead MFE Background",
-    "description": "Trailhead MFE Background",
-    "credit": "Trailblazer.me"
   },
   {
     "src": "/assets/background-library/energy-central-background.png",
     "alt": "Energy Central Background",
-    "description": "Energy Central Background",
     "credit": "energycentral.com"
   },
-
+  {
+    "src": "/assets/background-library/clouds_mongo.jpg",
+    "alt": "Clouds",
+    "credit": "Trailblazer.me"
+  },
+  {
+    "src": "/assets/background-library/salesforce_canyon_1.png",
+    "alt": "Canyon Background 1",
+    "credit": "salesforce.com"
+  },
+  {
+    "src": "/assets/background-library/salesforce_canyon_2.png",
+    "alt": "Canyon Background 2",
+    "credit": "salesforce.com"
+  },
   {
     "src": "/assets/background-library/NYC_desert_1.png",
     "alt": "Desert Background 1",
-    "description": "Desert Background 1",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/NYC_desert_3.png",
     "alt": "Desert Background 3",
-    "description": "Desert Background 3",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/NYC_desert_4.png",
     "alt": "Desert Background 4",
-    "description": "Desert Background 4",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/sf_event.png",
     "alt": "Salesforce Event Background",
-    "description": "Salesforce Event Background",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/sf_meetup.png",
     "alt": "Meetup Background",
-    "description": "Meetup Background",
+    "credit": "salesforce.com"
+  },
+  {
+    "src": "/assets/background-library/robot_codey.png",
+    "alt": "Robot Codey",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/SF_Desk-Backdrop.png",
     "alt": "Salesforce Desk Backdrop",
-    "description": "Salesforce Desk Backdrop",
     "credit": "salesforce.com"
   },
   {
     "src": "/assets/background-library/vass-company.png",
     "alt": "Vass Company Background",
-    "description": "Vass Company Background",
     "credit": "vasscompany.com"
   },
   {
     "src": "/assets/background-library/golden-sun.png",
     "alt": "Golden sun",
-    "description": "Golden sun",
     "credit": "Salesforce.com"
+  },
+  {
+    "src": "/assets/background-library/trailhead-mfe-background.png",
+    "alt": "Trailhead MFE Background",
+    "credit": "Trailblazer.me"
   },
   {
     "src": "/assets/background-library/marquee-our-story-bg.png",
     "alt": "Our Story Background 1",
-    "description": "Our Story Background 1",
     "credit": "Salesforce.com"
   },
   {
     "src": "/assets/background-library/our-story-marquee.png",
     "alt": "Our Story Background 2",
-    "description": "Our Story Background 2",
     "credit": "Salesforce.com"
   },
   {
     "src": "/assets/background-library/service_background-1.png",
     "alt": "Service Background 1",
-    "description": "Service Background 1",
     "credit": "Salesforce.com"
   },
   {
     "src": "/assets/background-library/salescloud_faq-1.png",
     "alt": "Sales Cloud Background 1",
-    "description": "Sales Cloud Background 1",
     "credit": "Salesforce.com"
   },
   {
     "src": "/assets/background-library/hero-block__variation-1.png",
-    "alt": "hero block variation 1",
-    "description": "Hero Block Variation 1",
+    "alt": "Hero Block Variation 1",
     "credit": "Salesforce.com"
   },
   {
     "src": "/assets/background-library/hero-block__variation-2.png",
-    "alt": "hero block variation 2",
-    "description": "Hero Block Variation 2",
+    "alt": "Hero Block Variation 2",
     "credit": "Salesforce.com"
   },
   {
     "src": "/assets/background-library/hero-block__variation-3.png",
-    "alt": "hero block variation 3",
-    "description": "Hero Block Variation 3",
+    "alt": "Hero Block Variation 3",
     "credit": "Salesforce.com"
   },
   {
     "src": "/assets/background-library/hero-block__variation-4.png",
-    "alt": "hero block variation 4",
-    "description": "Hero Block Variation 4",
+    "alt": "Hero Block Variation 4",
     "credit": "Salesforce.com"
   }
 ]
