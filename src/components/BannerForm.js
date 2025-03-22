@@ -50,6 +50,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return { valid: false, state: 'invalid', message: 'Enter an username' };
     }
 
+    if (username.startsWith('http://') || username.startsWith('https://')) {
+      setUsernameError("username shouldn't be an URL");
+      setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't be an URL" });
+      return { valid: false, state: 'invalid', message: "username shouldn't be an URL" };
+    }
+
     if (username.includes('@')) {
       setUsernameError("username shouldn't be an email address");
       setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't be an email address" });
