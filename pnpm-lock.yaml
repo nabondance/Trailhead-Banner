@@ -30,8 +30,8 @@ importers:
         specifier: ^0.27.3
         version: 0.27.3
       '@vercel/speed-insights':
-        specifier: ^1.1.0
-        version: 1.1.0(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        specifier: ^1.2.0
+        version: 1.2.0(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       axios:
         specifier: ^1.8.3
         version: 1.8.3
@@ -645,8 +645,8 @@ packages:
     resolution: {integrity: sha512-WizeAxzOTmv0JL7wOaxvLIU/KdBcrclM1ZUOdSlIZAxsTTTe1jsyBthStLby0Ueh7FnmKYAjLz26qRJTk5SDkQ==}
     engines: {node: '>=16.14'}
 
-  '@vercel/speed-insights@1.1.0':
-    resolution: {integrity: sha512-rAXxuhhO4mlRGC9noa5F7HLMtGg8YF1zAN6Pjd1Ny4pII4cerhtwSG4vympbCl+pWkH7nBS9kVXRD4FAn54dlg==}
+  '@vercel/speed-insights@1.2.0':
+    resolution: {integrity: sha512-y9GVzrUJ2xmgtQlzFP2KhVRoCglwfRQgjyfY607aU0hh0Un6d0OUyrJkjuAlsV18qR4zfoFPs/BiIj9YDS6Wzw==}
     peerDependencies:
       '@sveltejs/kit': ^1 || ^2
       next: '>= 13'
@@ -3210,7 +3210,7 @@ snapshots:
       throttleit: 2.1.0
       undici: 5.28.5
 
-  '@vercel/speed-insights@1.1.0(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+  '@vercel/speed-insights@1.2.0(next@15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
     optionalDependencies:
       next: 15.2.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
