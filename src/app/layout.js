@@ -50,6 +50,27 @@ export default function RootLayout({ children }) {
         ></script>
         <SpeedInsights />
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
+        <link
+          rel='preload'
+          href='/_next/static/media/569ce4b8f30dc480-s.p.woff2'
+          as='font'
+          type='font/woff2'
+          crossorigin='anonymous'
+        />
+        <link
+          rel='preload'
+          href='/_next/static/media/93f479601ee12b01-s.p.woff2'
+          as='font'
+          type='font/woff2'
+          crossorigin='anonymous'
+        />
+        <link
+          rel='preload'
+          href='/_next/static/media/a34f9d1faa5f3315-s.p.woff2'
+          as='font'
+          type='font/woff2'
+          crossorigin='anonymous'
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
