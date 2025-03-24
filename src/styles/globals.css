@@ -793,6 +793,7 @@ legend {
 
   .logo-container {
     margin-top: 10px;
+    filter: none;
   }
 }
 

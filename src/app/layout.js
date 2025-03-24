@@ -49,6 +49,7 @@ export default function RootLayout({ children }) {
           data-website-id='b540d5cc-247f-426e-87ec-0c1258767c22'
         ></script>
         <SpeedInsights />
+        <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
