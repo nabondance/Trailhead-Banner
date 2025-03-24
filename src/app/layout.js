@@ -1,5 +1,3 @@
-import { SpeedInsights } from '@vercel/speed-insights/next';
-
 import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
 import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
 
@@ -48,7 +46,6 @@ export default function RootLayout({ children }) {
           src='https://cloud.umami.is/script.js'
           data-website-id='b540d5cc-247f-426e-87ec-0c1258767c22'
         ></script>
-        <SpeedInsights />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
