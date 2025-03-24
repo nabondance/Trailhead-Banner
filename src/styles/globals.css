@@ -774,6 +774,10 @@ legend {
     align-items: center;
   }
 
+  .trailhead-banner-header h2 {
+    font-size: 1.1em;
+  }
+
   .header-content {
     position: static;
     transform: none;
