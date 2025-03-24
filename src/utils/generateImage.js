@@ -186,7 +186,7 @@ export const generateImage = async (options) => {
   // Draw badge counter
   try {
     const counterConfig = getCountersConfig(options);
-    const badgeScale = counterConfig.badgeScale;
+    const badgeScale = counterConfig.badgeCounterScale;
     let badgeCounterYPosition = 5;
     const badgeCounterYDelta = counterConfig.badgeCounterYDelta;
     const badgeCounterX = rankLogoWidth + 40;

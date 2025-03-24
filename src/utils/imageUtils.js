@@ -100,15 +100,23 @@ const getCountersConfig = (options) => {
     options.displayPointCount,
   ].filter(Boolean).length;
 
-  let badgeScale = 1;
-  if (counter > 4) {
-    badgeScale = 0.6;
-  } else if (counter == 3) {
-    badgeScale = 0.8;
-  }
-  const badgeCounterYDelta = 35 * badgeScale;
+  let badgeCounterScale = 1;
 
-  return { counter, badgeScale, badgeCounterYDelta };
+  switch (counter) {
+    case 5:
+      badgeCounterScale = 0.6;
+      break;
+    case 4:
+      badgeCounterScale = 0.8;
+      break;
+    default:
+      badgeCounterScale = 1;
+      break;
+  }
+
+  const badgeCounterYDelta = 35 * badgeCounterScale;
+
+  return { counter, badgeCounterScale, badgeCounterYDelta };
 };
 
 const getCounterPointText = (points) => {
