@@ -13,17 +13,20 @@ config.autoAddCss = false;
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap',
 });
 
 const InterFont = Inter({
   variable: '--font-inter',
   weights: [400, 500, 600, 700],
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata = {
@@ -49,6 +52,28 @@ export default function RootLayout({ children }) {
           data-website-id='b540d5cc-247f-426e-87ec-0c1258767c22'
         ></script>
         <SpeedInsights />
+        <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
+        <link
+          rel='preload'
+          href='/_next/static/media/569ce4b8f30dc480-s.p.woff2'
+          as='font'
+          type='font/woff2'
+          crossorigin='anonymous'
+        />
+        <link
+          rel='preload'
+          href='/_next/static/media/93f479601ee12b01-s.p.woff2'
+          as='font'
+          type='font/woff2'
+          crossorigin='anonymous'
+        />
+        <link
+          rel='preload'
+          href='/_next/static/media/a34f9d1faa5f3315-s.p.woff2'
+          as='font'
+          type='font/woff2'
+          crossorigin='anonymous'
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
