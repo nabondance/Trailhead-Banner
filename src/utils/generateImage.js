@@ -224,7 +224,6 @@ export const generateImage = async (options) => {
   }
 
   // learnerStatusLevels
-  console.log('Agentblazer Rank Data:', options.rankData.learnerStatusLevels);
   if (options.rankData.learnerStatusLevels) {
     options.rankData.learnerStatusLevels.forEach(async (learnerStatusLevel) => {
       // Agentblazer Rank
