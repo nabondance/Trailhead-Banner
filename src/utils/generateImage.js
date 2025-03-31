@@ -322,7 +322,7 @@ export const generateImage = async (options) => {
     const certifYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
     const availableWidth = canvas.width - 40; // Leave some padding on the sides
     const availableHeight = canvas.height * bottom_part * 0.95; // 95% of the bottom 2/3 height
-    const certifSpacing = 10; // Space between certif logos
+    const certifSpacing = 5; // Space between certif logos
 
     // Calculate certifDesign for certifications
     const certifDesign = calculateCertificationsDesign(
