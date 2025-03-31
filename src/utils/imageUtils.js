@@ -1,4 +1,4 @@
-const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpacing) => {
+const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpacing, alignment) => {
   let logoWidth = logos[0].width;
   let logoHeight = logos[0].height;
   let scale = 2.0;
@@ -14,13 +14,11 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
 
     // Step 3: Check if the current scale allows all rows to fit within the canvas height
     if (numRowsNeeded * (logoHeight * scale + logoSpacing) - logoSpacing <= canvasHeight) {
-      break; // The current scale fits, so stop adjusting
+      break;
     } else {
-      // Step 4: Reduce the scale proportionally to fit more rows
-      scale *= 0.9; // Gradually reduce scale (adjust decrement factor if necessary)
+      scale *= 0.9;
     }
   }
-
   // Step 5: Compute the final number of rows
   numRows = Math.ceil(logos.length / maxLogosPerRow);
 
@@ -33,10 +31,19 @@ const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpa
   for (let row = 0; row < numRows; row++) {
     const logosInLine = row === numRows - 1 ? logos.length % maxLogosPerRow || maxLogosPerRow : maxLogosPerRow;
     const lineWidth = logosInLine * finalLogoWidth + (logosInLine - 1) * logoSpacing;
-    logoLineStartX.push((canvasWidth - lineWidth) / 2);
+
+    let startX;
+    if (alignment === 'left') {
+      startX = 0;
+    } else if (alignment === 'right') {
+      startX = canvasWidth - lineWidth;
+    } else {
+      // center
+      startX = (canvasWidth - lineWidth) / 2;
+    }
+    logoLineStartX.push(startX);
   }
 
-  // Return the results
   return {
     logoWidth: finalLogoWidth,
     logoHeight: finalLogoHeight,

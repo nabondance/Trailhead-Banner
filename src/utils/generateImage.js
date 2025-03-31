@@ -329,7 +329,8 @@ export const generateImage = async (options) => {
       certificationsLogos.map(({ logo }) => logo),
       availableWidth,
       availableHeight,
-      certifSpacing
+      certifSpacing,
+      options.certificationAlignment
     );
 
     // Draw logos centered with a small space between them
