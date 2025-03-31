@@ -397,7 +397,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               />
             </label>
             <label>
-              Only Lasts Certifications:
+              Limit Number of Certifications:
               <input
                 type='checkbox'
                 checked={options.displayLastXCertifications}
