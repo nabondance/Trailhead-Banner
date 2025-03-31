@@ -30,6 +30,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     lastXSuperbadges: '',
     certificationSort: 'date',
     certificationSortOrder: 'descendant',
+    certificationAlignment: 'center',
     displaySalesforceCertifications: true,
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
@@ -435,6 +436,17 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               >
                 <option value='ascendant'>Ascendant</option>
                 <option value='descendant'>Descendant</option>
+              </select>
+            </label>
+            <label className='picklist'>
+              Certification Alignment:
+              <select
+                value={options.certificationAlignment}
+                onChange={(e) => setOptions({ ...options, certificationAlignment: e.target.value })}
+              >
+                <option value='center'>Center</option>
+                <option value='left'>Left</option>
+                <option value='right'>Right</option>
               </select>
             </label>
           </fieldset>

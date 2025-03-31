@@ -70,5 +70,9 @@
   {
     "number": 18,
     "description": "Banner with the number of trails displayed"
+  },
+  {
+    "number": 19,
+    "description": "Banner with Certifications aligned on the right"
   }
 ]

@@ -1,7 +1,7 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
-const { getLocalCertificationData } = require('./dataUtils');
+const { getLocalCertificationData, logOptions } = require('./dataUtils');
 const {
   calculateCertificationsDesign,
   sortCertifications,
@@ -73,45 +73,7 @@ const isValidImageType = async (url) => {
 
 export const generateImage = async (options) => {
   // Options logging
-  console.log('Generating banner with the following data:');
-  console.log('Username:', options.username);
-  console.log('Rank Data:', options.rankData);
-  console.log('Certifications Data:', options.certificationsData);
-  console.log('Badges Data:', options.badgesData);
-  console.log('Superbadges Data:', options.superbadgesData);
-  console.log('Background Options:', {
-    kind: options.backgroundKind,
-    libraryUrl: options.backgroundLibraryUrl,
-    customImageUrl: options.customBackgroundImageUrl,
-    backgroundColor: options.backgroundColor,
-  });
-  console.log('Display Options:', {
-    rankLogo: options.displayRankLogo,
-  });
-  console.log('Counter Options:', {
-    textColor: options.textColor,
-    badgeCount: options.displayBadgeCount,
-    superbadgeCount: options.displaySuperbadgeCount,
-    certificationCount: options.displayCertificationCount,
-    trailCount: options.displayTrailCount,
-    pointCount: options.displayPointCount,
-  });
-  console.log('Badge Options:', {
-    labelColor: options.badgeLabelColor,
-    messageColor: options.badgeMessageColor,
-  });
-  console.log('Superbadge Options:', {
-    superbadges: options.displaySuperbadges,
-    displayLastXSuperbadges: options.lastXSuperbadges,
-    lastXSuperbadges: options.lastXSuperbadges,
-  });
-  console.log('Certification Options:', {
-    includeExpired: options.includeExpiredCertifications,
-    includeRetired: options.includeRetiredCertifications,
-    displayLastXCertifications: options.lastXCertifications,
-    lastXCertifications: options.lastXCertifications,
-  });
-  console.log('MVP Data:', options.mvpData);
+  logOptions(options);
 
   // Warning
   const warnings = [];
@@ -262,7 +224,6 @@ export const generateImage = async (options) => {
   }
 
   // learnerStatusLevels
-  console.log('Agentblazer Rank Data:', options.rankData.learnerStatusLevels);
   if (options.rankData.learnerStatusLevels) {
     options.rankData.learnerStatusLevels.forEach(async (learnerStatusLevel) => {
       // Agentblazer Rank
@@ -358,16 +319,17 @@ export const generateImage = async (options) => {
 
   if (certificationsLogos.length !== 0) {
     const certifYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
-    const availableWidth = canvas.width - 40; // Leave some padding on the sides
+    const availableWidth = canvas.width;
     const availableHeight = canvas.height * bottom_part * 0.95; // 95% of the bottom 2/3 height
-    const certifSpacing = 10; // Space between certif logos
+    const certifSpacing = 5; // Space between certif logos
 
     // Calculate certifDesign for certifications
     const certifDesign = calculateCertificationsDesign(
       certificationsLogos.map(({ logo }) => logo),
       availableWidth,
       availableHeight,
-      certifSpacing
+      certifSpacing,
+      options.certificationAlignment
     );
 
     // Draw logos centered with a small space between them
