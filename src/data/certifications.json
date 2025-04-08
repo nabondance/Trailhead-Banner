@@ -211,6 +211,14 @@
     "category": "admin",
     "difficulty": 3
   },
+  "Salesforce Certified Slack Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Slack Developer": {
+    "category": "developer",
+    "difficulty": 5
+  },
   "Salesforce Certified Strategy Designer": {
     "category": "designer",
     "difficulty": 4
@@ -287,6 +295,10 @@
     "category": "accredited-commerce",
     "difficulty": 6
   },
+  "Health Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
   "Heroku Developer Accredited Professional": {
     "category": "accredited-platform",
     "difficulty": 4
@@ -320,6 +332,10 @@
     "difficulty": 5
   },
   "Media Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Net Zero Cloud Accredited Professional": {
     "category": "accredited-industry",
     "difficulty": 5
   },
