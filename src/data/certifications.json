@@ -311,6 +311,10 @@
     "category": "accredited-sales",
     "difficulty": 3
   },
+  "Loyalty Management Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
+  },
   "Manufacturing Cloud Accredited Professional": {
     "category": "accredited-industry",
     "difficulty": 5
