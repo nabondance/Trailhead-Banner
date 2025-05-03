@@ -6,6 +6,14 @@ import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '4mb', // Set a higher limit for the API route
+    },
+  },
+};
+
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const start_time = new Date().getTime();
