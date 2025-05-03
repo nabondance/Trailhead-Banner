@@ -90,6 +90,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
 
+  const extractUsernameFromUrl = (input) => {
+    const trailblazerUrlPrefix = 'https://www.salesforce.com/trailblazer/';
+    if (input.startsWith(trailblazerUrlPrefix)) {
+      return input.substring(trailblazerUrlPrefix.length).split('?')[0].split('#')[0];
+    }
+    return input;
+  };
+
   const validateUsername = async (username, api_check) => {
     username = username.toLowerCase();
     setUsernameError(''); // Clear username error
@@ -148,6 +156,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     } else {
       await validateUsername(options.username.toLowerCase(), true);
     }
+  };
+
+  const handleUsernameChange = (e) => {
+    const input = e.target.value.toLowerCase();
+    const cleanUsername = extractUsernameFromUrl(input);
+    setOptions({ ...options, username: cleanUsername });
   };
 
   const handleUrlChange = (e) => {
@@ -264,13 +278,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setIsGenerating(false);
   };
 
+  // Form itself
   return (
     <form onSubmit={handleSubmit} className='form'>
       <div className='input-container'>
         <input
           type='text'
           value={options.username}
-          onChange={(e) => setOptions({ ...options, username: e.target.value.toLowerCase() })}
+          onChange={handleUsernameChange}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username' // Add placeholder
           required
