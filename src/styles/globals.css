@@ -918,10 +918,6 @@ legend {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 10px;
 }
 
 .thumbnail {
@@ -933,6 +929,11 @@ legend {
   border-radius: 10px;
   cursor: pointer;
   transition: border-color 0.3s;
+}
+
+.thumbnail.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
 }
 
 @media (width <= 768px) {
@@ -952,18 +953,6 @@ legend {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-  }
-
-  .predefined-background {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    gap: 8px;
-    padding: 5px 0;
-    margin: 0 -10px;
-    padding: 0 10px;
   }
 
   .thumbnail {
