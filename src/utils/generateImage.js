@@ -94,12 +94,12 @@ export const generateImage = async (options) => {
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
         break;
-      case 'custom':
+      case 'customUrl':
       case 'upload':
         if (options.backgroundImageUrl) {
           // For upload, backgroundImageUrl will be a data URL, which is already validated
           // For custom URLs, we still need to validate
-          if (options.backgroundKind === 'custom' && !(await isValidImageType(options.backgroundImageUrl))) {
+          if (options.backgroundKind === 'customUrl' && !(await isValidImageType(options.backgroundImageUrl))) {
             throw new Error('Unsupported image type');
           }
           const bgImage = await loadImage(options.backgroundImageUrl);

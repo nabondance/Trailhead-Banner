@@ -229,7 +229,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
     const usernameValidation = await validateUsername(options.username, true);
     const imageUrlValidation =
-      options.backgroundKind === 'custom' ? await validateImageUrl(options.customBackgroundImageUrl) : { valid: true };
+      options.backgroundKind === 'customUrl'
+        ? await validateImageUrl(options.customBackgroundImageUrl)
+        : { valid: true };
 
     if (!usernameValidation.valid || !imageUrlValidation.valid) {
       const errorMessages = [];
@@ -246,7 +248,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     let backgroundImageUrl = '';
     if (options.backgroundKind === 'library') {
       backgroundImageUrl = options.backgroundLibraryUrl;
-    } else if (options.backgroundKind === 'custom') {
+    } else if (options.backgroundKind === 'customUrl') {
       backgroundImageUrl = options.customBackgroundImageUrl;
     } else if (options.backgroundKind === 'upload') {
       backgroundImageUrl = options.backgroundImageUrl;
@@ -309,7 +311,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               <select value={options.backgroundKind} onChange={handleBackgroundKindChange}>
                 <option value='library'>Background Library</option>
                 <option value='upload'>Upload Image</option>
-                <option value='custom'>Custom URL</option>
+                <option value='customUrl'>Custom URL</option>
                 <option value='monochromatic'>Monochromatic Background</option>
               </select>
             </label>
@@ -331,7 +333,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
               </label>
             )}
-            {options.backgroundKind === 'custom' && (
+            {options.backgroundKind === 'customUrl' && (
               <label>
                 Custom Background Url:
                 <input
@@ -366,7 +368,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               src={
                 options.backgroundKind === 'library'
                   ? options.backgroundLibraryUrl
-                  : options.backgroundKind === 'custom'
+                  : options.backgroundKind === 'customUrl'
                     ? options.customBackgroundImageUrl
                     : options.backgroundKind === 'upload'
                       ? options.backgroundImageUrl
