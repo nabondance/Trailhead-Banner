@@ -171,6 +171,10 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Nonprofit Cloud Consultant (NPC)": {
+    "category": "consultant",
+    "difficulty": 5
+  },
   "Salesforce Certified OmniStudio Consultant": {
     "category": "consultant",
     "difficulty": 6
@@ -306,6 +310,10 @@
   "Indirect Sales Accredited Professional": {
     "category": "accredited-sales",
     "difficulty": 3
+  },
+  "Loyalty Management Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
   },
   "Manufacturing Cloud Accredited Professional": {
     "category": "accredited-industry",
