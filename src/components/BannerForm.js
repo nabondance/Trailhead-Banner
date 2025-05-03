@@ -146,7 +146,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       setValidationResult(null); // Clear validation result if username is empty
       setUsernameError(''); // Clear username error
     } else {
-      await validateUsername(options.username.toLowerCase(), false);
+      await validateUsername(options.username.toLowerCase(), true);
     }
   };
 
