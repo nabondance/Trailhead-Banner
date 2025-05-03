@@ -308,8 +308,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               Background Kind:
               <select value={options.backgroundKind} onChange={handleBackgroundKindChange}>
                 <option value='library'>Background Library</option>
-                <option value='custom'>Custom URL</option>
                 <option value='upload'>Upload Image</option>
+                <option value='custom'>Custom URL</option>
                 <option value='monochromatic'>Monochromatic Background</option>
               </select>
             </label>
@@ -321,6 +321,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   value={options.backgroundColor}
                   onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
                 />
+              </label>
+            )}
+            {options.backgroundKind === 'upload' && (
+              <label>
+                Upload Background Image:
+                <input type='file' accept='image/*' onChange={handleFileChange} className='input-file' />
+                {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+                {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
               </label>
             )}
             {options.backgroundKind === 'custom' && (
@@ -337,14 +345,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   data-form-type='other'
                 />
                 {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
-              </label>
-            )}
-            {options.backgroundKind === 'upload' && (
-              <label>
-                Upload Background Image:
-                <input type='file' accept='image/*' onChange={handleFileChange} className='input-file' />
-                {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
-                {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
               </label>
             )}
             {options.backgroundKind === 'library' && (
