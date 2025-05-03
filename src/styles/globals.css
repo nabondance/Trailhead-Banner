@@ -256,6 +256,23 @@ main {
   color: var(--text-contrast);
 }
 
+.input-file {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.file-info {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
 ::placeholder {
   color: var(--text-faded);
 }
@@ -905,6 +922,7 @@ legend {
 
 .thumbnail {
   width: 200px;
+  min-width: 200px;
   height: 50px;
   object-fit: cover;
   border: 2px solid transparent;
@@ -914,8 +932,50 @@ legend {
 }
 
 .thumbnail.selected {
-  border: 3px solid transparent;
   border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+@media (width <= 768px) {
+  .options {
+    padding: 10px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .options label {
+    margin-bottom: 15px;
+  }
+
+  .options input[type='text'],
+  .options input[type='url'],
+  .options input[type='file'] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .thumbnail {
+    scroll-snap-align: start;
+    width: 160px;
+    min-width: 160px;
+    height: 40px;
+  }
+
+  .background-preview {
+    margin: 10px -5px;
+    padding: 10px;
+  }
+
+  .background-preview canvas {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  fieldset {
+    padding: 8px;
+    margin-bottom: 10px;
+  }
 }
 
 .picklist {
@@ -1123,4 +1183,48 @@ select:focus {
   border-radius: 6px;
   margin-left: 10px;
   font-size: 0.8em;
+}
+
+.background-preview {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: var(--middleground);
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+.background-preview h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: var(--text-contrast);
+}
+
+.background-preview .canvas-container {
+  position: relative;
+  width: 100%;
+  padding-top: calc(396 / 1584 * 100%); /* Maintain exact 1584:396 aspect ratio */
+  margin: 0 auto;
+  max-width: calc(100vw - 30px); /* Account for padding */
+}
+
+.background-preview canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+}
+
+@media (width <= 768px) {
+  .background-preview {
+    margin: 15px 0;
+    padding: 10px;
+  }
+
+  .background-preview .canvas-container {
+    width: 100%;
+    max-width: 100%;
+  }
 }

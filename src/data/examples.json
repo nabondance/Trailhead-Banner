@@ -74,5 +74,9 @@
   {
     "number": 19,
     "description": "Banner with Certifications aligned on the right"
+  },
+  {
+    "number": 20,
+    "description": "Banner with custom uploaded background image"
   }
 ]

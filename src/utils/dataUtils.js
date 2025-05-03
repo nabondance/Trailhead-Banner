@@ -24,7 +24,8 @@ export const logOptions = (options) => {
   console.log('Background Options:', {
     kind: options.backgroundKind,
     libraryUrl: options.backgroundLibraryUrl,
-    customImageUrl: options.customBackgroundImageUrl,
+    backgroundImageUrl: options.backgroundImageUrl,
+    customBackgroundImageUrl: options.customBackgroundImageUrl,
     backgroundColor: options.backgroundColor,
   });
   console.log('Display Options:', {

@@ -1,8 +1,56 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
-import Image from 'next/image';
 import bannerBackground from '../data/banners.json';
+
+const BackgroundPreview = ({ src, backgroundColor }) => {
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas dimensions based on LinkedIn banner aspect ratio
+    canvas.width = 1584;
+    canvas.height = 396;
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (src) {
+      // Load and draw image exactly like in generateImage.js
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.onerror = () => {
+        console.error('Failed to load image:', src);
+        // On error, show background color
+        ctx.fillStyle = backgroundColor || '#5badd6';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      };
+      // For library backgrounds, use the raw path without window.location.origin
+      const imagePath = src.includes(window.location.origin) ? src.replace(window.location.origin, '') : src;
+      img.src = imagePath;
+    } else {
+      // Draw solid background color
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  }, [src, backgroundColor]);
+
+  return (
+    <div className='background-preview'>
+      <h3>Background Preview</h3>
+      <div className='canvas-container'>
+        <canvas ref={canvasRef} />
+      </div>
+    </div>
+  );
+};
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
@@ -35,6 +83,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
   });
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
@@ -143,6 +192,35 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setOptions({ ...options, backgroundKind: e.target.value });
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setBackgroundImageUrlError('Please upload an image file');
+        return;
+      }
+
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        setBackgroundImageUrlError('Image file is too large. Maximum size is 5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setOptions({
+          ...options,
+          backgroundImageUrl: reader.result,
+          customBackgroundImageUrl: '', // Clear custom URL when uploading
+        });
+        setUploadedFile(file);
+        setBackgroundImageUrlError('');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     setMainError(null); // Clear previous errors
     e.preventDefault();
@@ -150,7 +228,10 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setShowOptions(false); // Hide the options when generating
 
     const usernameValidation = await validateUsername(options.username, true);
-    const imageUrlValidation = await validateImageUrl(options.customBackgroundImageUrl);
+    const imageUrlValidation =
+      options.backgroundKind === 'customUrl'
+        ? await validateImageUrl(options.customBackgroundImageUrl)
+        : { valid: true };
 
     if (!usernameValidation.valid || !imageUrlValidation.valid) {
       const errorMessages = [];
@@ -163,10 +244,19 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return;
     }
 
+    // Determine which URL to use based on background kind
+    let backgroundImageUrl = '';
+    if (options.backgroundKind === 'library') {
+      backgroundImageUrl = options.backgroundLibraryUrl;
+    } else if (options.backgroundKind === 'customUrl') {
+      backgroundImageUrl = options.customBackgroundImageUrl;
+    } else if (options.backgroundKind === 'upload') {
+      backgroundImageUrl = options.backgroundImageUrl;
+    }
+
     await onSubmit({
       ...options,
-      backgroundImageUrl: options.customBackgroundImageUrl,
-      backgroundLibraryUrl: options.backgroundLibraryUrl,
+      backgroundImageUrl,
       lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
       lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
     });
@@ -220,7 +310,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               Background Kind:
               <select value={options.backgroundKind} onChange={handleBackgroundKindChange}>
                 <option value='library'>Background Library</option>
-                <option value='custom'>Custom URL</option>
+                <option value='upload'>Upload Image</option>
+                <option value='customUrl'>Custom URL</option>
                 <option value='monochromatic'>Monochromatic Background</option>
               </select>
             </label>
@@ -234,7 +325,15 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 />
               </label>
             )}
-            {options.backgroundKind === 'custom' && (
+            {options.backgroundKind === 'upload' && (
+              <label>
+                Upload Background Image:
+                <input type='file' accept='image/*' onChange={handleFileChange} className='input-file' />
+                {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+                {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
+              </label>
+            )}
+            {options.backgroundKind === 'customUrl' && (
               <label>
                 Custom Background Url:
                 <input
@@ -253,7 +352,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             {options.backgroundKind === 'library' && (
               <div className='predefined-background'>
                 {bannerBackground.map((image) => (
-                  <Image
+                  <img
                     key={image.src}
                     src={image.src}
                     alt={image.description}
@@ -265,6 +364,18 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 ))}
               </div>
             )}
+            <BackgroundPreview
+              src={
+                options.backgroundKind === 'library'
+                  ? options.backgroundLibraryUrl
+                  : options.backgroundKind === 'customUrl'
+                    ? options.customBackgroundImageUrl
+                    : options.backgroundKind === 'upload'
+                      ? options.backgroundImageUrl
+                      : null
+              }
+              backgroundColor={options.backgroundColor}
+            />
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
