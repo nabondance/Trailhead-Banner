@@ -35,6 +35,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
   });
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
@@ -143,6 +144,27 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setOptions({ ...options, backgroundKind: e.target.value });
   };
 
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setBackgroundImageUrlError('Please upload an image file');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setOptions({
+          ...options,
+          backgroundImageUrl: reader.result,
+          customBackgroundImageUrl: '', // Clear custom URL when uploading
+        });
+        setUploadedFile(file);
+        setBackgroundImageUrlError('');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     setMainError(null); // Clear previous errors
     e.preventDefault();
@@ -150,7 +172,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setShowOptions(false); // Hide the options when generating
 
     const usernameValidation = await validateUsername(options.username, true);
-    const imageUrlValidation = await validateImageUrl(options.customBackgroundImageUrl);
+    const imageUrlValidation =
+      options.backgroundKind === 'custom' ? await validateImageUrl(options.customBackgroundImageUrl) : { valid: true };
 
     if (!usernameValidation.valid || !imageUrlValidation.valid) {
       const errorMessages = [];
@@ -163,10 +186,19 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return;
     }
 
+    // Determine which URL to use based on background kind
+    let backgroundImageUrl = '';
+    if (options.backgroundKind === 'library') {
+      backgroundImageUrl = options.backgroundLibraryUrl;
+    } else if (options.backgroundKind === 'custom') {
+      backgroundImageUrl = options.customBackgroundImageUrl;
+    } else if (options.backgroundKind === 'upload') {
+      backgroundImageUrl = options.backgroundImageUrl;
+    }
+
     await onSubmit({
       ...options,
-      backgroundImageUrl: options.customBackgroundImageUrl,
-      backgroundLibraryUrl: options.backgroundLibraryUrl,
+      backgroundImageUrl,
       lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
       lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
     });
@@ -221,6 +253,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               <select value={options.backgroundKind} onChange={handleBackgroundKindChange}>
                 <option value='library'>Background Library</option>
                 <option value='custom'>Custom URL</option>
+                <option value='upload'>Upload Image</option>
                 <option value='monochromatic'>Monochromatic Background</option>
               </select>
             </label>
@@ -248,6 +281,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   data-form-type='other'
                 />
                 {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+              </label>
+            )}
+            {options.backgroundKind === 'upload' && (
+              <label>
+                Upload Background Image:
+                <input type='file' accept='image/*' onChange={handleFileChange} className='input-file' />
+                {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
+                {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
               </label>
             )}
             {options.backgroundKind === 'library' && (

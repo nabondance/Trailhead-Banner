@@ -256,6 +256,23 @@ main {
   color: var(--text-contrast);
 }
 
+.input-file {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.file-info {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
 ::placeholder {
   color: var(--text-faded);
 }
