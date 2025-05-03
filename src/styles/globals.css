@@ -1141,3 +1141,22 @@ select:focus {
   margin-left: 10px;
   font-size: 0.8em;
 }
+
+.background-preview {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--middleground);
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.background-preview h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: var(--text-contrast);
+}
+
+.preview-frame {
+  border: 2px solid var(--border);
+  aspect-ratio: 1584/396;
+}

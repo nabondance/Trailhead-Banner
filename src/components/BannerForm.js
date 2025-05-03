@@ -1,8 +1,70 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
-import Image from 'next/image';
 import bannerBackground from '../data/banners.json';
+
+const BackgroundPreview = ({ src, backgroundColor }) => {
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Get device pixel ratio and scale up the canvas dimensions
+    const dpr = window.devicePixelRatio || 1;
+    const displayWidth = 1584 / 3; // Slightly larger preview size
+    const displayHeight = 396 / 3;
+
+    // Set canvas size accounting for device pixel ratio
+    canvas.width = displayWidth * dpr;
+    canvas.height = displayHeight * dpr;
+
+    // Set display size
+    canvas.style.width = `${displayWidth}px`;
+    canvas.style.height = `${displayHeight}px`;
+
+    const ctx = canvas.getContext('2d');
+
+    // Scale context to account for device pixel ratio
+    ctx.scale(dpr, dpr);
+
+    // Enable image smoothing
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+    if (src) {
+      // Load and draw image exactly like in generateImage.js
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+      };
+      img.src = src;
+    } else {
+      // Draw solid background color
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, displayWidth, displayHeight);
+    }
+  }, [src, backgroundColor]);
+
+  return (
+    <div className='background-preview'>
+      <h3>Background Preview</h3>
+      <canvas
+        ref={canvasRef}
+        style={{
+          border: '2px solid var(--border)',
+          borderRadius: '10px',
+          width: '100%',
+          height: 'auto',
+          maxWidth: '800px',
+        }}
+      />
+    </div>
+  );
+};
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
@@ -302,7 +364,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             {options.backgroundKind === 'library' && (
               <div className='predefined-background'>
                 {bannerBackground.map((image) => (
-                  <Image
+                  <img
                     key={image.src}
                     src={image.src}
                     alt={image.description}
@@ -314,6 +376,18 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 ))}
               </div>
             )}
+            <BackgroundPreview
+              src={
+                options.backgroundKind === 'library'
+                  ? options.backgroundLibraryUrl
+                  : options.backgroundKind === 'custom'
+                    ? options.customBackgroundImageUrl
+                    : options.backgroundKind === 'upload'
+                      ? options.backgroundImageUrl
+                      : null
+              }
+              backgroundColor={options.backgroundColor}
+            />
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
