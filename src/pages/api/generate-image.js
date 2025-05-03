@@ -9,13 +9,21 @@ import GraphQLUtils from '../../utils/graphqlUtils';
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '4mb', // Set a higher limit for the API route
+      sizeLimit: '5mb', // Set limit to 5MB
     },
   },
 };
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
+    // Check content length against limit (5MB)
+    const contentLength = parseInt(req.headers['content-length'] || '0');
+    if (contentLength > 5 * 1024 * 1024) {
+      return res.status(413).json({
+        error: 'Request entity too large. Maximum payload size is 5MB',
+      });
+    }
+
     const start_time = new Date().getTime();
     const options = req.body;
     // const protocol = req.headers['x-forwarded-proto'] || 'http';

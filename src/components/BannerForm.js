@@ -151,6 +151,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         setBackgroundImageUrlError('Please upload an image file');
         return;
       }
+
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        setBackgroundImageUrlError('Image file is too large. Maximum size is 5MB');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = () => {
         setOptions({
