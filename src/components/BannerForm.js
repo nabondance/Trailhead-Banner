@@ -10,58 +10,44 @@ const BackgroundPreview = ({ src, backgroundColor }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Get device pixel ratio and scale up the canvas dimensions
-    const dpr = window.devicePixelRatio || 1;
-    const displayWidth = 1584 / 3; // Slightly larger preview size
-    const displayHeight = 396 / 3;
-
-    // Set canvas size accounting for device pixel ratio
-    canvas.width = displayWidth * dpr;
-    canvas.height = displayHeight * dpr;
-
-    // Set display size
-    canvas.style.width = `${displayWidth}px`;
-    canvas.style.height = `${displayHeight}px`;
-
     const ctx = canvas.getContext('2d');
 
-    // Scale context to account for device pixel ratio
-    ctx.scale(dpr, dpr);
-
-    // Enable image smoothing
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    // Set canvas dimensions based on LinkedIn banner aspect ratio
+    canvas.width = 1584;
+    canvas.height = 396;
 
     // Clear the canvas
-    ctx.clearRect(0, 0, displayWidth, displayHeight);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (src) {
       // Load and draw image exactly like in generateImage.js
       const img = new Image();
       img.onload = () => {
-        ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       };
-      img.src = src;
+      img.onerror = () => {
+        console.error('Failed to load image:', src);
+        // On error, show background color
+        ctx.fillStyle = backgroundColor || '#5badd6';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      };
+      // For library backgrounds, use the raw path without window.location.origin
+      const imagePath = src.includes(window.location.origin) ? src.replace(window.location.origin, '') : src;
+      img.src = imagePath;
     } else {
       // Draw solid background color
       ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, displayWidth, displayHeight);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   }, [src, backgroundColor]);
 
   return (
     <div className='background-preview'>
       <h3>Background Preview</h3>
-      <canvas
-        ref={canvasRef}
-        style={{
-          border: '2px solid var(--border)',
-          borderRadius: '10px',
-          width: '100%',
-          height: 'auto',
-          maxWidth: '800px',
-        }}
-      />
+      <div className='canvas-container'>
+        <canvas ref={canvasRef} />
+      </div>
     </div>
   );
 };

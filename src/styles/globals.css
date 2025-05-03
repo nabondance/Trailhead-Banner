@@ -918,10 +918,15 @@ legend {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
 }
 
 .thumbnail {
   width: 200px;
+  min-width: 200px;
   height: 50px;
   object-fit: cover;
   border: 2px solid transparent;
@@ -930,9 +935,58 @@ legend {
   transition: border-color 0.3s;
 }
 
-.thumbnail.selected {
-  border: 3px solid transparent;
-  border-color: var(--primary);
+@media (width <= 768px) {
+  .options {
+    padding: 10px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .options label {
+    margin-bottom: 15px;
+  }
+
+  .options input[type='text'],
+  .options input[type='url'],
+  .options input[type='file'] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .predefined-background {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 8px;
+    padding: 5px 0;
+    margin: 0 -10px;
+    padding: 0 10px;
+  }
+
+  .thumbnail {
+    scroll-snap-align: start;
+    width: 160px;
+    min-width: 160px;
+    height: 40px;
+  }
+
+  .background-preview {
+    margin: 10px -5px;
+    padding: 10px;
+  }
+
+  .background-preview canvas {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  fieldset {
+    padding: 8px;
+    margin-bottom: 10px;
+  }
 }
 
 .picklist {
@@ -1143,7 +1197,7 @@ select:focus {
 }
 
 .background-preview {
-  margin-top: 20px;
+  margin: 20px 0px;
   padding: 15px;
   background-color: var(--middleground);
   border-radius: 10px;
@@ -1156,7 +1210,32 @@ select:focus {
   color: var(--text-contrast);
 }
 
-.preview-frame {
+.background-preview .canvas-container {
+  position: relative;
+  width: 100%;
+  padding-top: calc(396 / 1584 * 100%); /* Maintain exact 1584:396 aspect ratio */
+  margin: 0 auto;
+  max-width: calc(100vw - 30px); /* Account for padding */
+}
+
+.background-preview canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: 2px solid var(--border);
-  aspect-ratio: 1584/396;
+  border-radius: 10px;
+}
+
+@media (width <= 768px) {
+  .background-preview {
+    margin: 15px 0px;
+    padding: 10px;
+  }
+
+  .background-preview .canvas-container {
+    width: 100%;
+    max-width: 100%;
+  }
 }
