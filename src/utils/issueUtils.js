@@ -6,7 +6,6 @@ export const generateIssueBody = (error, warning, options, version) => {
   const errorMessage = error?.message || 'N/A';
   const errorStack = error?.stack || 'N/A';
   const warnings = warning?.join('\n') || 'N/A';
-  const optionsString = JSON.stringify(options, null, 2);
 
   return `
 An error occurred while generating the banner:
@@ -27,8 +26,8 @@ ${warnings}
 \`\`\`
 
 Options:
-\`\`\`
-${optionsString}
+\`\`\`json
+${JSON.stringify(options, null, 2)}
 \`\`\`
 
 Version: ${version}

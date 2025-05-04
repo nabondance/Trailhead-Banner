@@ -154,6 +154,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     const usernameFormatResult = validateUsernameFormat(options.username.toLowerCase());
     if (!usernameFormatResult.valid) {
       setMainError(new Error(usernameFormatResult.message));
+      onValidationError(new Error(usernameFormatResult.message), options);
       setIsGenerating(false);
       return;
     }
@@ -171,6 +172,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
       const validationError = new Error(`Validation failed: ${errorMessages.join('. And ')}`);
       setMainError(validationError);
+      onValidationError(validationError, options);
       setIsGenerating(false);
       return;
     }
