@@ -28,14 +28,3 @@ export const validateImageUrl = async (url) => {
     return { valid: false, message: 'Failed to fetch the image URL' };
   }
 };
-
-export const getBackgroundPreviewSrc = (options) => {
-  if (options.backgroundKind === 'library') {
-    return options.backgroundLibraryUrl;
-  } else if (options.backgroundKind === 'customUrl') {
-    return options.customBackgroundImageUrl;
-  } else if (options.backgroundKind === 'upload') {
-    return options.backgroundImageUrl;
-  }
-  return null;
-};

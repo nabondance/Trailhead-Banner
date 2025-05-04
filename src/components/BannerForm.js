@@ -3,7 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import bannerBackground from '../data/banners.json';
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
-import { validateImageFile, validateImageUrl, getBackgroundPreviewSrc } from '../utils/imageValidation';
+import { validateImageUrl } from '../utils/imageValidation';
+import {
+  handleFileChange,
+  handleBackgroundKindChange,
+  handleBackgroundColorChange,
+  handleCustomUrlChange,
+  handlePredefinedImageChange,
+  getBackgroundPreviewSrc,
+} from '../utils/backgroundUtils';
 
 const BackgroundPreview = ({ src, backgroundColor }) => {
   const canvasRef = React.useRef(null);
@@ -117,35 +125,24 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setOptions({ ...options, username: cleanUsername });
   };
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const validation = validateImageFile(file);
-      if (!validation.valid) {
-        setBackgroundImageUrlError(validation.message);
-        return;
-      }
+  const handleBackgroundChange = (e) => {
+    handleBackgroundKindChange(e.target.value, setOptions);
+  };
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        setOptions({
-          ...options,
-          backgroundImageUrl: reader.result,
-          customBackgroundImageUrl: '', // Clear custom URL when uploading
-        });
-        setUploadedFile(file);
-        setBackgroundImageUrlError('');
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleColorChange = (e) => {
+    handleBackgroundColorChange(e.target.value, setOptions);
   };
 
   const handleUrlChange = (e) => {
-    const url = e.target.value;
-    setOptions({ ...options, customBackgroundImageUrl: url });
-    if (!url) {
-      setBackgroundImageUrlError('');
-    }
+    handleCustomUrlChange(e.target.value, setOptions, setBackgroundImageUrlError);
+  };
+
+  const handleImageChange = async (e) => {
+    await handleFileChange(e.target.files[0], setBackgroundImageUrlError, setOptions, setUploadedFile);
+  };
+
+  const handlePredefinedImage = (src) => {
+    handlePredefinedImageChange(src, setOptions);
   };
 
   const handleSubmit = async (e) => {
@@ -235,10 +232,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Background Options</legend>
             <label className='picklist'>
               Background Kind:
-              <select
-                value={options.backgroundKind}
-                onChange={(e) => setOptions({ ...options, backgroundKind: e.target.value })}
-              >
+              <select value={options.backgroundKind} onChange={handleBackgroundChange}>
                 <option value='library'>Background Library</option>
                 <option value='upload'>Upload Image</option>
                 <option value='customUrl'>Custom URL</option>
@@ -248,17 +242,13 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             {options.backgroundKind === 'monochromatic' && (
               <label>
                 Background Color:
-                <input
-                  type='color'
-                  value={options.backgroundColor}
-                  onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
-                />
+                <input type='color' value={options.backgroundColor} onChange={handleColorChange} />
               </label>
             )}
             {options.backgroundKind === 'upload' && (
               <label>
                 Upload Background Image:
-                <input type='file' accept='image/*' onChange={handleFileChange} className='input-file' />
+                <input type='file' accept='image/*' onChange={handleImageChange} className='input-file' />
                 {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
                 {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
               </label>
@@ -289,25 +279,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     width={200}
                     height={50}
                     className={`thumbnail ${options.backgroundLibraryUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
-                    onClick={() =>
-                      setOptions({ ...options, backgroundLibraryUrl: `${window.location.origin}${image.src}` })
-                    }
+                    onClick={() => handlePredefinedImage(image.src)}
                   />
                 ))}
               </div>
             )}
-            <BackgroundPreview
-              src={
-                options.backgroundKind === 'library'
-                  ? options.backgroundLibraryUrl
-                  : options.backgroundKind === 'customUrl'
-                    ? options.customBackgroundImageUrl
-                    : options.backgroundKind === 'upload'
-                      ? options.backgroundImageUrl
-                      : null
-              }
-              backgroundColor={options.backgroundColor}
-            />
+            <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
