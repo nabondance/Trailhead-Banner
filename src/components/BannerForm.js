@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import bannerBackground from '../data/banners.json';
+import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
+import { validateImageUrl } from '../utils/imageValidation';
+import {
+  handleFileChange,
+  handleBackgroundKindChange,
+  handleBackgroundColorChange,
+  handleCustomUrlChange,
+  handlePredefinedImageChange,
+  getBackgroundPreviewSrc,
+} from '../utils/backgroundUtils';
 
 const BackgroundPreview = ({ src, backgroundColor }) => {
   const canvasRef = React.useRef(null);
@@ -90,72 +100,23 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
 
-  const extractUsernameFromUrl = (input) => {
-    const trailblazerUrlPrefix = 'https://www.salesforce.com/trailblazer/';
-    if (input.startsWith(trailblazerUrlPrefix)) {
-      return input.substring(trailblazerUrlPrefix.length).split('?')[0].split('#')[0];
-    }
-    return input;
-  };
-
-  const validateUsername = async (username, api_check) => {
-    username = username.toLowerCase();
-    setUsernameError(''); // Clear username error
-    setValidationResult(null); // Clear validation result
-    if (!username) {
-      setUsernameError('Enter an username');
-      setValidationResult({ valid: false, state: 'invalid', message: 'Enter an username' });
-      return { valid: false, state: 'invalid', message: 'Enter an username' };
-    }
-
-    if (username.startsWith('http://') || username.startsWith('https://')) {
-      setUsernameError("username shouldn't be an URL");
-      setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't be an URL" });
-      return { valid: false, state: 'invalid', message: "username shouldn't be an URL" };
-    }
-
-    if (username.includes('@')) {
-      setUsernameError("username shouldn't be an email address");
-      setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't be an email address" });
-      return { valid: false, state: 'invalid', message: "username shouldn't be an email address" };
-    }
-
-    if (username.includes(' ')) {
-      setUsernameError("username shouldn't contain spaces");
-      setValidationResult({ valid: false, state: 'invalid', message: "username shouldn't contain spaces" });
-      return { valid: false, state: 'invalid', message: "username shouldn't contain spaces" };
-    }
-
-    if (api_check) {
-      try {
-        const response = await fetch(`/api/validate-username?username=${username}`);
-        const data = await response.json();
-        setValidationResult(data);
-        if (data.valid) {
-          setUsernameError('');
-          return data;
-        } else {
-          setUsernameError(data.message); // Display the message from the API
-          return data;
-        }
-      } catch (error) {
-        console.error('Error validating username:', error);
-        setUsernameError('Failed to validate username');
-        setValidationResult({ valid: false, state: 'invalid', message: 'Failed to validate username' });
-        return { valid: false, state: 'invalid', message: 'Failed to validate username' };
-      }
-    }
-
-    return { valid: true, state: 'ok', message: 'looks ok' };
-  };
-
   const handleUsernameBlur = async () => {
     if (!options.username) {
-      setValidationResult(null); // Clear validation result if username is empty
-      setUsernameError(''); // Clear username error
-    } else {
-      await validateUsername(options.username.toLowerCase(), true);
+      setValidationResult(null);
+      setUsernameError('');
+      return;
     }
+
+    const formatResult = validateUsernameFormat(options.username.toLowerCase());
+    if (!formatResult.valid) {
+      setUsernameError(formatResult.message);
+      setValidationResult(formatResult);
+      return;
+    }
+
+    const apiResult = await validateUsernameWithApi(options.username.toLowerCase());
+    setUsernameError(apiResult.valid ? '' : apiResult.message);
+    setValidationResult(apiResult);
   };
 
   const handleUsernameChange = (e) => {
@@ -164,109 +125,59 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setOptions({ ...options, username: cleanUsername });
   };
 
+  const handleBackgroundChange = (e) => {
+    handleBackgroundKindChange(e.target.value, setOptions);
+  };
+
+  const handleColorChange = (e) => {
+    handleBackgroundColorChange(e.target.value, setOptions);
+  };
+
   const handleUrlChange = (e) => {
-    const url = e.target.value;
-    setOptions({ ...options, customBackgroundImageUrl: url });
-    if (!url) {
-      setBackgroundImageUrlError(''); // Clear error message if input is emptied
-    }
+    handleCustomUrlChange(e.target.value, setOptions, setBackgroundImageUrlError);
   };
 
-  const validateImageUrl = async (url) => {
-    setBackgroundImageUrlError(''); // Clear image URL error
-    if (!url) {
-      setBackgroundImageUrlError('');
-      return { valid: true };
-    }
-
-    try {
-      console.debug('Validating image URL:', url);
-      const response = await fetch(url, { method: 'HEAD', mode: 'no-cors', redirect: 'follow' });
-      if (response.ok || response.type === 'opaque') {
-        setBackgroundImageUrlError('');
-        return { valid: true };
-      } else {
-        setBackgroundImageUrlError('Invalid image URL');
-        return { valid: false, message: 'Invalid image URL' };
-      }
-    } catch (error) {
-      console.error('Error validating image URL:', error);
-      setBackgroundImageUrlError('Failed to fetch the image URL');
-      return { valid: false, message: 'Failed to fetch the image URL' };
-    }
+  const handleImageChange = async (e) => {
+    await handleFileChange(e.target.files[0], setBackgroundImageUrlError, setOptions, setUploadedFile);
   };
 
-  const handlePredefinedImageChange = (src) => {
-    const baseUrl = window.location.origin;
-    const newUrl = `${baseUrl}${src}`;
-    setOptions({ ...options, backgroundLibraryUrl: newUrl });
-  };
-
-  const handleBackgroundKindChange = (e) => {
-    setOptions({ ...options, backgroundKind: e.target.value });
-  };
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        setBackgroundImageUrlError('Please upload an image file');
-        return;
-      }
-
-      // Check file size (5MB = 5 * 1024 * 1024 bytes)
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        setBackgroundImageUrlError('Image file is too large. Maximum size is 5MB');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        setOptions({
-          ...options,
-          backgroundImageUrl: reader.result,
-          customBackgroundImageUrl: '', // Clear custom URL when uploading
-        });
-        setUploadedFile(file);
-        setBackgroundImageUrlError('');
-      };
-      reader.readAsDataURL(file);
-    }
+  const handlePredefinedImage = (src) => {
+    handlePredefinedImageChange(src, setOptions);
   };
 
   const handleSubmit = async (e) => {
-    setMainError(null); // Clear previous errors
+    setMainError(null);
     e.preventDefault();
-    setIsGenerating(true); // Hide the button when clicked
-    setShowOptions(false); // Hide the options when generating
+    setIsGenerating(true);
+    setShowOptions(false);
 
-    const usernameValidation = await validateUsername(options.username, true);
+    const usernameFormatResult = validateUsernameFormat(options.username.toLowerCase());
+    if (!usernameFormatResult.valid) {
+      setMainError(new Error(usernameFormatResult.message));
+      onValidationError(new Error(usernameFormatResult.message), options);
+      setIsGenerating(false);
+      return;
+    }
+
+    const usernameApiResult = await validateUsernameWithApi(options.username.toLowerCase());
     const imageUrlValidation =
       options.backgroundKind === 'customUrl'
         ? await validateImageUrl(options.customBackgroundImageUrl)
         : { valid: true };
 
-    if (!usernameValidation.valid || !imageUrlValidation.valid) {
+    if (!usernameApiResult.valid || !imageUrlValidation.valid) {
       const errorMessages = [];
-      if (!usernameValidation.valid) errorMessages.push(usernameValidation.message);
+      if (!usernameApiResult.valid) errorMessages.push(usernameApiResult.message);
       if (!imageUrlValidation.valid) errorMessages.push(imageUrlValidation.message);
 
       const validationError = new Error(`Validation failed: ${errorMessages.join('. And ')}`);
       setMainError(validationError);
+      onValidationError(validationError, options);
       setIsGenerating(false);
       return;
     }
 
-    // Determine which URL to use based on background kind
-    let backgroundImageUrl = '';
-    if (options.backgroundKind === 'library') {
-      backgroundImageUrl = options.backgroundLibraryUrl;
-    } else if (options.backgroundKind === 'customUrl') {
-      backgroundImageUrl = options.customBackgroundImageUrl;
-    } else if (options.backgroundKind === 'upload') {
-      backgroundImageUrl = options.backgroundImageUrl;
-    }
+    const backgroundImageUrl = getBackgroundPreviewSrc(options);
 
     await onSubmit({
       ...options,
@@ -323,7 +234,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             <legend>Background Options</legend>
             <label className='picklist'>
               Background Kind:
-              <select value={options.backgroundKind} onChange={handleBackgroundKindChange}>
+              <select value={options.backgroundKind} onChange={handleBackgroundChange}>
                 <option value='library'>Background Library</option>
                 <option value='upload'>Upload Image</option>
                 <option value='customUrl'>Custom URL</option>
@@ -333,17 +244,13 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             {options.backgroundKind === 'monochromatic' && (
               <label>
                 Background Color:
-                <input
-                  type='color'
-                  value={options.backgroundColor}
-                  onChange={(e) => setOptions({ ...options, backgroundColor: e.target.value })}
-                />
+                <input type='color' value={options.backgroundColor} onChange={handleColorChange} />
               </label>
             )}
             {options.backgroundKind === 'upload' && (
               <label>
                 Upload Background Image:
-                <input type='file' accept='image/*' onChange={handleFileChange} className='input-file' />
+                <input type='file' accept='image/*' onChange={handleImageChange} className='input-file' />
                 {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
                 {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
               </label>
@@ -374,23 +281,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     width={200}
                     height={50}
                     className={`thumbnail ${options.backgroundLibraryUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
-                    onClick={() => handlePredefinedImageChange(image.src)}
+                    onClick={() => handlePredefinedImage(image.src)}
                   />
                 ))}
               </div>
             )}
-            <BackgroundPreview
-              src={
-                options.backgroundKind === 'library'
-                  ? options.backgroundLibraryUrl
-                  : options.backgroundKind === 'customUrl'
-                    ? options.customBackgroundImageUrl
-                    : options.backgroundKind === 'upload'
-                      ? options.backgroundImageUrl
-                      : null
-              }
-              backgroundColor={options.backgroundColor}
-            />
+            <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>

@@ -14,7 +14,7 @@ const MainPage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [mainError, setMainError] = useState(null);
-  const [mainWarning, setMainWarning] = useState(null);
+  const [mainWarning, setMainWarning] = useState([]);
   const [formOptions, setFormOptions] = useState({});
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const bannerCountRef = useRef(null);
@@ -27,7 +27,7 @@ const MainPage = () => {
     setImageUrl(''); // Clear the previously generated banner
     setLoading(true);
     setMainError(null); // Clear previous errors
-    setMainWarning(null); // Clear previous warnings
+    setMainWarning([]); // Clear previous warnings using empty array
 
     try {
       const response = await fetch('/api/generate-image', {
@@ -58,6 +58,7 @@ const MainPage = () => {
   const handleValidationError = (error, options) => {
     setMainError(error);
     setFormOptions(options);
+    console.error('Validation Error:', error);
   };
 
   const handleImageClick = (src) => {
@@ -85,7 +86,11 @@ const MainPage = () => {
           <p>
             If the error persists, consider writing an{' '}
             <a
-              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(generateIssueTitle(mainError))}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions, packageJson.version))}`}
+              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(
+                generateIssueTitle(mainError)
+              )}&body=${encodeURIComponent(
+                generateIssueBody(mainError, mainWarning || [], formOptions, packageJson.version)
+              )}`}
               target='_blank'
               rel='noopener noreferrer'
             >
@@ -119,7 +124,11 @@ const MainPage = () => {
               <p>
                 If the error persists, consider writing an{' '}
                 <a
-                  href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent('Warning happened')}&body=${encodeURIComponent(generateIssueBody(mainError, mainWarning, formOptions, packageJson.version))}`}
+                  href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(
+                    'Warning: Banner generated with warnings'
+                  )}&body=${encodeURIComponent(
+                    generateIssueBody(null, mainWarning, formOptions, packageJson.version)
+                  )}`}
                   target='_blank'
                   rel='noopener noreferrer'
                 >
