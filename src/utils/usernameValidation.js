@@ -12,15 +12,15 @@ export const validateUsernameFormat = (username) => {
   }
 
   if (username.startsWith('http://') || username.startsWith('https://')) {
-    return { valid: false, state: 'invalid', message: "username shouldn't be an URL" };
+    return { valid: false, state: 'invalid', message: "Username shouldn't be an URL" };
   }
 
   if (username.includes('@')) {
-    return { valid: false, state: 'invalid', message: "username shouldn't be an email address" };
+    return { valid: false, state: 'invalid', message: "Username shouldn't be an email address" };
   }
 
   if (username.includes(' ')) {
-    return { valid: false, state: 'invalid', message: "username shouldn't contain spaces" };
+    return { valid: false, state: 'invalid', message: "Username shouldn't contain spaces" };
   }
 
   return { valid: true, state: 'ok', message: 'Username format is valid' };
