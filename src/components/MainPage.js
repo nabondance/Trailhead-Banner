@@ -7,6 +7,7 @@ import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
 import ProductionWarning from './ProductionWarning';
 import BannerCount from './BannerCount';
+import PoweredByThink2 from './PoweredByThink2';
 import '../styles/globals.css';
 import packageJson from '../../package.json';
 
@@ -145,6 +146,7 @@ const MainPage = () => {
           <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
+      <PoweredByThink2 />
     </div>
   );
 };
