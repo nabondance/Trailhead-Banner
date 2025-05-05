@@ -40,6 +40,8 @@
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
   --error-color: #ba0517;
+  --think2-yellow: #f2eb0a;
+  --think2-blue: #00b9b9;
 }
 
 .dark {
@@ -63,6 +65,8 @@
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
   --error-color: #ba0517;
+  --think2-yellow: #f2eb0a;
+  --think2-blue: #00b9b9;
 }
 
 body {
@@ -1301,7 +1305,7 @@ select:focus {
 }
 
 .think2-highlight {
-  color: var(--primary);
+  color: var(--think2-blue);
   font-weight: 600;
 }
 
