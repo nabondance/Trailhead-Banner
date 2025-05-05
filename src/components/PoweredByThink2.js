@@ -6,7 +6,7 @@ const PoweredByThink2 = () => {
     <div className='think2-container' onClick={() => window.open('https://think2.ai', '_blank')}>
       <div className='think2-background'>
         <Image
-          src='/assets/logos/wallpaper-patterns.svg'
+          src='/assets/logos/think2-urls-5-large.svg'
           alt='Think2 Background Pattern'
           fill
           priority
