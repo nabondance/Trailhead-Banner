@@ -15,7 +15,7 @@ const PoweredByThink2 = () => {
       </div>
       <div className='think2-content'>
         <p className='think2-description'>
-          Infrastructure costs graciously handled by <span className='think2-highlight'>Think2</span>
+          Powered by <span className='think2-highlight'>Think2</span>
         </p>
       </div>
     </div>
