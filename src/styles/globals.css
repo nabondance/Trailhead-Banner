@@ -1263,3 +1263,61 @@ select:focus {
     max-width: 100%;
   }
 }
+
+.think2-container {
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  background-color: var(--middleground);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.think2-container:hover {
+  background-color: var(--background);
+}
+
+.think2-logo-container {
+  margin-bottom: 15px;
+  width: 280px; /* Scaled down from 700 to maintain proportion */
+  height: 220px; /* Scaled down from 550 to maintain proportion */
+  margin: 0 auto;
+}
+
+.think2-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.think2-description {
+  color: var(--text-contrast);
+  font-size: 1.1em;
+  margin-top: 15px;
+  font-family: var(--font-geist-sans);
+  line-height: 1.5;
+}
+
+.think2-highlight {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+@media (width <= 768px) {
+  .think2-container {
+    margin: 20px 10px;
+    padding: 15px;
+  }
+
+  .think2-logo-container {
+    width: 200px; /* Further scaled down for mobile */
+    height: 157px; /* Maintains 700:550 ratio */
+  }
+
+  .think2-description {
+    font-size: 0.95em;
+    margin-top: 12px;
+  }
+}
