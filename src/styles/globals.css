@@ -1300,7 +1300,7 @@ select:focus {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: linear-gradient(to top, rgb(0 0 0 / 50%), rgb(0 0 0 / 0%) 50%);
+  background: linear-gradient(to top, rgb(0 0 0 / 30%), rgb(0 0 0 / 0%) 30%);
   padding: 10px;
 }
 
