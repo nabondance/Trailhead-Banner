@@ -46,7 +46,7 @@ const TrailheadBannerFooter = () => {
         </GitHubButton>
       </div>
       <a href='https://nabondance.me' target='_blank' rel='noopener noreferrer' className='footer-link'>
-        &copy; 2025 Trailhead-Banner by /nabondance.me
+        &copy; 2025 Trailhead-Banner by /nabondance.me powered by Think2
       </a>
     </footer>
   );
