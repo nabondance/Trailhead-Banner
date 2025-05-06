@@ -1271,8 +1271,9 @@ select:focus {
 .think2-container {
   position: relative;
   width: 100%;
+  max-width: 800px;
   height: 200px;
-  margin-top: 40px;
+  margin: 40px auto;
   border-radius: 8px;
   cursor: pointer;
   overflow: hidden;
@@ -1322,7 +1323,8 @@ select:focus {
 @media (width <= 768px) {
   .think2-container {
     height: 150px;
-    margin: 20px 10px;
+    margin: 20px auto;
+    width: calc(100% - 20px);
   }
 
   .think2-description {
