@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const PoweredByThink2 = () => {
   return (
-    <div className='think2-container' onClick={() => window.open('https://think2.ai', '_blank')}>
+    <div className='think2-container' onClick={() => window.open('https://think2.ai/trailhead-banner', '_blank')}>
       <div className='think2-background'>
         <Image
           src='/assets/logos/think2-urls-5-large.svg'
