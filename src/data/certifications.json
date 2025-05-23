@@ -279,6 +279,10 @@
     "category": "accredited-industry",
     "difficulty": 4
   },
+  "Contact Center Accredited Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
+  },
   "Digital Engagement Accredited Professional": {
     "category": "accredited-service",
     "difficulty": 5
@@ -385,6 +389,10 @@
   },
   "Security & Privacy Accredited Professional": {
     "category": "accredited-platform",
+    "difficulty": 5
+  },
+  "Service Cloud Einstein Accredited Professional": {
+    "category": "accredited-service",
     "difficulty": 5
   },
   "Service Business Excellence Accredited Professional": {
