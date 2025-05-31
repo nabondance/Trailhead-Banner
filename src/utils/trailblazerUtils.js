@@ -13,10 +13,7 @@ function mergeTrailblazerData(trailblazerDataArray) {
       trails: 0,
       completedTrailCount: 0,
       earnedPointsSum: 0,
-      rank: {
-        imageUrl:
-          'https://res.cloudinary.com/trailhead/image/upload/public-trailhead/assets/images/ranks/triple-star-ranger.png',
-      },
+      rank: {},
       learnerStatusLevels: [],
     },
     certificationsData: {

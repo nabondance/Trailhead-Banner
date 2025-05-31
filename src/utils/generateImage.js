@@ -121,8 +121,18 @@ export const generateImage = async (options) => {
   }
 
   // Rank Logo
+  let rankLogoBuffer;
+  console.log('Company Banner:', options.isCompanyBanner);
+  console.log('Company Logo URL:', options.companyLogoUrl);
+  if (options.isCompanyBanner && options.companyLogoUrl) {
+    if (!(await isValidImageType(options.companyLogoUrl))) {
+      throw new Error('Unsupported image type for company logo');
+    }
+    rankLogoBuffer = await loadImage(options.companyLogoUrl);
+  } else {
+    rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
+  }
   try {
-    const rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
     const rankLogo = await loadImage(rankLogoBuffer);
     rankLogoHeight = canvas.height * top_part * 1;
     rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio

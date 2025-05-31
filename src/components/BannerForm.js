@@ -67,6 +67,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     username: '',
     additionalUsers: [],
     isCompanyBanner: false,
+    companyLogoUrl: '',
+    displayCompanyLogo: false,
     backgroundColor: '#5badd6',
     backgroundImageUrl: '',
     displayBadgeCount: true,
@@ -287,45 +289,76 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       </div>
 
       {options.isCompanyBanner && (
-        <div className='additional-users'>
-          <h4>Additional Team Members</h4>
-          {options.additionalUsers.map((user, index) => (
-            <div key={index} className='additional-user-input'>
+        <div className='company-banner-options'>
+          <h3>Company Banner Options</h3>
+          <div className='company-logo-section'>
+            <h4>Company Logo</h4>
+            <label>
+              Display Company Logo:
               <input
-                type='text'
-                value={user}
-                onChange={(e) => {
-                  const newUsers = [...options.additionalUsers];
-                  newUsers[index] = e.target.value;
-                  setOptions({ ...options, additionalUsers: newUsers });
-                }}
-                placeholder={`Enter team member ${index + 1} username`}
-                className='input'
+                type='checkbox'
+                checked={options.displayCompanyLogo}
+                onChange={(e) => setOptions({ ...options, displayCompanyLogo: e.target.checked })}
               />
-              <button
-                type='button'
-                className='button remove-user'
-                onClick={() => {
-                  const newUsers = options.additionalUsers.filter((_, i) => i !== index);
-                  setOptions({ ...options, additionalUsers: newUsers });
-                }}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <button
-            type='button'
-            className='button add-user'
-            onClick={() => {
-              setOptions({
-                ...options,
-                additionalUsers: [...options.additionalUsers, ''],
-              });
-            }}
-          >
-            Add Team Member
-          </button>
+            </label>
+            {options.displayCompanyLogo && (
+              <div className='company-logo-input'>
+                <label>
+                  Company Logo URL:
+                  <input
+                    type='text'
+                    value={options.companyLogoUrl}
+                    onChange={(e) => setOptions({ ...options, companyLogoUrl: e.target.value })}
+                    placeholder='Enter company logo URL'
+                    className='input'
+                  />
+                </label>
+                <p className='help-text'>
+                  The logo should be a PNG or JPEG file with a transparent or white background.
+                </p>
+              </div>
+            )}
+          </div>
+          <div className='additional-users'>
+            <h4>Additional Team Members</h4>
+            {options.additionalUsers.map((user, index) => (
+              <div key={index} className='additional-user-input'>
+                <input
+                  type='text'
+                  value={user}
+                  onChange={(e) => {
+                    const newUsers = [...options.additionalUsers];
+                    newUsers[index] = e.target.value;
+                    setOptions({ ...options, additionalUsers: newUsers });
+                  }}
+                  placeholder={`Enter team member ${index + 1} username`}
+                  className='input'
+                />
+                <button
+                  type='button'
+                  className='button remove-user'
+                  onClick={() => {
+                    const newUsers = options.additionalUsers.filter((_, i) => i !== index);
+                    setOptions({ ...options, additionalUsers: newUsers });
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button
+              type='button'
+              className='button add-user'
+              onClick={() => {
+                setOptions({
+                  ...options,
+                  additionalUsers: [...options.additionalUsers, ''],
+                });
+              }}
+            >
+              Add Team Member
+            </button>
+          </div>
         </div>
       )}
 
