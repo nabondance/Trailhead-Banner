@@ -142,8 +142,27 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     handleCustomUrlChange(e.target.value, setOptions, setBackgroundImageUrlError);
   };
 
-  const handleImageChange = async (e) => {
-    await handleFileChange(e.target.files[0], setBackgroundImageUrlError, setOptions, setUploadedFile);
+  const handleImageChange = async (e, isCompanyLogo = false) => {
+    if (isCompanyLogo) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setOptions({
+            ...options,
+            companyLogoUrl: reader.result,
+            companyLogoUploadUrl: reader.result,
+          });
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error reading company logo file:', error);
+      }
+    } else {
+      await handleFileChange(e.target.files[0], setBackgroundImageUrlError, setOptions, setUploadedFile);
+    }
   };
 
   const handlePredefinedImage = (src) => {
@@ -327,20 +346,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   <input
                     type='file'
                     accept='image/*'
-                    onChange={async (e) => {
-                      await handleFileChange(
-                        e.target.files[0],
-                        null,
-                        (newOptions) => {
-                          setOptions({
-                            ...options,
-                            companyLogoUrl: newOptions.backgroundImageUrl,
-                            companyLogoUploadUrl: newOptions.backgroundImageUrl,
-                          });
-                        },
-                        null
-                      );
-                    }}
+                    onChange={(e) => handleImageChange(e, true)}
                     className='input-file'
                   />
                 </label>
