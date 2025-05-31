@@ -65,6 +65,8 @@ const BackgroundPreview = ({ src, backgroundColor }) => {
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [options, setOptions] = useState({
     username: '',
+    additionalUsers: [],
+    isCompanyBanner: false,
     backgroundColor: '#5badd6',
     backgroundImageUrl: '',
     displayBadgeCount: true,
@@ -151,6 +153,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setIsGenerating(true);
     setShowOptions(false);
 
+    // Validate primary username
     const usernameFormatResult = validateUsernameFormat(options.username.toLowerCase());
     if (!usernameFormatResult.valid) {
       setMainError(new Error(usernameFormatResult.message));
@@ -159,20 +162,66 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return;
     }
 
-    const usernameApiResult = await validateUsernameWithApi(options.username.toLowerCase());
+    // Validate additional usernames if company banner is enabled
+    if (options.isCompanyBanner && options.additionalUsers.length > 0) {
+      const additionalUsernameErrors = [];
+      for (let i = 0; i < options.additionalUsers.length; i++) {
+        const username = options.additionalUsers[i];
+        if (username) {
+          const formatResult = validateUsernameFormat(username.toLowerCase());
+          if (!formatResult.valid) {
+            additionalUsernameErrors.push(`Team member ${i + 1}: ${formatResult.message}`);
+          }
+        }
+      }
+
+      if (additionalUsernameErrors.length > 0) {
+        const error = new Error(`Validation failed: ${additionalUsernameErrors.join('. ')}`);
+        setMainError(error);
+        onValidationError(error, options);
+        setIsGenerating(false);
+        return;
+      }
+
+      // Validate all usernames with API
+      const allUsernames = [options.username, ...options.additionalUsers.filter((u) => u)];
+      const apiValidations = await Promise.all(
+        allUsernames.map((username) => validateUsernameWithApi(username.toLowerCase()))
+      );
+
+      const apiErrors = apiValidations
+        .map((result, index) => (!result.valid ? `${allUsernames[index]}: ${result.message}` : null))
+        .filter((error) => error);
+
+      if (apiErrors.length > 0) {
+        const error = new Error(`API validation failed: ${apiErrors.join('. ')}`);
+        setMainError(error);
+        onValidationError(error, options);
+        setIsGenerating(false);
+        return;
+      }
+    } else {
+      // Single user validation
+      const usernameApiResult = await validateUsernameWithApi(options.username.toLowerCase());
+      if (!usernameApiResult.valid) {
+        const error = new Error(`Validation failed: ${usernameApiResult.message}`);
+        setMainError(error);
+        onValidationError(error, options);
+        setIsGenerating(false);
+        return;
+      }
+    }
+
+    // Validate background image if using custom URL
     const imageUrlValidation =
       options.backgroundKind === 'customUrl'
         ? await validateImageUrl(options.customBackgroundImageUrl)
         : { valid: true };
 
-    if (!usernameApiResult.valid || !imageUrlValidation.valid) {
-      const errorMessages = [];
-      if (!usernameApiResult.valid) errorMessages.push(usernameApiResult.message);
-      if (!imageUrlValidation.valid) errorMessages.push(imageUrlValidation.message);
-
-      const validationError = new Error(`Validation failed: ${errorMessages.join('. And ')}`);
-      setMainError(validationError);
-      onValidationError(validationError, options);
+    if (!imageUrlValidation.valid) {
+      const error = new Error(`Validation failed: ${imageUrlValidation.message}`);
+      setMainError(error);
+      onValidationError(error, options);
       setIsGenerating(false);
       return;
     }
@@ -184,6 +233,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       backgroundImageUrl,
       lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
       lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
+      // Clean up additionalUsers by removing empty strings
+      additionalUsers: options.additionalUsers.filter((username) => username.trim()),
     });
 
     setIsGenerating(false);
@@ -197,23 +248,23 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           type='text'
           value={options.username}
           onChange={handleUsernameChange}
-          onBlur={handleUsernameBlur} // Add onBlur event to validate username
-          placeholder='Enter Trailhead username' // Add placeholder
+          onBlur={handleUsernameBlur}
+          placeholder='Enter primary Trailhead username'
           required
           className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
           name='trailhead-username'
           autoComplete='off'
-          data-lpignore='true' // LastPass specific attribute to ignore
+          data-lpignore='true'
           data-form-type='other'
         />
         {validationResult && (
           <div className='validation-icon' data-tooltip={validationResult.message}>
             {validationResult.state === 'ok' ? (
-              <FontAwesomeIcon icon={faCheck} className='fa-fw icon-valid' /> // Checkmark
+              <FontAwesomeIcon icon={faCheck} className='fa-fw icon-valid' />
             ) : validationResult.state === 'private' ? (
-              <FontAwesomeIcon icon={faTriangleExclamation} className='fa-fw icon-warning' /> // Yellow warning
+              <FontAwesomeIcon icon={faTriangleExclamation} className='fa-fw icon-warning' />
             ) : (
-              <FontAwesomeIcon icon={faCircleXmark} className='fa-fw icon-error' /> // Red cross
+              <FontAwesomeIcon icon={faCircleXmark} className='fa-fw icon-error' />
             )}
           </div>
         )}
@@ -223,6 +274,61 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </div>
         )}
       </div>
+
+      <div className='company-banner-toggle'>
+        <label>
+          Enable Company Banner
+          <input
+            type='checkbox'
+            checked={options.isCompanyBanner}
+            onChange={(e) => setOptions({ ...options, isCompanyBanner: e.target.checked })}
+          />
+        </label>
+      </div>
+
+      {options.isCompanyBanner && (
+        <div className='additional-users'>
+          <h4>Additional Team Members</h4>
+          {options.additionalUsers.map((user, index) => (
+            <div key={index} className='additional-user-input'>
+              <input
+                type='text'
+                value={user}
+                onChange={(e) => {
+                  const newUsers = [...options.additionalUsers];
+                  newUsers[index] = e.target.value;
+                  setOptions({ ...options, additionalUsers: newUsers });
+                }}
+                placeholder={`Enter team member ${index + 1} username`}
+                className='input'
+              />
+              <button
+                type='button'
+                className='button remove-user'
+                onClick={() => {
+                  const newUsers = options.additionalUsers.filter((_, i) => i !== index);
+                  setOptions({ ...options, additionalUsers: newUsers });
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type='button'
+            className='button add-user'
+            onClick={() => {
+              setOptions({
+                ...options,
+                additionalUsers: [...options.additionalUsers, ''],
+              });
+            }}
+          >
+            Add Team Member
+          </button>
+        </div>
+      )}
+
       {!isGenerating && (
         <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
           {showOptions ? 'Hide Options' : 'More Options'}
