@@ -121,7 +121,7 @@ export const generateImage = async (options) => {
   }
 
   // Rank Logo
-  let rankLogoBuffer;
+  let rankLogoBuffer = null;
   if (!options.isCompanyBanner && options.companyLogoUrl) {
     rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
   } else if (options.displayCompanyLogo && options.companyLogoUrl) {
@@ -129,20 +129,26 @@ export const generateImage = async (options) => {
       throw new Error('Unsupported image type for company logo');
     }
     rankLogoBuffer = await loadImage(options.companyLogoUrl);
-  }
-  try {
-    const rankLogo = await loadImage(rankLogoBuffer);
-    rankLogoHeight = canvas.height * top_part * 1;
-    rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
-    const rankLogoScalingFactor = 1.2;
-    if (options.displayRankLogo) {
-      ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
-    }
-  } catch (error) {
-    rankLogoWidth = 180;
+  } else {
+    rankLogoWidth = 100;
     rankLogoHeight = 40;
-    console.error(`Error loading rank logo ${options.rankData.rank.imageUrl}:`, error);
-    warnings.push(`Error loading rank logo ${options.rankData.rank.imageUrl}: ${error.message}`);
+    console.warn('No rank logo found, using default dimensions.');
+  }
+  if (rankLogoBuffer !== null) {
+    try {
+      const rankLogo = await loadImage(rankLogoBuffer);
+      rankLogoHeight = canvas.height * top_part * 1;
+      rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
+      const rankLogoScalingFactor = 1.2;
+      if (options.displayRankLogo) {
+        ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
+      }
+    } catch (error) {
+      rankLogoWidth = 100;
+      rankLogoHeight = 40;
+      console.error(`Error loading rank logo ${options.rankData.rank.imageUrl}:`, error);
+      warnings.push(`Error loading rank logo ${options.rankData.rank.imageUrl}: ${error.message}`);
+    }
   }
 
   // Counters
