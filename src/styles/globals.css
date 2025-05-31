@@ -1228,3 +1228,46 @@ select:focus {
     max-width: 100%;
   }
 }
+
+.company-banner-toggle {
+  margin: 1rem 0;
+}
+
+.company-banner-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  color: var(--text-contrast);
+}
+
+.additional-users {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: var(--middleground);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.additional-users h4 {
+  margin: 0 0 1rem;
+  color: var(--text-contrast);
+}
+
+.additional-user-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.button.remove-user {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--error-color);
+}
+
+.button.add-user {
+  margin-top: 0.5rem;
+  background-color: var(--valid-color);
+  width: auto;
+}

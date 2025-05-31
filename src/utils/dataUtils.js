@@ -56,4 +56,9 @@ export const logOptions = (options) => {
     certificationAlignment: options.certificationAlignment,
   });
   console.log('MVP Data:', options.mvpData);
+  console.log('Company Options:', {
+    isCompanyBanner: options.isCompanyBanner,
+    companyName: options.companyName,
+    companyLogoUrl: options.companyLogoUrl,
+  });
 };
