@@ -17,6 +17,7 @@ function mergeTrailblazerData(trailblazerDataArray) {
         imageUrl:
           'https://res.cloudinary.com/trailhead/image/upload/public-trailhead/assets/images/ranks/triple-star-ranger.png',
       },
+      learnerStatusLevels: [],
     },
     certificationsData: {
       certifications: [],
@@ -56,6 +57,26 @@ function mergeTrailblazerData(trailblazerDataArray) {
     const trails = rankData?.completedTrailCount || 0;
     mergedData.rankData.trails += trails;
     mergedData.rankData.completedTrailCount += trails;
+
+    // Merge learnerStatusLevels keeping the highest level for each status
+    if (rankData?.learnerStatusLevels) {
+      for (const newStatus of rankData.learnerStatusLevels) {
+        const existingStatusIndex = mergedData.rankData.learnerStatusLevels.findIndex(
+          (status) => status.statusName === newStatus.statusName
+        );
+
+        if (existingStatusIndex === -1) {
+          // Status doesn't exist yet, add it
+          mergedData.rankData.learnerStatusLevels.push(newStatus);
+        } else {
+          // Status exists, keep the one with higher level
+          const existingStatus = mergedData.rankData.learnerStatusLevels[existingStatusIndex];
+          if (newStatus.level > existingStatus.level) {
+            mergedData.rankData.learnerStatusLevels[existingStatusIndex] = newStatus;
+          }
+        }
+      }
+    }
 
     // Merge certifications
     if (certificationsData?.certifications) {
