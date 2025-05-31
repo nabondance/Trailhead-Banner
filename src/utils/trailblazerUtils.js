@@ -46,14 +46,14 @@ function mergeTrailblazerData(trailblazerDataArray) {
     const { rankData, certificationsData, badgesData, superbadgesData, mvpData } = userData;
 
     // Merge rank data
-    const earnedPoints = rankData?.trailheadStats?.earnedPointsSum || 0;
+    const earnedPoints = rankData?.earnedPointsSum || 0;
     mergedData.rankData.points += earnedPoints;
     mergedData.rankData.earnedPointsSum += earnedPoints;
 
-    const badges = rankData?.trailheadStats?.badges || 0;
+    const badges = rankData?.earnedBadgesCount || 0;
     mergedData.rankData.badges += badges;
 
-    const trails = rankData?.trailheadStats?.completedTrailCount || 0;
+    const trails = rankData?.completedTrailCount || 0;
     mergedData.rankData.trails += trails;
     mergedData.rankData.completedTrailCount += trails;
 
