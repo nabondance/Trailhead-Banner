@@ -73,7 +73,7 @@ const isValidImageType = async (url) => {
 
 export const generateImage = async (options) => {
   // Options logging
-  logOptions(options);
+  // logOptions(options);
 
   // Warning
   const warnings = [];
@@ -122,15 +122,13 @@ export const generateImage = async (options) => {
 
   // Rank Logo
   let rankLogoBuffer;
-  console.log('Company Banner:', options.isCompanyBanner);
-  console.log('Company Logo URL:', options.companyLogoUrl);
-  if (options.isCompanyBanner && options.companyLogoUrl) {
+  if (!options.isCompanyBanner && options.companyLogoUrl) {
+    rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
+  } else if (options.displayCompanyLogo && options.companyLogoUrl) {
     if (!(await isValidImageType(options.companyLogoUrl))) {
       throw new Error('Unsupported image type for company logo');
     }
     rankLogoBuffer = await loadImage(options.companyLogoUrl);
-  } else {
-    rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
   }
   try {
     const rankLogo = await loadImage(rankLogoBuffer);
