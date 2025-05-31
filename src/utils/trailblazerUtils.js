@@ -60,8 +60,8 @@ function mergeTrailblazerData(trailblazerDataArray) {
     // Merge certifications
     if (certificationsData?.certifications) {
       for (const cert of certificationsData.certifications) {
-        if (!certIds.has(cert.id)) {
-          certIds.add(cert.id);
+        if (!certIds.has(cert.title)) {
+          certIds.add(cert.title);
           mergedData.certificationsData.certifications.push(cert);
         }
       }
