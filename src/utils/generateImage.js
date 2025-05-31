@@ -21,8 +21,8 @@ require('./fonts');
 const top_part = 1 / 4;
 const bottom_part = 3 / 4;
 const right_part = 7 / 10;
-let rankLogoWidth;
-let rankLogoHeight;
+let rankLogoWidth = 120;
+let rankLogoHeight = 40;
 
 const isValidImageType = async (url) => {
   try {
@@ -129,10 +129,6 @@ export const generateImage = async (options) => {
       throw new Error('Unsupported image type for company logo');
     }
     rankLogoBuffer = await loadImage(options.companyLogoUrl);
-  } else {
-    rankLogoWidth = 100;
-    rankLogoHeight = 40;
-    console.warn('No rank logo found, using default dimensions.');
   }
   if (rankLogoBuffer !== null) {
     try {
@@ -144,8 +140,6 @@ export const generateImage = async (options) => {
         ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
       }
     } catch (error) {
-      rankLogoWidth = 100;
-      rankLogoHeight = 40;
       console.error(`Error loading rank logo ${options.rankData.rank.imageUrl}:`, error);
       warnings.push(`Error loading rank logo ${options.rankData.rank.imageUrl}: ${error.message}`);
     }
