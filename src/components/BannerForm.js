@@ -317,9 +317,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     className='input'
                   />
                 </label>
-                <p className='help-text'>
-                  The logo should be a PNG or JPEG file with a transparent or white background.
-                </p>
+                <p className='help-text'></p>
               </div>
             )}
             {options.companyLogoKind === 'upload' && (
