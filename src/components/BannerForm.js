@@ -68,7 +68,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     additionalUsers: [],
     isCompanyBanner: false,
     companyLogoUrl: '',
-    displayCompanyLogo: false,
+    companyLogoKind: 'no',
+    companyLogoUploadUrl: '',
     backgroundColor: '#5badd6',
     backgroundImageUrl: '',
     displayBadgeCount: true,
@@ -293,15 +294,18 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           <h3>Company Banner Options</h3>
           <div className='company-logo-section'>
             <h4>Company Logo</h4>
-            <label>
-              Display Company Logo:
-              <input
-                type='checkbox'
-                checked={options.displayCompanyLogo}
-                onChange={(e) => setOptions({ ...options, displayCompanyLogo: e.target.checked })}
-              />
+            <label className='picklist'>
+              Company Logo:
+              <select
+                value={options.companyLogoKind}
+                onChange={(e) => setOptions({ ...options, companyLogoKind: e.target.value })}
+              >
+                <option value='no'>No Logo</option>
+                <option value='url'>Custom URL</option>
+                <option value='upload'>Upload Logo</option>
+              </select>
             </label>
-            {options.displayCompanyLogo && (
+            {options.companyLogoKind === 'url' && (
               <div className='company-logo-input'>
                 <label>
                   Company Logo URL:
@@ -311,6 +315,35 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     onChange={(e) => setOptions({ ...options, companyLogoUrl: e.target.value })}
                     placeholder='Enter company logo URL'
                     className='input'
+                  />
+                </label>
+                <p className='help-text'>
+                  The logo should be a PNG or JPEG file with a transparent or white background.
+                </p>
+              </div>
+            )}
+            {options.companyLogoKind === 'upload' && (
+              <div className='company-logo-input'>
+                <label>
+                  Upload Company Logo:
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={async (e) => {
+                      await handleFileChange(
+                        e.target.files[0],
+                        null,
+                        (newOptions) => {
+                          setOptions({
+                            ...options,
+                            companyLogoUrl: newOptions.backgroundImageUrl,
+                            companyLogoUploadUrl: newOptions.backgroundImageUrl,
+                          });
+                        },
+                        null
+                      );
+                    }}
+                    className='input-file'
                   />
                 </label>
                 <p className='help-text'>
