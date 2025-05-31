@@ -99,6 +99,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displayAgentblazerRank: true,
   });
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedLogoFile, setUploadedLogoFile] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
@@ -155,6 +156,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             companyLogoUrl: reader.result,
             companyLogoUploadUrl: reader.result,
           });
+          setUploadedLogoFile(file);
         };
         reader.readAsDataURL(file);
       } catch (error) {
@@ -320,8 +322,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 onChange={(e) => setOptions({ ...options, companyLogoKind: e.target.value })}
               >
                 <option value='no'>No Logo</option>
-                <option value='url'>Custom URL</option>
                 <option value='upload'>Upload Logo</option>
+                <option value='url'>Custom URL</option>
               </select>
             </label>
             {options.companyLogoKind === 'url' && (
@@ -350,9 +352,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                     className='input-file'
                   />
                 </label>
-                <p className='help-text'>
-                  The logo should be a PNG or JPEG file with a transparent or white background.
-                </p>
+                {uploadedLogoFile && <p className='file-info'>Selected file: {uploadedLogoFile.name}</p>}
+                <p className='help-text'></p>
               </div>
             )}
           </div>
