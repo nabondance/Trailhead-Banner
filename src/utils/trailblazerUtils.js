@@ -100,11 +100,16 @@ function mergeTrailblazerData(trailblazerDataArray) {
       mergedData.mvpCount++;
       mergedData.mvpData.isMvp = true;
     }
-  }
 
-  // Update counts
-  mergedData.badgesData.trailheadStats.earnedBadgesCount = mergedData.badgesData.earnedBadges.edges.length;
-  mergedData.superbadgesData.trailheadStats.superbadgeCount = mergedData.superbadgesData.earnedBadges.edges.length;
+    // Update badge and superbadge counts directly from trailheadStats
+    if (badgesData?.trailheadStats?.earnedBadgesCount) {
+      mergedData.badgesData.trailheadStats.earnedBadgesCount += badgesData.trailheadStats.earnedBadgesCount;
+    }
+
+    if (superbadgesData?.trailheadStats?.superbadgeCount) {
+      mergedData.superbadgesData.trailheadStats.superbadgeCount += superbadgesData.trailheadStats.superbadgeCount;
+    }
+  }
 
   console.log('Merged Trailblazer Data:', mergedData);
   return mergedData;
