@@ -40,6 +40,8 @@
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
   --error-color: #ba0517;
+  --think2-yellow: #f2eb0a;
+  --think2-blue: #00b9b9;
 }
 
 .dark {
@@ -63,6 +65,8 @@
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
   --error-color: #ba0517;
+  --think2-yellow: #f2eb0a;
+  --think2-blue: #00b9b9;
 }
 
 body {
@@ -1261,5 +1265,69 @@ select:focus {
   .background-preview .canvas-container {
     width: 100%;
     max-width: 100%;
+  }
+}
+
+.think2-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 200px;
+  margin: 40px auto;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.think2-container:hover {
+  transform: scale(1.02);
+}
+
+.think2-background {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.think2-pattern {
+  object-fit: cover;
+  object-position: center;
+}
+
+.think2-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: linear-gradient(to top, rgb(0 0 0 / 30%), rgb(0 0 0 / 0%) 30%);
+  padding: 10px;
+}
+
+.think2-description {
+  color: white;
+  font-size: 1.5em;
+  font-family: var(--font-geist-sans);
+  line-height: 1em;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgb(0 0 0 / 80%);
+  margin-bottom: 0;
+}
+
+.think2-highlight {
+  color: var(--think2-yellow);
+  font-weight: 600;
+}
+
+@media (width <= 768px) {
+  .think2-container {
+    height: 150px;
+    margin: 20px auto;
+    width: calc(100% - 20px);
+  }
+
+  .think2-description {
+    font-size: 1.2em;
   }
 }
