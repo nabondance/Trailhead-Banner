@@ -251,6 +251,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
               <label>
                 Upload Background Image:
                 <input type='file' accept='image/*' onChange={handleImageChange} className='input-file' />
+                <p className='helper-text'>Recommended image size: 1584 x 396 pixels</p>
                 {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
                 {uploadedFile && <p className='file-info'>Selected file: {uploadedFile.name}</p>}
               </label>
@@ -268,6 +269,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   data-lpignore='true'
                   data-form-type='other'
                 />
+                <p className='helper-text'>Recommended image size: 1584 x 396 pixels</p>
                 {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
               </label>
             )}
