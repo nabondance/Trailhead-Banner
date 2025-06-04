@@ -273,6 +273,12 @@ main {
   color: var(--text-color-secondary);
 }
 
+.helper-text {
+  font-size: 0.875rem;
+  color: var(--text-faded);
+  margin: 0.25rem 0;
+}
+
 ::placeholder {
   color: var(--text-faded);
 }
