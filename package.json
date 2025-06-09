@@ -48,7 +48,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@napi-rs/canvas": "^0.1.68",
+    "@napi-rs/canvas": "^0.1.71",
     "@supabase/supabase-js": "^2.49.4",
     "@theme-toggles/react": "^4.1.0",
     "@vercel/blob": "^1.1.1",
