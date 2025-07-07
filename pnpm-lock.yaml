@@ -36,8 +36,8 @@ importers:
         specifier: ^1.8.4
         version: 1.9.0
       countup.js:
-        specifier: ^2.8.0
-        version: 2.8.2
+        specifier: ^2.9.0
+        version: 2.9.0
       i:
         specifier: ^0.3.7
         version: 0.3.7
@@ -995,8 +995,8 @@ packages:
       typescript:
         optional: true
 
-  countup.js@2.8.2:
-    resolution: {integrity: sha512-UtRoPH6udaru/MOhhZhI/GZHJKAyAxuKItD2Tr7AbrqrOPBX/uejWBBJt8q86169AMqKkE9h9/24kFWbUk/Bag==}
+  countup.js@2.9.0:
+    resolution: {integrity: sha512-llqrvyXztRFPp6+i8jx25phHWcVWhrHO4Nlt0uAOSKHB8778zzQswa4MU3qKBvkXfJKftRYFJuVHez67lyKdHg==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -3607,7 +3607,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.2
 
-  countup.js@2.8.2: {}
+  countup.js@2.9.0: {}
 
   cross-spawn@7.0.6:
     dependencies:
