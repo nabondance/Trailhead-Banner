@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Megalinter
 megalinter-reports/
+
+# vscode
+.vscode/
