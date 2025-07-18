@@ -35,6 +35,10 @@
     "category": "architect",
     "difficulty": 8
   },
+  "Salesforce Certified B2C Commerce Cloud Developer": {
+    "category": "developer",
+    "difficulty": 6
+  },
   "Salesforce Certified B2C Commerce Developer": {
     "category": "developer",
     "difficulty": 6
@@ -46,6 +50,18 @@
   "Salesforce Certified Business Analyst": {
     "category": "admin",
     "difficulty": 3
+  },
+  "Salesforce Certified Consultant": {
+    "category": "consultant",
+    "difficulty": 4
+  },
+  "Salesforce Certified Catalyst Specialist": {
+    "category": "consultant",
+    "difficulty": 4
+  },
+  "Salesforce Certified CPQ Administrator": {
+    "category": "admin",
+    "difficulty": 4
   },
   "Salesforce Certified CPQ Specialist": {
     "category": "admin",
@@ -64,6 +80,10 @@
     "difficulty": 6
   },
   "Salesforce Certified Development Lifecycle and Deployment Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Platform Development Lifecycle and Deployment Architect": {
     "category": "architect",
     "difficulty": 8
   },
@@ -99,6 +119,10 @@
     "category": "architect",
     "difficulty": 8
   },
+  "Salesforce Certified Platform Identity and Access Management Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
   "Salesforce Certified Industries CPQ Developer": {
     "category": "developer",
     "difficulty": 7
@@ -106,6 +130,14 @@
   "Salesforce Certified Integration Architect": {
     "category": "architect",
     "difficulty": 8
+  },
+  "Salesforce Certified Platform Integration Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified JavaScript Developer": {
+    "category": "developer",
+    "difficulty": 5
   },
   "Salesforce Certified JavaScript Developer I": {
     "category": "developer",
@@ -139,6 +171,22 @@
     "category": "marketer",
     "difficulty": 3
   },
+  "Salesforce Certified Marketing Cloud Engagement Administrator": {
+    "category": "admin",
+    "difficulty": 4
+  },
+  "Salesforce Certified Marketing Cloud Engagement Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
+  "Salesforce Certified Marketing Cloud Engagement Developer": {
+    "category": "developer",
+    "difficulty": 6
+  },
+  "Salesforce Certified Marketing Cloud Engagement Foundations": {
+    "category": "associate",
+    "difficulty": 2
+  },
   "Salesforce Certified Marketing Cloud Social Specialist": {
     "category": "marketer",
     "difficulty": 2
@@ -155,15 +203,31 @@
     "category": "developer",
     "difficulty": 6
   },
+  "Salesforce Certified MuleSoft Developer": {
+    "category": "developer",
+    "difficulty": 6
+  },
   "Salesforce Certified MuleSoft Developer II": {
     "category": "developer",
     "difficulty": 7
+  },
+  "Salesforce Certified MuleSoft Integration Foundations": {
+    "category": "associate",
+    "difficulty": 2
   },
   "Salesforce Certified MuleSoft Integration Architect I": {
     "category": "architect",
     "difficulty": 8
   },
+  "Salesforce Certified MuleSoft Platform Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
   "Salesforce Certified MuleSoft Platform Architect I": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified MuleSoft Platform Integration Architect": {
     "category": "architect",
     "difficulty": 8
   },
@@ -175,17 +239,37 @@
     "category": "consultant",
     "difficulty": 5
   },
-  "Salesforce Certified OmniStudio Consultant": {
+  "Salesforce Certified Nonprofit Success Pack Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Omnistudio Consultant": {
     "category": "consultant",
     "difficulty": 6
   },
-  "Salesforce Certified OmniStudio Developer": {
+  "Salesforce Certified Omnistudio Developer": {
     "category": "developer",
     "difficulty": 6
   },
   "Salesforce Certified Platform App Builder": {
     "category": "admin",
     "difficulty": 3
+  },
+  "Salesforce Certified Platform Administrator": {
+    "category": "admin",
+    "difficulty": 2
+  },
+  "Salesforce Certified Platform Administrator II": {
+    "category": "admin",
+    "difficulty": 4
+  },
+  "Salesforce Certified Platform Data Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Platform Developer": {
+    "category": "developer",
+    "difficulty": 5
   },
   "Salesforce Certified Platform Developer I": {
     "category": "developer",
@@ -195,9 +279,29 @@
     "category": "developer",
     "difficulty": 7
   },
+  "Salesforce Certified Platform Foundations": {
+    "category": "associate",
+    "difficulty": 1
+  },
+  "Salesforce Certified Platform Sharing and Visibility Architect": {
+    "category": "architect",
+    "difficulty": 8
+  },
+  "Salesforce Certified Platform Strategy Designer": {
+    "category": "designer",
+    "difficulty": 4
+  },
+  "Salesforce Certified Platform User Experience Designer": {
+    "category": "designer",
+    "difficulty": 3
+  },
   "Salesforce Certified Sales Cloud Consultant": {
     "category": "consultant",
     "difficulty": 5
+  },
+  "Salesforce Certified Sales Foundations": {
+    "category": "associate",
+    "difficulty": 1
   },
   "Salesforce Certified Sales Representative": {
     "category": "sales",
