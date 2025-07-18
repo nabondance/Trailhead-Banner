@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import bannerBackground from '../data/banners.json';
@@ -63,6 +66,8 @@ const BackgroundPreview = ({ src, backgroundColor }) => {
 };
 
 const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
+  const router = useRouter();
+
   const [options, setOptions] = useState({
     username: '',
     backgroundColor: '#5badd6',
@@ -145,6 +150,10 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     handlePredefinedImageChange(src, setOptions);
   };
 
+  const handleHelpClick = () => {
+    router.push('/how-to');
+  };
+
   const handleSubmit = async (e) => {
     setMainError(null);
     e.preventDefault();
@@ -209,7 +218,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
         {validationResult && (
           <div className='validation-icon' data-tooltip={validationResult.message}>
             {validationResult.state === 'ok' ? (
-              <FontAwesomeIcon icon={faCheck} className='fa-fw icon-valid' /> // Checkmark
+              <FontAwesomeIcon icon={faCheck} className='fa-fw icon-valid' /> // Check mark
             ) : validationResult.state === 'private' ? (
               <FontAwesomeIcon icon={faTriangleExclamation} className='fa-fw icon-warning' /> // Yellow warning
             ) : (
@@ -218,7 +227,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </div>
         )}
         {!validationResult && (
-          <div className='validation-icon' data-tooltip='Check the How-To page to get guidance.'>
+          <div
+            className='validation-icon clickable'
+            data-tooltip='Need help? Click for guidance.'
+            onClick={handleHelpClick}
+            style={{ cursor: 'pointer' }}
+          >
             <FontAwesomeIcon icon={faQuestionCircle} className='fa-fw icon-help' />
           </div>
         )}
