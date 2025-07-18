@@ -140,11 +140,12 @@ export const generateImage = async (options) => {
   // Counters
   const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount || 0;
   const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount || 0;
-  const certificationCount = options.certificationsData.certifications.filter(
-    (cert) =>
-      (options.includeExpiredCertifications || cert.status.expired === false) &&
-      (options.includeRetiredCertifications || cert.status.title !== 'Retired')
-  ).length;
+  const certificationCount =
+    options.certificationsData.certifications.filter(
+      (cert) =>
+        (options.includeExpiredCertifications || cert.status.expired === false) &&
+        (options.includeRetiredCertifications || cert.status.title !== 'Retired')
+    ).length || 0;
   const trailCount = options.rankData.completedTrailCount || 0;
   const pointCount = getCounterPointText(options.rankData.earnedPointsSum || 0);
 
@@ -249,7 +250,7 @@ export const generateImage = async (options) => {
 
   // Certifications Data
   // Filter certifications based on options
-  let certifications = options.certificationsData.certifications.filter(
+  let certifications = options.certificationsData.certifications?.filter(
     (cert) =>
       (options.includeExpiredCertifications || cert.status.expired === false) &&
       (options.includeRetiredCertifications || cert.status.title !== 'Retired') &&
@@ -361,12 +362,12 @@ export const generateImage = async (options) => {
 
   // Display Superbadges if enabled
   if (options.displaySuperbadges) {
-    const totalSuperbadges = options.superbadgesData.earnedAwards.edges.filter(
+    const totalSuperbadges = options.superbadgesData.earnedAwards.edges?.filter(
       (edge) => edge.node.award && edge.node.award.icon
     ).length;
 
     let superbadgeLogos = options.superbadgesData.earnedAwards.edges
-      .filter((edge) => edge.node.award && edge.node.award.icon)
+      ?.filter((edge) => edge.node.award && edge.node.award.icon)
       .map((edge) => edge.node.award.icon);
 
     if (options.displayLastXSuperbadges && options.lastXSuperbadges) {
