@@ -857,21 +857,6 @@ legend {
   }
 }
 
-.copy-button {
-  margin-top: 10px;
-  padding: 5px 10px;
-  font-size: 14px;
-  color: var(--text-color);
-  background-color: var(--primary);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.copy-button:hover {
-  background-color: var(--secondary);
-}
-
 .notification {
   position: fixed;
   top: 20px;
