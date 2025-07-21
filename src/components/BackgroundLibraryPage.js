@@ -6,7 +6,7 @@ import '../styles/globals.css';
 import banners from '../data/banners.json';
 import searchQueries from '../data/searchQueries.json';
 
-const BannerCard = ({ src, alt, description, credit, onClick, onCopy, isUnoptimized }) => (
+const BannerCard = ({ src, alt, description, credit, onClick, isUnoptimized }) => (
   <div className='example-card'>
     <Image
       src={src}
@@ -18,15 +18,11 @@ const BannerCard = ({ src, alt, description, credit, onClick, onCopy, isUnoptimi
     />
     <p>{description}</p>
     {credit && <p className='credit'>Credit: {credit}</p>}
-    <button className='copy-button' onClick={() => onCopy(src)}>
-      Copy URL
-    </button>
   </div>
 );
 
 const BackgroundLibraryPage = () => {
   const [fullscreenImage, setFullscreenImage] = useState(null);
-  const [notification, setNotification] = useState('');
   const [unoptimizedImages, setUnoptimizedImages] = useState({}); // Track unoptimized state for each image
 
   const handleImageClick = (src) => {
@@ -41,15 +37,6 @@ const BackgroundLibraryPage = () => {
       delete updated[fullscreenImage]; // Reset optimization for the fullscreen image
       return updated;
     });
-  };
-
-  const handleCopyUrl = (src) => {
-    const fullUrl = `${window.location.origin}${src}`;
-    navigator.clipboard.writeText(fullUrl);
-    setNotification('Image URL copied to clipboard!');
-    setTimeout(() => {
-      setNotification('');
-    }, 1000);
   };
 
   return (
@@ -70,7 +57,6 @@ const BackgroundLibraryPage = () => {
         ))}
       </ul>
       <h2>You can also select an example background for your banner</h2>
-      {notification && <div className='notification'>{notification}</div>}
       <div className='library-grid'>
         {banners.map((example, index) => (
           <BannerCard
@@ -80,7 +66,6 @@ const BackgroundLibraryPage = () => {
             description={example.alt}
             credit={example.credit}
             onClick={handleImageClick}
-            onCopy={handleCopyUrl}
             isUnoptimized={unoptimizedImages[example.src] || false} // Individual unoptimized state
           />
         ))}
