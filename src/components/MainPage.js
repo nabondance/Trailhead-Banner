@@ -8,6 +8,7 @@ import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
 import ProductionWarning from './ProductionWarning';
 import BannerCount from './BannerCount';
+import AnnouncementBanner from './AnnouncementBanner';
 import '../styles/globals.css';
 import packageJson from '../../package.json';
 
@@ -77,6 +78,7 @@ const MainPage = () => {
 
   return (
     <div className='container'>
+      <AnnouncementBanner />
       <ProductionWarning />
       <BannerCount ref={bannerCountRef} />
       <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} onValidationError={handleValidationError} />
