@@ -33,7 +33,7 @@ const AnnouncementBanner = () => {
         console.error('Error fetching announcements:', error);
         setAnnouncements([]);
       } else if (data) {
-        setAnnouncements(data || []);
+        setAnnouncements(data);
       }
     } catch (error) {
       console.error('Error fetching announcements:', error);
