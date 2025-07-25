@@ -87,6 +87,12 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
       const categoryB = b.category || '';
       return categoryOrder.indexOf(categoryA) - categoryOrder.indexOf(categoryB);
     });
+  } else if (sortOption === 'product') {
+    certifications.sort((a, b) => {
+      const productA = a.product || '';
+      const productB = b.product || '';
+      return productA.localeCompare(productB);
+    });
   } else if (sortOption === 'difficulty') {
     certifications.sort((a, b) => a.difficulty - b.difficulty);
   }
