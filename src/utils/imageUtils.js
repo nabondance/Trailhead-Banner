@@ -94,7 +94,7 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
       return productA.localeCompare(productB);
     });
   } else if (sortOption === 'difficulty') {
-    certifications.sort((a, b) => a.difficulty.localeCompare(b.difficulty));
+    certifications.sort((a, b) => a.difficulty - b.difficulty);
   }
 
   if (sortOrder === 'descendant') {
