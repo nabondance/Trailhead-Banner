@@ -1328,7 +1328,7 @@ select:focus {
   padding: 12px 16px;
   margin-bottom: 8px;
   border-radius: 8px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Iosevka', Arial, Helvetica, sans-serif;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
