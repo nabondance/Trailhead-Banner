@@ -42,7 +42,7 @@ const AnnouncementBanner = () => {
   };
 
   useEffect(() => {
-    // Fetch initial announcement
+    // Fetch initial announcements
     fetchAnnouncement();
 
     // Subscribe to changes in the 'announcement' table
