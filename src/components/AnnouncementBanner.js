@@ -55,8 +55,7 @@ const AnnouncementBanner = () => {
           schema: 'public',
           table: 'announcement',
         },
-        (payload) => {
-          console.log('Announcement change detected:', payload);
+        () => {
           fetchAnnouncement(); // Update the announcements when a change is detected
         }
       )
