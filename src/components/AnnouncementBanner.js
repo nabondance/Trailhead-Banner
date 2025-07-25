@@ -85,7 +85,7 @@ const AnnouncementBanner = () => {
       let lastIndex = 0;
       let match;
 
-      while ((match = linkRegex.exec(line)) !== null) {
+      for (const match of line.matchAll(linkRegex)) {
         // Add text before the link
         if (match.index > lastIndex) {
           parts.push(line.slice(lastIndex, match.index));
