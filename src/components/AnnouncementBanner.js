@@ -56,7 +56,7 @@ const AnnouncementBanner = () => {
           table: 'announcement',
         },
         () => {
-          fetchAnnouncement(); // Update the announcements when a change is detected
+          fetchAnnouncements(); // Update the announcements when a change is detected
         }
       )
       .subscribe();
