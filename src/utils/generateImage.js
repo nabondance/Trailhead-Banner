@@ -293,6 +293,7 @@ export const generateImage = async (options) => {
           retired: cert.status.title == 'Retired',
           dateCompleted: cert.dateCompleted,
           title: cert.title,
+          product: cert.product,
           category: certificationLocalData?.category || '',
           difficulty: certificationLocalData?.difficulty || '',
         });
