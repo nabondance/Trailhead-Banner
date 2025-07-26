@@ -94,6 +94,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     certificationSort: 'date',
     certificationSortOrder: 'descendant',
     certificationAlignment: 'center',
+    superbadgeAlignment: 'left',
     displaySalesforceCertifications: true,
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
@@ -369,7 +370,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           <fieldset>
             <legend>Superbadge Options</legend>
             <label>
-              Show Superbadges:
+              Display Superbadges:
               <input
                 type='checkbox'
                 checked={options.displaySuperbadges}
@@ -397,6 +398,17 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 />
               </label>
             )}
+            <label className='picklist'>
+              Superbadges Alignment:
+              <select
+                value={options.superbadgeAlignment}
+                onChange={(e) => setOptions({ ...options, superbadgeAlignment: e.target.value })}
+              >
+                <option value='center'>Center</option>
+                <option value='left'>Left</option>
+                <option value='right'>Right</option>
+              </select>
+            </label>
           </fieldset>
           <fieldset>
             <legend>Certification Options</legend>
