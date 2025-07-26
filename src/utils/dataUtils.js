@@ -47,6 +47,7 @@ export const logOptions = (options) => {
     superbadges: options.displaySuperbadges,
     displayLastXSuperbadges: options.lastXSuperbadges,
     lastXSuperbadges: options.lastXSuperbadges,
+    superbadgeAlignment: options.superbadgeAlignment,
   });
   console.log('Certification Options:', {
     includeExpired: options.includeExpiredCertifications,
