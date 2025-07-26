@@ -94,7 +94,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     certificationSort: 'date',
     certificationSortOrder: 'descendant',
     certificationAlignment: 'center',
-    superbadgeAlignment: 'center',
+    superbadgeAlignment: 'left',
     displaySalesforceCertifications: true,
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
