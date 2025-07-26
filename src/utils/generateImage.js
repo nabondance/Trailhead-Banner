@@ -4,7 +4,6 @@ const crypto = require('crypto');
 const { getLocalCertificationData, logOptions } = require('./dataUtils');
 const {
   calculateCertificationsDesign,
-  calculateSuperbadgesDesign,
   sortCertifications,
   getCountersConfig,
   getCounterPointText,
