@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { getLocalCertificationData, logOptions } = require('./dataUtils');
 const {
   calculateCertificationsDesign,
+  calculateSuperbadgesDesign,
   sortCertifications,
   getCountersConfig,
   getCounterPointText,
@@ -402,16 +403,16 @@ export const generateImage = async (options) => {
       superbadgeLogosImages.push(plusXBadgeImage);
     }
 
+    // Calculate superbadge positioning with alignment
     const superbadgeLogoHeight = canvas.height * top_part * 0.9;
     const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
     let superbadgeSpacing = 10;
     const superbadgeAvailableWidth = canvas.width * right_part; // Available width for superbadges
-    let superbadgeX = canvas.width - superbadgeAvailableWidth;
-    let superbadgeY = 10;
+    const superbadgeY = 10;
 
     // Calculate total width required for superbadges
     const totalSuperbadgeWidth =
-      superbadgeLogosImages.length * (superbadgeLogoWidth + superbadgeSpacing) - superbadgeSpacing;
+      superbadgeLogosImages.length * superbadgeLogoWidth + (superbadgeLogosImages.length - 1) * superbadgeSpacing;
 
     // Adjust spacing if total width exceeds available space
     if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
@@ -419,6 +420,28 @@ export const generateImage = async (options) => {
         (superbadgeAvailableWidth - superbadgeLogosImages.length * superbadgeLogoWidth) /
         (superbadgeLogosImages.length - 1);
     }
+
+    // Calculate starting X position based on alignment
+    const finalTotalWidth =
+      superbadgeLogosImages.length * superbadgeLogoWidth + (superbadgeLogosImages.length - 1) * superbadgeSpacing;
+    let superbadgeStartX;
+
+    if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
+      // When compressed, always start from left edge of available area
+      superbadgeStartX = canvas.width - superbadgeAvailableWidth;
+    } else {
+      // When there's enough space, apply alignment
+      if (options.superbadgeAlignment === 'left') {
+        superbadgeStartX = canvas.width - superbadgeAvailableWidth;
+      } else if (options.superbadgeAlignment === 'right') {
+        superbadgeStartX = canvas.width - finalTotalWidth;
+      } else {
+        // center (default)
+        superbadgeStartX = canvas.width - superbadgeAvailableWidth + (superbadgeAvailableWidth - finalTotalWidth) / 2;
+      }
+    }
+
+    let superbadgeX = superbadgeStartX;
 
     for (const logo of superbadgeLogosImages) {
       if (logo) {
