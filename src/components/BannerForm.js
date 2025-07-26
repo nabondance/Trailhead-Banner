@@ -369,7 +369,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           <fieldset>
             <legend>Superbadge Options</legend>
             <label>
-              Show Superbadges:
+              Display Superbadges:
               <input
                 type='checkbox'
                 checked={options.displaySuperbadges}
