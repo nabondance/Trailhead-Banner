@@ -420,9 +420,6 @@ export const generateImage = async (options) => {
         (superbadgeLogosImages.length - 1);
     }
 
-    // Calculate starting X position based on alignment
-    const finalTotalWidth =
-      superbadgeLogosImages.length * superbadgeLogoWidth + (superbadgeLogosImages.length - 1) * superbadgeSpacing;
     let superbadgeStartX;
 
     if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
@@ -433,10 +430,11 @@ export const generateImage = async (options) => {
       if (options.superbadgeAlignment === 'left') {
         superbadgeStartX = canvas.width - superbadgeAvailableWidth;
       } else if (options.superbadgeAlignment === 'right') {
-        superbadgeStartX = canvas.width - finalTotalWidth;
+        superbadgeStartX = canvas.width - totalSuperbadgeWidth;
       } else {
-        // center (default)
-        superbadgeStartX = canvas.width - superbadgeAvailableWidth + (superbadgeAvailableWidth - finalTotalWidth) / 2;
+        // center
+        superbadgeStartX =
+          canvas.width - superbadgeAvailableWidth + (superbadgeAvailableWidth - totalSuperbadgeWidth) / 2;
       }
     }
 
