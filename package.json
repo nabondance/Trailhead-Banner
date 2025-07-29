@@ -53,7 +53,7 @@
     "@theme-toggles/react": "^4.1.0",
     "@vercel/blob": "^1.1.1",
     "@vercel/speed-insights": "^1.2.0",
-    "axios": "^1.8.4",
+    "axios": "^1.11.0",
     "countup.js": "^2.9.0",
     "i": "^0.3.7",
     "next": "15.3.5",
