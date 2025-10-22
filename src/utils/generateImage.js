@@ -29,6 +29,7 @@ const isValidImageType = async (url) => {
     // First try to fetch the image
     const response = await fetch(url);
     if (!response.ok) {
+      console.error('Non-OK response:', response.status);
       return false;
     }
 
@@ -90,7 +91,8 @@ export const generateImage = async (options) => {
           if (!(await isValidImageType(options.backgroundLibraryUrl))) {
             throw new Error('Unsupported image type');
           }
-          const bgImage = await loadImage(options.backgroundLibraryUrl);
+          const bgImageBuffer = await getImage(options.backgroundLibraryUrl, 'background');
+          const bgImage = await loadImage(bgImageBuffer);
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
         break;
@@ -102,7 +104,8 @@ export const generateImage = async (options) => {
           if (options.backgroundKind === 'customUrl' && !(await isValidImageType(options.backgroundImageUrl))) {
             throw new Error('Unsupported image type');
           }
-          const bgImage = await loadImage(options.backgroundImageUrl);
+          const bgImageBuffer = await getImage(options.backgroundImageUrl, 'background');
+          const bgImage = await loadImage(bgImageBuffer);
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
         break;
