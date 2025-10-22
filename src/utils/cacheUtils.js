@@ -23,8 +23,13 @@ export const getImage = async (imageUrl, folder = 'images') => {
   }
 
   try {
-    // Download the image from the internet
-    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    const response = await axios.get(imageUrl, {
+      responseType: 'arraybuffer',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+      },
+    });
     const imageBuffer = Buffer.from(response.data, 'binary');
     // Upload the image to the blob
     await uploadImage(imageBuffer, fileName, folder);
