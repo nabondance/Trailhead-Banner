@@ -235,6 +235,14 @@
     "category": "architect",
     "difficulty": 8
   },
+  "Salesforce Certified MuleSoft Catalyst Consultant": {
+    "category": "consultant",
+    "difficulty": 7
+  },
+  "Salesforce Certified MuleSoft Hyperautomation Developer": {
+    "category": "developer",
+    "difficulty": 6
+  },
   "Salesforce Certified Nonprofit Cloud Consultant": {
     "category": "consultant",
     "difficulty": 5
@@ -303,6 +311,10 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Revenue Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
   "Salesforce Certified Sales Foundations": {
     "category": "associate",
     "difficulty": 1
@@ -356,8 +368,16 @@
     "difficulty": 5
   },
   "Tableau Desktop Specialist": {
-    "category": "associate",
+    "category": "admin",
     "difficulty": 2
+  },
+  "Salesforce Certified Tableau Desktop Foundations": {
+    "category": "admin",
+    "difficulty": 2
+  },
+  "Salesforce Certified Tableau Data Analyst": {
+    "category": "analyst",
+    "difficulty": 4
   },
   "Tableau Server Certified Associate": {
     "category": "admin",
@@ -386,6 +406,10 @@
   "Consumer Goods Cloud Accredited Professional": {
     "category": "accredited-industry",
     "difficulty": 4
+  },
+  "Consumer Goods Cloud: Trade Promotion Management Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
   },
   "Contact Center Accredited Professional": {
     "category": "accredited-service",
@@ -476,6 +500,10 @@
     "difficulty": 5
   },
   "Revenue Cloud Consultant Accredited Professional": {
+    "category": "accredited-sales",
+    "difficulty": 5
+  },
+  "CPQ and Billing Consultant Accredited Professional": {
     "category": "accredited-sales",
     "difficulty": 5
   },
