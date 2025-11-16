@@ -43,10 +43,11 @@ export const getMaintenanceWarnings = (certifications) => {
 
   return certificationsNeedingMaintenance.map((cert) => {
     const dueDate = new Date(cert.maintenanceDueDate);
-    const day = String(dueDate.getDate()).padStart(2, '0');
-    const month = String(dueDate.getMonth() + 1).padStart(2, '0');
-    const year = dueDate.getFullYear();
-    const formattedDate = `${day}-${month}-${year}`;
+    const formattedDate = dueDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
     return `${cert.title} by ${formattedDate}`;
   });
 };
