@@ -12,17 +12,9 @@ export const getCertificationsNeedingMaintenance = (certifications) => {
     return [];
   }
 
-  const today = new Date();
   const certificationsNeedingMaintenance = certifications.filter((cert) => {
-    // Check if cert has a maintenance due date
-    if (!cert.maintenanceDueDate) return false;
-
-    // Check if cert is active (not expired)
-    if (cert.status?.expired === true) return false;
-
-    // Check if maintenance date is in the future
-    const maintenanceDate = new Date(cert.maintenanceDueDate);
-    return maintenanceDate > today;
+    // Check if certification status is "Maintenance Due"
+    return cert.status?.title === 'Maintenance Due';
   });
 
   // Sort by maintenance due date (earliest first)
