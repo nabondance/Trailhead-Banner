@@ -811,7 +811,7 @@ legend {
   text-align: center;
   background-color: #d1ecf1;
   padding: 15px;
-  border: 1px solid #bee5eb;
+  border: 1px solid var(--border);
   border-radius: 4px;
   margin-top: 20px;
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
