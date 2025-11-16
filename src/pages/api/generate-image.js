@@ -5,6 +5,7 @@ import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
+import { getMaintenanceWarnings } from '../../utils/certificationMaintenanceUtils';
 
 export const config = {
   api: {
@@ -92,39 +93,7 @@ export default async function handler(req, res) {
       const mvpData = mvpResponse.data?.data?.profileData || {};
 
       // Check for certifications requiring maintenance
-      const maintenanceWarnings = [];
-      if (certificationsData.certifications && Array.isArray(certificationsData.certifications)) {
-        const today = new Date();
-        const certificationsNeedingMaintenance = certificationsData.certifications.filter((cert) => {
-          // Check if cert has a maintenance due date
-          if (!cert.maintenanceDueDate) return false;
-
-          // Check if cert is active (not expired)
-          if (cert.status?.expired === true) return false;
-
-          // Check if maintenance date is in the future
-          const maintenanceDate = new Date(cert.maintenanceDueDate);
-          return maintenanceDate > today;
-        });
-
-        if (certificationsNeedingMaintenance.length > 0) {
-          // Sort by maintenance due date (earliest first)
-          certificationsNeedingMaintenance.sort((a, b) => {
-            return new Date(a.maintenanceDueDate) - new Date(b.maintenanceDueDate);
-          });
-
-          // Create warning messages
-          certificationsNeedingMaintenance.forEach((cert) => {
-            const dueDate = new Date(cert.maintenanceDueDate);
-            const formattedDate = dueDate.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            });
-            maintenanceWarnings.push(`Certification "${cert.title}" requires maintenance by ${formattedDate}`);
-          });
-        }
-      }
+      const maintenanceWarnings = getMaintenanceWarnings(certificationsData.certifications);
 
       // Generate the image
       const generateImageResult = await generateImage({
