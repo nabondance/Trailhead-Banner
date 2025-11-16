@@ -22,6 +22,7 @@ const MainPage = () => {
   const [loading, setLoading] = useState(false);
   const [mainError, setMainError] = useState(null);
   const [mainWarning, setMainWarning] = useState([]);
+  const [mainInfo, setMainInfo] = useState([]);
   const [formOptions, setFormOptions] = useState({});
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const bannerCountRef = useRef(null);
@@ -35,6 +36,7 @@ const MainPage = () => {
     setLoading(true);
     setMainError(null); // Clear previous errors
     setMainWarning([]); // Clear previous warnings using empty array
+    setMainInfo([]); // Clear previous info messages using empty array
 
     try {
       const response = await fetch('/api/generate-image', {
@@ -52,6 +54,7 @@ const MainPage = () => {
       console.debug('Data:', data);
       setImageUrl(data.imageUrl);
       setMainWarning(data.warnings);
+      setMainInfo(data.infoMessages || []);
       bannerCountRef.current.fetchCount(); // Refresh the banner count
     } catch (error) {
       console.error('Error generating image:', error);
@@ -145,6 +148,17 @@ const MainPage = () => {
               </p>
             </div>
           )}
+          {mainInfo.length > 0 &&
+            mainInfo.map((info, idx) => (
+              <div key={idx} className='info-message'>
+                <p>{info.header}</p>
+                <ul>
+                  {info.items.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           <LinkedInBannerTutorial />
         </div>
       )}

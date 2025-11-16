@@ -5,6 +5,7 @@ import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
+import { getMaintenanceInfoMessages } from '../../utils/certificationMaintenanceUtils';
 
 export const config = {
   api: {
@@ -101,8 +102,12 @@ export default async function handler(req, res) {
         mvpData,
       });
       const imageUrl = generateImageResult.bannerUrl;
-      const warnings = generateImageResult.warnings;
+      const warnings = generateImageResult.warnings || [];
       const imageHash = generateImageResult.hash;
+
+      // Collect all info messages
+      const infoMessages = [...getMaintenanceInfoMessages(certificationsData.certifications)];
+      // Future: Add other info message types here
 
       // Update the counter in the database
       try {
@@ -123,7 +128,9 @@ export default async function handler(req, res) {
       }
 
       // Send back the combined data and image URL
-      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings });
+      res
+        .status(200)
+        .json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings, infoMessages });
     } catch (error) {
       console.error('Error generating banner:', error.message);
       if (error.response) {
