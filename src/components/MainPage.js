@@ -150,7 +150,10 @@ const MainPage = () => {
           )}
           {mainInfo.length > 0 && (
             <div className='info-message'>
-              <p>Some Certifications are due for maintenance soon:</p>
+              <p>
+                🔔 While generating your banner, we noticed that some of your Certifications will soon require
+                maintenance:
+              </p>
               <ul>
                 {mainInfo.map((info, index) => (
                   <li key={index}>{info}</li>
