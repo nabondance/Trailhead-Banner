@@ -805,6 +805,41 @@ legend {
   text-decoration: none;
 }
 
+.info-message {
+  color: #0c5460;
+  font-size: 16px;
+  text-align: center;
+  background-color: #d1ecf1;
+  padding: 15px;
+  border: 1px solid #bee5eb;
+  border-radius: 4px;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+  margin-bottom: 10px;
+}
+
+.info-message p {
+  margin: 0;
+  font-weight: bold;
+}
+
+.info-message ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 10px 0 0;
+  text-align: left;
+}
+
+.info-message a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.info-message a:hover {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
 .background-library-container {
   padding: 20px;
   text-align: center;

@@ -93,7 +93,7 @@ export default async function handler(req, res) {
       const mvpData = mvpResponse.data?.data?.profileData || {};
 
       // Check for certifications requiring maintenance
-      const maintenanceWarnings = getMaintenanceWarnings(certificationsData.certifications);
+      const maintenanceInfoMessages = getMaintenanceWarnings(certificationsData.certifications);
 
       // Generate the image
       const generateImageResult = await generateImage({
@@ -105,7 +105,8 @@ export default async function handler(req, res) {
         mvpData,
       });
       const imageUrl = generateImageResult.bannerUrl;
-      const warnings = [...(generateImageResult.warnings || []), ...maintenanceWarnings];
+      const warnings = generateImageResult.warnings || [];
+      const infoMessages = maintenanceInfoMessages;
       const imageHash = generateImageResult.hash;
 
       // Update the counter in the database
@@ -127,7 +128,9 @@ export default async function handler(req, res) {
       }
 
       // Send back the combined data and image URL
-      res.status(200).json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings });
+      res
+        .status(200)
+        .json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings, infoMessages });
     } catch (error) {
       console.error('Error generating banner:', error.message);
       if (error.response) {
