@@ -26,14 +26,18 @@ export const getCertificationsNeedingMaintenance = (certifications) => {
 };
 
 /**
- * Generate warning messages for certifications requiring maintenance
+ * Generate info message objects for certifications requiring maintenance
  * @param {Array} certifications - Array of certification objects from Trailhead API
- * @returns {Array} Array of formatted warning messages
+ * @returns {Array} Array of info message objects with header and items
  */
-export const getMaintenanceWarnings = (certifications) => {
+export const getMaintenanceInfoMessages = (certifications) => {
   const certificationsNeedingMaintenance = getCertificationsNeedingMaintenance(certifications);
 
-  return certificationsNeedingMaintenance.map((cert) => {
+  if (certificationsNeedingMaintenance.length === 0) {
+    return [];
+  }
+
+  const items = certificationsNeedingMaintenance.map((cert) => {
     const dueDate = new Date(cert.maintenanceDueDate);
     const formattedDate = dueDate.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -42,4 +46,12 @@ export const getMaintenanceWarnings = (certifications) => {
     });
     return `${cert.title} by ${formattedDate}`;
   });
+
+  return [
+    {
+      header:
+        '🔔 While generating your banner, we noticed that some of your Certifications will soon require maintenance:',
+      items: items,
+    },
+  ];
 };

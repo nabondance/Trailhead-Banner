@@ -5,7 +5,7 @@ import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
-import { getMaintenanceWarnings } from '../../utils/certificationMaintenanceUtils';
+import { getMaintenanceInfoMessages } from '../../utils/certificationMaintenanceUtils';
 
 export const config = {
   api: {
@@ -92,9 +92,6 @@ export default async function handler(req, res) {
       const superbadgesData = superbadgesResponse.data?.data?.profile || {};
       const mvpData = mvpResponse.data?.data?.profileData || {};
 
-      // Check for certifications requiring maintenance
-      const maintenanceInfoMessages = getMaintenanceWarnings(certificationsData.certifications);
-
       // Generate the image
       const generateImageResult = await generateImage({
         ...options,
@@ -106,8 +103,11 @@ export default async function handler(req, res) {
       });
       const imageUrl = generateImageResult.bannerUrl;
       const warnings = generateImageResult.warnings || [];
-      const infoMessages = maintenanceInfoMessages;
       const imageHash = generateImageResult.hash;
+
+      // Collect all info messages
+      const infoMessages = [...getMaintenanceInfoMessages(certificationsData.certifications)];
+      // Future: Add other info message types here
 
       // Update the counter in the database
       try {

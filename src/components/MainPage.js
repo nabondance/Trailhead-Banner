@@ -148,19 +148,17 @@ const MainPage = () => {
               </p>
             </div>
           )}
-          {mainInfo.length > 0 && (
-            <div className='info-message'>
-              <p>
-                🔔 While generating your banner, we noticed that some of your Certifications will soon require
-                maintenance:
-              </p>
-              <ul>
-                {mainInfo.map((info, index) => (
-                  <li key={index}>{info}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {mainInfo.length > 0 &&
+            mainInfo.map((info, idx) => (
+              <div key={idx} className='info-message'>
+                <p>{info.header}</p>
+                <ul>
+                  {info.items.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           <LinkedInBannerTutorial />
         </div>
       )}
