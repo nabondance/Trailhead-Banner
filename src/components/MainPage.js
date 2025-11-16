@@ -150,7 +150,7 @@ const MainPage = () => {
           )}
           {mainInfo.length > 0 && (
             <div className='info-message'>
-              <p>Certification maintenance information:</p>
+              <p>Looks like some certifications require maintenance soon:</p>
               <ul>
                 {mainInfo.map((info, index) => (
                   <li key={index}>{info}</li>
