@@ -111,11 +111,15 @@ const getCountersConfig = (options) => {
     options.displayCertificationCount,
     options.displayTrailCount,
     options.displayPointCount,
+    options.displayStampCount,
   ].filter(Boolean).length;
 
   let badgeCounterScale = 1;
 
   switch (counter) {
+    case 6:
+      badgeCounterScale = 0.5;
+      break;
     case 5:
       badgeCounterScale = 0.6;
       break;

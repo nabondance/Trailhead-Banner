@@ -48,8 +48,10 @@ class SupabaseUtils {
           th_nb_certif: thb_data.certificationsData.certifications.length,
           th_nb_sb: thb_data.superbadgesData.earnedAwards.edges.length,
           th_nb_badge: thb_data.rankData.badges,
+          th_nb_stamps: thb_data.stampsData.totalCount,
           th_certif: thb_data.certificationsData.certifications,
           th_sb: thb_data.superbadgesData.earnedAwards.edges,
+          th_stamps: thb_data.stampsData,
           th_mvp: thb_data.mvp,
           th_agentblazer: `${thb_data.learnerStatusLevels?.statusName}-${thb_data.learnerStatusLevels?.title}`,
         },
@@ -113,6 +115,20 @@ class SupabaseUtils {
             })
             .filter((edge) => edge !== null),
         },
+      },
+      stampsData: {
+        totalCount: data.stampsData.totalCount,
+        edges: data.stampsData.edges.map((edge) => ({
+          node: {
+            kind: edge.node.kind,
+            apiName: edge.node.apiName,
+            name: edge.node.name,
+            eventDate: edge.node.eventDate,
+            eventLocation: edge.node.eventLocation,
+            iconUrl: edge.node.iconUrl,
+            linkUrl: edge.node.linkUrl,
+          },
+        })),
       },
     };
     return cleanedData;
