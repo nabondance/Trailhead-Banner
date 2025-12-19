@@ -12,13 +12,15 @@ const TrailheadBannerHeader = () => {
     <div className='trailhead-banner-header'>
       <ThemeSwitch />
       <div className='logo-container'>
-        <Image
-          src='/assets/logos/trailhead-banner-logo.svg'
-          alt='Trailhead-Banner Logo'
-          width={120}
-          height={120}
-          priority
-        />
+        <Link href='/'>
+          <Image
+            src='/assets/logos/trailhead-banner-logo.svg'
+            alt='Trailhead-Banner Logo'
+            width={120}
+            height={120}
+            priority
+          />
+        </Link>
       </div>
       <div className='header-content'>
         <h1>Trailhead-Banner</h1>
