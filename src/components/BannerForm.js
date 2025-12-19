@@ -33,7 +33,7 @@ const BackgroundPreview = ({ src, backgroundColor }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (src) {
-      // Load and draw image exactly like in generateImage.js
+      // Load and draw image background exactly like in generateImage.js
       const img = new Image();
       img.onload = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -77,6 +77,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displayCertificationCount: true,
     displayTrailCount: false,
     displayPointCount: false,
+    displayStampCount: false,
     displayRankLogo: true,
     displaySuperbadges: true,
     includeExpiredCertifications: false,
@@ -345,6 +346,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 type='checkbox'
                 checked={options.displayPointCount}
                 onChange={(e) => setOptions({ ...options, displayPointCount: e.target.checked })}
+              />
+            </label>
+            <label>
+              Show Stamp Count:
+              <input
+                type='checkbox'
+                checked={options.displayStampCount}
+                onChange={(e) => setOptions({ ...options, displayStampCount: e.target.checked })}
               />
             </label>
           </fieldset>

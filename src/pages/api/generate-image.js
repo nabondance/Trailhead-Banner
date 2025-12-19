@@ -2,6 +2,7 @@ import GET_TRAILBLAZER_RANK from '../../graphql/queries/getTrailblazerRank';
 import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications';
 import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
 import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
+import GET_STAMPS from '../../graphql/queries/getStamps';
 import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
@@ -78,11 +79,19 @@ export default async function handler(req, res) {
         },
         url: 'https://community.api.trailhead.com/graphql',
       },
+      {
+        query: GET_STAMPS,
+        variables: {
+          slug: options.username,
+          first: 10,
+        },
+        url: 'https://mobile.api.trailhead.com/graphql',
+      },
     ];
 
     try {
       // Perform the GraphQL queries in parallel using the utils class
-      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse] =
+      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse, stampsResponse] =
         await GraphQLUtils.performQueries(graphqlQueries);
 
       // Extract the data from the responses
@@ -91,6 +100,7 @@ export default async function handler(req, res) {
       const badgesData = badgesResponse.data?.data?.profile || {};
       const superbadgesData = superbadgesResponse.data?.data?.profile || {};
       const mvpData = mvpResponse.data?.data?.profileData || {};
+      const stampsData = stampsResponse.data?.data?.earnedStamps || {};
 
       // Generate the image
       const generateImageResult = await generateImage({
@@ -100,6 +110,7 @@ export default async function handler(req, res) {
         badgesData,
         superbadgesData,
         mvpData,
+        stampsData,
       });
       const imageUrl = generateImageResult.bannerUrl;
       const warnings = generateImageResult.warnings || [];
@@ -121,6 +132,7 @@ export default async function handler(req, res) {
           superbadgesData: superbadgesData,
           rankData: rankData,
           mvpData: mvpData,
+          stampsData: stampsData,
         };
         SupabaseUtils.updateBannerCounter(thb_data);
       } catch (error) {
@@ -128,9 +140,17 @@ export default async function handler(req, res) {
       }
 
       // Send back the combined data and image URL
-      res
-        .status(200)
-        .json({ rankData, certificationsData, badgesData, superbadgesData, mvpData, imageUrl, warnings, infoMessages });
+      res.status(200).json({
+        rankData,
+        certificationsData,
+        badgesData,
+        superbadgesData,
+        mvpData,
+        stampsData,
+        imageUrl,
+        warnings,
+        infoMessages,
+      });
     } catch (error) {
       console.error('Error generating banner:', error.message);
       if (error.response) {

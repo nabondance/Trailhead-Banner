@@ -21,6 +21,7 @@ export const logOptions = (options) => {
   console.log('Certifications Data:', options.certificationsData);
   console.log('Badges Data:', options.badgesData);
   console.log('Superbadges Data:', options.superbadgesData);
+  console.log('Stamps Data:', options.stampsData);
   console.log('Background Options:', {
     kind: options.backgroundKind,
     libraryUrl: options.backgroundLibraryUrl,
@@ -38,6 +39,7 @@ export const logOptions = (options) => {
     certificationCount: options.displayCertificationCount,
     trailCount: options.displayTrailCount,
     pointCount: options.displayPointCount,
+    stampCount: options.displayStampCount,
   });
   console.log('Badge Options:', {
     labelColor: options.badgeLabelColor,

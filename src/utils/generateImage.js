@@ -151,6 +151,7 @@ export const generateImage = async (options) => {
     ).length || 0;
   const trailCount = options.rankData.completedTrailCount || 0;
   const pointCount = getCounterPointText(options.rankData.earnedPointsSum || 0);
+  const stampCount = options.stampsData.totalCount || 0;
 
   // Draw badge counter
   try {
@@ -222,6 +223,19 @@ export const generateImage = async (options) => {
         badgeScale,
         options.badgeLabelColor,
         '#18477D'
+      );
+      badgeCounterYPosition += badgeCounterYDelta;
+    }
+    if (options.displayStampCount && stampCount > 0) {
+      await drawBadgeCounter(
+        ctx,
+        'Stamp',
+        stampCount,
+        badgeCounterX,
+        badgeCounterYPosition,
+        badgeScale,
+        options.badgeLabelColor,
+        '#00B3A4'
       );
       badgeCounterYPosition += badgeCounterYDelta;
     }
