@@ -117,6 +117,7 @@ main {
   margin-left: auto;
   justify-content: center; /* Center the links */
   margin-top: 10px; /* Add space on top of the links */
+  z-index: 1;
 }
 
 .header-nav a {
@@ -132,6 +133,7 @@ main {
 .header-nav .dropdown {
   position: relative;
   display: inline-block;
+  z-index: 1;
 }
 
 .header-nav .dropbtn {
@@ -1388,6 +1390,7 @@ select:focus {
   border-radius: 8px;
   font-family: Iosevka, Arial, Helvetica, sans-serif;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  z-index: -1;
 }
 
 .announcement-banner:last-child {
