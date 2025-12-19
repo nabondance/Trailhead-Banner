@@ -177,6 +177,110 @@ main {
   text-decoration: underline;
 }
 
+.dropdown-arrow {
+  display: inline-block;
+  margin-left: 6px;
+  border: solid var(--text-nav);
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.header-nav .dropdown:hover .dropdown-arrow {
+  transform: rotate(225deg);
+}
+
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown-button {
+  background-color: transparent;
+  color: var(--text-nav);
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  font-family: inherit;
+}
+
+.nav-dropdown-button:hover {
+  text-decoration: underline;
+}
+
+.nav-dropdown-button.non-navigable {
+  cursor: default;
+}
+
+.nav-dropdown-button.non-navigable:hover {
+  text-decoration: none;
+}
+
+.nav-dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--background);
+  min-width: max-content;
+  width: max-content;
+  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
+  z-index: 1001;
+  border-radius: 4px;
+  padding: 0;
+  margin-top: 0;
+}
+
+.nav-dropdown-content::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: transparent;
+}
+
+.nav-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  color: var(--text-nav);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.nav-dropdown-item:hover {
+  background-color: var(--middleground);
+  text-decoration: underline;
+}
+
+.nav-dropdown .dropdown-arrow.open {
+  transform: rotate(225deg);
+}
+
+/* Mobile responsive positioning */
+@media (width <= 768px) {
+  .nav-dropdown-content {
+    right: 0;
+    left: auto;
+  }
+
+  .nav-dropdown:first-child .nav-dropdown-content {
+    left: 0;
+    right: auto;
+  }
+}
+
 .trailhead-banner-header h1 {
   margin: 0;
   font-size: 3em;
