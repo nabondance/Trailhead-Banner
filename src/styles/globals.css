@@ -201,6 +201,9 @@ main {
   border-top: 1px solid var(--border);
   left: 0; /* Ensure the footer starts from the left edge */
   position: relative; /* Change from fixed to relative */
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
 }
 
 .footer-link {
@@ -1140,11 +1143,13 @@ legend {
   display: flex;
   justify-content: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 @media (width <= 768px) {
   .footer-link {
     text-size-adjust: 80%;
+    font-size: 12px;
   }
 
   .footer-buttons .github-btn {
