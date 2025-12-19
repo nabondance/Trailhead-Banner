@@ -41,7 +41,8 @@ const NavDropdown = ({ label, options, defaultUrl, className = '' }) => {
         <div className='nav-dropdown-content'>
           {options.map((option, index) => (
             <button key={index} className='nav-dropdown-item' onClick={() => handleOptionClick(option.value)}>
-              {option.label}
+              <span>{option.label}</span>
+              {option.isNew && <span className='new-badge'>NEW</span>}
             </button>
           ))}
         </div>
