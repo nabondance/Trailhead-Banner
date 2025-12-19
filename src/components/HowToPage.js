@@ -43,6 +43,20 @@ const HowToPage = () => {
         </ol>
       </section>
       <section className='how-to-section'>
+        <h2>How to Make Your Trailhead Certifications Public</h2>
+        <ol>
+          <li>Log in to Trailhead.</li>
+          <li>
+            Go to{' '}
+            <a href='https://trailheadacademy.salesforce.com/profile' target='_blank' rel='noopener noreferrer'>
+              your Trailhead Academy profile
+            </a>
+            .
+          </li>
+          <li>Under &quot;Certification Privacy&quot;, select &quot;Make my certifications public to all&quot;.</li>
+        </ol>
+      </section>
+      <section className='how-to-section'>
         <h2>Generating Your LinkedIn Banner</h2>
         <ol>
           <li>Enter your Trailhead username in the input field.</li>
