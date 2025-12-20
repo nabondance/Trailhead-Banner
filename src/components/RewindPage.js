@@ -101,8 +101,8 @@ const RewindPage = () => {
 
   return (
     <div className='container'>
-      <h1>Trailhead Rewind</h1>
-      <h2>Generate your Trailhead rewind.</h2>
+      <h1>Trailhead Rewind (written backward ???)</h1>
+      <h2>It was an amazing learning year, let's rewind it !</h2>
 
       <form onSubmit={handleSubmit} className='form'>
         <div className='input-container'>
