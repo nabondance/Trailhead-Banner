@@ -57,17 +57,24 @@ const RewindPage = () => {
     }
 
     try {
-      // TODO: Replace with actual Rewind API call
       console.log('Generating Trailhead Rewind for:', username);
-      // Placeholder for Rewind-specific API call
-      // const response = await fetch('/api/generate-rewind', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ username }),
-      // });
 
-      // For now, just show a placeholder message
-      alert(`Rewind generation for ${username} would be implemented here!`);
+      const response = await fetch('/api/generate-rewind', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, year: 2025 }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate rewind');
+      }
+
+      const data = await response.json();
+      console.log('Rewind data:', data);
+
+      // TODO: Display the generated rewind image
+      // The imageUrl will be available in data.imageUrl once generateRewind.js is implemented
     } catch (error) {
       console.error('Error generating rewind:', error);
       setError(error.message || 'Failed to generate rewind');

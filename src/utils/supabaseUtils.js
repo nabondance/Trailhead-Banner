@@ -134,6 +134,42 @@ class SupabaseUtils {
     return cleanedData;
   }
 
+  static async updateRewindCounter(rewind_data) {
+    try {
+      const { data, error } = await supabase.from('rewinds').insert([
+        {
+          th_username: rewind_data.th_username,
+          rewind_processing_time: rewind_data.rewind_processing_time,
+          source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+          year: rewind_data.year,
+          thb_version: packageJson.version,
+          th_current_rank: rewind_data.rankData.rank?.title,
+          th_current_points: rewind_data.rankData.earnedPointTotal,
+          th_current_badges: rewind_data.rankData.earnedBadgeTotal,
+          th_current_trails: rewind_data.rankData.completedTrailTotal,
+          yearly_stamps_count: rewind_data.yearlyData.stamps.length,
+          yearly_certifications_count: rewind_data.yearlyData.certifications.length,
+          yearly_stamps: rewind_data.yearlyData.stamps,
+          yearly_certifications: rewind_data.yearlyData.certifications,
+          rewind_summary: rewind_data.rewindSummary,
+          most_active_month: rewind_data.rewindSummary.mostActiveMonth,
+          monthly_breakdown: {
+            certifications: rewind_data.rewindSummary.monthlyCertifications,
+          },
+          certification_products: rewind_data.rewindSummary.certificationProducts,
+        },
+      ]);
+
+      if (error) {
+        throw new Error('Failed to add rewind: ' + error.message);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error adding rewind:', error.message);
+    }
+  }
+
   static async updateErrors(errors_data) {
     try {
       const { data, error } = await supabase.from('errors').insert([
