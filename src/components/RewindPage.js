@@ -1,16 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
+import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import '../styles/globals.css';
+import packageJson from '../../package.json';
 
 const RewindPage = () => {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
+  const [warnings, setWarnings] = useState([]);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const handleUsernameChange = (e) => {
     const input = e.target.value.toLowerCase();
@@ -41,6 +47,8 @@ const RewindPage = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setImageUrl(''); // Clear previous image
+    setWarnings([]); // Clear previous warnings
 
     const usernameFormatResult = validateUsernameFormat(username.toLowerCase());
     if (!usernameFormatResult.valid) {
@@ -73,14 +81,22 @@ const RewindPage = () => {
       const data = await response.json();
       console.log('Rewind data:', data);
 
-      // TODO: Display the generated rewind image
-      // The imageUrl will be available in data.imageUrl once generateRewind.js is implemented
+      setImageUrl(data.imageUrl);
+      setWarnings(data.warnings || []);
     } catch (error) {
       console.error('Error generating rewind:', error);
       setError(error.message || 'Failed to generate rewind');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageClick = (src) => {
+    setFullscreenImage(src);
+  };
+
+  const handleOverlayClick = () => {
+    setFullscreenImage(null);
   };
 
   return (
@@ -125,7 +141,25 @@ const RewindPage = () => {
           )}
         </div>
 
-        {error && <div className='error-message'>{error}</div>}
+        {error && (
+          <div className='error-message'>
+            {error}
+            <p>
+              If the error persists, consider writing an{' '}
+              <a
+                href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(
+                  generateIssueTitle({ message: error })
+                )}&body=${encodeURIComponent(
+                  generateIssueBody({ message: error }, warnings || [], { username }, packageJson.version)
+                )}`}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                issue
+              </a>
+            </p>
+          </div>
+        )}
 
         {!loading && (
           <button type='submit' className='button submit-button'>
@@ -138,6 +172,51 @@ const RewindPage = () => {
         <div className='loading-container'>
           <p>Generating your Trailhead Rewind...</p>
           <div className='loading-icon'></div>
+        </div>
+      )}
+
+      {imageUrl && !error && (
+        <div className='image-container'>
+          <Image
+            src={imageUrl}
+            alt='Generated Rewind'
+            className='generated-image'
+            width={2160}
+            height={2700}
+            unoptimized
+            onClick={() => handleImageClick(imageUrl)}
+          />
+          <a href={imageUrl} download={`trailhead-rewind-${username}-2025.png`} className='download-link'>
+            Download Rewind
+          </a>
+          {warnings.length > 0 && (
+            <div className='warning-message'>
+              <p>Rewind generated, with warnings:</p>
+              <ul>
+                {warnings.map((warning, index) => (
+                  <li key={index}>{warning}</li>
+                ))}
+              </ul>
+              <p>
+                If the error persists, consider writing an{' '}
+                <a
+                  href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(
+                    'Warning: Rewind generated with warnings'
+                  )}&body=${encodeURIComponent(generateIssueBody(null, warnings, { username }, packageJson.version))}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  issue
+                </a>
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {fullscreenImage && (
+        <div className='fullscreen-overlay visible' onClick={handleOverlayClick}>
+          <Image src={fullscreenImage} alt='Full Screen Rewind' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
     </div>
