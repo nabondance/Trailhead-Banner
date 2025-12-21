@@ -158,25 +158,24 @@ const generatePlusXCertificationsSvg = (count) => {
 // Accent color used ONLY for background elements (lines / waves / dots / geometry).
 function getRankAccentColor(rank) {
   const rankAccentMap = {
-    // Basic ranks (icon-driven accents)
-    Scout: '#22C3B5', // teal (scout badge vibe)
-    Hiker: '#F4B73B', // warm amber (boot / sunny panel)
-    Explorer: '#F25C54', // coral red (compass face)
-    Adventurer: '#FF8A3D', // flame orange (campfire)
-    Mountaineer: '#8B5CF6', // violet (mountain range accent)
-    Expeditioner: '#38BDF8', // sky/sea cyan (boat / ocean)
+    // Basic ranks - warm progression: gold → amber → orange → coral → red
+    Scout: '#F7C948', // warm gold (entry level, welcoming)
+    Hiker: '#F5A623', // amber/orange (matches badge's warm tones)
+    Explorer: '#F26B50', // coral red (compass face, sunset)
+    Adventurer: '#E84D30', // flame red-orange (campfire intensity)
+    Mountaineer: '#D93B4A', // rich crimson (peak achievement pre-ranger)
+    Expeditioner: '#C42E5C', // deep rose (transition toward ranger premium)
 
-    // Ranger family (progression: cyan → blue → indigo → violet → gold → magenta)
-    Ranger: '#22A6D5', // cyan (base ranger)
-    'Double Star Ranger': '#1C7ED6', // azure
-    'Triple Star Ranger': '#3B5BDB', // indigo
-    'Four Star Ranger': '#7048E8', // violet
-    'Five Star Ranger': '#F5C26B', // legendary gold
-    'All Star Ranger': '#FF4D9D', // elite magenta
+    // Ranger family - cool premium progression: cyan → blue → indigo → violet → purple → magenta
+    Ranger: '#2196E8', // bright azure (fresh start as ranger)
+    'Double Star Ranger': '#3D6BDB', // royal blue (growing prestige)
+    'Triple Star Ranger': '#5347C4', // indigo (deepening expertise)
+    'Four Star Ranger': '#7142B8', // violet (approaching elite)
+    'Five Star Ranger': '#9234A8', // purple-magenta (premium territory)
+    'All Star Ranger': '#B5278F', // rich magenta (ultimate prestige)
   };
 
-  // Default (Salesforce blue)
-  return rankAccentMap[rank] || '#0176D3';
+  return rankAccentMap[rank] || '#22C3B5'; // fallback teal
 }
 
 function getAgentblazerStyle(agentblazerRank) {
