@@ -160,11 +160,17 @@ async function drawYearSection(ctx, year) {
 
   ctx.textAlign = 'right';
   ctx.textBaseline = 'top';
-  ctx.letterSpacing = '-68px'; // Negative value brings letters closer together
+  ctx.letterSpacing = '-80px'; // Negative value brings letters closer together
 
   // IMPORTANT: very large font
   ctx.font = FontUtils.getFontString('200', 400, FontUtils.getFontFamily('dela-gothic-one'));
 
+  // Draw outline first
+  ctx.strokeStyle = '#009edb'; // Trailhead-Banner blue outline
+  ctx.lineWidth = 20;
+  ctx.strokeText(year.toString(), 0, 0);
+
+  // Draw filled text on top
   ctx.fillText(year.toString(), 0, 0);
 
   ctx.restore();
