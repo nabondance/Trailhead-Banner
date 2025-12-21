@@ -78,9 +78,9 @@ async function generateRewindImage(options) {
     // Certification & Stamps section
     if (rewindSummary.yearlyCertifications + rewindSummary.yearlyStamps > 1) {
       await drawTimelineSection(ctx, rewindSummary, yearlyData);
-    } else if (rewindSummary.yearlyCertifications == 1) {
-      await drawCertificationSection(ctx, rewindSummary, yearlyData);
-    } else if (rewindSummary.yearlyCertifications == 0) {
+    } else if (rewindSummary.yearlyCertifications + rewindSummary.yearlyStamps == 1) {
+      await drawLimitedCertificationStampSection(ctx, rewindSummary, yearlyData);
+    } else {
       await drawNoCertificationSection(ctx, rewindSummary, yearlyData);
     }
 
@@ -409,9 +409,49 @@ async function drawNoCertificationSection(ctx, rewindSummary, yearlyData) {
 }
 
 // Draw certification section for single certification
-async function drawCertificationSection(ctx, rewindSummary, yearlyData) {
-  const yPosition = 1250;
-  // To be implemented if needed
+async function drawLimitedCertificationStampSection(ctx, rewindSummary, yearlyData) {
+  const yPosition = 1600;
+  const logoSize = 500;
+  const spacing = 40;
+  const centerX = 1080;
+
+  // Use the pre-computed yearly achievements from rewind summary
+  const items = rewindSummary.yearlyAchievements || [];
+
+  if (items.length === 0) return;
+
+  // Calculate total width needed for all logos
+  const totalWidth = items.length * logoSize + (items.length - 1) * spacing;
+  const startX = centerX - totalWidth / 2;
+
+  // Draw section title
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.font = FontUtils.getFontString('bold', 80, FontUtils.getFontFamily('salesforce-sans'));
+
+  // Draw each logo centered and aligned
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const logoX = startX + i * (logoSize + spacing);
+    const logoY = yPosition - logoSize / 2;
+
+    try {
+      const logoBuffer = await getImage(item.logoUrl, item.folder);
+      const logo = await loadImage(logoBuffer);
+
+      // Fixed width, calculate height to respect aspect ratio
+      const drawWidth = logoSize;
+      const drawHeight = (drawWidth * logo.height) / logo.width;
+
+      // Center horizontally in the allocated space, use calculated height
+      const centeredX = logoX;
+      const centeredY = logoY;
+
+      ctx.drawImage(logo, centeredX, centeredY, drawWidth, drawHeight);
+    } catch (error) {
+      console.error(`Failed to load ${item.type} logo:`, error);
+    }
+  }
 }
 
 // Draw timeline section for certifications and stamps

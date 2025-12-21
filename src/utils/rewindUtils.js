@@ -54,6 +54,9 @@ export function generateRewindSummary({ rankData, certificationsData, yearlyData
   // Add timeline data for monthly activities
   summary.timelineData = getTimelineData(yearlyData);
 
+  // Add combined list of all certifications and stamps for the year
+  summary.yearlyAchievements = getCombinedAchievements(yearlyData);
+
   return summary;
 }
 
@@ -220,4 +223,42 @@ export function getTimelineData(yearlyData) {
   });
 
   return activitiesByMonth;
+}
+
+// Get combined list of certifications and stamps for the year
+export function getCombinedAchievements(yearlyData) {
+  const achievements = [];
+
+  // Add certifications
+  yearlyData.certifications.forEach((cert) => {
+    achievements.push({
+      type: 'certification',
+      logoUrl: cert.logoUrl,
+      name: cert.title,
+      folder: 'certifications',
+      date: new Date(cert.dateCompleted),
+      data: cert,
+    });
+  });
+
+  // Add stamps
+  yearlyData.stamps.forEach((stamp) => {
+    achievements.push({
+      type: 'stamp',
+      logoUrl: stamp.node.iconUrl,
+      name: stamp.node.title,
+      folder: 'stamps',
+      date: new Date(stamp.node.eventDate),
+      data: stamp.node,
+    });
+  });
+
+  // Sort by date (earliest first), but prioritize certifications over stamps
+  achievements.sort((a, b) => {
+    if (a.type === 'certification' && b.type === 'stamp') return -1;
+    if (a.type === 'stamp' && b.type === 'certification') return 1;
+    return a.date - b.date;
+  });
+
+  return achievements;
 }
