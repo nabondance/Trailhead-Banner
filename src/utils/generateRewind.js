@@ -142,8 +142,8 @@ async function drawYearSection(ctx, year) {
   const canvasWidth = 2160;
 
   // Push further outside for more "hint than label"
-  const rightMargin = -150;
-  const topMargin = 150;
+  const rightMargin = -120;
+  const topMargin = 80;
 
   const xPosition = canvasWidth - rightMargin;
   const yPosition = topMargin;
@@ -162,7 +162,7 @@ async function drawYearSection(ctx, year) {
   ctx.textBaseline = 'top';
 
   // IMPORTANT: very large font
-  ctx.font = FontUtils.getFontString('900', 340, FontUtils.getFontFamily('space-grotesk'));
+  ctx.font = FontUtils.getFontString('200', 400, FontUtils.getFontFamily('space-grotesk'));
 
   ctx.fillText(year.toString(), 0, 0);
 
