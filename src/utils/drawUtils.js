@@ -555,16 +555,16 @@ function drawCornerAccents(ctx, rankColors) {
   }
 }
 
-// Draw text with metallic gradient effect
-function drawMetallicText(ctx, text, fontSize, x, y, metalType) {
+// Draw text with stylized effect
+function drawStylizedText(ctx, text, fontSize, x, y, style) {
   const textWidth = ctx.measureText(text).width;
 
   let gradient, glowColor, strokeColor, highlightColor, glowPasses;
 
-  // Create gradient based on metal type
+  // Create gradient based on style
   gradient = ctx.createLinearGradient(x, y - fontSize * 0.5, x + textWidth, y + fontSize * 0.3);
 
-  if (metalType === 'gold') {
+  if (style === 'gold') {
     gradient.addColorStop(0, '#FFF9E6');
     gradient.addColorStop(0.2, '#FFE082');
     gradient.addColorStop(0.4, '#FFD54F');
@@ -576,7 +576,7 @@ function drawMetallicText(ctx, text, fontSize, x, y, metalType) {
     strokeColor = '#5D4037';
     highlightColor = '#FFECB3';
     glowPasses = 3;
-  } else if (metalType === 'silver') {
+  } else if (style === 'silver') {
     gradient.addColorStop(0, '#FFFFFF');
     gradient.addColorStop(0.25, '#E8E8E8');
     gradient.addColorStop(0.45, '#D0D0D0');
@@ -587,7 +587,7 @@ function drawMetallicText(ctx, text, fontSize, x, y, metalType) {
     strokeColor = '#404040';
     highlightColor = '#FFFFFF';
     glowPasses = 3;
-  } else if (metalType === 'holographic') {
+  } else if (style === 'holographic') {
     gradient.addColorStop(0, '#E8B4F8');
     gradient.addColorStop(0.2, '#D4A0F0');
     gradient.addColorStop(0.35, '#B8C8F8');
@@ -599,6 +599,49 @@ function drawMetallicText(ctx, text, fontSize, x, y, metalType) {
     strokeColor = '#6050A0';
     highlightColor = '#F0E8FF';
     glowPasses = 2;
+  } else if (style === 'stamp') {
+    // Rubber stamp effect - bold red with distressed look
+    gradient.addColorStop(0, '#D32F2F');
+    gradient.addColorStop(0.3, '#C62828');
+    gradient.addColorStop(0.5, '#B71C1C');
+    gradient.addColorStop(0.7, '#C62828');
+    gradient.addColorStop(1, '#D32F2F');
+    glowColor = '#FF5252';
+    strokeColor = '#7B1A1A';
+    highlightColor = '#FF8A80';
+    glowPasses = 1;
+  } else if (style === 'learn') {
+    // Blue learning theme - light blue to indigo gradient
+    gradient.addColorStop(0, '#90CAF9');
+    gradient.addColorStop(0.2, '#6FA8E0');
+    gradient.addColorStop(0.4, '#5580D0');
+    gradient.addColorStop(0.5, '#4A60C8');
+    gradient.addColorStop(0.65, '#4040B8');
+    gradient.addColorStop(0.8, '#3528A8');
+    gradient.addColorStop(1, '#280F8F');
+    glowColor = '#5580D0';
+    strokeColor = '#1A0860';
+    highlightColor = '#B8D8F8';
+    glowPasses = 2;
+  } else if (style === 'explore') {
+    // Green exploration theme - discovery/adventure vibe
+    gradient.addColorStop(0, '#E8F5E9');
+    gradient.addColorStop(0.2, '#A5D6A7');
+    gradient.addColorStop(0.4, '#81C784');
+    gradient.addColorStop(0.5, '#66BB6A');
+    gradient.addColorStop(0.65, '#4CAF50');
+    gradient.addColorStop(0.8, '#43A047');
+    gradient.addColorStop(1, '#2E7D32');
+    glowColor = '#81C784';
+    strokeColor = '#1B5E20';
+    highlightColor = '#C8E6C9';
+    glowPasses = 2;
+  } else {
+    // Default
+    glowColor = '#FFFFFF';
+    strokeColor = '#FFFFFF';
+    highlightColor = '#FFFFFF';
+    glowPasses = 0;
   }
 
   // LAYER 1: Outer glow (multiple passes)
@@ -672,7 +715,7 @@ module.exports = {
   generatePlusXCertificationsSvg,
   getRankAccentColor,
   getAgentblazerStyle,
-  drawMetallicText,
+  drawStylizedText,
   drawGeometricElements,
   drawCurvedLines,
   drawFlowingLinePatterns,

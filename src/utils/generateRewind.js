@@ -2,7 +2,7 @@ const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
 const { filterDataByYear, generateRewindSummary } = require('./rewindUtils');
-const { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawMetallicText } = require('./drawUtils');
+const { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawStylizedText } = require('./drawUtils');
 const FontUtils = require('./fontUtils');
 import { getImage } from './cacheUtils';
 
@@ -71,16 +71,16 @@ async function generateRewindImage(options) {
       await drawAgentblazerSection(ctx, rewindSummary.agentblazerRank);
       // Current Agentblazer rank section
       await drawAgentblazerRankSection(ctx, rewindSummary.agentblazerRank);
+    } else {
+      await drawMotivationSection(ctx, rewindSummary);
     }
 
-    // Certification section
-    if (rewindSummary.yearlyCertifications > 1 || rewindSummary.yearlyStamps > 1) {
+    // Certification & Stamps section
+    if (rewindSummary.yearlyCertifications + rewindSummary.yearlyStamps > 1) {
       await drawTimelineSection(ctx, rewindSummary, yearlyData);
-    }
-    if (rewindSummary.yearlyCertifications === 1) {
+    } else if (rewindSummary.yearlyCertifications == 1) {
       await drawCertificationSection(ctx, rewindSummary, yearlyData);
-    }
-    if (rewindSummary.yearlyCertifications === 0) {
+    } else if (rewindSummary.yearlyCertifications == 0) {
       await drawNoCertificationSection(ctx, rewindSummary, yearlyData);
     }
 
@@ -342,8 +342,61 @@ async function drawAgentblazerSection(ctx, agentblazerRank) {
   ctx.fillText(beforeText, startX, yPosition);
 
   // Draw the level with metallic effects using the generic function
-  const metalType = getAgentblazerStyle(agentblazerRank.title).metalType;
-  drawMetallicText(ctx, levelText, fontSize, startX + beforeWidth, yPosition, metalType);
+  const style = getAgentblazerStyle(agentblazerRank.title).metalType;
+  drawStylizedText(ctx, levelText, fontSize, startX + beforeWidth, yPosition, style);
+
+  // Draw " !" in white
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(afterText, startX + beforeWidth + levelWidth, yPosition);
+}
+
+async function drawMotivationSection(ctx, rewindSummary) {
+  const yPosition = 1150;
+  const fontSize = 100;
+
+  // Draw the achievement text with colored level word
+  ctx.font = FontUtils.getFontString('bold', fontSize, FontUtils.getFontFamily('salesforce-sans'));
+  ctx.textAlign = 'center';
+
+  // Split text to identify the level word for coloring
+  let beforeText, levelText, afterText, style;
+  if (rewindSummary.yearlyCertifications > 1) {
+    beforeText = "This year I've been ";
+    levelText = 'Learning';
+    afterText = ' !';
+    style = 'learn';
+  } else if (rewindSummary.yearlyStamps > 1) {
+    beforeText = "This year I've been ";
+    levelText = 'Stamping';
+    afterText = ' !';
+    style = 'stamp';
+  } else if (rewindSummary.yearlyCertifications > 0 || rewindSummary.yearlyStamps > 0) {
+    beforeText = "This year I've been ";
+    levelText = 'Exploring';
+    afterText = ' !';
+    style = 'explore';
+  } else {
+    beforeText = '';
+    levelText = '';
+    afterText = '';
+    style = 'default';
+  }
+
+  const beforeWidth = ctx.measureText(beforeText).width;
+  const levelWidth = ctx.measureText(levelText).width;
+  const afterWidth = ctx.measureText(afterText).width;
+  const totalWidth = beforeWidth + levelWidth + afterWidth;
+
+  // Calculate starting position to center the entire text
+  const startX = 1080 - totalWidth / 2;
+
+  // Draw "This year I've became a " in white
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'left';
+  ctx.fillText(beforeText, startX, yPosition);
+
+  // Draw the level with metallic effects using the generic function
+  drawStylizedText(ctx, levelText, fontSize, startX + beforeWidth, yPosition, style);
 
   // Draw " !" in white
   ctx.fillStyle = '#FFFFFF';
