@@ -8,6 +8,9 @@ class FontUtils {
 
   // Font family mappings constant
   static FONT_MAPPINGS = {
+    anta: 'Anta',
+    'anta-regular': 'Anta Regular',
+    'dela-gothic-one': 'Dela Gothic One',
     spacegrotesk: 'Space Grotesk',
     salesforcesans: 'Salesforce Sans',
     roboto: 'Roboto',
@@ -77,6 +80,7 @@ class FontUtils {
 
       this.#fontsLoaded = true;
       console.log(`Successfully loaded ${ttfFiles.length} font file(s)`);
+      console.log('Available font families:', this.getAvailableFontFamilies());
     } catch (error) {
       console.error('Error loading all fonts:', error);
       // Continue execution even if fonts fail to load - will fallback to system fonts
