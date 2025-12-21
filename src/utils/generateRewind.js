@@ -242,9 +242,9 @@ async function drawAgentblazerRankSection(ctx, agentblazerRank) {
 
 async function drawStatsSection(ctx, rewindSummary) {
   // Draw stats for the year
-  const yPositionInit = 650;
+  const yPositionInit = 600;
   const centerX = 1080;
-  const lineHeight = 60;
+  const lineHeight = 70;
 
   // Draw section title
   ctx.fillStyle = '#FFFFFF';
@@ -255,47 +255,59 @@ async function drawStatsSection(ctx, rewindSummary) {
   // Define current total stats to display
   const stats = [
     {
-      label: 'Total Points',
-      value: rewindSummary.currentPoints?.toLocaleString('fr') || '0',
-      color: '#FFD21F', // Trailhead yellow
+      number: rewindSummary.totalCertifications || 0,
+      label: rewindSummary.totalCertifications === 1 ? 'Certification earned' : 'Certifications earned',
+      color: '#54A265', // Green
     },
     {
-      label: 'Total Badges',
-      value: rewindSummary.currentBadges || 0,
+      number: rewindSummary.currentBadges || 0,
+      label: rewindSummary.currentBadges === 1 ? 'Badge collected' : 'Badges collected',
       color: '#1BA5F8', // Trailhead blue
     },
     {
-      label: 'Total Certifications',
-      value: rewindSummary.totalCertifications || 0,
-      color: '#54A265', // Green
+      number: rewindSummary.currentPoints?.toLocaleString('fr') || '0',
+      label: 'Points accumulated',
+      color: '#FFD21F', // Trailhead yellow
     },
   ];
 
-  // Draw each stat as a line
-  stats.forEach((stat, index) => {
-    const yPosition = yPositionInit + 80 + index * lineHeight;
+  // Draw each stat as a line (skip if number is 0)
+  let lineIndex = 0;
+  stats.forEach((stat) => {
+    // Skip if the number is 0
+    if (stat.number === 0 || stat.number === '0') return;
 
-    // Draw stat in format "Label: Value"
-    ctx.font = FontUtils.getFontString('normal', 50, FontUtils.getFontFamily('salesforce-sans'));
+    const yPosition = yPositionInit + 100 + lineIndex * lineHeight;
+    lineIndex++;
+
+    // Draw stat in format "Number Label"
     ctx.textAlign = 'center';
 
-    // Draw label in white
+    // Draw number in bold and colored
+    ctx.font = FontUtils.getFontString('bold', 50, FontUtils.getFontFamily('salesforce-sans'));
+    ctx.fillStyle = stat.color;
+    const numberText = `${stat.number} `;
+    const numberWidth = ctx.measureText(numberText).width;
+
+    // Draw label in normal white
+    ctx.font = FontUtils.getFontString('normal', 50, FontUtils.getFontFamily('salesforce-sans'));
     ctx.fillStyle = '#FFFFFF';
-    const labelText = `${stat.label}: `;
-    const labelWidth = ctx.measureText(labelText).width;
+    const labelWidth = ctx.measureText(stat.label).width;
 
     // Calculate positions to center the entire text
-    const totalText = `${stat.label}: ${stat.value}`;
-    const totalWidth = ctx.measureText(totalText).width;
+    const totalWidth = numberWidth + labelWidth;
     const startX = centerX - totalWidth / 2;
 
-    // Draw label
-    ctx.textAlign = 'left';
-    ctx.fillText(labelText, startX, yPosition);
-
-    // Draw value in color
+    // Draw number in bold and colored
+    ctx.font = FontUtils.getFontString('bold', 50, FontUtils.getFontFamily('salesforce-sans'));
     ctx.fillStyle = stat.color;
-    ctx.fillText(stat.value, startX + labelWidth, yPosition);
+    ctx.textAlign = 'left';
+    ctx.fillText(stat.number, startX, yPosition);
+
+    // Draw label in normal white
+    ctx.font = FontUtils.getFontString('normal', 50, FontUtils.getFontFamily('salesforce-sans'));
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(stat.label, startX + numberWidth, yPosition);
   });
 }
 
