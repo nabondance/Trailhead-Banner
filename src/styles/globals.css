@@ -1622,3 +1622,12 @@ select:focus {
 .dark .announcement-error {
   background-color: var(--error-color);
 }
+
+.animated-letter {
+  display: inline-block;
+  transition: transform 0.3s ease-in-out;
+}
+
+.flipped-text {
+  transform: scaleX(-1);
+}

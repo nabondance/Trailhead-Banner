@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
@@ -11,12 +11,36 @@ import packageJson from '../../package.json';
 
 const RewindPage = () => {
   const [username, setUsername] = useState('');
+  const [flippedLetters, setFlippedLetters] = useState(new Set());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [warnings, setWarnings] = useState([]);
   const [fullscreenImage, setFullscreenImage] = useState(null);
+
+  useEffect(() => {
+    const interval = setInterval(
+      () => {
+        const titleText = 'Trailhead Rewind';
+        const randomIndex = Math.floor(Math.random() * titleText.length);
+
+        // Skip spaces
+        if (titleText[randomIndex] === ' ') return;
+
+        setFlippedLetters((prev) => {
+          const newSet = new Set(prev);
+          if (!newSet.has(randomIndex)) {
+            newSet.add(randomIndex);
+          }
+          return newSet;
+        });
+      },
+      400 + Math.random() * 600
+    ); // Random interval
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleUsernameChange = (e) => {
     const input = e.target.value.toLowerCase();
@@ -99,9 +123,23 @@ const RewindPage = () => {
     setFullscreenImage(null);
   };
 
+  const renderAnimatedTitle = () => {
+    const titleText = 'Trailhead Rewind';
+    return titleText.split('').map((char, index) => {
+      if (char === ' ') {
+        return <span key={index}> </span>;
+      }
+      return (
+        <span key={index} className={`animated-letter ${flippedLetters.has(index) ? 'flipped-text' : ''}`}>
+          {char}
+        </span>
+      );
+    });
+  };
+
   return (
     <div className='container'>
-      <h1>Trailhead Rewind (written backward ???)</h1>
+      <h1>{renderAnimatedTitle()}</h1>
       <h2>It was an amazing learning year, let's rewind it !</h2>
 
       <form onSubmit={handleSubmit} className='form'>
