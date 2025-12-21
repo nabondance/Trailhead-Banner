@@ -142,8 +142,8 @@ async function drawYearSection(ctx, year) {
   const canvasWidth = 2160;
 
   // Push further outside for more "hint than label"
-  const rightMargin = -120;
-  const topMargin = 80;
+  const rightMargin = -100;
+  const topMargin = 30;
 
   const xPosition = canvasWidth - rightMargin;
   const yPosition = topMargin;
@@ -153,16 +153,17 @@ async function drawYearSection(ctx, year) {
   ctx.translate(xPosition, yPosition);
 
   // Softer, more confident tilt
-  ctx.rotate((23 * Math.PI) / 180);
+  ctx.rotate((20 * Math.PI) / 180);
 
   // Slightly softened white
   ctx.fillStyle = '#EDEDED';
 
   ctx.textAlign = 'right';
   ctx.textBaseline = 'top';
+  ctx.letterSpacing = '-68px'; // Negative value brings letters closer together
 
   // IMPORTANT: very large font
-  ctx.font = FontUtils.getFontString('200', 400, FontUtils.getFontFamily('space-grotesk'));
+  ctx.font = FontUtils.getFontString('200', 400, FontUtils.getFontFamily('dela-gothic-one'));
 
   ctx.fillText(year.toString(), 0, 0);
 
