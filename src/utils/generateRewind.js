@@ -124,7 +124,7 @@ async function drawBackground(ctx, rewindSummary) {
 
 // Draw header with title and username
 async function drawHeader(ctx, year, username) {
-  const yPosition = 350;
+  const yPosition = 450;
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
 
@@ -174,7 +174,7 @@ async function drawYearSection(ctx, year) {
 async function drawRankSection(ctx, rankData) {
   // Define the center point where the logo should be positioned
   const rightX = 650;
-  const centerY = 750;
+  const centerY = 900;
 
   // Load and draw rank logo if available
   try {
@@ -206,7 +206,7 @@ async function drawRankSection(ctx, rankData) {
 async function drawAgentblazerRankSection(ctx, agentblazerRank) {
   // Load and draw Agentblazer image below the text
   if (agentblazerRank?.statusName === 'Agentblazer') {
-    const centerY = 750;
+    const centerY = 900;
     const xPosition = 1550;
     const logoHeight = 400;
     try {
@@ -243,7 +243,7 @@ async function drawAgentblazerRankSection(ctx, agentblazerRank) {
 
 async function drawStatsSection(ctx, rewindSummary) {
   // Draw stats for the year
-  const yPositionInit = 600;
+  const yPositionInit = 750;
   const centerX = 1080;
   const lineHeight = 70;
 
@@ -314,7 +314,7 @@ async function drawStatsSection(ctx, rewindSummary) {
 
 // Draw Agentblazer achievement section
 async function drawAgentblazerSection(ctx, agentblazerRank) {
-  const yPosition = 1150;
+  const yPosition = 1300;
   const fontSize = 100;
 
   // Draw the achievement text with colored level word
@@ -364,7 +364,7 @@ async function drawAgentblazerSection(ctx, agentblazerRank) {
 }
 
 async function drawMotivationSection(ctx, rewindSummary) {
-  const yPosition = 1150;
+  const yPosition = 1300;
   const fontSize = 100;
 
   // Draw the achievement text with colored level word
@@ -418,12 +418,12 @@ async function drawMotivationSection(ctx, rewindSummary) {
 
 // Draw certification section when no certifications earned
 async function drawNoCertificationSection(ctx, rewindSummary, yearlyData) {
-  const yPosition = 1250;
+  const yPosition = 1300;
 }
 
 // Draw certification section for single certification
 async function drawLimitedCertificationStampSection(ctx, rewindSummary, yearlyData) {
-  const yPosition = 1600;
+  const yPosition = 1750;
   const logoSize = 500;
   const spacing = 40;
   const centerX = 1080;
@@ -469,7 +469,7 @@ async function drawLimitedCertificationStampSection(ctx, rewindSummary, yearlyDa
 
 // Draw timeline section for certifications and stamps
 async function drawTimelineSection(ctx, rewindSummary, yearlyData) {
-  const yPosition = 1650;
+  const yPosition = 1800;
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   // Use pre-computed timeline data from rewind summary
@@ -561,7 +561,7 @@ async function drawTimelineSection(ctx, rewindSummary, yearlyData) {
 
 // Draw favorite product section with logos
 async function drawTopProducts(ctx, certificationProducts) {
-  const yPosition = 2100;
+  const yPosition = 2250;
 
   // Find products with the highest count
   const products = Object.entries(certificationProducts);
@@ -666,13 +666,6 @@ function getProductLogoFileName(productName) {
   // Example: "Sales Cloud" -> "sales-cloud.png"
   return productName.toLowerCase().replace(/\s+/g, '-') + '.png';
 }
-
-// Agentblazer rank colors
-const AGENTBLAZER_COLORS = {
-  Champion: '#C0C0C0', // Silver
-  Innovator: '#FFD700', // Gold
-  Legend: '#E5E4E2', // Platinum
-};
 
 async function drawWatermark(ctx) {
   const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'thb-rewind.svg');
