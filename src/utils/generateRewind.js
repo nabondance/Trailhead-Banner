@@ -129,8 +129,15 @@ async function drawHeader(ctx, year, username) {
   ctx.textAlign = 'center';
 
   // Main title
-  ctx.font = FontUtils.getFontString('bold', 120, FontUtils.getFontFamily('salesforce-sans'));
-  ctx.fillText(`Trailhead Rewind`, 1080, yPosition);
+  ctx.font = FontUtils.getFontString('bold', 120, FontUtils.getFontFamily('dela-gothic-one'));
+
+  // Layer 1: Blue offset/underline shadow (drawn first, behind)
+  ctx.fillStyle = '#009edb'; // Trailhead-Banner blue
+  ctx.fillText(`Trailhead  Rewind`, 1080 + 12, yPosition + 12); // Offset down
+
+  // Layer 2: White main text (on top)
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(`Trailhead  Rewind`, 1080, yPosition);
 
   // Username
   ctx.font = FontUtils.getFontString('normal', 60, FontUtils.getFontFamily('salesforce-sans'));
@@ -143,7 +150,7 @@ async function drawYearSection(ctx, year) {
 
   // Push further outside for more "hint than label"
   const rightMargin = -100;
-  const topMargin = 30;
+  const topMargin = 20;
 
   const xPosition = canvasWidth - rightMargin;
   const yPosition = topMargin;
@@ -165,14 +172,13 @@ async function drawYearSection(ctx, year) {
   // IMPORTANT: very large font
   ctx.font = FontUtils.getFontString('200', 400, FontUtils.getFontFamily('dela-gothic-one'));
 
-  // Draw outline first
-  ctx.strokeStyle = '#009edb'; // Trailhead-Banner blue outline
-  ctx.lineWidth = 20;
-  ctx.strokeText(year.toString(), 0, 0);
+  // Layer 1: Blue offset/underline shadow (drawn first, behind)
+  ctx.fillStyle = '#009edb'; // Trailhead-Banner blue
+  ctx.fillText(`${year}`, 20, 20);
 
-  // Draw filled text on top
-  ctx.fillText(year.toString(), 0, 0);
-
+  // Layer 2: White main text (on top)
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(`${year}`, 0, 0);
   ctx.restore();
 }
 
