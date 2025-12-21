@@ -179,13 +179,13 @@ function getRankAccentColor(rank) {
   return rankAccentMap[rank] || '#0176D3';
 }
 
-function getAgentblazerColor(agentblazerRank) {
-  const agentblazerColorMap = {
-    Champion: '#C0C0C0', // Silver
-    Innovator: '#FFD700', // Gold
-    Legend: '#E5E4E2', // Platinum
+function getAgentblazerStyle(agentblazerRank) {
+  const agentblazerStyleMap = {
+    Champion: { color: '#C0C0C0', metalType: 'silver' },
+    Innovator: { color: '#FFD700', metalType: 'gold' },
+    Legend: { color: '#E5E4E2', metalType: 'holographic' },
   };
-  return agentblazerColorMap[agentblazerRank] || '#0176D3';
+  return agentblazerStyleMap[agentblazerRank] || { color: '#0176D3', metalType: null };
 }
 
 // Draw geometric elements based on rank colors
@@ -555,6 +555,115 @@ function drawCornerAccents(ctx, rankColors) {
   }
 }
 
+// Draw text with metallic gradient effect
+function drawMetallicText(ctx, text, fontSize, x, y, metalType) {
+  const textWidth = ctx.measureText(text).width;
+
+  let gradient, glowColor, strokeColor, highlightColor, glowPasses;
+
+  // Create gradient based on metal type
+  gradient = ctx.createLinearGradient(x, y - fontSize * 0.5, x + textWidth, y + fontSize * 0.3);
+
+  if (metalType === 'gold') {
+    gradient.addColorStop(0, '#FFF9E6');
+    gradient.addColorStop(0.2, '#FFE082');
+    gradient.addColorStop(0.4, '#FFD54F');
+    gradient.addColorStop(0.5, '#FFCA28');
+    gradient.addColorStop(0.65, '#FFB300');
+    gradient.addColorStop(0.8, '#FF8F00');
+    gradient.addColorStop(1, '#E65100');
+    glowColor = '#FFB300';
+    strokeColor = '#5D4037';
+    highlightColor = '#FFECB3';
+    glowPasses = 3;
+  } else if (metalType === 'silver') {
+    gradient.addColorStop(0, '#FFFFFF');
+    gradient.addColorStop(0.25, '#E8E8E8');
+    gradient.addColorStop(0.45, '#D0D0D0');
+    gradient.addColorStop(0.6, '#B8B8B8');
+    gradient.addColorStop(0.8, '#A0A0A0');
+    gradient.addColorStop(1, '#888888');
+    glowColor = '#C0C0C0';
+    strokeColor = '#404040';
+    highlightColor = '#FFFFFF';
+    glowPasses = 3;
+  } else if (metalType === 'holographic') {
+    gradient.addColorStop(0, '#E8B4F8');
+    gradient.addColorStop(0.2, '#D4A0F0');
+    gradient.addColorStop(0.35, '#B8C8F8');
+    gradient.addColorStop(0.5, '#E8F0FF');
+    gradient.addColorStop(0.65, '#A8E8F0');
+    gradient.addColorStop(0.8, '#80D8E8');
+    gradient.addColorStop(1, '#9878C8');
+    glowColor = '#E0E0FF';
+    strokeColor = '#6050A0';
+    highlightColor = '#F0E8FF';
+    glowPasses = 2;
+  }
+
+  // LAYER 1: Outer glow (multiple passes)
+  ctx.save();
+  for (let i = 0; i < glowPasses; i++) {
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 30 + i * 10;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.fillStyle = 'rgba(0,0,0,0)';
+    ctx.strokeStyle = glowColor;
+    ctx.lineWidth = 1;
+    ctx.strokeText(text, x, y);
+  }
+  ctx.restore();
+
+  // LAYER 2: Drop shadow
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillText(text, x + 2, y + 3);
+  ctx.restore();
+
+  // LAYER 3: Dark stroke outline
+  ctx.save();
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 5;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(text, x, y);
+  ctx.restore();
+
+  // LAYER 4: Main gradient fill
+  ctx.fillStyle = gradient;
+  ctx.fillText(text, x, y);
+
+  // LAYER 5: Inner highlight
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x - 10, y - fontSize, 500, fontSize * 0.6);
+  ctx.clip();
+
+  const innerHighlight = ctx.createLinearGradient(x, y - fontSize, x, y - fontSize * 0.3);
+  innerHighlight.addColorStop(0, highlightColor);
+  innerHighlight.addColorStop(0.5, 'rgba(255,255,255,0.3)');
+  innerHighlight.addColorStop(1, 'rgba(255,255,255,0)');
+
+  ctx.globalCompositeOperation = 'overlay';
+  ctx.fillStyle = innerHighlight;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+
+  // LAYER 6: Specular highlight
+  ctx.save();
+  ctx.globalCompositeOperation = 'overlay';
+  ctx.globalAlpha = 0.5;
+
+  const specular = ctx.createRadialGradient(x + 80, y - fontSize * 0.3, 0, x + 80, y - fontSize * 0.3, fontSize * 1.5);
+  specular.addColorStop(0, '#FFFFFF');
+  specular.addColorStop(0.3, 'rgba(255,255,255,0.3)');
+  specular.addColorStop(1, 'rgba(255,255,255,0)');
+
+  ctx.fillStyle = specular;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
 module.exports = {
   applyGrayscale,
   cropImage,
@@ -562,7 +671,8 @@ module.exports = {
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
   getRankAccentColor,
-  getAgentblazerColor,
+  getAgentblazerStyle,
+  drawMetallicText,
   drawGeometricElements,
   drawCurvedLines,
   drawFlowingLinePatterns,

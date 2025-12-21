@@ -2,7 +2,7 @@ const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
 const { filterDataByYear, generateRewindSummary } = require('./rewindUtils');
-const { getRankAccentColor, getAgentblazerColor, drawGeometricElements } = require('./drawUtils');
+const { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawMetallicText } = require('./drawUtils');
 import { getImage } from './cacheUtils';
 require('./fonts');
 
@@ -216,7 +216,7 @@ async function drawAgentblazerRankSection(ctx, agentblazerRank) {
 
       // Add glow effect
       ctx.save();
-      ctx.shadowColor = getAgentblazerColor(agentblazerRank.title);
+      ctx.shadowColor = getAgentblazerStyle(agentblazerRank.title).color;
       ctx.shadowBlur = 30;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
@@ -293,12 +293,10 @@ async function drawStatsSection(ctx, rewindSummary) {
 // Draw Agentblazer achievement section
 async function drawAgentblazerSection(ctx, agentblazerRank) {
   const yPosition = 1150;
-
-  // Get color for the rank
-  const rankColor = AGENTBLAZER_COLORS[agentblazerRank.title] || '#FFFFFF';
+  const fontSize = 100;
 
   // Draw the achievement text with colored level word
-  ctx.font = 'bold 100px "Salesforce Sans"';
+  ctx.font = `bold ${fontSize}px "Salesforce Sans"`;
   ctx.textAlign = 'center';
 
   // Split text to identify the level word for coloring
@@ -334,99 +332,9 @@ async function drawAgentblazerSection(ctx, agentblazerRank) {
   ctx.textAlign = 'left';
   ctx.fillText(beforeText, startX, yPosition);
 
-  // Draw the level with special metallic effects
-  if (agentblazerRank.title === 'Champion') {
-    // Create silver gradient for Champion
-    const gradient = ctx.createLinearGradient(
-      startX + beforeWidth,
-      yPosition - 40,
-      startX + beforeWidth + levelWidth,
-      yPosition + 10
-    );
-
-    // Silver gradient with metallic shine
-    gradient.addColorStop(0, '#E8E8E8'); // Light silver
-    gradient.addColorStop(0.3, '#C0C0C0'); // Silver
-    gradient.addColorStop(0.5, '#F8F8F8'); // White highlight
-    gradient.addColorStop(0.7, '#C0C0C0'); // Silver
-    gradient.addColorStop(1, '#A8A8A8'); // Dark silver
-
-    ctx.fillStyle = gradient;
-
-    // Add silver glow
-    ctx.shadowColor = '#C0C0C0';
-    ctx.shadowBlur = 3;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-
-    ctx.fillText(levelText, startX + beforeWidth, yPosition);
-
-    // Reset shadow
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-  } else if (agentblazerRank.title === 'Innovator') {
-    // Create golden gradient for Innovator
-    const gradient = ctx.createLinearGradient(
-      startX + beforeWidth,
-      yPosition - 40,
-      startX + beforeWidth + levelWidth,
-      yPosition + 10
-    );
-
-    // Golden gradient with metallic shine
-    gradient.addColorStop(0, '#FFE135'); // Light gold
-    gradient.addColorStop(0.3, '#FFD700'); // Gold
-    gradient.addColorStop(0.5, '#FFFF99'); // Yellow highlight
-    gradient.addColorStop(0.7, '#FFD700'); // Gold
-    gradient.addColorStop(1, '#DAA520'); // Dark gold
-
-    ctx.fillStyle = gradient;
-
-    // Add golden glow
-    ctx.shadowColor = '#FFD700';
-    ctx.shadowBlur = 3;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-
-    ctx.fillText(levelText, startX + beforeWidth, yPosition);
-
-    // Reset shadow
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-  } else if (agentblazerRank.title === 'Legend') {
-    // Create subtle metallic gradient for Legend
-    const gradient = ctx.createLinearGradient(
-      startX + beforeWidth,
-      yPosition - 40,
-      startX + beforeWidth + levelWidth,
-      yPosition + 10
-    );
-
-    // Elegant platinum gradient with subtle shimmer
-    gradient.addColorStop(0, '#F0F0F0'); // Light silver
-    gradient.addColorStop(0.3, '#E8E8E8'); // Platinum
-    gradient.addColorStop(0.5, '#FFFFFF'); // White highlight
-    gradient.addColorStop(0.7, '#E8E8E8'); // Platinum
-    gradient.addColorStop(1, '#D3D3D3'); // Light gray
-
-    ctx.fillStyle = gradient;
-
-    // Add subtle glow
-    ctx.shadowColor = '#FFFFFF';
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-
-    ctx.fillText(levelText, startX + beforeWidth, yPosition);
-
-    // Reset shadow
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-  } else {
-    // Fallback for unknown levels
-    ctx.fillStyle = rankColor;
-    ctx.fillText(levelText, startX + beforeWidth, yPosition);
-  }
+  // Draw the level with metallic effects using the generic function
+  const metalType = getAgentblazerStyle(agentblazerRank.title).metalType;
+  drawMetallicText(ctx, levelText, fontSize, startX + beforeWidth, yPosition, metalType);
 
   // Draw " !" in white
   ctx.fillStyle = '#FFFFFF';
