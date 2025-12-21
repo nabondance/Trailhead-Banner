@@ -3,11 +3,14 @@ const path = require('path');
 const crypto = require('crypto');
 const { filterDataByYear, generateRewindSummary } = require('./rewindUtils');
 const { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawMetallicText } = require('./drawUtils');
+const FontUtils = require('./fontUtils');
 import { getImage } from './cacheUtils';
-require('./fonts');
 
 export const generateRewind = async (options) => {
   const { username, year, rankData, certificationsData, stampsData } = options;
+
+  // Load all fonts before generating the image
+  await FontUtils.loadFonts();
 
   // Filter data for the specified year
   const yearlyData = filterDataByYear({ certificationsData, stampsData }, year);
@@ -126,37 +129,43 @@ async function drawHeader(ctx, year, username) {
   ctx.textAlign = 'center';
 
   // Main title
-  ctx.font = 'bold 120px "Salesforce Sans"';
+  ctx.font = FontUtils.getFontString('bold', 120, FontUtils.getFontFamily('salesforce-sans'));
   ctx.fillText(`Trailhead Rewind`, 1080, yPosition);
 
   // Username
-  ctx.font = '60px "Salesforce Sans"';
+  ctx.font = FontUtils.getFontString('normal', 60, FontUtils.getFontFamily('salesforce-sans'));
   ctx.fillStyle = '#FFD21F'; // Trailhead yellow
   ctx.fillText(`@${username}`, 1080, yPosition + 100);
 }
 
 async function drawYearSection(ctx, year) {
-  const rightMargin = 200;
-  const topMargin = 350;
-  const xPosition = 2160 - rightMargin;
+  const canvasWidth = 2160;
+
+  // Push further outside for more "hint than label"
+  const rightMargin = -150;
+  const topMargin = 150;
+
+  const xPosition = canvasWidth - rightMargin;
   const yPosition = topMargin;
 
-  // Save context state
   ctx.save();
 
-  // Move to the position where we want to draw the text
   ctx.translate(xPosition, yPosition);
 
-  // Rotate the text -15 degrees (clockwise tilt)
-  ctx.rotate((20 * Math.PI) / 180);
+  // Softer, more confident tilt
+  ctx.rotate((23 * Math.PI) / 180);
 
-  // Draw year tilted
-  ctx.fillStyle = '#FFFFFF';
+  // Slightly softened white
+  ctx.fillStyle = '#EDEDED';
+
   ctx.textAlign = 'right';
-  ctx.font = 'bold 160px "Salesforce Sans"';
+  ctx.textBaseline = 'top';
+
+  // IMPORTANT: very large font
+  ctx.font = FontUtils.getFontString('900', 340, FontUtils.getFontFamily('space-grotesk'));
+
   ctx.fillText(year.toString(), 0, 0);
 
-  // Restore context state
   ctx.restore();
 }
 
@@ -240,7 +249,7 @@ async function drawStatsSection(ctx, rewindSummary) {
   // Draw section title
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
-  ctx.font = 'bold 60px "Salesforce Sans"';
+  ctx.font = FontUtils.getFontString('bold', 60, FontUtils.getFontFamily('salesforce-sans'));
   ctx.fillText('Current Trailhead Stats', centerX, yPositionInit);
 
   // Define current total stats to display
@@ -267,7 +276,7 @@ async function drawStatsSection(ctx, rewindSummary) {
     const yPosition = yPositionInit + 80 + index * lineHeight;
 
     // Draw stat in format "Label: Value"
-    ctx.font = '50px "Salesforce Sans"';
+    ctx.font = FontUtils.getFontString('normal', 50, FontUtils.getFontFamily('salesforce-sans'));
     ctx.textAlign = 'center';
 
     // Draw label in white
@@ -296,7 +305,7 @@ async function drawAgentblazerSection(ctx, agentblazerRank) {
   const fontSize = 100;
 
   // Draw the achievement text with colored level word
-  ctx.font = `bold ${fontSize}px "Salesforce Sans"`;
+  ctx.font = FontUtils.getFontString('bold', fontSize, FontUtils.getFontFamily('salesforce-sans'));
   ctx.textAlign = 'center';
 
   // Split text to identify the level word for coloring
@@ -385,7 +394,7 @@ async function drawTimelineSection(ctx, rewindSummary, yearlyData) {
     // Draw month label
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
-    ctx.font = '40px "Salesforce Sans"';
+    ctx.font = FontUtils.getFontString('normal', 40, FontUtils.getFontFamily('salesforce-sans'));
     ctx.fillText(monthNames[monthIndex], monthX, timelineY + 50);
 
     // Draw month marker
@@ -435,7 +444,7 @@ async function drawTimelineSection(ctx, rewindSummary, yearlyData) {
 
       if (extraCount > 0) {
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 40px "Salesforce Sans"';
+        ctx.font = FontUtils.getFontString('bold', 40, FontUtils.getFontFamily('salesforce-sans'));
         ctx.textAlign = 'center';
         // Position above the actual logos drawn for this month
         ctx.fillText(`+${extraCount}`, monthX, timelineY - 30 - currentVerticalOffset - 20);
@@ -457,7 +466,7 @@ async function drawTopProducts(ctx, certificationProducts) {
 
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
-  ctx.font = 'bold 80px "Salesforce Sans"';
+  ctx.font = FontUtils.getFontString('bold', 80, FontUtils.getFontFamily('salesforce-sans'));
 
   // Draw the title
   ctx.fillText('My favorite topic to learn about:', 1080, yPosition);
@@ -477,7 +486,7 @@ async function drawTopProducts(ctx, certificationProducts) {
 
       // Draw "&" between products
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 80px "Salesforce Sans"';
+      ctx.font = FontUtils.getFontString('bold', 80, FontUtils.getFontFamily('salesforce-sans'));
       ctx.textAlign = 'center';
       ctx.fillText('&', 1080, yPosition + 140);
 
@@ -492,7 +501,7 @@ async function drawTopProducts(ctx, certificationProducts) {
         // Add "&" before last product, comma before others
         if (i < productNames.length - 1) {
           ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 60px "Salesforce Sans"';
+          ctx.font = FontUtils.getFontString('bold', 60, FontUtils.getFontFamily('salesforce-sans'));
           ctx.textAlign = 'center';
           const separator = i === productNames.length - 2 ? '&' : ',';
           ctx.fillText(separator, 1080, currentY - 60);
@@ -516,7 +525,7 @@ async function drawProductWithLogo(ctx, productName, centerX, centerY) {
     const logoWidth = (logo.width / logo.height) * logoSize;
 
     // Measure text width to calculate positioning
-    ctx.font = 'bold 100px "Salesforce Sans"';
+    ctx.font = FontUtils.getFontString('bold', 100, FontUtils.getFontFamily('salesforce-sans'));
     const textMetrics = ctx.measureText(productName);
     const textWidth = textMetrics.width;
 
@@ -539,7 +548,7 @@ async function drawProductWithLogo(ctx, productName, centerX, centerY) {
     console.error(`Failed to load logo for product ${productName}:`, error);
     // Fallback to text only
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 100px "Salesforce Sans"';
+    ctx.font = FontUtils.getFontString('bold', 100, FontUtils.getFontFamily('salesforce-sans'));
     ctx.textAlign = 'center';
     ctx.fillText(productName, centerX, centerY + 30);
   }
