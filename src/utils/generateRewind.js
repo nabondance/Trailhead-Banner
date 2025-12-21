@@ -561,21 +561,23 @@ async function drawTimelineSection(ctx, rewindSummary, yearlyData) {
 
 // Draw favorite product section with logos
 async function drawTopProducts(ctx, certificationProducts) {
-  const yPosition = 2250;
+  const yPosition = 2200;
 
   // Find products with the highest count
   const products = Object.entries(certificationProducts);
   if (products.length === 0) return;
 
   const maxCount = Math.max(...products.map(([, count]) => count));
-  const topProducts = products.filter(([, count]) => count === maxCount);
+  const topProducts = products.filter(([, count]) => count === maxCount).slice(0, 3);
 
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.font = FontUtils.getFontString('bold', 80, FontUtils.getFontFamily('salesforce-sans'));
 
-  // Draw the title
-  ctx.fillText('My favorite topic to learn about:', 1080, yPosition);
+  // Draw the title with proper singular/plural
+  const titleText =
+    topProducts.length === 1 ? 'My favorite topic to learn about:' : 'My favorite topics to learn about:';
+  ctx.fillText(titleText, 1080, yPosition);
 
   if (topProducts.length === 1) {
     // Single product - draw logo and text
@@ -590,12 +592,6 @@ async function drawTopProducts(ctx, certificationProducts) {
       const spacing = 400;
       await drawProductWithLogo(ctx, productNames[0], 1080 - spacing / 2, yPosition + 120);
 
-      // Draw "&" between products
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = FontUtils.getFontString('bold', 80, FontUtils.getFontFamily('salesforce-sans'));
-      ctx.textAlign = 'center';
-      ctx.fillText('&', 1080, yPosition + 140);
-
       await drawProductWithLogo(ctx, productNames[1], 1080 + spacing / 2, yPosition + 120);
     } else {
       // Three or more products - stack vertically or show as list
@@ -603,15 +599,6 @@ async function drawTopProducts(ctx, certificationProducts) {
       for (let i = 0; i < productNames.length; i++) {
         await drawProductWithLogo(ctx, productNames[i], 1080, currentY);
         currentY += 120;
-
-        // Add "&" before last product, comma before others
-        if (i < productNames.length - 1) {
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = FontUtils.getFontString('bold', 60, FontUtils.getFontFamily('salesforce-sans'));
-          ctx.textAlign = 'center';
-          const separator = i === productNames.length - 2 ? '&' : ',';
-          ctx.fillText(separator, 1080, currentY - 60);
-        }
       }
     }
   }
