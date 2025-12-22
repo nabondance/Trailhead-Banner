@@ -26,16 +26,25 @@ const RewindPage = () => {
     const interval = setInterval(
       () => {
         const titleText = 'Trailhead Rewind';
-        const randomIndex = Math.floor(Math.random() * titleText.length);
-
-        // Skip spaces
-        if (titleText[randomIndex] === ' ') return;
 
         setFlippedLetters((prev) => {
-          const newSet = new Set(prev);
-          if (!newSet.has(randomIndex)) {
-            newSet.add(randomIndex);
+          // Get all non-space indices that haven't been flipped yet
+          const availableIndices = [];
+          for (let i = 0; i < titleText.length; i++) {
+            if (titleText[i] !== ' ' && !prev.has(i)) {
+              availableIndices.push(i);
+            }
           }
+
+          // If no more letters to flip, return unchanged
+          if (availableIndices.length === 0) {
+            return prev;
+          }
+
+          // Pick a random available index and flip it
+          const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+          const newSet = new Set(prev);
+          newSet.add(randomIndex);
           return newSet;
         });
       },
