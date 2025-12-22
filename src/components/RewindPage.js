@@ -20,6 +20,7 @@ const RewindPage = () => {
   const [warnings, setWarnings] = useState([]);
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const rewindCountRef = useRef(null);
+  const YEAR = 2025;
 
   useEffect(() => {
     const interval = setInterval(
@@ -96,7 +97,7 @@ const RewindPage = () => {
       const response = await fetch('/api/generate-rewind', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, year: 2025 }),
+        body: JSON.stringify({ username, year: YEAR }),
       });
 
       if (!response.ok) {
@@ -144,7 +145,7 @@ const RewindPage = () => {
     <div className='container'>
       <div className='rewind-header'>
         <h1>{renderAnimatedTitle()}</h1>
-        <h2>Ready to showcase your 2025 achievements?</h2>
+        <h2>Ready to showcase your {YEAR} achievements?</h2>
       </div>
 
       <RewindCount ref={rewindCountRef} />
@@ -230,7 +231,7 @@ const RewindPage = () => {
             unoptimized
             onClick={() => handleImageClick(imageUrl)}
           />
-          <a href={imageUrl} download={`trailhead-rewind-${username}-2025.png`} className='download-link'>
+          <a href={imageUrl} download={`trailhead-rewind-${username}-${YEAR}.png`} className='download-link'>
             Download Rewind
           </a>
           {warnings.length > 0 && (
