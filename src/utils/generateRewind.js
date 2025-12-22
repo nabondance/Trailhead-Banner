@@ -19,6 +19,7 @@ export const generateRewind = async (options) => {
   const rewindSummary = generateRewindSummary({
     rankData,
     certificationsData,
+    stampsData,
     yearlyData,
     year,
     username,

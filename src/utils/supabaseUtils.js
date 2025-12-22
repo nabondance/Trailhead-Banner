@@ -144,19 +144,23 @@ class SupabaseUtils {
           year: rewind_data.year,
           thb_version: packageJson.version,
           th_current_rank: rewind_data.rankData.rank?.title,
-          th_current_points: rewind_data.rankData.earnedPointTotal,
-          th_current_badges: rewind_data.rankData.earnedBadgeTotal,
-          th_current_trails: rewind_data.rankData.completedTrailTotal,
+          th_current_points: rewind_data.rankData.earnedPointsSum,
+          th_current_badges: rewind_data.rankData.earnedBadgesCount,
+          th_current_trails: rewind_data.rankData.completedTrailCount,
           yearly_stamps_count: rewind_data.yearlyData.stamps.length,
           yearly_certifications_count: rewind_data.yearlyData.certifications.length,
           yearly_stamps: rewind_data.yearlyData.stamps,
           yearly_certifications: rewind_data.yearlyData.certifications,
-          rewind_summary: rewind_data.rewindSummary,
+          yearly_achievements: rewind_data.rewindSummary.yearlyAchievements,
           most_active_month: rewind_data.rewindSummary.mostActiveMonth,
-          monthly_breakdown: {
-            certifications: rewind_data.rewindSummary.monthlyCertifications,
-          },
+          monthly_breakdown_certifications: rewind_data.rewindSummary.monthlyCertifications || [],
+          monthly_breakdown_stamps: rewind_data.rewindSummary.monthlyStamps || [],
           certification_products: rewind_data.rewindSummary.certificationProducts,
+          agentblazer_progress: rewind_data.rewindSummary.agentblazerRank,
+          timeline_data: rewind_data.rewindSummary.timelineData,
+          rewind_summary: rewind_data.rewindSummary,
+          total_stamps_all_time: rewind_data.rewindSummary.totalStamps,
+          total_certifications_all_time: rewind_data.rewindSummary.totalCertifications,
         },
       ]);
 
@@ -167,6 +171,7 @@ class SupabaseUtils {
       return data;
     } catch (error) {
       console.error('Error adding rewind:', error.message);
+      throw error;
     }
   }
 

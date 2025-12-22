@@ -27,13 +27,13 @@ export function filterDataByYear(data, year) {
 }
 
 // Generate a summary of the user's year in review
-export function generateRewindSummary({ rankData, certificationsData, yearlyData, year, username }) {
+export function generateRewindSummary({ rankData, certificationsData, stampsData, yearlyData, year, username }) {
   const summary = {
     username,
     year,
     yearlyStamps: yearlyData.stamps.length,
     yearlyCertifications: yearlyData.certifications.length,
-    totalStamps: rankData.earnedStampsCount || 0,
+    totalStamps: stampsData.totalCount || 0,
     totalCertifications: certificationsData.certifications.length || 0,
     currentRank: rankData.rank?.title || 'Unknown',
     currentPoints: rankData.earnedPointsSum || 0,
@@ -42,8 +42,9 @@ export function generateRewindSummary({ rankData, certificationsData, yearlyData
     agentblazerRank: getAgentblazerRankForYear(rankData.learnerStatusLevels, year),
   };
 
-  // Add monthly breakdown for certifications
+  // Add monthly breakdown for certifications and stamps
   summary.monthlyCertifications = getMonthlyBreakdown(yearlyData.certifications, 'dateCompleted');
+  summary.monthlyStamps = getMonthlyBreakdown(yearlyData.stamps, 'eventDate');
 
   // Add certification products breakdown
   summary.certificationProducts = getCertificationProducts(yearlyData.certifications);
@@ -66,7 +67,9 @@ export function getMonthlyBreakdown(items, dateField) {
 
   items.forEach((item) => {
     let date;
-    if (dateField === 'earnedAt' && item.node) {
+    if (dateField === 'eventDate' && item.node) {
+      date = new Date(item.node[dateField]);
+    } else if (dateField === 'earnedAt' && item.node) {
       date = new Date(item.node[dateField]);
     } else {
       date = new Date(item[dateField]);
