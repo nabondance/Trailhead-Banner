@@ -139,8 +139,10 @@ const RewindPage = () => {
 
   return (
     <div className='container'>
-      <h1>{renderAnimatedTitle()}</h1>
-      <h2>It was an amazing learning year, let's rewind it !</h2>
+      <div className='rewind-header'>
+        <h1>{renderAnimatedTitle()}</h1>
+        <h2>It was an amazing learning year, let's rewind it !</h2>
+      </div>
 
       <form onSubmit={handleSubmit} className='form'>
         <div className='input-container'>
