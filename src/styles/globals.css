@@ -94,6 +94,8 @@ main {
 .header {
   background-color: var(--header-bg);
   border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 1000;
 }
 
 .trailhead-banner-header {
@@ -117,7 +119,7 @@ main {
   margin-left: auto;
   justify-content: center; /* Center the links */
   margin-top: 10px; /* Add space on top of the links */
-  z-index: 100;
+  z-index: 1002;
 }
 
 .header-nav a {
@@ -133,7 +135,7 @@ main {
 .header-nav .dropdown {
   position: relative;
   display: inline-block;
-  z-index: 100;
+  z-index: 1002;
 }
 
 .header-nav .dropbtn {
@@ -153,7 +155,7 @@ main {
   background-color: var(--background);
   min-width: 160px;
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-  z-index: 101;
+  z-index: 1001;
   right: 0;
 }
 
@@ -194,6 +196,7 @@ main {
 .nav-dropdown {
   position: relative;
   display: inline-block;
+  z-index: 1002;
 }
 
 .nav-dropdown-button {
@@ -229,7 +232,7 @@ main {
   min-width: max-content;
   width: max-content;
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-  z-index: 101;
+  z-index: 1001;
   border-radius: 4px;
   padding: 0;
   margin-top: 0;
@@ -1542,7 +1545,7 @@ select:focus {
   border-radius: 8px;
   font-family: Iosevka, Arial, Helvetica, sans-serif;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-  z-index: -1;
+  z-index: 0;
 }
 
 .announcement-banner:last-child {
