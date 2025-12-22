@@ -707,7 +707,7 @@ legend {
 .loading-container p {
   font-size: 18px;
   font-weight: bold;
-  color: var(--primary);
+  color: var(--text-contrast);
   margin-bottom: 10px;
 }
 
@@ -1638,6 +1638,15 @@ select:focus {
 
 .rewind-header h1 {
   text-align: center;
+  color: var(--text-contrast);
+}
+
+.rewind-header h2 {
+  color: var(--text-contrast);
+}
+
+.disclaimer {
+  color: var(--text-contrast);
 }
 
 .animated-letter {
