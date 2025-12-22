@@ -68,20 +68,18 @@ export default async function handler(req, res) {
       const rewindSummary = generateRewindResult.rewindSummary;
       const yearlyData = generateRewindResult.yearlyData;
 
-      // Update the rewind counter in the database
-      try {
-        const rewind_data = {
-          th_username: username,
-          rewind_processing_time: new Date().getTime() - start_time,
-          year,
-          rankData,
-          yearlyData,
-          rewindSummary,
-        };
-        SupabaseUtils.updateRewindCounter(rewind_data);
-      } catch (error) {
+      // Update the rewind counter in the database (non-blocking)
+      const rewind_data = {
+        th_username: username,
+        rewind_processing_time: new Date().getTime() - start_time,
+        year,
+        rankData,
+        yearlyData,
+        rewindSummary,
+      };
+      SupabaseUtils.updateRewindCounter(rewind_data).catch((error) => {
         console.error('Error updating rewind counter:', error.message);
-      }
+      });
 
       // Send back the rewind data and image URL
       res.status(200).json({
