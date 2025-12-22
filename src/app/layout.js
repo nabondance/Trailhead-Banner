@@ -36,9 +36,15 @@ export const metadata = {
   keywords: 'Trailhead, LinkedIn, Banner, Header, Generator, Salesforce, Trailblazer, open-source',
   authors: [{ name: 'nabondance', url: 'https://nabondance.me' }],
   publisher: 'nabondance',
-  icon: {
-    url: '/favicon.svg',
-    type: 'image/svg+xml',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 
@@ -46,6 +52,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en'>
       <head>
+        <link rel='icon' href='/favicon.ico' sizes='32x32' />
+        <link rel='icon' href='/favicon-16x16.png' sizes='16x16' type='image/png' />
+        <link rel='icon' href='/favicon-32x32.png' sizes='32x32' type='image/png' />
+        <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
+        <link rel='apple-touch-icon' href='/apple-touch-icon.png' />
+        <link rel='manifest' href='/site.webmanifest' />
         <script
           defer
           src='https://cloud.umami.is/script.js'
