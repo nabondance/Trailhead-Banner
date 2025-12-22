@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
 import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
+import RewindCount from './RewindCount';
 import '../styles/globals.css';
 import packageJson from '../../package.json';
 
@@ -18,6 +19,7 @@ const RewindPage = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [warnings, setWarnings] = useState([]);
   const [fullscreenImage, setFullscreenImage] = useState(null);
+  const rewindCountRef = useRef(null);
 
   useEffect(() => {
     const interval = setInterval(
@@ -107,6 +109,7 @@ const RewindPage = () => {
 
       setImageUrl(data.imageUrl);
       setWarnings(data.warnings || []);
+      rewindCountRef.current.fetchCount(); // Refresh the rewind count
     } catch (error) {
       console.error('Error generating rewind:', error);
       setError(error.message || 'Failed to generate rewind');
@@ -144,6 +147,7 @@ const RewindPage = () => {
         <h2>Ready to showcase your 2025 achievements?</h2>
       </div>
 
+      <RewindCount ref={rewindCountRef} />
       <form onSubmit={handleSubmit} className='form'>
         <div className='input-container'>
           <input

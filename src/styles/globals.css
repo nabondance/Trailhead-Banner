@@ -1203,6 +1203,19 @@ legend {
   font-weight: bold;
 }
 
+.rewind-count {
+  margin-top: 20px;
+  font-size: 18px;
+  color: var(--text-contrast);
+  background-color: var(--middleground);
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
 .how-to-page {
   padding: 20px;
   max-width: 800px;
