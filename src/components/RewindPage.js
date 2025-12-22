@@ -141,7 +141,7 @@ const RewindPage = () => {
     <div className='container'>
       <div className='rewind-header'>
         <h1>{renderAnimatedTitle()}</h1>
-        <h2>It was an amazing learning year, let's rewind it !</h2>
+        <h2>Ready to showcase your 2025 achievements?</h2>
       </div>
 
       <form onSubmit={handleSubmit} className='form'>
@@ -259,6 +259,11 @@ const RewindPage = () => {
           <Image src={fullscreenImage} alt='Full Screen Rewind' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
+
+      <p className='disclaimer'>
+        Please note: Trailhead's API doesn't provide (yet?) badge earn dates, so yearly stats on badges, points, and
+        rank changes cannot be displayed.
+      </p>
     </div>
   );
 };
