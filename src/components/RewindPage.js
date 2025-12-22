@@ -46,9 +46,24 @@ const RewindPage = () => {
   }, []);
 
   const handleUsernameChange = (e) => {
-    const input = e.target.value.toLowerCase();
+    const input = e.target.value;
     const cleanUsername = extractUsernameFromUrl(input);
-    setUsername(cleanUsername);
+
+    // Clear previous errors when user starts typing
+    if (error) {
+      setError('');
+    }
+    if (validationResult?.state === 'invalid') {
+      setValidationResult(null);
+    }
+
+    // Apply additional client-side sanitization
+    const sanitizedUsername = cleanUsername
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9._-]/g, '') // Remove invalid characters
+      .substring(0, 64); // Limit length
+
+    setUsername(sanitizedUsername);
   };
 
   const handleUsernameBlur = async () => {
@@ -70,12 +85,37 @@ const RewindPage = () => {
     setValidationResult(apiResult);
   };
 
+  // Client-side validation helper
+  const validateClientInput = (username) => {
+    const errors = [];
+
+    if (!username || username.trim().length === 0) {
+      errors.push('Username is required');
+    } else if (username.length < 4) {
+      errors.push('Username must be at least 4 characters long');
+    } else if (username.length > 64) {
+      errors.push('Username is too long (max 64 characters)');
+    } else if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+      errors.push('Username can only contain letters, numbers, dots, hyphens, and underscores');
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     setImageUrl(''); // Clear previous image
     setWarnings([]); // Clear previous warnings
+
+    // Client-side validation
+    const clientErrors = validateClientInput(username);
+    if (clientErrors.length > 0) {
+      setError(clientErrors[0]); // Show first error
+      setLoading(false);
+      return;
+    }
 
     const usernameFormatResult = validateUsernameFormat(username.toLowerCase());
     if (!usernameFormatResult.valid) {
@@ -102,7 +142,34 @@ const RewindPage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate rewind');
+
+        // Handle different error types with user-friendly messages
+        let userMessage = 'Failed to generate rewind';
+
+        switch (response.status) {
+          case 400:
+            userMessage = errorData.details
+              ? `Input error: ${errorData.details.join(', ')}`
+              : 'Please check your username and try again';
+            break;
+          case 404:
+            userMessage = 'Trailhead profile not found. Please verify your username is correct';
+            break;
+          case 422:
+            userMessage =
+              'Not enough Trailhead data found to create a meaningful rewind. Try earning some badges or certifications first!';
+            break;
+          case 429:
+            userMessage = 'Too many requests. Please wait a moment and try again';
+            break;
+          case 503:
+            userMessage = 'Trailhead services are temporarily unavailable. Please try again in a few minutes';
+            break;
+          default:
+            userMessage = errorData.message || errorData.error || 'An unexpected error occurred';
+        }
+
+        throw new Error(userMessage);
       }
 
       const data = await response.json();
@@ -113,7 +180,17 @@ const RewindPage = () => {
       rewindCountRef.current.fetchCount(); // Refresh the rewind count
     } catch (error) {
       console.error('Error generating rewind:', error);
-      setError(error.message || 'Failed to generate rewind');
+
+      // Handle network errors with user-friendly messages
+      let userMessage = error.message;
+
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        userMessage = 'Unable to connect to the server. Please check your internet connection and try again';
+      } else if (error.message.includes('timeout')) {
+        userMessage = 'Request timed out. The server might be busy, please try again in a moment';
+      }
+
+      setError(userMessage);
     } finally {
       setLoading(false);
     }

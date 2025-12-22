@@ -11,6 +11,7 @@ class GraphQLUtils {
             headers: {
               'Content-Type': 'application/json',
             },
+            timeout: 15000, // 15 second timeout (reasonable for GraphQL)
           }
         )
       )
