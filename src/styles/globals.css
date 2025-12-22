@@ -1636,13 +1636,23 @@ select:focus {
   background-color: var(--error-color);
 }
 
+.rewind-header {
+  color: var(--text-contrast);
+  margin-bottom: 2rem;
+}
+
 .rewind-header h1 {
   text-align: center;
-  color: var(--text-contrast);
 }
 
 .rewind-header h2 {
-  color: var(--text-contrast);
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+.rewind-header p {
+  margin-top: 0;
+  opacity: 0.85; /* optional: softer support text */
 }
 
 .disclaimer {

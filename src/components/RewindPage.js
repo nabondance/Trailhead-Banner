@@ -223,6 +223,7 @@ const RewindPage = () => {
       <div className='rewind-header'>
         <h1>{renderAnimatedTitle()}</h1>
         <h2>Ready to showcase your {YEAR} achievements?</h2>
+        <p>One image. One year. Your Trailhead story.</p>
       </div>
 
       <RewindCount ref={rewindCountRef} />
@@ -343,8 +344,8 @@ const RewindPage = () => {
       )}
 
       <p className='disclaimer'>
-        Please note: Trailhead's API doesn't provide (yet?) badge earn dates, so yearly stats on badges, points, and
-        rank changes cannot be displayed.
+        Some yearly details (badges, points, rank changes) aren’t available yet via Trailhead APIs, but we’re keeping an
+        eye on it 👀.
       </p>
     </div>
   );
