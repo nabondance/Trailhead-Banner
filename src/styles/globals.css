@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities; */
 
+/* Global box-sizing and overflow control */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 @font-face {
   font-family: Iosevka;
   src: url('/fonts/Iosevka.ttf') format('ttf');
@@ -85,10 +98,12 @@ main {
 }
 
 .container {
-  max-width: 800px;
+  max-width: min(800px, 100vw);
   margin: 0 auto;
   padding: 20px;
   margin-bottom: 60px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header {
@@ -386,6 +401,8 @@ main {
   background: var(--background);
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   color: var(--text-form);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input-container {
@@ -559,7 +576,7 @@ main {
   border-radius: 3px;
   white-space: nowrap;
   z-index: 10;
-  max-width: 90vw; /* Ensure the tooltip fits within the viewport */
+  max-width: min(300px, 90vw); /* Ensure the tooltip fits within the viewport */
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -727,9 +744,11 @@ legend {
 
 .generated-image {
   max-width: 100%;
+  width: 100%;
   height: auto;
   border: 1px solid var(--border);
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .download-link {
@@ -1026,6 +1045,7 @@ legend {
   .header-nav {
     margin-left: 0;
     margin-top: 10px;
+    gap: 8px;
   }
 
   .header-nav .dropdown-content {
@@ -1036,6 +1056,13 @@ legend {
   .logo-container {
     margin-top: 10px;
     filter: none;
+  }
+}
+
+/* Additional styles for very small screens */
+@media (width <= 425px) {
+  .header-nav {
+    font-size: 14px;
   }
 }
 
@@ -1425,7 +1452,8 @@ select:focus {
   width: 100%;
   padding-top: calc(396 / 1584 * 100%); /* Maintain exact 1584:396 aspect ratio */
   margin: 0 auto;
-  max-width: calc(100vw - 30px); /* Account for padding */
+  max-width: min(100%, calc(100vw - 60px)); /* Account for padding and prevent overflow */
+  box-sizing: border-box;
 }
 
 .background-preview canvas {
@@ -1446,7 +1474,11 @@ select:focus {
 
   .background-preview .canvas-container {
     width: 100%;
-    max-width: 100%;
+    max-width: calc(100vw - 40px); /* Account for container padding on mobile */
+  }
+
+  .container {
+    padding: 15px;
   }
 }
 
