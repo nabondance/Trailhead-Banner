@@ -50,8 +50,10 @@ export const getLocal = async (name, type) => {
     imageDir = path.join(baseDir, 'Rank');
   } else if (type === 'Agentblazer') {
     imageDir = path.join(baseDir, 'Agentblazer');
+  } else if (type === 'Product') {
+    imageDir = path.join(baseDir, 'Product');
   } else {
-    throw new Error(`Invalid type: ${type}. Must be 'Rank' or 'Agentblazer'`);
+    throw new Error(`Invalid type: ${type}. Must be 'Rank', 'Agentblazer', or 'Product'`);
   }
 
   const imagePath = path.join(imageDir, name);

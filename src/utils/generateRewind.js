@@ -618,8 +618,8 @@ async function drawProductWithLogo(ctx, productName, centerX, centerY) {
   try {
     // Load product logo from local assets
     const logoFileName = getProductLogoFileName(productName);
-    const logoPath = path.join(process.cwd(), 'src', 'assets', 'logos', 'products', logoFileName);
-    const logo = await loadImage(logoPath);
+    const logoBuffer = await getLocal(logoFileName, 'Product');
+    const logo = await loadImage(logoBuffer);
 
     // Calculate dimensions
     const logoWidth = (logo.width / logo.height) * logoSize;
