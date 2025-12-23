@@ -184,9 +184,9 @@ async function drawYearSection(ctx, year) {
 }
 
 // Draw current rank section with rank logo
-async function drawRankSection(ctx, rankData) {
-  // Define the center point where the logo should be positioned
-  const rightX = 650;
+async function drawRankSection(ctx, rankData, logoX = null, logoY = null) {
+  // Use provided coordinates or default values
+  const centerX = 450;
   const centerY = 900;
 
   // Load and draw rank logo if available
@@ -194,12 +194,21 @@ async function drawRankSection(ctx, rankData) {
     const rankFileName = rankData.rank.imageUrl.split('/').pop();
     const rankLogoBuffer = await getLocal(rankFileName, 'Rank', 'high');
     const rankLogo = await loadImage(rankLogoBuffer);
-    const rankLogoHeight = 400;
+    const rankLogoHeight = 450;
     const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
 
-    // Calculate position: right edge horizontally, center vertically
-    const logoX = rightX - rankLogoWidth; // Right edge at centerX
-    const logoY = centerY - rankLogoHeight / 2; // Center vertically
+    // Calculate position based on provided coordinates or defaults
+    let finalLogoX, finalLogoY;
+
+    if (logoX !== null && logoY !== null) {
+      // Use provided coordinates and center the logo at that point
+      finalLogoX = logoX - rankLogoWidth / 2;
+      finalLogoY = logoY - rankLogoHeight / 2;
+    } else {
+      // Use default positioning: center the logo at centerX, centerY
+      finalLogoX = centerX - rankLogoWidth / 2;
+      finalLogoY = centerY - rankLogoHeight / 2;
+    }
 
     // Add glow effect
     ctx.save();
@@ -208,7 +217,7 @@ async function drawRankSection(ctx, rankData) {
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
 
-    ctx.drawImage(rankLogo, logoX, logoY, rankLogoWidth, rankLogoHeight);
+    ctx.drawImage(rankLogo, finalLogoX, finalLogoY, rankLogoWidth, rankLogoHeight);
 
     // Reset shadow for other elements
     ctx.restore();
@@ -217,19 +226,31 @@ async function drawRankSection(ctx, rankData) {
   }
 }
 
-async function drawAgentblazerRankSection(ctx, agentblazerRank) {
+async function drawAgentblazerRankSection(ctx, agentblazerRank, logoX = null, logoY = null) {
   // Load and draw Agentblazer image below the text
   if (agentblazerRank?.statusName === 'Agentblazer') {
+    // Use provided coordinates or default values
+    const centerX = 1750;
     const centerY = 900;
-    const xPosition = 1550;
     const logoHeight = 400;
+
     try {
       const agentBlazerBuffer = await getLocal(`${agentblazerRank.title}.png`, 'Agentblazer', 'high');
       const agentblazerImage = await loadImage(agentBlazerBuffer);
       const logoWidth = (agentblazerImage.width / agentblazerImage.height) * logoHeight;
-      // Center the logo below the text
-      const logoX = xPosition;
-      const logoY = centerY - logoHeight / 2; // Center vertically
+
+      // Calculate position based on provided coordinates or defaults
+      let finalLogoX, finalLogoY;
+
+      if (logoX !== null && logoY !== null) {
+        // Use provided coordinates and center the logo at that point
+        finalLogoX = logoX - logoWidth / 2;
+        finalLogoY = logoY - logoHeight / 2;
+      } else {
+        // Use default positioning: center the logo at centerX, centerY
+        finalLogoX = centerX - logoWidth / 2;
+        finalLogoY = centerY - logoHeight / 2;
+      }
 
       // Add glow effect
       ctx.save();
@@ -238,7 +259,7 @@ async function drawAgentblazerRankSection(ctx, agentblazerRank) {
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0;
 
-      ctx.drawImage(agentblazerImage, logoX, logoY, logoWidth, logoHeight);
+      ctx.drawImage(agentblazerImage, finalLogoX, finalLogoY, logoWidth, logoHeight);
 
       // Reset shadow for other elements
       ctx.restore();
