@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const { filterDataByYear, generateRewindSummary } = require('./rewindUtils');
 const { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawStylizedText } = require('./drawUtils');
 const FontUtils = require('./fontUtils');
-import { getImage } from './cacheUtils';
+import { getImage, getLocal } from './cacheUtils';
 
 export const generateRewind = async (options) => {
   const { username, year, rankData, certificationsData, stampsData } = options;
@@ -191,7 +191,8 @@ async function drawRankSection(ctx, rankData) {
 
   // Load and draw rank logo if available
   try {
-    const rankLogoBuffer = await getImage(rankData.rank.imageUrl, 'ranks');
+    const rankFileName = rankData.rank.imageUrl.split('/').pop();
+    const rankLogoBuffer = await getLocal(rankFileName, 'Rank');
     const rankLogo = await loadImage(rankLogoBuffer);
     const rankLogoHeight = 400;
     const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
@@ -223,15 +224,8 @@ async function drawAgentblazerRankSection(ctx, agentblazerRank) {
     const xPosition = 1550;
     const logoHeight = 400;
     try {
-      const agentBlazerPath = path.join(
-        process.cwd(),
-        'src',
-        'assets',
-        'logos',
-        agentblazerRank.statusName,
-        `${agentblazerRank.title}-big.png`
-      );
-      const agentblazerImage = await loadImage(agentBlazerPath);
+      const agentBlazerBuffer = await getLocal(`${agentblazerRank.title}-big.png`, 'Agentblazer');
+      const agentblazerImage = await loadImage(agentBlazerBuffer);
       const logoWidth = (agentblazerImage.width / agentblazerImage.height) * logoHeight;
       // Center the logo below the text
       const logoX = xPosition;
