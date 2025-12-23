@@ -367,6 +367,10 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Tableau Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
   "Tableau Desktop Specialist": {
     "category": "admin",
     "difficulty": 2
