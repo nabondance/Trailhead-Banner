@@ -42,7 +42,7 @@ export const getImage = async (imageUrl, folder = 'images') => {
   }
 };
 
-export const getLocal = async (name, type) => {
+export const getLocal = async (name, type, resolution = 'normal') => {
   const baseDir = path.join(process.cwd(), 'src/assets/logos');
   let imageDir;
 
@@ -54,6 +54,10 @@ export const getLocal = async (name, type) => {
     imageDir = path.join(baseDir, 'Product');
   } else {
     throw new Error(`Invalid type: ${type}. Must be 'Rank', 'Agentblazer', or 'Product'`);
+  }
+
+  if (resolution === 'high') {
+    imageDir = path.join(imageDir, 'high-res');
   }
 
   const imagePath = path.join(imageDir, name);

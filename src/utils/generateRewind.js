@@ -192,7 +192,7 @@ async function drawRankSection(ctx, rankData) {
   // Load and draw rank logo if available
   try {
     const rankFileName = rankData.rank.imageUrl.split('/').pop();
-    const rankLogoBuffer = await getLocal(rankFileName, 'Rank');
+    const rankLogoBuffer = await getLocal(rankFileName, 'Rank', 'high');
     const rankLogo = await loadImage(rankLogoBuffer);
     const rankLogoHeight = 400;
     const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
@@ -224,7 +224,7 @@ async function drawAgentblazerRankSection(ctx, agentblazerRank) {
     const xPosition = 1550;
     const logoHeight = 400;
     try {
-      const agentBlazerBuffer = await getLocal(`${agentblazerRank.title}-big.png`, 'Agentblazer');
+      const agentBlazerBuffer = await getLocal(`${agentblazerRank.title}.png`, 'Agentblazer', 'high');
       const agentblazerImage = await loadImage(agentBlazerBuffer);
       const logoWidth = (agentblazerImage.width / agentblazerImage.height) * logoHeight;
       // Center the logo below the text
