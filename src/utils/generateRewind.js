@@ -607,28 +607,13 @@ async function drawTopProducts(ctx, certificationProducts) {
     topProducts.length === 1 ? 'My favorite topic to learn about:' : 'My favorite topics to learn about:';
   ctx.fillText(titleText, 1080, yPosition);
 
-  if (topProducts.length === 1) {
-    // Single product - draw logo and text
-    const product = topProducts[0][0];
-    await drawProductWithLogo(ctx, product, 1080, yPosition + 120);
-  } else {
-    // Multiple products - draw each with its logo
-    const productNames = topProducts.map(([product]) => product);
+  // Always display each product on a separate line
+  const productNames = topProducts.map(([product]) => product);
+  let currentY = yPosition + 120;
 
-    if (productNames.length === 2) {
-      // Two products side by side
-      const spacing = 400;
-      await drawProductWithLogo(ctx, productNames[0], 1080 - spacing / 2, yPosition + 120);
-
-      await drawProductWithLogo(ctx, productNames[1], 1080 + spacing / 2, yPosition + 120);
-    } else {
-      // Three or more products - stack vertically or show as list
-      let currentY = yPosition + 120;
-      for (let i = 0; i < productNames.length; i++) {
-        await drawProductWithLogo(ctx, productNames[i], 1080, currentY);
-        currentY += 120;
-      }
-    }
+  for (let i = 0; i < productNames.length; i++) {
+    await drawProductWithLogo(ctx, productNames[i], 1080, currentY);
+    currentY += 120;
   }
 }
 
