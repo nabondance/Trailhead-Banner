@@ -1712,7 +1712,7 @@ select:focus {
 }
 
 .disclaimer {
-  color: var(--text-contrast);
+  color: var(--text-faded);
 }
 
 .animated-letter {
