@@ -262,15 +262,6 @@ const RewindPage = () => {
               )}
             </div>
           )}
-          {!validationResult && (
-            <div
-              className='validation-icon clickable'
-              data-tooltip='Need help? Click for guidance.'
-              style={{ cursor: 'pointer' }}
-            >
-              <FontAwesomeIcon icon={faQuestionCircle} className='fa-fw icon-help' />
-            </div>
-          )}
         </div>
 
         {error && (
