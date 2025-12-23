@@ -1,0 +1,247 @@
+---
+name: Automated Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      release_notes:
+        description: 'Release notes (optional)'
+        required: false
+        type: string
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          CURRENT_VERSION="${{ steps.current_version.outputs.current }}"
+          IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+
+          case "${{ github.event.inputs.release_type }}" in
+            major)
+              NEW_VERSION="$((MAJOR + 1)).0.0"
+              ;;
+            minor)
+              NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+              ;;
+            patch)
+              NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+              ;;
+          esac
+
+          {
+            echo "version=$NEW_VERSION"
+            echo "tag=v$NEW_VERSION"
+            echo "branch=release/v$NEW_VERSION"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create release branch
+        run: |
+          git checkout -b "${{ steps.new_version.outputs.branch }}"
+
+      - name: Update package.json version
+        run: |
+          npm version "${{ steps.new_version.outputs.version }}" --no-git-tag-version
+
+      - name: Run format and linting
+        run: |
+          pnpm format:all:fix || true
+
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json pnpm-lock.yaml
+          git commit -m "release: v${{ steps.new_version.outputs.version }}"
+
+      - name: Push release branch
+        run: |
+          git push origin "${{ steps.new_version.outputs.branch }}"
+
+      - name: Create Pull Request
+        id: create_pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_NOTES="${{ github.event.inputs.release_notes }}"
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="Automated release v${{ steps.new_version.outputs.version }}"
+          fi
+
+          PR_BODY="## Release v${{ steps.new_version.outputs.version }}
+
+          <!-- display-start -->
+          # Features
+          -  ...
+          <!-- display-end -->
+
+          ## What's Changed
+          $RELEASE_NOTES
+
+          ### Version Bump
+          - **Type**: ${{ github.event.inputs.release_type }}
+          - **Previous Version**: v${{ steps.current_version.outputs.current }}
+          - **New Version**: v${{ steps.new_version.outputs.version }}
+
+          ### Checklist
+          - [x] Version updated in package.json
+          - [ ] Review changes
+          - [ ] Merge to trigger deployment
+
+          ---
+          *This PR was created automatically by the Automated Release workflow.*"
+
+          PR_URL=$(gh pr create \
+            --title "Release v${{ steps.new_version.outputs.version }}" \
+            --body "$PR_BODY" \
+            --base main \
+            --head ${{ steps.new_version.outputs.branch }} \
+            --label "release" \
+            --assignee ${{ github.actor }})
+
+          echo "url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Create Draft Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_NOTES="${{ github.event.inputs.release_notes }}"
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="Automated release v${{ steps.new_version.outputs.version }}"
+          fi
+
+          # Generate changelog from commits since last release
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$LAST_TAG" ]; then
+            CHANGELOG=$(git log "$LAST_TAG..HEAD" --oneline --pretty=format:"- %s" | grep -v "^- Merge pull request" | head -20)
+          else
+            CHANGELOG="- Initial release"
+          fi
+
+          RELEASE_BODY="## What's Changed
+
+          $RELEASE_NOTES
+
+          ### Commits
+          $CHANGELOG
+
+          **Full Changelog**: https://github.com/nabondance/Trailhead-Banner/compare/$LAST_TAG...${{ steps.new_version.outputs.tag }}
+
+          ---
+          *This release was created automatically. It will be published when the release PR is merged.*"
+
+          RELEASE_URL=$(gh release create ${{ steps.new_version.outputs.tag }} \
+            --title "Release v${{ steps.new_version.outputs.version }}" \
+            --notes "$RELEASE_BODY" \
+            --draft \
+            --target ${{ steps.new_version.outputs.branch }})
+
+          echo "url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Add comment to PR with release link
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment "${{ steps.create_pr.outputs.url }}" --body "🚀 **Draft release created**: ${{ steps.create_release.outputs.url }}
+
+          The release will be automatically published when this PR is merged to main."
+
+      - name: Summary
+        run: |
+          {
+            echo "## 🎉 Release Automation Complete!"
+            echo ""
+            echo "### Details"
+            echo "- **Release Type**: ${{ github.event.inputs.release_type }}"
+            echo "- **Version**: v${{ steps.new_version.outputs.version }}"
+            echo "- **Branch**: ${{ steps.new_version.outputs.branch }}"
+            echo ""
+            echo "### Created Resources"
+            echo "- 📋 **Pull Request**: ${{ steps.create_pr.outputs.url }}"
+            echo "- 📦 **Draft Release**: ${{ steps.create_release.outputs.url }}"
+            echo ""
+            echo "### Next Steps"
+            echo "1. Review the pull request"
+            echo "2. Merge the PR to publish the release and trigger deployment"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # This job runs after the release PR is merged to publish the release
+  publish-release:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          {
+            echo "version=$VERSION"
+            echo "tag=v$VERSION"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check if draft release exists
+        id: check_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish release
+        if: steps.check_release.outputs.exists == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "${{ steps.version.outputs.tag }}" --draft=false
+          echo "✅ Release v${{ steps.version.outputs.version }} has been published!"
