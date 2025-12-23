@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { downloadImage, uploadImage } from './blobUtils';
+import fs from 'fs';
+import path from 'path';
 
 export const getImage = async (imageUrl, folder = 'images') => {
   let fileName = imageUrl.split('/').pop();
@@ -37,5 +39,28 @@ export const getImage = async (imageUrl, folder = 'images') => {
   } catch (error) {
     console.error(`Error downloading or uploading image ${imageUrl}:`, error);
     throw new Error('Failed to get image');
+  }
+};
+
+export const getLocal = async (name, type) => {
+  const baseDir = path.join(process.cwd(), 'src/assets/logos');
+  let imageDir;
+
+  if (type === 'Rank') {
+    imageDir = path.join(baseDir, 'Rank');
+  } else if (type === 'Agentblazer') {
+    imageDir = path.join(baseDir, 'Agentblazer');
+  } else {
+    throw new Error(`Invalid type: ${type}. Must be 'Rank' or 'Agentblazer'`);
+  }
+
+  const imagePath = path.join(imageDir, name);
+
+  try {
+    const imageBuffer = fs.readFileSync(imagePath);
+    return imageBuffer;
+  } catch (error) {
+    console.error(`Error reading local image ${imagePath}:`, error);
+    throw new Error(`Failed to read local image: ${name}`);
   }
 };

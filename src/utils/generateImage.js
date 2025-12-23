@@ -15,7 +15,7 @@ const {
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
 } = require('./drawUtils');
-import { getImage } from './cacheUtils';
+import { getImage, getLocal } from './cacheUtils';
 require('./fonts');
 
 const top_part = 1 / 4;
@@ -125,8 +125,22 @@ export const generateImage = async (options) => {
 
   // Rank Logo
   try {
-    const rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
-    const rankLogo = await loadImage(rankLogoBuffer);
+    let rankLogoBuffer;
+    let rankLogo;
+
+    // Try to load from local assets first, then fallback to remote URL
+    try {
+      // Extract filename from URL for local lookup
+      const rankFileName = options.rankData.rank.imageUrl.split('/').pop();
+      rankLogoBuffer = await getLocal(rankFileName, 'Rank');
+      rankLogo = await loadImage(rankLogoBuffer);
+      console.log(`Loaded rank logo locally: ${rankFileName}`);
+    } catch (localError) {
+      console.log(`Local rank logo not found, downloading from URL: ${options.rankData.rank.imageUrl}`);
+      rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
+      rankLogo = await loadImage(rankLogoBuffer);
+    }
+
     rankLogoHeight = canvas.height * top_part * 1;
     rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
     const rankLogoScalingFactor = 1.2;
@@ -246,23 +260,21 @@ export const generateImage = async (options) => {
 
   // learnerStatusLevels
   if (options.rankData.learnerStatusLevels) {
-    options.rankData.learnerStatusLevels.forEach(async (learnerStatusLevel) => {
+    for (const learnerStatusLevel of options.rankData.learnerStatusLevels) {
       // Agentblazer Rank
       if (learnerStatusLevel.statusName === 'Agentblazer' && options.displayAgentblazerRank) {
-        const agentBlazerPath = path.join(
-          process.cwd(),
-          'src',
-          'assets',
-          'logos',
-          learnerStatusLevel.statusName,
-          `${learnerStatusLevel.title}.png`
-        );
-        const agentBlazerImage = await loadImage(agentBlazerPath);
-        const agentBlazerLogoHeight = 100;
-        const agentBlazerLogoWidth = (agentBlazerImage.width / agentBlazerImage.height) * agentBlazerLogoHeight;
-        ctx.drawImage(agentBlazerImage, 370, 5, agentBlazerLogoWidth, agentBlazerLogoHeight);
+        try {
+          const agentBlazerBuffer = await getLocal(`${learnerStatusLevel.title}.png`, 'Agentblazer');
+          const agentBlazerImage = await loadImage(agentBlazerBuffer);
+          const agentBlazerLogoHeight = 100;
+          const agentBlazerLogoWidth = (agentBlazerImage.width / agentBlazerImage.height) * agentBlazerLogoHeight;
+          ctx.drawImage(agentBlazerImage, 370, 5, agentBlazerLogoWidth, agentBlazerLogoHeight);
+        } catch (error) {
+          console.error(`Error loading Agentblazer logo ${learnerStatusLevel.title}:`, error);
+          warnings.push(`Error loading Agentblazer logo ${learnerStatusLevel.title}: ${error.message}`);
+        }
       }
-    });
+    }
   }
 
   // Certifications Data
