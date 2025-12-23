@@ -343,8 +343,8 @@ const RewindPage = () => {
       )}
 
       <p className='disclaimer'>
-        Some yearly details (badges, points, rank changes) aren’t available yet via Trailhead APIs, but we’re keeping an
-        eye on it 👀.
+        Some yearly details (badges, points, rank changes) aren't available yet via Trailhead APIs, but I'm tracking API
+        updates. 🫶
       </p>
     </div>
   );
