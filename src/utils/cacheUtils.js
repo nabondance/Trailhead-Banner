@@ -15,7 +15,6 @@ export const getImage = async (imageUrl, folder = 'images') => {
     // Combine them to form a pseudo filename
     fileName = `${id}_${oid}_${lastMod}.png`;
   }
-  console.log(`Getting image: ${fileName}`);
   let imageDownloaded = null;
   try {
     imageDownloaded = await downloadImage(fileName, folder);
@@ -42,7 +41,7 @@ export const getImage = async (imageUrl, folder = 'images') => {
   }
 };
 
-export const getLocal = async (name, type) => {
+export const getLocal = async (name, type, resolution = 'normal') => {
   const baseDir = path.join(process.cwd(), 'src/assets/logos');
   let imageDir;
 
@@ -50,8 +49,14 @@ export const getLocal = async (name, type) => {
     imageDir = path.join(baseDir, 'Rank');
   } else if (type === 'Agentblazer') {
     imageDir = path.join(baseDir, 'Agentblazer');
+  } else if (type === 'Product') {
+    imageDir = path.join(baseDir, 'Product');
   } else {
-    throw new Error(`Invalid type: ${type}. Must be 'Rank' or 'Agentblazer'`);
+    throw new Error(`Invalid type: ${type}. Must be 'Rank', 'Agentblazer', or 'Product'`);
+  }
+
+  if (resolution === 'high') {
+    imageDir = path.join(imageDir, 'high-res');
   }
 
   const imagePath = path.join(imageDir, name);

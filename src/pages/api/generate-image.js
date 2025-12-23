@@ -120,24 +120,22 @@ export default async function handler(req, res) {
       const infoMessages = [...getMaintenanceInfoMessages(certificationsData.certifications)];
       // Future: Add other info message types here
 
-      // Update the counter in the database
-      try {
-        const thb_data = {
-          th_username: options.username,
-          thb_processing_time: new Date().getTime() - start_time,
-          options,
-          bannerHash: imageHash,
-          certificationsData: certificationsData,
-          badgesData: badgesData,
-          superbadgesData: superbadgesData,
-          rankData: rankData,
-          mvpData: mvpData,
-          stampsData: stampsData,
-        };
-        SupabaseUtils.updateBannerCounter(thb_data);
-      } catch (error) {
+      // Update the counter in the database (non-blocking)
+      const thb_data = {
+        th_username: options.username,
+        thb_processing_time: new Date().getTime() - start_time,
+        options,
+        bannerHash: imageHash,
+        certificationsData: certificationsData,
+        badgesData: badgesData,
+        superbadgesData: superbadgesData,
+        rankData: rankData,
+        mvpData: mvpData,
+        stampsData: stampsData,
+      };
+      SupabaseUtils.updateBannerCounter(thb_data).catch((error) => {
         console.error('Error updating banner counter:', error.message);
-      }
+      });
 
       // Send back the combined data and image URL
       res.status(200).json({

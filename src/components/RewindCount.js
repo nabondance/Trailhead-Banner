@@ -6,7 +6,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const BannerCount = forwardRef((props, ref) => {
+const RewindCount = forwardRef((props, ref) => {
   const [count, setCount] = useState(0);
   const countUpRef = useRef(null);
   const initialLoad = useRef(true);
@@ -15,7 +15,7 @@ const BannerCount = forwardRef((props, ref) => {
     if (countUpRef.current) {
       countUpRef.current.update(end);
     } else {
-      countUpRef.current = new CountUp('countup-element', end, {
+      countUpRef.current = new CountUp('rewind-countup-element', end, {
         startVal: start,
         duration: 4,
         useEasing: true,
@@ -28,12 +28,12 @@ const BannerCount = forwardRef((props, ref) => {
 
   const fetchCount = async () => {
     const { count: newCount, error } = await supabase
-      .from('banners')
-      .select('id', { count: 'estimated', head: true })
+      .from('rewinds')
+      .select('id', { count: 'exact', head: true })
       .eq('source_env', process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development');
 
     if (error) {
-      console.error('Error fetching banner count:', error);
+      console.error('Error fetching rewind count:', error);
     } else {
       if (initialLoad.current) {
         animateCount(0, newCount);
@@ -49,15 +49,15 @@ const BannerCount = forwardRef((props, ref) => {
     // Fetch initial count
     fetchCount();
 
-    // Subscribe to changes in the 'banners' table
+    // Subscribe to changes in the 'rewinds' table
     const subscription = supabase
-      .channel('realtime:banners')
+      .channel('realtime:rewinds')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'banners',
+          table: 'rewinds',
           filter: `source_env=eq.${process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development'}`,
         },
         () => {
@@ -77,14 +77,14 @@ const BannerCount = forwardRef((props, ref) => {
   }));
 
   return (
-    <div className='banner-count'>
+    <div className='rewind-count'>
       <p>
-        Already <span id='countup-element'>{count}</span> amazing banners generated and still counting !
+        Already <span id='rewind-countup-element'>{count}</span> rewinds generated, create yours now !
       </p>
     </div>
   );
 });
 
-BannerCount.displayName = 'BannerCount';
+RewindCount.displayName = 'RewindCount';
 
-export default BannerCount;
+export default RewindCount;

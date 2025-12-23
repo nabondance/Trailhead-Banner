@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 100" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+  </defs>
+  <rect x="10" y="0" width="780" height="100" rx="50" style="stroke-opacity: 0.9; fill:#DDDDDD;"/>
+  <text x="400" y="75" style="fill:#000; font-family: Anta; font-size: 80px;" text-anchor="middle">thb.nabondance.me</text>
+</svg>

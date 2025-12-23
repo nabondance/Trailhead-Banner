@@ -3,41 +3,46 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import NavDropdown from './NavDropdown';
 
 const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
 import '../styles/globals.css';
 
 const TrailheadBannerHeader = () => {
+  const generatorsOptions = [
+    { value: '/', label: 'Banner Generator' },
+    { value: '/rewind', label: 'Trailhead Rewind', isNew: true },
+  ];
+
+  const aboutOptions = [
+    { value: '/releases', label: 'Releases' },
+    { value: '/legal', label: 'Terms & Privacy' },
+    { value: 'https://github.com/nabondance/Trailhead-Stats', label: 'Trailhead Stats' },
+  ];
+
   return (
     <div className='trailhead-banner-header'>
       <ThemeSwitch />
       <div className='logo-container'>
-        <Image
-          src='/assets/logos/trailhead-banner-logo.svg'
-          alt='Trailhead-Banner Logo'
-          width={120}
-          height={120}
-          priority
-        />
+        <Link href='/'>
+          <Image
+            src='/assets/logos/trailhead-banner-logo.svg'
+            alt='Trailhead-Banner Logo'
+            width={120}
+            height={120}
+            priority
+          />
+        </Link>
       </div>
       <div className='header-content'>
         <h1>Trailhead-Banner</h1>
         <h2>Generate your LinkedIn Banner with your Trailhead data</h2>
         <nav className='header-nav'>
-          <Link href='/'>Banner Generator</Link>
+          <NavDropdown label='Generators' options={generatorsOptions} defaultUrl='/' />
           <Link href='/how-to'>How-To</Link>
           <Link href='/examples'>Examples</Link>
           <Link href='/background-library'>Background Library</Link>
-          <div className='dropdown'>
-            <button className='dropbtn'>About</button>
-            <div className='dropdown-content'>
-              <Link href='/releases'>Releases</Link>
-              <Link href='/legal'>Terms & Privacy</Link>
-              <Link href='https://github.com/nabondance/Trailhead-Stats' target='_blank' rel='noopener noreferrer'>
-                Trailhead Stats
-              </Link>
-            </div>
-          </div>
+          <NavDropdown label='About' options={aboutOptions} />
         </nav>
       </div>
     </div>
