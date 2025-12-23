@@ -141,8 +141,7 @@ const RewindPage = () => {
     }
 
     try {
-      console.log('Generating Trailhead Rewind for:', username);
-
+      console.debug('Generating Trailhead Rewind for:', username);
       const response = await fetch('/api/generate-rewind', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -182,7 +181,7 @@ const RewindPage = () => {
       }
 
       const data = await response.json();
-      console.log('Rewind data:', data);
+      console.debug('Rewind data:', data);
 
       setImageUrl(data.imageUrl);
       setWarnings(data.warnings || []);

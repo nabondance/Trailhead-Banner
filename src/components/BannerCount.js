@@ -60,8 +60,7 @@ const BannerCount = forwardRef((props, ref) => {
           table: 'banners',
           filter: `source_env=eq.${process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development'}`,
         },
-        (payload) => {
-          console.log('Change detected:', payload);
+        () => {
           fetchCount(); // Update the count when a change is detected
         }
       )

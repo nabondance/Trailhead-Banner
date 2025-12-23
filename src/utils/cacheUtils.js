@@ -15,7 +15,6 @@ export const getImage = async (imageUrl, folder = 'images') => {
     // Combine them to form a pseudo filename
     fileName = `${id}_${oid}_${lastMod}.png`;
   }
-  console.log(`Getting image: ${fileName}`);
   let imageDownloaded = null;
   try {
     imageDownloaded = await downloadImage(fileName, folder);
