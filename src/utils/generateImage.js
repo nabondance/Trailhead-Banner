@@ -480,7 +480,7 @@ export const generateImage = async (options) => {
   // Load and draw the MVP SVG in diagonal from the top right corner if the user is an MVP
   if (options.mvpData?.isMvp) {
     ctx.globalAlpha = 1.0; // Reset transparency
-    const mvpSvgPath = path.join(process.cwd(), 'public', 'assets', 'logos', 'mvp.svg');
+    const mvpSvgPath = path.join(process.cwd(), 'src', 'assets', 'ribbons', 'mvp.svg');
     const mvpSvg = await loadImage(mvpSvgPath);
     const mvpWidth = 200;
     const mvpHeight = 40;
