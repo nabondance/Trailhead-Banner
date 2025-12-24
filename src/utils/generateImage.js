@@ -492,18 +492,12 @@ export const generateImage = async (options) => {
   }
 
   // Load and draw the "By nabondance.me" SVG
-  const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'bynabondance.svg');
-  const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
-  const byNabondanceWidth = 160;
-  const byNabondanceHeight = 20;
+  const thbSvgPath = path.join(process.cwd(), 'src', 'assets', 'watermarks', 'thb-small.svg');
+  const thbSvg = await loadImage(thbSvgPath);
+  const thbSvgWidth = 160;
+  const thbSvgHeight = 20;
   ctx.globalAlpha = 1.0; // Reset transparency
-  ctx.drawImage(
-    byNabondanceSvg,
-    canvas.width - byNabondanceWidth,
-    canvas.height - byNabondanceHeight - 2,
-    byNabondanceWidth,
-    byNabondanceHeight
-  );
+  ctx.drawImage(thbSvg, canvas.width - thbSvgWidth, canvas.height - thbSvgHeight - 2, thbSvgWidth, thbSvgHeight);
 
   // Convert canvas to banner
   const buffer = canvas.toBuffer('image/png');
