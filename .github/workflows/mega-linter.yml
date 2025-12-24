@@ -71,7 +71,7 @@ jobs:
 
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/latest/flavors/
-        uses: oxsecurity/megalinter/flavors/javascript@v9.2.0
+        uses: nabondance/megalinter-custom-flavor-trailhead-banner@main
 
         id: ml
 
@@ -94,7 +94,7 @@ jobs:
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          # Uncomment to use ApiReporter (Grafana)
+          # ApiReporter (Grafana)
           API_REPORTER: true
           API_REPORTER_URL: ${{ secrets.API_REPORTER_URL }}
           API_REPORTER_BASIC_AUTH_USERNAME: ${{ secrets.API_REPORTER_BASIC_AUTH_USERNAME }}
