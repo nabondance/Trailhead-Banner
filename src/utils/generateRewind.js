@@ -668,7 +668,7 @@ function getProductLogoFileName(productName) {
 }
 
 async function drawWatermark(ctx) {
-  const byNabondanceSvgPath = path.join(process.cwd(), 'public', 'thb-rewind.svg');
+  const byNabondanceSvgPath = path.join(process.cwd(), 'src', 'assets', 'watermarks', 'thb-rewind.svg');
   const byNabondanceSvg = await loadImage(byNabondanceSvgPath);
   const byNabondanceHeight = 40;
   const byNabondanceWidth = (byNabondanceSvg.width / byNabondanceSvg.height) * byNabondanceHeight;
