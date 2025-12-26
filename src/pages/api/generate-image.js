@@ -27,6 +27,7 @@ export default async function handler(req, res) {
     }
 
     const start_time = new Date().getTime();
+    const timings = {}; // Track detailed timings
     const options = req.body;
     // const protocol = req.headers['x-forwarded-proto'] || 'http';
     // const host = req.headers.host;
@@ -91,8 +92,10 @@ export default async function handler(req, res) {
 
     try {
       // Perform the GraphQL queries in parallel using the utils class
+      const graphqlStart = new Date().getTime();
       const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse, stampsResponse] =
         await GraphQLUtils.performQueries(graphqlQueries);
+      timings.graphql_queries_ms = new Date().getTime() - graphqlStart;
 
       // Extract the data from the responses
       const rankData = rankResponse.data?.data?.profile?.trailheadStats || {};
@@ -103,6 +106,7 @@ export default async function handler(req, res) {
       const stampsData = stampsResponse.data?.data?.earnedStamps || {};
 
       // Generate the image
+      const imageGenStart = new Date().getTime();
       const generateImageResult = await generateImage({
         ...options,
         rankData,
@@ -112,18 +116,34 @@ export default async function handler(req, res) {
         mvpData,
         stampsData,
       });
+      timings.image_generation_ms = new Date().getTime() - imageGenStart;
+
       const imageUrl = generateImageResult.bannerUrl;
       const warnings = generateImageResult.warnings || [];
       const imageHash = generateImageResult.hash;
+
+      // Merge timings from generateImage if available
+      if (generateImageResult.timings) {
+        timings.image_generation_breakdown = generateImageResult.timings;
+      }
 
       // Collect all info messages
       const infoMessages = [...getMaintenanceInfoMessages(certificationsData.certifications)];
       // Future: Add other info message types here
 
+      // Calculate total time and add to timings
+      timings.total_ms = new Date().getTime() - start_time;
+      timings.other_ms = timings.total_ms - timings.graphql_queries_ms - timings.image_generation_ms;
+
+      // Log timings for debugging
+      console.log(
+        `[Banner] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`
+      );
+
       // Update the counter in the database (non-blocking)
       const thb_data = {
         th_username: options.username,
-        thb_processing_time: new Date().getTime() - start_time,
+        thb_processing_time: timings.total_ms,
         options,
         bannerHash: imageHash,
         certificationsData: certificationsData,
@@ -132,6 +152,7 @@ export default async function handler(req, res) {
         rankData: rankData,
         mvpData: mvpData,
         stampsData: stampsData,
+        timings: timings,
       };
       SupabaseUtils.updateBannerCounter(thb_data).catch((error) => {
         console.error('Error updating banner counter:', error.message);
@@ -148,6 +169,7 @@ export default async function handler(req, res) {
         imageUrl,
         warnings,
         infoMessages,
+        timings,
       });
     } catch (error) {
       console.error('Error generating banner:', error.message);

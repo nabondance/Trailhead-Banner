@@ -76,6 +76,11 @@ export const generateImage = async (options) => {
   // Options logging
   logOptions(options);
 
+  // Timing instrumentation
+  const timings = {};
+  const startTime = Date.now();
+  let stepStartTime = Date.now();
+
   // Warning
   const warnings = [];
 
@@ -84,6 +89,7 @@ export const generateImage = async (options) => {
   const ctx = canvas.getContext('2d');
 
   // Background
+  stepStartTime = Date.now();
   try {
     switch (options.backgroundKind) {
       case 'library':
@@ -122,8 +128,10 @@ export const generateImage = async (options) => {
     console.error('Error loading background image:', error);
     throw new Error('Unsupported image type');
   }
+  timings.background_load_ms = Date.now() - stepStartTime;
 
   // Rank Logo
+  stepStartTime = Date.now();
   try {
     let rankLogoBuffer;
     let rankLogo;
@@ -153,8 +161,10 @@ export const generateImage = async (options) => {
     console.error(`Error loading rank logo ${options.rankData.rank.imageUrl}:`, error);
     warnings.push(`Error loading rank logo ${options.rankData.rank.imageUrl}: ${error.message}`);
   }
+  timings.rank_logo_load_ms = Date.now() - stepStartTime;
 
   // Counters
+  stepStartTime = Date.now();
   const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount || 0;
   const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount || 0;
   const certificationCount =
@@ -257,8 +267,10 @@ export const generateImage = async (options) => {
     console.error('Error drawing counter as badges:', error);
     warnings.push(`Error drawing counter as badges: ${error.message}`);
   }
+  timings.counters_draw_ms = Date.now() - stepStartTime;
 
   // learnerStatusLevels
+  stepStartTime = Date.now();
   if (options.rankData.learnerStatusLevels) {
     for (const learnerStatusLevel of options.rankData.learnerStatusLevels) {
       // Agentblazer Rank
@@ -276,8 +288,10 @@ export const generateImage = async (options) => {
       }
     }
   }
+  timings.agentblazer_load_ms = Date.now() - stepStartTime;
 
   // Certifications Data
+  stepStartTime = Date.now();
   // Filter certifications based on options
   let certifications = options.certificationsData.certifications?.filter(
     (cert) =>
@@ -334,7 +348,10 @@ export const generateImage = async (options) => {
   });
 
   // Wait for all logos to be downloaded
+  const certLogosStart = Date.now();
   await Promise.all(logoPromises);
+  timings.certifications_download_ms = Date.now() - certLogosStart;
+  timings.certifications_count = certifications.length;
 
   // Sort certification logos
   certificationsLogos = sortCertifications(
@@ -351,6 +368,7 @@ export const generateImage = async (options) => {
     certificationsLogos.push({ logo: plusXBadgeImage });
   }
 
+  const certRenderStart = Date.now();
   if (certificationsLogos.length !== 0) {
     const certifYPosition = canvas.height * top_part + 20; // Start just below the top 1/3
     const availableWidth = canvas.width;
@@ -389,8 +407,12 @@ export const generateImage = async (options) => {
       }
     }
   }
+  timings.certifications_render_ms = Date.now() - certRenderStart;
+  timings.certifications_prep_ms =
+    Date.now() - stepStartTime - timings.certifications_download_ms - timings.certifications_render_ms;
 
   // Display Superbadges if enabled
+  stepStartTime = Date.now();
   if (options.displaySuperbadges) {
     const totalSuperbadges = options.superbadgesData.earnedAwards.edges?.filter(
       (edge) => edge.node.award && edge.node.award.icon
@@ -421,7 +443,10 @@ export const generateImage = async (options) => {
     });
 
     // Wait for all superbadge logos to be downloaded
+    const superbadgesDownloadStart = Date.now();
     const superbadgeLogosImages = await Promise.all(superbadgeLogoPromises);
+    timings.superbadges_download_ms = Date.now() - superbadgesDownloadStart;
+    timings.superbadges_count = superbadgeLogos.length;
 
     if (hiddenSuperbadges > 0) {
       const plusXBadgeSvg = generatePlusXSuperbadgesSvg(hiddenSuperbadges);
@@ -476,8 +501,10 @@ export const generateImage = async (options) => {
       }
     }
   }
+  timings.superbadges_render_ms = Date.now() - stepStartTime - (timings.superbadges_download_ms || 0);
 
   // Load and draw the MVP SVG in diagonal from the top right corner if the user is an MVP
+  stepStartTime = Date.now();
   if (options.mvpData?.isMvp) {
     ctx.globalAlpha = 1.0; // Reset transparency
     const mvpSvgPath = path.join(process.cwd(), 'src', 'assets', 'ribbons', 'mvp.svg');
@@ -498,17 +525,23 @@ export const generateImage = async (options) => {
   const thbSvgHeight = 20;
   ctx.globalAlpha = 1.0; // Reset transparency
   ctx.drawImage(thbSvg, canvas.width - thbSvgWidth, canvas.height - thbSvgHeight - 2, thbSvgWidth, thbSvgHeight);
+  timings.mvp_watermark_ms = Date.now() - stepStartTime;
 
   // Convert canvas to banner
+  stepStartTime = Date.now();
   const buffer = canvas.toBuffer('image/png');
   const bannerUrl = `data:image/png;base64,${buffer.toString('base64')}`;
+  timings.canvas_encoding_ms = Date.now() - stepStartTime;
 
   // Hash the image
   const hash = crypto.createHash('sha256').update(buffer).digest('hex');
 
+  timings.total_ms = Date.now() - startTime;
+
   console.log('Banner generation complete.');
   console.log('Warnings:', warnings);
   console.log('Image hash:', hash);
+  console.log('Timings:', JSON.stringify(timings, null, 2));
 
-  return { bannerUrl, warnings, hash };
+  return { bannerUrl, warnings, hash, timings };
 };

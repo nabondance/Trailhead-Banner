@@ -9,13 +9,23 @@ import { getImage, getLocal } from './cacheUtils';
 export const generateRewind = async (options) => {
   const { username, year, rankData, certificationsData, stampsData } = options;
 
+  // Timing instrumentation
+  const timings = {};
+  const startTime = Date.now();
+  let stepStartTime = Date.now();
+
   // Load all fonts before generating the image
+  stepStartTime = Date.now();
   await FontUtils.loadFonts();
+  timings.font_loading_ms = Date.now() - stepStartTime;
 
   // Filter data for the specified year
+  stepStartTime = Date.now();
   const yearlyData = filterDataByYear({ certificationsData, stampsData }, year);
+  timings.data_filtering_ms = Date.now() - stepStartTime;
 
   // Generate rewind summary
+  stepStartTime = Date.now();
   const rewindSummary = generateRewindSummary({
     rankData,
     certificationsData,
@@ -24,8 +34,10 @@ export const generateRewind = async (options) => {
     year,
     username,
   });
+  timings.summary_generation_ms = Date.now() - stepStartTime;
 
   // Generate the rewind image
+  stepStartTime = Date.now();
   const imageResult = await generateRewindImage({
     username,
     year,
@@ -33,12 +45,24 @@ export const generateRewind = async (options) => {
     rewindSummary,
     yearlyData,
   });
+  timings.image_rendering_ms = Date.now() - stepStartTime;
+
+  // Merge image generation timings if available
+  if (imageResult.timings) {
+    timings.image_rendering_breakdown = imageResult.timings;
+  }
+
+  timings.total_ms = Date.now() - startTime;
+
+  console.log('Rewind generation complete.');
+  console.log('Timings:', JSON.stringify(timings, null, 2));
 
   return {
     imageUrl: imageResult.imageUrl,
     warnings: imageResult.warnings,
     rewindSummary,
     yearlyData,
+    timings,
   };
 };
 
@@ -46,6 +70,8 @@ export const generateRewind = async (options) => {
 async function generateRewindImage(options) {
   const { username, year, rankData, rewindSummary, yearlyData } = options;
   const warnings = [];
+  const timings = {};
+  let stepStartTime = Date.now();
 
   try {
     // Canvas dimensions: 2160x2700px (4:5 ratio)
@@ -53,21 +79,32 @@ async function generateRewindImage(options) {
     const ctx = canvas.getContext('2d');
 
     // Draw background
+    stepStartTime = Date.now();
     await drawBackground(ctx, rewindSummary);
+    timings.background_draw_ms = Date.now() - stepStartTime;
 
     // Header section
+    stepStartTime = Date.now();
     await drawHeader(ctx, year, username);
+    timings.header_draw_ms = Date.now() - stepStartTime;
 
     // Year section
+    stepStartTime = Date.now();
     await drawYearSection(ctx, year);
+    timings.year_section_ms = Date.now() - stepStartTime;
 
     // Current rank section
+    stepStartTime = Date.now();
     await drawRankSection(ctx, rankData);
+    timings.rank_section_ms = Date.now() - stepStartTime;
 
     // Stats section
+    stepStartTime = Date.now();
     await drawStatsSection(ctx, rewindSummary);
+    timings.stats_section_ms = Date.now() - stepStartTime;
 
     // Agentblazer section (if achieved this year)
+    stepStartTime = Date.now();
     if (rewindSummary.agentblazerRank) {
       await drawAgentblazerSection(ctx, rewindSummary.agentblazerRank);
       // Current Agentblazer rank section
@@ -75,8 +112,10 @@ async function generateRewindImage(options) {
     } else {
       await drawMotivationSection(ctx, rewindSummary);
     }
+    timings.agentblazer_section_ms = Date.now() - stepStartTime;
 
     // Certification & Stamps section
+    stepStartTime = Date.now();
     if (rewindSummary.yearlyCertifications + rewindSummary.yearlyStamps > 1) {
       await drawTimelineSection(ctx, rewindSummary, yearlyData);
     } else if (rewindSummary.yearlyCertifications + rewindSummary.yearlyStamps == 1) {
@@ -84,20 +123,28 @@ async function generateRewindImage(options) {
     } else {
       await drawNoCertificationSection(ctx, rewindSummary, yearlyData);
     }
+    timings.timeline_section_ms = Date.now() - stepStartTime;
 
     // Top products section
+    stepStartTime = Date.now();
     await drawTopProducts(ctx, rewindSummary.certificationProducts);
+    timings.products_section_ms = Date.now() - stepStartTime;
 
     // Watermark
+    stepStartTime = Date.now();
     await drawWatermark(ctx);
+    timings.watermark_ms = Date.now() - stepStartTime;
 
     // Generate image URL and hash
+    stepStartTime = Date.now();
     const buffer = canvas.toBuffer('image/png');
     const hash = crypto.createHash('md5').update(buffer).digest('hex');
     const imageUrl = `data:image/png;base64,${buffer.toString('base64')}`;
+    timings.canvas_encoding_ms = Date.now() - stepStartTime;
 
     return {
       imageUrl,
+      timings,
       warnings,
       hash,
     };

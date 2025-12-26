@@ -34,6 +34,7 @@ class SupabaseUtils {
   }
 
   static async updateBannerCounter(thb_data) {
+    const originalTimings = thb_data.timings; // Save timings before cleaning
     thb_data = SupabaseUtils.cleanData(thb_data);
     try {
       const { data, error } = await supabase.from('banners').insert([
@@ -54,6 +55,7 @@ class SupabaseUtils {
           th_stamps: thb_data.stampsData,
           th_mvp: thb_data.mvp,
           th_agentblazer: `${thb_data.learnerStatusLevels?.statusName}-${thb_data.learnerStatusLevels?.title}`,
+          timings: originalTimings,
         },
       ]);
 
@@ -161,6 +163,7 @@ class SupabaseUtils {
           rewind_summary: rewind_data.rewindSummary,
           total_stamps_all_time: rewind_data.rewindSummary.totalStamps,
           total_certifications_all_time: rewind_data.rewindSummary.totalCertifications,
+          timings: rewind_data.timings,
         },
       ]);
 
