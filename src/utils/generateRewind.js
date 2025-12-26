@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { filterDataByYear, generateRewindSummary } = require('./rewindUtils');
 const { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawStylizedText } = require('./drawUtils');
 const FontUtils = require('./fontUtils');
+const { loadImageWithSharp } = require('./imageUtils');
 import { getImage, getLocal } from './cacheUtils';
 
 export const generateRewind = async (options) => {
@@ -55,7 +56,6 @@ export const generateRewind = async (options) => {
   timings.total_ms = Date.now() - startTime;
 
   console.log('Rewind generation complete.');
-  console.log('Timings:', JSON.stringify(timings, null, 2));
 
   return {
     imageUrl: imageResult.imageUrl,
@@ -240,7 +240,7 @@ async function drawRankSection(ctx, rankData, logoX = null, logoY = null) {
   try {
     const rankFileName = rankData.rank.imageUrl.split('/').pop();
     const rankLogoBuffer = await getLocal(rankFileName, 'Rank', 'high');
-    const rankLogo = await loadImage(rankLogoBuffer);
+    const rankLogo = await loadImageWithSharp(rankLogoBuffer);
     const rankLogoHeight = 450;
     const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
 

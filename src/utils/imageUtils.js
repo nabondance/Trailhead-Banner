@@ -1,3 +1,43 @@
+const { createCanvas, loadImage } = require('@napi-rs/canvas');
+const sharp = require('sharp');
+
+/**
+ * Load image using Sharp (fast) and convert to canvas
+ * Sharp is 5-10x faster than @napi-rs/canvas loadImage on serverless environments
+ * @param {Buffer|string} imageSource - Image buffer or data URL to decode
+ * @returns {Promise<Canvas>} Canvas with decoded image
+ */
+const loadImageWithSharp = async (imageSource) => {
+  try {
+    // Handle strings (data URLs, file paths, SVG) - use original loadImage for these
+    // Sharp has issues with SVG files and file paths, so we only use it for buffers
+    if (typeof imageSource === 'string') {
+      return await loadImage(imageSource);
+    }
+
+    // Use Sharp to decode buffers only (5-10x faster on serverless)
+    const { data, info } = await sharp(imageSource)
+      .ensureAlpha() // Ensure RGBA format
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    // Create canvas and load raw pixel data
+    const canvas = createCanvas(info.width, info.height);
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.createImageData(info.width, info.height);
+
+    // Copy Sharp's raw pixel data to canvas
+    imageData.data.set(data);
+    ctx.putImageData(imageData, 0, 0);
+
+    return canvas;
+  } catch (error) {
+    console.error('Sharp decode failed, falling back to loadImage:', error);
+    // Fallback to original loadImage if Sharp fails
+    return await loadImage(imageSource);
+  }
+};
+
 const calculateCertificationsDesign = (logos, canvasWidth, canvasHeight, logoSpacing, alignment) => {
   let logoWidth = logos[0].width;
   let logoHeight = logos[0].height;
@@ -144,6 +184,7 @@ const getCounterPointText = (points) => {
 };
 
 module.exports = {
+  loadImageWithSharp,
   calculateCertificationsDesign,
   sortCertifications,
   getCountersConfig,

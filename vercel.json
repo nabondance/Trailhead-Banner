@@ -7,6 +7,10 @@
   "functions": {
     "src/pages/api/generate-image.js": {
       "maxDuration": 20,
+      "memory": 1024
+    },
+    "src/pages/api/generate-rewind.js": {
+      "maxDuration": 20,
       "memory": 512
     },
     "src/pages/api/graphql-query.js": {

@@ -64,7 +64,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-github-btn": "^1.4.0",
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

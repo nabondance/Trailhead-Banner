@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { getLocalCertificationData, logOptions } = require('./dataUtils');
 const {
+  loadImageWithSharp,
   calculateCertificationsDesign,
   sortCertifications,
   getCountersConfig,
@@ -100,7 +101,7 @@ export const generateImage = async (options) => {
           }
           const bgImageResult = await getImage(options.backgroundLibraryUrl, 'background');
           const bgImageBuffer = bgImageResult.buffer || bgImageResult;
-          const bgImage = await loadImage(bgImageBuffer);
+          const bgImage = await loadImageWithSharp(bgImageBuffer);
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
         break;
@@ -114,7 +115,7 @@ export const generateImage = async (options) => {
           }
           const bgImageResult = await getImage(options.backgroundImageUrl, 'background');
           const bgImageBuffer = bgImageResult.buffer || bgImageResult;
-          const bgImage = await loadImage(bgImageBuffer);
+          const bgImage = await loadImageWithSharp(bgImageBuffer);
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
         break;
@@ -144,13 +145,13 @@ export const generateImage = async (options) => {
       // Extract filename from URL for local lookup
       const rankFileName = options.rankData.rank.imageUrl.split('/').pop();
       rankLogoBuffer = await getLocal(rankFileName, 'Rank');
-      rankLogo = await loadImage(rankLogoBuffer);
+      rankLogo = await loadImageWithSharp(rankLogoBuffer);
       console.log(`Loaded rank logo locally: ${rankFileName}`);
     } catch (localError) {
       console.log(`Local rank logo not found, downloading from URL: ${options.rankData.rank.imageUrl}`);
       const rankLogoResult = await getImage(options.rankData.rank.imageUrl, 'ranks');
       rankLogoBuffer = rankLogoResult.buffer || rankLogoResult;
-      rankLogo = await loadImage(rankLogoBuffer);
+      rankLogo = await loadImageWithSharp(rankLogoBuffer);
     }
 
     rankLogoHeight = canvas.height * top_part * 1;
@@ -281,7 +282,7 @@ export const generateImage = async (options) => {
       if (learnerStatusLevel.statusName === 'Agentblazer' && options.displayAgentblazerRank) {
         try {
           const agentBlazerBuffer = await getLocal(`${learnerStatusLevel.title}.png`, 'Agentblazer');
-          const agentBlazerImage = await loadImage(agentBlazerBuffer);
+          const agentBlazerImage = await loadImageWithSharp(agentBlazerBuffer);
           const agentBlazerLogoHeight = 100;
           const agentBlazerLogoWidth = (agentBlazerImage.width / agentBlazerImage.height) * agentBlazerLogoHeight;
           ctx.drawImage(agentBlazerImage, 370, 5, agentBlazerLogoWidth, agentBlazerLogoHeight);
@@ -358,9 +359,9 @@ export const generateImage = async (options) => {
 
           const croppedLogoBuffer = croppedLogoResult.buffer || croppedLogoResult;
 
-          // Load the already-cropped image
+          // Load the already-cropped image (using Sharp for fast decode)
           const loadImageStart = Date.now();
-          logo = await loadImage(croppedLogoBuffer);
+          logo = await loadImageWithSharp(croppedLogoBuffer);
           loadImageTime = Date.now() - loadImageStart;
           certTimings.loadImage_times.push(loadImageTime);
 
@@ -385,9 +386,9 @@ export const generateImage = async (options) => {
 
           const certificationLogoBuffer = certificationLogoResult.buffer || certificationLogoResult;
 
-          // Time loadImage
+          // Time loadImage (using Sharp for fast decode)
           const loadImageStart = Date.now();
-          logo = await loadImage(certificationLogoBuffer);
+          logo = await loadImageWithSharp(certificationLogoBuffer);
           loadImageTime = Date.now() - loadImageStart;
           certTimings.loadImage_times.push(loadImageTime);
 
@@ -403,7 +404,7 @@ export const generateImage = async (options) => {
             const croppedFileName = getCertificationFileName(cert.logoUrl);
 
             // Upload cropped version (don't await - let it happen in background)
-            uploadImage(croppedBuffer, croppedFileName, 'certifications_cropped').catch((err) =>
+            uploadImageWithSharp(croppedBuffer, croppedFileName, 'certifications_cropped').catch((err) =>
               console.error(`Failed to cache cropped image for ${cert.title}:`, err)
             );
           } catch (cacheError) {
@@ -488,7 +489,7 @@ export const generateImage = async (options) => {
 
   if (hiddenCertifications > 0) {
     const plusXBadgeSvg = generatePlusXCertificationsSvg(hiddenCertifications);
-    const plusXBadgeImage = await loadImage(
+    const plusXBadgeImage = await loadImageWithSharp(
       `data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`
     );
     certificationsLogos.push({ logo: plusXBadgeImage });
@@ -560,7 +561,7 @@ export const generateImage = async (options) => {
       try {
         const logoResult = await getImage(logoUrl, 'superbadges');
         const logoBuffer = logoResult.buffer || logoResult;
-        const logo = await loadImage(logoBuffer);
+        const logo = await loadImageWithSharp(logoBuffer);
         return logo;
       } catch (error) {
         console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
@@ -577,7 +578,7 @@ export const generateImage = async (options) => {
 
     if (hiddenSuperbadges > 0) {
       const plusXBadgeSvg = generatePlusXSuperbadgesSvg(hiddenSuperbadges);
-      const plusXBadgeImage = await loadImage(
+      const plusXBadgeImage = await loadImageWithSharp(
         `data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`
       );
       superbadgeLogosImages.push(plusXBadgeImage);
@@ -635,7 +636,7 @@ export const generateImage = async (options) => {
   if (options.mvpData?.isMvp) {
     ctx.globalAlpha = 1.0; // Reset transparency
     const mvpSvgPath = path.join(process.cwd(), 'src', 'assets', 'ribbons', 'mvp.svg');
-    const mvpSvg = await loadImage(mvpSvgPath);
+    const mvpSvg = await loadImageWithSharp(mvpSvgPath);
     const mvpWidth = 200;
     const mvpHeight = 40;
     ctx.save();
@@ -647,7 +648,7 @@ export const generateImage = async (options) => {
 
   // Load and draw the "By nabondance.me" SVG
   const thbSvgPath = path.join(process.cwd(), 'src', 'assets', 'watermarks', 'thb-small.svg');
-  const thbSvg = await loadImage(thbSvgPath);
+  const thbSvg = await loadImageWithSharp(thbSvgPath);
   const thbSvgWidth = 160;
   const thbSvgHeight = 20;
   ctx.globalAlpha = 1.0; // Reset transparency
@@ -668,7 +669,6 @@ export const generateImage = async (options) => {
   console.log('Banner generation complete.');
   console.log('Warnings:', warnings);
   console.log('Image hash:', hash);
-  console.log('Timings:', JSON.stringify(timings, null, 2));
 
   return { bannerUrl, warnings, hash, timings };
 };
