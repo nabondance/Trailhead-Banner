@@ -367,6 +367,10 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Tableau Architect": {
+    "category": "architect",
+    "difficulty": 7
+  },
   "Salesforce Certified Tableau Consultant": {
     "category": "consultant",
     "difficulty": 5
@@ -382,6 +386,10 @@
   "Salesforce Certified Tableau Data Analyst": {
     "category": "analyst",
     "difficulty": 4
+  },
+  "Salesforce Certified Tableau Server Administrator": {
+    "category": "admin",
+    "difficulty": 5
   },
   "Tableau Server Certified Associate": {
     "category": "admin",
