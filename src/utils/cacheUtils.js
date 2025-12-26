@@ -3,17 +3,23 @@ import { downloadImage, uploadImage } from './blobUtils';
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * Generate a filename for certification images based on URL parameters
+ * @param {string} imageUrl - The certification image URL
+ * @returns {string} Generated filename in format: id_oid_lastMod.png
+ */
+export const getCertificationFileName = (imageUrl) => {
+  const url = new URL(imageUrl);
+  const id = url.searchParams.get('id');
+  const oid = url.searchParams.get('oid');
+  const lastMod = url.searchParams.get('lastMod');
+  return `${id}_${oid}_${lastMod}.png`;
+};
+
 export const getImage = async (imageUrl, folder = 'images') => {
   let fileName = imageUrl.split('/').pop();
-  if (folder === 'certifications') {
-    const url = new URL(imageUrl);
-    // Extract the query parameters
-    const id = url.searchParams.get('id');
-    const oid = url.searchParams.get('oid');
-    const lastMod = url.searchParams.get('lastMod');
-
-    // Combine them to form a pseudo filename
-    fileName = `${id}_${oid}_${lastMod}.png`;
+  if (folder === 'certifications' || folder === 'certifications_cropped') {
+    fileName = getCertificationFileName(imageUrl);
   }
   let imageDownloaded = null;
   let cacheHit = false;
@@ -23,6 +29,11 @@ export const getImage = async (imageUrl, folder = 'images') => {
     return { buffer: imageDownloaded, cacheHit };
   } catch (error) {
     console.log(`Image not found in blob storage, downloading from URL: ${imageUrl}`);
+  }
+
+  // For cropped certifications folder, don't download from URL - it should only contain pre-cropped images
+  if (folder === 'certifications_cropped') {
+    throw new Error('Cropped version not found in cache');
   }
 
   try {
