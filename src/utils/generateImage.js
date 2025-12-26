@@ -408,7 +408,8 @@ export const generateImage = async (options) => {
     }
   }
   timings.certifications_render_ms = Date.now() - certRenderStart;
-  timings.certifications_prep_ms = Date.now() - stepStartTime - timings.certifications_download_ms - timings.certifications_render_ms;
+  timings.certifications_prep_ms =
+    Date.now() - stepStartTime - timings.certifications_download_ms - timings.certifications_render_ms;
 
   // Display Superbadges if enabled
   stepStartTime = Date.now();

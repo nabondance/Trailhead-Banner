@@ -146,7 +146,9 @@ export default async function handler(req, res) {
     timings.other_ms = timings.total_ms - timings.graphql_queries_ms - timings.image_generation_ms;
 
     // Log timings for debugging
-    console.log(`[Rewind] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`);
+    console.log(
+      `[Rewind] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`
+    );
 
     // Update the rewind counter in the database (non-blocking)
     const rewind_data = {

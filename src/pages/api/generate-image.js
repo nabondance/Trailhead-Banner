@@ -136,7 +136,9 @@ export default async function handler(req, res) {
       timings.other_ms = timings.total_ms - timings.graphql_queries_ms - timings.image_generation_ms;
 
       // Log timings for debugging
-      console.log(`[Banner] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`);
+      console.log(
+        `[Banner] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`
+      );
 
       // Update the counter in the database (non-blocking)
       const thb_data = {
