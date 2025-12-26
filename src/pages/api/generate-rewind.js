@@ -85,10 +85,16 @@ export default async function handler(req, res) {
   ];
 
   try {
-    // Perform the GraphQL queries in parallel using the utils class
+    // Perform the GraphQL queries in parallel using the utils class with caching
     const graphqlStart = new Date().getTime();
-    const [rankResponse, certificationsResponse, stampsResponse] = await GraphQLUtils.performQueries(graphqlQueries);
+    const { responses, timingBreakdown, cacheSummary } = await GraphQLUtils.performQueriesWithCache(
+      graphqlQueries,
+      username
+    );
+    const [rankResponse, certificationsResponse, stampsResponse] = responses;
     timings.graphql_queries_ms = new Date().getTime() - graphqlStart;
+    timings.graphql_breakdown = timingBreakdown;
+    timings.cache_summary = cacheSummary;
 
     // Validate GraphQL responses
     if (!rankResponse?.data?.data?.profile) {
@@ -145,9 +151,12 @@ export default async function handler(req, res) {
     timings.total_ms = new Date().getTime() - start_time;
     timings.other_ms = timings.total_ms - timings.graphql_queries_ms - timings.image_generation_ms;
 
+    // Log detailed timing breakdown
+    console.log('[Rewind] Full Timings:', JSON.stringify(timings, null, 2));
+
     // Log timings for debugging
     console.log(
-      `[Rewind] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`
+      `[Rewind] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms (${cacheSummary.cache_hits}/${cacheSummary.total_queries} cached) | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`
     );
 
     // Update the rewind counter in the database (non-blocking)

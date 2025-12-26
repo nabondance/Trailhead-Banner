@@ -52,6 +52,7 @@
     "@napi-rs/canvas": "^0.1.68",
     "@supabase/supabase-js": "^2.50.3",
     "@theme-toggles/react": "^4.1.0",
+    "@upstash/redis": "^1.36.0",
     "@vercel/blob": "^1.1.1",
     "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.12.0",
