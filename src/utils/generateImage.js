@@ -318,7 +318,7 @@ export const generateImage = async (options) => {
   const logoPromises = certifications.map(async (cert) => {
     if (cert.logoUrl) {
       try {
-        console.log('Loading certification logo from URL:', cert.logoUrl);
+        console.debug('Loading certification logo from URL:', cert.logoUrl);
         const certificationLogoBuffer = await getImage(cert.logoUrl, 'certifications');
         let logo = await loadImage(certificationLogoBuffer);
         logo = cropImage(logo); // Crop the logo to remove extra space

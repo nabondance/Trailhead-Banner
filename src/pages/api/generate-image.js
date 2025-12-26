@@ -91,11 +91,17 @@ export default async function handler(req, res) {
     ];
 
     try {
-      // Perform the GraphQL queries in parallel using the utils class
+      // Perform the GraphQL queries in parallel using the utils class with caching
       const graphqlStart = new Date().getTime();
+      const { responses, timingBreakdown, cacheSummary } = await GraphQLUtils.performQueriesWithCache(
+        graphqlQueries,
+        options.username
+      );
       const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse, stampsResponse] =
-        await GraphQLUtils.performQueries(graphqlQueries);
+        responses;
       timings.graphql_queries_ms = new Date().getTime() - graphqlStart;
+      timings.graphql_breakdown = timingBreakdown;
+      timings.cache_summary = cacheSummary;
 
       // Extract the data from the responses
       const rankData = rankResponse.data?.data?.profile?.trailheadStats || {};
@@ -135,9 +141,12 @@ export default async function handler(req, res) {
       timings.total_ms = new Date().getTime() - start_time;
       timings.other_ms = timings.total_ms - timings.graphql_queries_ms - timings.image_generation_ms;
 
+      // Log detailed timing breakdown
+      console.log('[Banner] Full Timings:', JSON.stringify(timings, null, 2));
+
       // Log timings for debugging
       console.log(
-        `[Banner] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`
+        `[Banner] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms (${cacheSummary.cache_hits}/${cacheSummary.total_queries} cached) | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`
       );
 
       // Update the counter in the database (non-blocking)
