@@ -16,9 +16,11 @@ export const getImage = async (imageUrl, folder = 'images') => {
     fileName = `${id}_${oid}_${lastMod}.png`;
   }
   let imageDownloaded = null;
+  let cacheHit = false;
   try {
     imageDownloaded = await downloadImage(fileName, folder);
-    return imageDownloaded;
+    cacheHit = true;
+    return { buffer: imageDownloaded, cacheHit };
   } catch (error) {
     console.log(`Image not found in blob storage, downloading from URL: ${imageUrl}`);
   }
@@ -34,7 +36,8 @@ export const getImage = async (imageUrl, folder = 'images') => {
     const imageBuffer = Buffer.from(response.data, 'binary');
     // Upload the image to the blob
     await uploadImage(imageBuffer, fileName, folder);
-    return imageBuffer;
+    cacheHit = false;
+    return { buffer: imageBuffer, cacheHit };
   } catch (error) {
     console.error(`Error downloading or uploading image ${imageUrl}:`, error);
     throw new Error('Failed to get image');

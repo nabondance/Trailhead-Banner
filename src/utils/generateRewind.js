@@ -524,7 +524,8 @@ async function drawLimitedCertificationStampSection(ctx, rewindSummary, yearlyDa
     const logoY = yPosition - logoSize / 2;
 
     try {
-      const logoBuffer = await getImage(item.logoUrl, item.folder);
+      const logoResult = await getImage(item.logoUrl, item.folder);
+      const logoBuffer = logoResult.buffer || logoResult;
       const logo = await loadImage(logoBuffer);
 
       // Fixed width, calculate height to respect aspect ratio
@@ -598,7 +599,8 @@ async function drawTimelineSection(ctx, rewindSummary, yearlyData) {
         const activity = monthActivities[i];
         if (activity.logoUrl) {
           try {
-            const logoBuffer = await getImage(activity.logoUrl, activity.folder);
+            const logoResult = await getImage(activity.logoUrl, activity.folder);
+            const logoBuffer = logoResult.buffer || logoResult;
             const logo = await loadImage(logoBuffer);
 
             // Calculate dimensions using actual image aspect ratio
