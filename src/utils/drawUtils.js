@@ -25,6 +25,10 @@ const cropImage = (image) => {
   const imageData = tempCtx.getImageData(0, 0, image.width, image.height);
   const data = imageData.data;
 
+  // Alpha threshold - only consider pixels with alpha > 10 as actual content
+  // This ignores nearly-transparent pixels that cause improper cropping
+  const alphaThreshold = 10;
+
   let top = 0,
     bottom = image.height,
     left = 0,
@@ -34,7 +38,7 @@ const cropImage = (image) => {
   for (let y = 0; y < image.height; y++) {
     for (let x = 0; x < image.width; x++) {
       const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
+      if (alpha > alphaThreshold) {
         top = y;
         break;
       }
@@ -46,7 +50,7 @@ const cropImage = (image) => {
   for (let y = image.height - 1; y >= 0; y--) {
     for (let x = 0; x < image.width; x++) {
       const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
+      if (alpha > alphaThreshold) {
         bottom = y;
         break;
       }
@@ -58,7 +62,7 @@ const cropImage = (image) => {
   for (let x = 0; x < image.width; x++) {
     for (let y = 0; y < image.height; y++) {
       const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
+      if (alpha > alphaThreshold) {
         left = x;
         break;
       }
@@ -70,7 +74,7 @@ const cropImage = (image) => {
   for (let x = image.width - 1; x >= 0; x--) {
     for (let y = 0; y < image.height; y++) {
       const alpha = data[(y * image.width + x) * 4 + 3];
-      if (alpha > 0) {
+      if (alpha > alphaThreshold) {
         right = x;
         break;
       }

@@ -15,7 +15,8 @@ const {
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
 } = require('./drawUtils');
-import { getImage, getLocal } from './cacheUtils';
+import { getImage, getLocal, getCertificationFileName } from './cacheUtils';
+import { uploadImage } from './blobUtils';
 require('./fonts');
 
 const top_part = 1 / 4;
@@ -325,6 +326,8 @@ export const generateImage = async (options) => {
     grayscale_times: [],
     blob_cache_hits: 0,
     blob_cache_misses: 0,
+    cropped_cache_hits: 0,
+    cropped_cache_misses: 0,
   };
 
   // Download all certification logos in parallel
@@ -333,34 +336,83 @@ export const generateImage = async (options) => {
       try {
         console.debug('Loading certification logo from URL:', cert.logoUrl);
 
-        // Time getImage
-        const getImageStart = Date.now();
-        const certificationLogoResult = await getImage(cert.logoUrl, 'certifications');
-        const getImageTime = Date.now() - getImageStart;
-        certTimings.getImage_times.push(getImageTime);
+        let logo;
+        let getImageTime = 0;
+        let loadImageTime = 0;
+        let cropTime = 0;
 
-        // Track cache hits/misses
-        if (certificationLogoResult.cacheHit) {
-          certTimings.blob_cache_hits++;
-        } else {
-          certTimings.blob_cache_misses++;
+        // Try to get pre-cropped version first
+        const getImageStart = Date.now();
+        try {
+          const croppedLogoResult = await getImage(cert.logoUrl, 'certifications_cropped');
+          getImageTime = Date.now() - getImageStart;
+          certTimings.getImage_times.push(getImageTime);
+          certTimings.cropped_cache_hits++;
+
+          // Track original blob cache status
+          if (croppedLogoResult.cacheHit) {
+            certTimings.blob_cache_hits++;
+          } else {
+            certTimings.blob_cache_misses++;
+          }
+
+          const croppedLogoBuffer = croppedLogoResult.buffer || croppedLogoResult;
+
+          // Load the already-cropped image
+          const loadImageStart = Date.now();
+          logo = await loadImage(croppedLogoBuffer);
+          loadImageTime = Date.now() - loadImageStart;
+          certTimings.loadImage_times.push(loadImageTime);
+
+          // No cropping needed!
+          cropTime = 0;
+          certTimings.cropImage_times.push(cropTime);
+        } catch (error) {
+          // Cropped version not cached - do full processing
+          console.log(`Cropped cache miss for ${cert.title}, processing now...`);
+          certTimings.cropped_cache_misses++;
+
+          const certificationLogoResult = await getImage(cert.logoUrl, 'certifications');
+          getImageTime = Date.now() - getImageStart;
+          certTimings.getImage_times.push(getImageTime);
+
+          // Track cache hits/misses
+          if (certificationLogoResult.cacheHit) {
+            certTimings.blob_cache_hits++;
+          } else {
+            certTimings.blob_cache_misses++;
+          }
+
+          const certificationLogoBuffer = certificationLogoResult.buffer || certificationLogoResult;
+
+          // Time loadImage
+          const loadImageStart = Date.now();
+          logo = await loadImage(certificationLogoBuffer);
+          loadImageTime = Date.now() - loadImageStart;
+          certTimings.loadImage_times.push(loadImageTime);
+
+          // Time cropImage
+          const cropStart = Date.now();
+          logo = cropImage(logo); // Crop the logo to remove extra space
+          cropTime = Date.now() - cropStart;
+          certTimings.cropImage_times.push(cropTime);
+
+          // Cache the cropped version for next time (non-blocking)
+          try {
+            const croppedBuffer = logo.toBuffer('image/png');
+            const croppedFileName = getCertificationFileName(cert.logoUrl);
+
+            // Upload cropped version (don't await - let it happen in background)
+            uploadImage(croppedBuffer, croppedFileName, 'certifications_cropped').catch((err) =>
+              console.error(`Failed to cache cropped image for ${cert.title}:`, err)
+            );
+          } catch (cacheError) {
+            console.error(`Error caching cropped image for ${cert.title}:`, cacheError);
+            // Continue - caching failure shouldn't break generation
+          }
         }
 
-        const certificationLogoBuffer = certificationLogoResult.buffer || certificationLogoResult;
-
-        // Time loadImage
-        const loadImageStart = Date.now();
-        let logo = await loadImage(certificationLogoBuffer);
-        const loadImageTime = Date.now() - loadImageStart;
-        certTimings.loadImage_times.push(loadImageTime);
-
-        // Time cropImage
-        const cropStart = Date.now();
-        logo = cropImage(logo); // Crop the logo to remove extra space
-        const cropTime = Date.now() - cropStart;
-        certTimings.cropImage_times.push(cropTime);
-
-        // Time grayscale if needed
+        // Grayscale if needed
         if (cert.status.expired) {
           const grayscaleStart = Date.now();
           const tempCanvas = createCanvas(logo.width, logo.height);
@@ -403,6 +455,9 @@ export const generateImage = async (options) => {
   const totalCerts = certTimings.getImage_times.length;
   const cacheHitRate = totalCerts > 0 ? certTimings.blob_cache_hits / totalCerts : 0;
 
+  // Calculate cropped cache statistics
+  const croppedCacheHitRate = totalCerts > 0 ? certTimings.cropped_cache_hits / totalCerts : 0;
+
   // Add detailed breakdown to timings
   timings.certifications_detailed = {
     count: totalCerts,
@@ -417,6 +472,9 @@ export const generateImage = async (options) => {
     blob_cache_hits: certTimings.blob_cache_hits,
     blob_cache_misses: certTimings.blob_cache_misses,
     blob_cache_hit_rate: Math.round(cacheHitRate * 100) / 100,
+    cropped_cache_hits: certTimings.cropped_cache_hits,
+    cropped_cache_misses: certTimings.cropped_cache_misses,
+    cropped_cache_hit_rate: Math.round(croppedCacheHitRate * 100) / 100,
   };
 
   console.log('Certification Processing Breakdown:', JSON.stringify(timings.certifications_detailed, null, 2));
