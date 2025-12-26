@@ -97,7 +97,8 @@ export const generateImage = async (options) => {
           if (!(await isValidImageType(options.backgroundLibraryUrl))) {
             throw new Error('Unsupported image type');
           }
-          const bgImageBuffer = await getImage(options.backgroundLibraryUrl, 'background');
+          const bgImageResult = await getImage(options.backgroundLibraryUrl, 'background');
+          const bgImageBuffer = bgImageResult.buffer || bgImageResult;
           const bgImage = await loadImage(bgImageBuffer);
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
@@ -110,7 +111,8 @@ export const generateImage = async (options) => {
           if (options.backgroundKind === 'customUrl' && !(await isValidImageType(options.backgroundImageUrl))) {
             throw new Error('Unsupported image type');
           }
-          const bgImageBuffer = await getImage(options.backgroundImageUrl, 'background');
+          const bgImageResult = await getImage(options.backgroundImageUrl, 'background');
+          const bgImageBuffer = bgImageResult.buffer || bgImageResult;
           const bgImage = await loadImage(bgImageBuffer);
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
@@ -145,7 +147,8 @@ export const generateImage = async (options) => {
       console.log(`Loaded rank logo locally: ${rankFileName}`);
     } catch (localError) {
       console.log(`Local rank logo not found, downloading from URL: ${options.rankData.rank.imageUrl}`);
-      rankLogoBuffer = await getImage(options.rankData.rank.imageUrl, 'ranks');
+      const rankLogoResult = await getImage(options.rankData.rank.imageUrl, 'ranks');
+      rankLogoBuffer = rankLogoResult.buffer || rankLogoResult;
       rankLogo = await loadImage(rankLogoBuffer);
     }
 
@@ -314,21 +317,61 @@ export const generateImage = async (options) => {
 
   let certificationsLogos = [];
 
+  // Track detailed timing for each certification processing step
+  const certTimings = {
+    getImage_times: [],
+    loadImage_times: [],
+    cropImage_times: [],
+    grayscale_times: [],
+    blob_cache_hits: 0,
+    blob_cache_misses: 0,
+  };
+
   // Download all certification logos in parallel
   const logoPromises = certifications.map(async (cert) => {
     if (cert.logoUrl) {
       try {
         console.debug('Loading certification logo from URL:', cert.logoUrl);
-        const certificationLogoBuffer = await getImage(cert.logoUrl, 'certifications');
+
+        // Time getImage
+        const getImageStart = Date.now();
+        const certificationLogoResult = await getImage(cert.logoUrl, 'certifications');
+        const getImageTime = Date.now() - getImageStart;
+        certTimings.getImage_times.push(getImageTime);
+
+        // Track cache hits/misses
+        if (certificationLogoResult.cacheHit) {
+          certTimings.blob_cache_hits++;
+        } else {
+          certTimings.blob_cache_misses++;
+        }
+
+        const certificationLogoBuffer = certificationLogoResult.buffer || certificationLogoResult;
+
+        // Time loadImage
+        const loadImageStart = Date.now();
         let logo = await loadImage(certificationLogoBuffer);
+        const loadImageTime = Date.now() - loadImageStart;
+        certTimings.loadImage_times.push(loadImageTime);
+
+        // Time cropImage
+        const cropStart = Date.now();
         logo = cropImage(logo); // Crop the logo to remove extra space
+        const cropTime = Date.now() - cropStart;
+        certTimings.cropImage_times.push(cropTime);
+
+        // Time grayscale if needed
         if (cert.status.expired) {
+          const grayscaleStart = Date.now();
           const tempCanvas = createCanvas(logo.width, logo.height);
           const tempCtx = tempCanvas.getContext('2d');
           tempCtx.drawImage(logo, 0, 0);
           applyGrayscale(tempCtx, 0, 0, logo.width, logo.height); // Apply grayscale for expired certifications
           logo = tempCanvas;
+          const grayscaleTime = Date.now() - grayscaleStart;
+          certTimings.grayscale_times.push(grayscaleTime);
         }
+
         const certificationLocalData = getLocalCertificationData(cert);
         certificationsLogos.push({
           logo,
@@ -352,6 +395,31 @@ export const generateImage = async (options) => {
   await Promise.all(logoPromises);
   timings.certifications_download_ms = Date.now() - certLogosStart;
   timings.certifications_count = certifications.length;
+
+  // Calculate statistics
+  const sum = (arr) => arr.reduce((a, b) => a + b, 0);
+  const avg = (arr) => (arr.length > 0 ? sum(arr) / arr.length : 0);
+
+  const totalCerts = certTimings.getImage_times.length;
+  const cacheHitRate = totalCerts > 0 ? certTimings.blob_cache_hits / totalCerts : 0;
+
+  // Add detailed breakdown to timings
+  timings.certifications_detailed = {
+    count: totalCerts,
+    avg_getImage_ms: Math.round(avg(certTimings.getImage_times)),
+    avg_loadImage_ms: Math.round(avg(certTimings.loadImage_times)),
+    avg_cropImage_ms: Math.round(avg(certTimings.cropImage_times)),
+    avg_grayscale_ms: Math.round(avg(certTimings.grayscale_times)),
+    total_getImage_ms: Math.round(sum(certTimings.getImage_times)),
+    total_loadImage_ms: Math.round(sum(certTimings.loadImage_times)),
+    total_cropImage_ms: Math.round(sum(certTimings.cropImage_times)),
+    total_grayscale_ms: Math.round(sum(certTimings.grayscale_times)),
+    blob_cache_hits: certTimings.blob_cache_hits,
+    blob_cache_misses: certTimings.blob_cache_misses,
+    blob_cache_hit_rate: Math.round(cacheHitRate * 100) / 100,
+  };
+
+  console.log('Certification Processing Breakdown:', JSON.stringify(timings.certifications_detailed, null, 2));
 
   // Sort certification logos
   certificationsLogos = sortCertifications(
@@ -432,7 +500,8 @@ export const generateImage = async (options) => {
     // Download all superbadge logos in parallel
     const superbadgeLogoPromises = superbadgeLogos.map(async (logoUrl) => {
       try {
-        const logoBuffer = await getImage(logoUrl, 'superbadges');
+        const logoResult = await getImage(logoUrl, 'superbadges');
+        const logoBuffer = logoResult.buffer || logoResult;
         const logo = await loadImage(logoBuffer);
         return logo;
       } catch (error) {
