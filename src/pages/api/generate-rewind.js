@@ -42,6 +42,7 @@ export default async function handler(req, res) {
   }
 
   const start_time = new Date().getTime();
+  const timings = {}; // Track detailed timings
   const { username: rawUsername, year = 2025 } = req.body;
 
   // Sanitize and validate input
@@ -85,7 +86,9 @@ export default async function handler(req, res) {
 
   try {
     // Perform the GraphQL queries in parallel using the utils class
+    const graphqlStart = new Date().getTime();
     const [rankResponse, certificationsResponse, stampsResponse] = await GraphQLUtils.performQueries(graphqlQueries);
+    timings.graphql_queries_ms = new Date().getTime() - graphqlStart;
 
     // Validate GraphQL responses
     if (!rankResponse?.data?.data?.profile) {
@@ -109,6 +112,7 @@ export default async function handler(req, res) {
     }
 
     // Generate the rewind image with all processing handled in the utility
+    const imageGenStart = new Date().getTime();
     const generateRewindResult = await generateRewind({
       username,
       year,
@@ -116,6 +120,12 @@ export default async function handler(req, res) {
       certificationsData,
       stampsData,
     });
+    timings.image_generation_ms = new Date().getTime() - imageGenStart;
+
+    // Merge timings from generateRewind if available
+    if (generateRewindResult.timings) {
+      timings.image_generation_breakdown = generateRewindResult.timings;
+    }
 
     // Validate rewind generation result
     if (!generateRewindResult?.imageUrl) {
@@ -131,14 +141,22 @@ export default async function handler(req, res) {
     const rewindSummary = generateRewindResult.rewindSummary;
     const yearlyData = generateRewindResult.yearlyData;
 
+    // Calculate total time and add to timings
+    timings.total_ms = new Date().getTime() - start_time;
+    timings.other_ms = timings.total_ms - timings.graphql_queries_ms - timings.image_generation_ms;
+
+    // Log timings for debugging
+    console.log(`[Rewind] Total: ${timings.total_ms}ms | GraphQL: ${timings.graphql_queries_ms}ms | Image: ${timings.image_generation_ms}ms | Other: ${timings.other_ms}ms`);
+
     // Update the rewind counter in the database (non-blocking)
     const rewind_data = {
       th_username: username,
-      rewind_processing_time: new Date().getTime() - start_time,
+      rewind_processing_time: timings.total_ms,
       year,
       rankData,
       yearlyData,
       rewindSummary,
+      timings: timings,
     };
     SupabaseUtils.updateRewindCounter(rewind_data).catch((error) => {
       console.error('Error updating rewind counter:', error.message);
@@ -152,6 +170,7 @@ export default async function handler(req, res) {
       yearlyData,
       year,
       username,
+      timings,
     });
   } catch (error) {
     console.error('Error generating rewind:', {
