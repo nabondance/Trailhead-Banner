@@ -1,5 +1,6 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const { getLocalCertificationData, logOptions } = require('./dataUtils');
 const {
@@ -95,11 +96,10 @@ export const generateImage = async (options) => {
     switch (options.backgroundKind) {
       case 'library':
         if (options.backgroundLibraryUrl) {
-          if (!(await isValidImageType(options.backgroundLibraryUrl))) {
-            throw new Error('Unsupported image type');
-          }
-          const bgImageResult = await getImage(options.backgroundLibraryUrl, 'background');
-          const bgImageBuffer = bgImageResult.buffer || bgImageResult;
+          // Extract filename from URL and read directly from local filesystem
+          const filename = options.backgroundLibraryUrl.split('/').pop();
+          const filePath = path.join(process.cwd(), 'public', 'assets', 'background-library', filename);
+          const bgImageBuffer = await fs.promises.readFile(filePath);
           const bgImage = await loadImage(bgImageBuffer);
           ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
