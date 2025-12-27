@@ -1,3 +1,4 @@
+import axios from 'axios';
 import GET_TRAILBLAZER_RANK from '../../graphql/queries/getTrailblazerRank';
 import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications';
 import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
@@ -7,6 +8,7 @@ import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
 import { getMaintenanceInfoMessages } from '../../utils/certificationMaintenanceUtils';
+import { validateUsernameWithGraphQL } from '../../utils/usernameValidation';
 
 export const config = {
   api: {
@@ -31,6 +33,27 @@ export default async function handler(req, res) {
     const options = req.body;
     // const protocol = req.headers['x-forwarded-proto'] || 'http';
     // const host = req.headers.host;
+
+    // Validate username only if it differs from lastValidatedUsername
+    const shouldValidateUsername = !options.lastValidatedUsername || options.lastValidatedUsername !== options.username;
+    if (shouldValidateUsername) {
+      const validationStart = new Date().getTime();
+
+      // Use shared validation logic from utils
+      const validationResult = await validateUsernameWithGraphQL(options.username, axios, GET_TRAILBLAZER_RANK);
+
+      timings.username_validation_ms = new Date().getTime() - validationStart;
+
+      if (!validationResult.valid) {
+        return res.status(400).json({
+          error: validationResult.message,
+          validationError: true,
+        });
+      }
+    } else {
+      timings.username_validation_ms = 0; // Validation was skipped (cached)
+      console.log(`[Banner] Skipping username validation for '${options.username}' (matches lastValidatedUsername)`);
+    }
 
     const graphqlQueries = [
       {
