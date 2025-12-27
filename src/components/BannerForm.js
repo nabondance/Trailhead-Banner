@@ -139,9 +139,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     const input = e.target.value.toLowerCase();
     const cleanUsername = extractUsernameFromUrl(input);
     setOptions({ ...options, username: cleanUsername });
-    // Reset validation cache when username changes
+    // Reset validation cache and clear visual feedback when username changes
     if (cleanUsername !== lastValidatedUsername) {
       setLastValidatedUsername(null);
+      setValidationResult(null);
+      setUsernameError('');
     }
   };
 
