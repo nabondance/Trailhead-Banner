@@ -6,14 +6,14 @@ import path from 'path';
 /**
  * Generate a filename for certification images based on URL parameters
  * @param {string} imageUrl - The certification image URL
- * @returns {string} Generated filename in format: id_oid_lastMod.png
+ * @returns {string} Generated filename in format: id_oid_lastMod.webp
  */
 export const getCertificationFileName = (imageUrl) => {
   const url = new URL(imageUrl);
   const id = url.searchParams.get('id');
   const oid = url.searchParams.get('oid');
   const lastMod = url.searchParams.get('lastMod');
-  return `${id}_${oid}_${lastMod}.png`;
+  return `${id}_${oid}_${lastMod}.webp`;
 };
 
 export const getImage = async (imageUrl, folder = 'images') => {

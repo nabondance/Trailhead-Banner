@@ -400,7 +400,7 @@ export const generateImage = async (options) => {
 
           // Cache the cropped version for next time (non-blocking)
           try {
-            const croppedBuffer = logo.toBuffer('image/png');
+            const croppedBuffer = logo.toBuffer('image/webp', { lossless: true });
             const croppedFileName = getCertificationFileName(cert.logoUrl);
 
             // Upload cropped version (don't await - let it happen in background)
