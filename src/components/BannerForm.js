@@ -106,11 +106,13 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
+  const [lastValidatedUsername, setLastValidatedUsername] = useState(null);
 
   const handleUsernameBlur = async () => {
     if (!options.username) {
       setValidationResult(null);
       setUsernameError('');
+      setLastValidatedUsername(null);
       return;
     }
 
@@ -118,18 +120,31 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     if (!formatResult.valid) {
       setUsernameError(formatResult.message);
       setValidationResult(formatResult);
+      setLastValidatedUsername(null);
       return;
     }
 
     const apiResult = await validateUsernameWithApi(options.username.toLowerCase());
     setUsernameError(apiResult.valid ? '' : apiResult.message);
     setValidationResult(apiResult);
+    // Store the validated username if validation was successful
+    if (apiResult.valid) {
+      setLastValidatedUsername(options.username.toLowerCase());
+    } else {
+      setLastValidatedUsername(null);
+    }
   };
 
   const handleUsernameChange = (e) => {
     const input = e.target.value.toLowerCase();
     const cleanUsername = extractUsernameFromUrl(input);
     setOptions({ ...options, username: cleanUsername });
+    // Reset validation cache and clear visual feedback when username changes
+    if (cleanUsername !== lastValidatedUsername) {
+      setLastValidatedUsername(null);
+      setValidationResult(null);
+      setUsernameError('');
+    }
   };
 
   const handleBackgroundChange = (e) => {
@@ -162,6 +177,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     setIsGenerating(true);
     setShowOptions(false);
 
+    // Basic format validation on client side for immediate feedback
     const usernameFormatResult = validateUsernameFormat(options.username.toLowerCase());
     if (!usernameFormatResult.valid) {
       setMainError(new Error(usernameFormatResult.message));
@@ -170,7 +186,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return;
     }
 
-    const usernameApiResult = await validateUsernameWithApi(options.username.toLowerCase());
+    // Reuse cached validation result if username hasn't changed
+    let usernameApiResult;
+    if (lastValidatedUsername === options.username.toLowerCase() && validationResult?.valid) {
+      usernameApiResult = validationResult;
+    } else {
+      usernameApiResult = await validateUsernameWithApi(options.username.toLowerCase());
+    }
+
     const imageUrlValidation =
       options.backgroundKind === 'customUrl'
         ? await validateImageUrl(options.customBackgroundImageUrl)
@@ -193,6 +216,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     await onSubmit({
       ...options,
       backgroundImageUrl,
+      lastValidatedUsername, // Pass to backend for validation caching
       lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
       lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
     });

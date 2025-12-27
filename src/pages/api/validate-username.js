@@ -1,51 +1,17 @@
 import axios from 'axios';
 import GET_TRAILBLAZER_RANK from '../../graphql/queries/getTrailblazerRank';
-
-const endpoint = 'https://profile.api.trailhead.com/graphql';
+import { validateUsernameWithGraphQL } from '../../utils/usernameValidation';
 
 export default async function handler(req, res) {
   const { username } = req.query;
   console.debug('validating:', username);
 
-  if (!username) {
-    return res.status(400).json({ valid: false, state: 'invalid', message: 'Username is required' });
-  }
+  // Use shared validation logic from utils
+  const validationResult = await validateUsernameWithGraphQL(username, axios, GET_TRAILBLAZER_RANK);
 
-  try {
-    const response = await axios.post(
-      endpoint,
-      {
-        query: GET_TRAILBLAZER_RANK,
-        variables: { slug: username, hasSlug: true },
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+  // Return appropriate status code based on validation result
+  const statusCode =
+    validationResult.state === 'invalid' && validationResult.message === 'Internal server error' ? 500 : 200;
 
-    const responseData = response.data;
-
-    if (responseData.errors) {
-      return res.status(200).json({
-        valid: false,
-        state: 'invalid',
-        message: `Trailhead profile does not exist for username: ${username}`,
-      });
-    }
-
-    if (responseData.data.profile.__typename === 'PrivateProfile') {
-      return res.status(200).json({
-        valid: false,
-        state: 'private',
-        message: `Trailhead profile is private for username '${username}', see How-To`,
-      });
-    }
-
-    return res.status(200).json({ valid: true, state: 'ok', message: 'Username is valid' });
-  } catch (error) {
-    console.error('Error validating username:', error);
-    return res.status(500).json({ valid: false, state: 'invalid', message: 'Internal server error' });
-  }
+  return res.status(statusCode).json(validationResult);
 }
