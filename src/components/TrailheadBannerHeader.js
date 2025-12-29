@@ -11,7 +11,7 @@ import '../styles/globals.css';
 const TrailheadBannerHeader = () => {
   const generatorsOptions = [
     { value: '/', label: 'Banner Generator' },
-    { value: '/rewind', label: 'Trailhead Rewind', isNew: true },
+    // { value: '/rewind', label: 'Trailhead Rewind', isNew: true },
   ];
 
   const aboutOptions = [
