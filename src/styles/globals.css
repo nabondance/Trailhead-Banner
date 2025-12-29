@@ -1429,8 +1429,8 @@ legend {
 
 select {
   padding: 1px;
-  padding-left: 2px;
-  padding-right: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
