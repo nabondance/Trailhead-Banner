@@ -3,7 +3,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faTriangleExclamation,
+  faCircleXmark,
+  faQuestionCircle,
+  faCircleInfo,
+} from '@fortawesome/free-solid-svg-icons';
+import { Tooltip } from 'react-tooltip';
 import bannerBackground from '../data/banners.json';
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
 import { validateImageUrl } from '../utils/imageValidation';
@@ -278,7 +285,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 <option value='library'>Background Library</option>
                 <option value='upload'>Upload Image</option>
                 <option value='customUrl'>Custom URL</option>
-                <option value='monochromatic'>Monochromatic Background</option>
+                <option value='monochromatic'>Solid Color</option>
               </select>
             </label>
             {options.backgroundKind === 'monochromatic' && (
@@ -333,91 +340,113 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           <fieldset>
             <legend>Counter Options</legend>
             <label>
-              Show Badge Count:
               <input
                 type='checkbox'
                 checked={options.displayBadgeCount}
                 onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
               />
+              <span className='option-label-text'>Show Badge Count</span>
             </label>
             <label>
-              Show Superbadge Count:
               <input
                 type='checkbox'
                 checked={options.displaySuperbadgeCount}
                 onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
               />
+              <span className='option-label-text'>Show Superbadge Count</span>
             </label>
             <label>
-              Show Certification Count:
               <input
                 type='checkbox'
                 checked={options.displayCertificationCount}
                 onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
               />
+              <span className='option-label-text'>Show Certification Count</span>
             </label>
             <label>
-              Show Trail Count:
               <input
                 type='checkbox'
                 checked={options.displayTrailCount}
                 onChange={(e) => setOptions({ ...options, displayTrailCount: e.target.checked })}
               />
+              <span className='option-label-text'>Show Trail Count</span>
             </label>
             <label>
-              Show Point Count:
               <input
                 type='checkbox'
                 checked={options.displayPointCount}
                 onChange={(e) => setOptions({ ...options, displayPointCount: e.target.checked })}
               />
+              <span className='option-label-text'>Show Point Count</span>
             </label>
             <label>
-              Show Stamp Count:
               <input
                 type='checkbox'
                 checked={options.displayStampCount}
                 onChange={(e) => setOptions({ ...options, displayStampCount: e.target.checked })}
               />
+              <span className='option-label-text'>Show Stamp Count</span>
             </label>
           </fieldset>
           <fieldset>
             <legend>Display Options</legend>
             <label>
-              Show Rank Logo:
               <input
                 type='checkbox'
                 checked={options.displayRankLogo}
                 onChange={(e) => setOptions({ ...options, displayRankLogo: e.target.checked })}
               />
+              <span className='option-label-text'>Show Rank Logo</span>
             </label>
             <label>
-              Show Agentblazer Rank:
               <input
                 type='checkbox'
                 checked={options.displayAgentblazerRank}
                 onChange={(e) => setOptions({ ...options, displayAgentblazerRank: e.target.checked })}
               />
+              <span className='option-label-text'>Show Agentblazer Rank</span>
+              <span
+                className='option-info'
+                data-tooltip-id='agentblazer-tooltip'
+                tabIndex='0'
+                aria-label='More information'
+              >
+                <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+              </span>
             </label>
+            <Tooltip id='agentblazer-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Agentblazer is the AI-focused ranking system on Trailhead
+            </Tooltip>
           </fieldset>
           <fieldset>
             <legend>Superbadge Options</legend>
             <label>
-              Display Superbadges:
               <input
                 type='checkbox'
                 checked={options.displaySuperbadges}
                 onChange={(e) => setOptions({ ...options, displaySuperbadges: e.target.checked })}
               />
+              <span className='option-label-text'>Display Superbadges</span>
             </label>
             <label>
-              Limit Number of Superbadges:
               <input
                 type='checkbox'
                 checked={options.displayLastXSuperbadges}
                 onChange={(e) => setOptions({ ...options, displayLastXSuperbadges: e.target.checked })}
               />
+              <span className='option-label-text'>Limit Number of Superbadges</span>
+              <span
+                className='option-info'
+                data-tooltip-id='limit-superbadges-tooltip'
+                tabIndex='0'
+                aria-label='More information'
+              >
+                <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+              </span>
             </label>
+            <Tooltip id='limit-superbadges-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Cap how many superbadge images appear on your banner
+            </Tooltip>
             {options.displayLastXSuperbadges && (
               <label>
                 Number of Superbadges:
@@ -446,15 +475,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           <fieldset>
             <legend>Certification Options</legend>
             <label>
-              Display Salesforce Certifications:
               <input
                 type='checkbox'
                 checked={options.displaySalesforceCertifications}
                 onChange={(e) => setOptions({ ...options, displaySalesforceCertifications: e.target.checked })}
               />
+              <span className='option-label-text'>Display Salesforce Certifications</span>
             </label>
             <label>
-              Display Accredited Professional Certifications:
               <input
                 type='checkbox'
                 checked={options.displayAccreditedProfessionalCertifications}
@@ -462,31 +490,65 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                   setOptions({ ...options, displayAccreditedProfessionalCertifications: e.target.checked })
                 }
               />
+              <span className='option-label-text'>Display Accredited Professional Certifications</span>
             </label>
             <label>
-              Include Expired Certifications:
               <input
                 type='checkbox'
                 checked={options.includeExpiredCertifications}
                 onChange={(e) => setOptions({ ...options, includeExpiredCertifications: e.target.checked })}
               />
+              <span className='option-label-text'>Include Expired Certifications</span>
+              <span
+                className='option-info'
+                data-tooltip-id='expired-certs-tooltip'
+                tabIndex='0'
+                aria-label='More information'
+              >
+                <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+              </span>
             </label>
+            <Tooltip id='expired-certs-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Expired certifications appear in grayscale to differentiate from active ones
+            </Tooltip>
             <label>
-              Include Retired Certifications:
               <input
                 type='checkbox'
                 checked={options.includeRetiredCertifications}
                 onChange={(e) => setOptions({ ...options, includeRetiredCertifications: e.target.checked })}
               />
+              <span className='option-label-text'>Include Retired Certifications</span>
+              <span
+                className='option-info'
+                data-tooltip-id='retired-certs-tooltip'
+                tabIndex='0'
+                aria-label='More information'
+              >
+                <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+              </span>
             </label>
+            <Tooltip id='retired-certs-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Retired certifications will be displayed with their retired ribbon
+            </Tooltip>
             <label>
-              Limit Number of Certifications:
               <input
                 type='checkbox'
                 checked={options.displayLastXCertifications}
                 onChange={(e) => setOptions({ ...options, displayLastXCertifications: e.target.checked })}
               />
+              <span className='option-label-text'>Limit Number of Certifications</span>
+              <span
+                className='option-info'
+                data-tooltip-id='limit-certs-tooltip'
+                tabIndex='0'
+                aria-label='More information'
+              >
+                <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+              </span>
             </label>
+            <Tooltip id='limit-certs-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Cap how many certification badges appear on your banner
+            </Tooltip>
             {options.displayLastXCertifications && (
               <label>
                 Number of Certifications:
