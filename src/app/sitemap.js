@@ -10,6 +10,7 @@ export default async function sitemap() {
     '/how-to',
     '/legal',
     '/releases',
+    '/rewind',
   ];
 
   // Create sitemap entries for static routes
