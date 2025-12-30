@@ -110,12 +110,18 @@ const HowToPage = () => {
       </section>
       <section id='further-assistance' className='how-to-section'>
         <h2>Need Further Assistance?</h2>
-        <p>
-          If the issue persists, please create an issue on our GitHub repository:{' '}
-          <a href='https://github.com/nabondance/Trailhead-Banner/issues/new' target='_blank' rel='noopener noreferrer'>
-            Create an Issue
-          </a>
-        </p>
+        <ul>
+          <li>
+            If the issue persists, please create an issue on our GitHub repository:{' '}
+            <a
+              href='https://github.com/nabondance/Trailhead-Banner/issues/new'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              Create an Issue
+            </a>
+          </li>
+        </ul>
       </section>
     </div>
   );
