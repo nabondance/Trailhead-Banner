@@ -9,9 +9,12 @@ const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
 import '../styles/globals.css';
 
 const TrailheadBannerHeader = () => {
+  const currentMonth = new Date().getMonth(); // 0 = January, 11 = December
+  const isRewindActive = currentMonth === 11 || currentMonth === 0;
+
   const generatorsOptions = [
     { value: '/', label: 'Banner Generator' },
-    // { value: '/rewind', label: 'Trailhead Rewind', isNew: true },
+    ...(isRewindActive ? [{ value: '/rewind', label: 'Trailhead Rewind', isNew: true }] : []),
   ];
 
   const aboutOptions = [
