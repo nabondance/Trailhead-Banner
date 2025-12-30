@@ -77,8 +77,10 @@ const HowToPage = () => {
         <h2>How to Use a Custom Background</h2>
         <ol>
           <li>Click on &quot;More Options&quot; in the banner generator form.</li>
-          <li>Select &quot;Custom URL&quot; from the &quot;Background Kind&quot; dropdown.</li>
-          <li>Enter the URL of the image you want to use as the background.</li>
+          <li>
+            Select &quot;Custom URL&quot; or &quot;Upload Image&quot; from the &quot;Background Kind&quot; dropdown.
+          </li>
+          <li>Enter the URL of the image or upload an image you want to use as the background.</li>
           <li>Click on &quot;Generate Banner&quot; to see your banner with the custom background.</li>
         </ol>
       </section>
