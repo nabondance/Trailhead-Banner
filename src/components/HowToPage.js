@@ -5,7 +5,7 @@ const HowToPage = () => {
   return (
     <div className='how-to-page'>
       <h1>How to Use Trailhead Banner</h1>
-      <section className='how-to-section'>
+      <section id='find-username' className='how-to-section'>
         <h2>Find Your Trailhead Username</h2>
         <ol>
           <li>Log in to Trailhead.</li>
@@ -28,7 +28,7 @@ const HowToPage = () => {
           />
         </div>
       </section>
-      <section className='how-to-section'>
+      <section id='make-profile-public' className='how-to-section'>
         <h2>How to Make Your Trailhead Profile Public</h2>
         <ol>
           <li>Log in to Trailhead.</li>
@@ -42,7 +42,7 @@ const HowToPage = () => {
           <li>Under &quot;Your Profile Privacy&quot;, select &quot;Public&quot;.</li>
         </ol>
       </section>
-      <section className='how-to-section'>
+      <section id='make-certifications-public' className='how-to-section'>
         <h2>How to Make Your Trailhead Certifications Public</h2>
         <ol>
           <li>Log in to Trailhead.</li>
@@ -56,7 +56,7 @@ const HowToPage = () => {
           <li>Under &quot;Certification Privacy&quot;, select &quot;Make my certifications public to all&quot;.</li>
         </ol>
       </section>
-      <section className='how-to-section'>
+      <section id='generate-banner' className='how-to-section'>
         <h2>Generating Your LinkedIn Banner</h2>
         <ol>
           <li>Enter your Trailhead username in the input field.</li>
@@ -65,7 +65,7 @@ const HowToPage = () => {
           <li>Download your banner.</li>
         </ol>
       </section>
-      <section className='how-to-section'>
+      <section id='personalize-banner' className='how-to-section'>
         <h2>How to Personalize the Banner</h2>
         <ol>
           <li>Click on &quot;More Options&quot;.</li>
@@ -73,7 +73,7 @@ const HowToPage = () => {
           <li>Click on &quot;Generate Banner&quot;.</li>
         </ol>
       </section>
-      <section className='how-to-section'>
+      <section id='custom-background' className='how-to-section'>
         <h2>How to Use a Custom Background</h2>
         <ol>
           <li>Click on &quot;More Options&quot; in the banner generator form.</li>
@@ -84,7 +84,7 @@ const HowToPage = () => {
           <li>Click on &quot;Generate Banner&quot; to see your banner with the custom background.</li>
         </ol>
       </section>
-      <section className='how-to-section'>
+      <section id='modify-linkedin-banner' className='how-to-section'>
         <h2>How to Modify Your Personal Banner on LinkedIn</h2>
         <ol>
           <li>Log in to your LinkedIn account.</li>
@@ -100,7 +100,7 @@ const HowToPage = () => {
           <li>Click &quot;Save&quot;.</li>
         </ol>
       </section>
-      <section className='how-to-section'>
+      <section id='common-issues' className='how-to-section'>
         <h2>Common Issues and Solutions</h2>
         <ul>
           <li>If you encounter an error, try refreshing the page and trying again.</li>
@@ -108,7 +108,7 @@ const HowToPage = () => {
           <li>If the problem persists, consider writing an issue on the GitHub repository.</li>
         </ul>
       </section>
-      <section className='how-to-section'>
+      <section id='further-assistance' className='how-to-section'>
         <h2>Need Further Assistance?</h2>
         <p>
           If the issue persists, please create an issue on our GitHub repository:{' '}
