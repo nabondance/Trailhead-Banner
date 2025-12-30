@@ -249,7 +249,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           data-form-type='other'
         />
         {validationResult && (
-          <div className='validation-icon' data-tooltip={validationResult.message}>
+          <div
+            className='validation-icon'
+            data-tooltip-id='validation-result-tooltip'
+            data-tooltip-content={validationResult.message}
+          >
             {validationResult.state === 'ok' ? (
               <FontAwesomeIcon icon={faCheck} className='fa-fw icon-valid' /> // Check mark
             ) : validationResult.state === 'private' ? (
@@ -259,16 +263,20 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             )}
           </div>
         )}
+        <Tooltip id='validation-result-tooltip' place='top' delayShow={200} className='react-tooltip' />
         {!validationResult && (
           <div
             className='validation-icon clickable'
-            data-tooltip='Need help? Click for guidance.'
+            data-tooltip-id='help-tooltip'
             onClick={handleHelpClick}
             style={{ cursor: 'pointer' }}
           >
             <FontAwesomeIcon icon={faQuestionCircle} className='fa-fw icon-help' />
           </div>
         )}
+        <Tooltip id='help-tooltip' place='top' delayShow={200} className='react-tooltip'>
+          Need help? Click for guidance.
+        </Tooltip>
       </div>
       {!isGenerating && (
         <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>

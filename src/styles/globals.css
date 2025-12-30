@@ -571,54 +571,16 @@ main {
   color: var(--error-color);
 }
 
-.validation-icon[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 100%;
-  background-color: #333;
-  color: #fff;
-  padding: 5px;
-  border-radius: 3px;
-  white-space: nowrap;
-  z-index: 10;
-  max-width: min(300px, 90vw); /* Ensure the tooltip fits within the viewport */
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@media (width <= 768px) {
-  .validation-icon[data-tooltip]:hover::after {
-    left: auto;
-    right: 10px;
-    transform: none;
-    text-size-adjust: 80%;
-  }
-}
-
 .icon-help {
   margin-left: 10px;
-  color: var(--text-faded);
+  color: var(--primary);
+  opacity: 0.5;
   cursor: pointer;
+  transition: opacity 0.2s;
 }
 
 .icon-help:hover {
-  color: var(--text-contrast);
-}
-
-.icon-help[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 100%;
-  background-color: #333;
-  color: #fff;
-  padding: 5px;
-  border-radius: 3px;
-  white-space: nowrap;
-  z-index: 10;
+  opacity: 0.7;
 }
 
 .option-info {
