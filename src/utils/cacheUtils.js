@@ -28,7 +28,7 @@ export const getImage = async (imageUrl, folder = 'images') => {
     cacheHit = true;
     return { buffer: imageDownloaded, cacheHit };
   } catch (error) {
-    console.log(`Image not found in blob storage, downloading from URL: ${imageUrl}`);
+    console.error(`Image not found in blob storage, downloading from URL: ${imageUrl}`);
   }
 
   // For cropped certifications folder, don't download from URL - it should only contain pre-cropped images

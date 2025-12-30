@@ -136,47 +136,56 @@ export const generateImage = async (options) => {
   // Rank Logo
   stepStartTime = Date.now();
   try {
-    let rankLogoBuffer;
-    let rankLogo;
+    // Check if rank data exists before attempting to load
+    if (!options.rankData.rank || !options.rankData.rank.imageUrl) {
+      console.debug('Rank data not available, skipping rank logo');
+      rankLogoWidth = 180;
+      rankLogoHeight = 40;
+    } else {
+      let rankLogoBuffer;
+      let rankLogo;
 
-    // Try to load from local assets first, then fallback to remote URL
-    try {
-      // Extract filename from URL for local lookup
-      const rankFileName = options.rankData.rank.imageUrl.split('/').pop();
-      rankLogoBuffer = await getLocal(rankFileName, 'Rank');
-      rankLogo = await loadImage(rankLogoBuffer);
-      console.log(`Loaded rank logo locally: ${rankFileName}`);
-    } catch (localError) {
-      console.log(`Local rank logo not found, downloading from URL: ${options.rankData.rank.imageUrl}`);
-      const rankLogoResult = await getImage(options.rankData.rank.imageUrl, 'ranks');
-      rankLogoBuffer = rankLogoResult.buffer || rankLogoResult;
-      rankLogo = await loadImage(rankLogoBuffer);
-    }
+      // Try to load from local assets first, then fallback to remote URL
+      try {
+        // Extract filename from URL for local lookup
+        const rankFileName = options.rankData.rank.imageUrl.split('/').pop();
+        rankLogoBuffer = await getLocal(rankFileName, 'Rank');
+        rankLogo = await loadImage(rankLogoBuffer);
+        console.debug(`Loaded rank logo locally: ${rankFileName}`);
+      } catch (localError) {
+        console.debug(`Local rank logo not found, downloading from URL: ${options.rankData.rank.imageUrl}`);
+        const rankLogoResult = await getImage(options.rankData.rank.imageUrl, 'ranks');
+        rankLogoBuffer = rankLogoResult.buffer || rankLogoResult;
+        rankLogo = await loadImage(rankLogoBuffer);
+      }
 
-    rankLogoHeight = canvas.height * top_part * 1;
-    rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
-    const rankLogoScalingFactor = 1.2;
-    if (options.displayRankLogo) {
-      ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
+      rankLogoHeight = canvas.height * top_part * 1;
+      rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight; // Maintain aspect ratio
+      const rankLogoScalingFactor = 1.2;
+      if (options.displayRankLogo) {
+        ctx.drawImage(rankLogo, 0, 0, rankLogoWidth * rankLogoScalingFactor, rankLogoHeight * rankLogoScalingFactor);
+      }
     }
   } catch (error) {
     rankLogoWidth = 180;
     rankLogoHeight = 40;
-    console.error(`Error loading rank logo ${options.rankData.rank.imageUrl}:`, error);
-    warnings.push(`Error loading rank logo ${options.rankData.rank.imageUrl}: ${error.message}`);
+    const rankUrl = options.rankData.rank?.imageUrl || 'unknown';
+    console.error(`Error loading rank logo ${rankUrl}:`, error);
+    warnings.push(`Error loading rank logo ${rankUrl}: ${error.message}`);
   }
   timings.rank_logo_load_ms = Date.now() - stepStartTime;
 
   // Counters
   stepStartTime = Date.now();
-  const badgeCount = options.badgesData.trailheadStats.earnedBadgesCount || 0;
-  const superbadgeCount = options.superbadgesData.trailheadStats.superbadgeCount || 0;
-  const certificationCount =
-    options.certificationsData.certifications.filter(
+  const badgeCount = options.badgesData.trailheadStats?.earnedBadgesCount || 0;
+  const superbadgeCount = options.superbadgesData.trailheadStats?.superbadgeCount || 0;
+  const certificationCount = (
+    options.certificationsData.certifications?.filter(
       (cert) =>
         (options.includeExpiredCertifications || cert.status.expired === false) &&
         (options.includeRetiredCertifications || cert.status.title !== 'Retired')
-    ).length || 0;
+    ) || []
+  ).length;
   const trailCount = options.rankData.completedTrailCount || 0;
   const pointCount = getCounterPointText(options.rankData.earnedPointsSum || 0);
   const stampCount = options.stampsData.totalCount || 0;
@@ -298,13 +307,14 @@ export const generateImage = async (options) => {
   stepStartTime = Date.now();
 
   // Filter certifications based on options
-  let certifications = options.certificationsData.certifications?.filter(
-    (cert) =>
-      (options.includeExpiredCertifications || cert.status.expired === false) &&
-      (options.includeRetiredCertifications || cert.status.title !== 'Retired') &&
-      (options.displaySalesforceCertifications || cert.title.includes('Accredited Professional')) &&
-      (options.displayAccreditedProfessionalCertifications || !cert.title.includes('Accredited Professional'))
-  );
+  let certifications =
+    options.certificationsData.certifications?.filter(
+      (cert) =>
+        (options.includeExpiredCertifications || cert.status.expired === false) &&
+        (options.includeRetiredCertifications || cert.status.title !== 'Retired') &&
+        (options.displaySalesforceCertifications || cert.title.includes('Accredited Professional')) &&
+        (options.displayAccreditedProfessionalCertifications || !cert.title.includes('Accredited Professional'))
+    ) || [];
   const totalCertifications = certifications.length;
 
   // Sort certifications
@@ -370,7 +380,7 @@ export const generateImage = async (options) => {
           certTimings.cropImage_times.push(cropTime);
         } catch (error) {
           // Cropped version not cached - do full processing
-          console.log(`Cropped cache miss for ${cert.title}, processing now...`);
+          console.debug(`Cropped cache miss for ${cert.title}, processing now...`);
           certTimings.cropped_cache_misses++;
 
           const certificationLogoResult = await getImage(cert.logoUrl, 'certifications');
@@ -541,13 +551,14 @@ export const generateImage = async (options) => {
   // Display Superbadges if enabled
   stepStartTime = Date.now();
   if (options.displaySuperbadges) {
-    const totalSuperbadges = options.superbadgesData.earnedAwards.edges?.filter(
-      (edge) => edge.node.award && edge.node.award.icon
-    ).length;
+    const totalSuperbadges =
+      options.superbadgesData.earnedAwards?.edges?.filter((edge) => edge.node.award && edge.node.award.icon).length ||
+      0;
 
-    let superbadgeLogos = options.superbadgesData.earnedAwards.edges
-      ?.filter((edge) => edge.node.award && edge.node.award.icon)
-      .map((edge) => edge.node.award.icon);
+    let superbadgeLogos =
+      options.superbadgesData.earnedAwards?.edges
+        ?.filter((edge) => edge.node.award && edge.node.award.icon)
+        .map((edge) => edge.node.award.icon) || [];
 
     if (options.displayLastXSuperbadges && options.lastXSuperbadges) {
       superbadgeLogos = superbadgeLogos.slice(-options.lastXSuperbadges);

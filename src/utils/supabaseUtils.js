@@ -45,13 +45,13 @@ class SupabaseUtils {
           thb_options: thb_data.thb_options,
           thb_version: thb_data.thb_version,
           thb_banner_hash: thb_data.bannerHash,
-          th_nb_points: thb_data.rankData.points,
-          th_nb_certif: thb_data.certificationsData.certifications.length,
-          th_nb_sb: thb_data.superbadgesData.earnedAwards.edges.length,
-          th_nb_badge: thb_data.rankData.badges,
-          th_nb_stamps: thb_data.stampsData.totalCount,
-          th_certif: thb_data.certificationsData.certifications,
-          th_sb: thb_data.superbadgesData.earnedAwards.edges,
+          th_nb_points: thb_data.rankData?.points,
+          th_nb_certif: thb_data.certificationsData?.certifications?.length || 0,
+          th_nb_sb: thb_data.superbadgesData?.earnedAwards?.edges?.length || 0,
+          th_nb_badge: thb_data.rankData?.badges,
+          th_nb_stamps: thb_data.stampsData?.totalCount,
+          th_certif: thb_data.certificationsData?.certifications || [],
+          th_sb: thb_data.superbadgesData?.earnedAwards?.edges || [],
           th_stamps: thb_data.stampsData,
           th_mvp: thb_data.mvp,
           th_agentblazer: `${thb_data.learnerStatusLevels?.statusName}-${thb_data.learnerStatusLevels?.title}`,
@@ -77,60 +77,63 @@ class SupabaseUtils {
       thb_options: data.options,
       thb_version: packageJson.version,
       bannerHash: data.bannerHash,
-      mvp: data.mvpData.isMvp,
+      mvp: data.mvpData?.isMvp || false,
       learnerStatusLevels: {
-        statusName: data.rankData.learnerStatusLevels[0]?.statusName,
-        title: data.rankData.learnerStatusLevels[0]?.title,
-        level: data.rankData.learnerStatusLevels[0]?.level,
+        statusName: data.rankData?.learnerStatusLevels?.[0]?.statusName,
+        title: data.rankData?.learnerStatusLevels?.[0]?.title,
+        level: data.rankData?.learnerStatusLevels?.[0]?.level,
       },
       rankData: {
-        rank: data.rankData.rank.title,
-        points: data.rankData.earnedPointsSum,
-        badges: data.rankData.earnedBadgesCount,
-        trails: data.rankData.completedTrailCount,
+        rank: data.rankData?.rank?.title,
+        points: data.rankData?.earnedPointsSum,
+        badges: data.rankData?.earnedBadgesCount,
+        trails: data.rankData?.completedTrailCount,
       },
       certificationsData: {
-        certifications: data.certificationsData.certifications.map((cert) => ({
-          title: cert.title,
-          dateCompleted: cert.dateCompleted,
-          dateExpired: cert.dateExpired,
-          status: cert.status.title,
-          logoUrl: cert.logoUrl,
-          product: cert.product,
-        })),
+        certifications:
+          data.certificationsData?.certifications?.map((cert) => ({
+            title: cert.title,
+            dateCompleted: cert.dateCompleted,
+            dateExpired: cert.dateExpired,
+            status: cert.status.title,
+            logoUrl: cert.logoUrl,
+            product: cert.product,
+          })) || [],
       },
       superbadgesData: {
         earnedAwards: {
-          edges: data.superbadgesData.earnedAwards.edges
-            .map((edge) => {
-              if (edge.node.award) {
-                return {
-                  node: {
-                    award: {
-                      title: edge.node.award.title,
-                      icon: edge.node.award.icon,
+          edges:
+            data.superbadgesData?.earnedAwards?.edges
+              ?.map((edge) => {
+                if (edge.node.award) {
+                  return {
+                    node: {
+                      award: {
+                        title: edge.node.award.title,
+                        icon: edge.node.award.icon,
+                      },
                     },
-                  },
-                };
-              }
-              return null;
-            })
-            .filter((edge) => edge !== null),
+                  };
+                }
+                return null;
+              })
+              .filter((edge) => edge !== null) || [],
         },
       },
       stampsData: {
-        totalCount: data.stampsData.totalCount,
-        edges: data.stampsData.edges.map((edge) => ({
-          node: {
-            kind: edge.node.kind,
-            apiName: edge.node.apiName,
-            name: edge.node.name,
-            eventDate: edge.node.eventDate,
-            eventLocation: edge.node.eventLocation,
-            iconUrl: edge.node.iconUrl,
-            linkUrl: edge.node.linkUrl,
-          },
-        })),
+        totalCount: data.stampsData?.totalCount,
+        edges:
+          data.stampsData?.edges?.map((edge) => ({
+            node: {
+              kind: edge.node.kind,
+              apiName: edge.node.apiName,
+              name: edge.node.name,
+              eventDate: edge.node.eventDate,
+              eventLocation: edge.node.eventLocation,
+              iconUrl: edge.node.iconUrl,
+              linkUrl: edge.node.linkUrl,
+            },
+          })) || [],
       },
     };
     return cleanedData;
