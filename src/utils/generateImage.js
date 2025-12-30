@@ -138,7 +138,7 @@ export const generateImage = async (options) => {
   try {
     // Check if rank data exists before attempting to load
     if (!options.rankData.rank || !options.rankData.rank.imageUrl) {
-      console.log('Rank data not available, skipping rank logo');
+      console.debug('Rank data not available, skipping rank logo');
       rankLogoWidth = 180;
       rankLogoHeight = 40;
     } else {
@@ -151,9 +151,9 @@ export const generateImage = async (options) => {
         const rankFileName = options.rankData.rank.imageUrl.split('/').pop();
         rankLogoBuffer = await getLocal(rankFileName, 'Rank');
         rankLogo = await loadImage(rankLogoBuffer);
-        console.log(`Loaded rank logo locally: ${rankFileName}`);
+        console.debug(`Loaded rank logo locally: ${rankFileName}`);
       } catch (localError) {
-        console.log(`Local rank logo not found, downloading from URL: ${options.rankData.rank.imageUrl}`);
+        console.debug(`Local rank logo not found, downloading from URL: ${options.rankData.rank.imageUrl}`);
         const rankLogoResult = await getImage(options.rankData.rank.imageUrl, 'ranks');
         rankLogoBuffer = rankLogoResult.buffer || rankLogoResult;
         rankLogo = await loadImage(rankLogoBuffer);
@@ -380,7 +380,7 @@ export const generateImage = async (options) => {
           certTimings.cropImage_times.push(cropTime);
         } catch (error) {
           // Cropped version not cached - do full processing
-          console.log(`Cropped cache miss for ${cert.title}, processing now...`);
+          console.debug(`Cropped cache miss for ${cert.title}, processing now...`);
           certTimings.cropped_cache_misses++;
 
           const certificationLogoResult = await getImage(cert.logoUrl, 'certifications');
