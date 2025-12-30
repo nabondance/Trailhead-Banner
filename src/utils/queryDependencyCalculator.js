@@ -26,9 +26,9 @@ const QUERY_DEPENDENCIES = {
       'displayTrailCount',
       'displayPointCount',
       'displayRankLogo',
-      'displayAgentblazerRank'
+      'displayAgentblazerRank',
     ],
-    params: {}
+    params: {},
   },
 
   GET_USER_CERTIFICATIONS: {
@@ -37,38 +37,34 @@ const QUERY_DEPENDENCIES = {
       'displayCertificationCount',
       'displaySalesforceCertifications',
       'displayAccreditedProfessionalCertifications',
-      'displayLastXCertifications'
+      'displayLastXCertifications',
     ],
-    params: { count: 100 }
+    params: { count: 100 },
   },
 
   GET_TRAILHEAD_BADGES: {
     // Fetch general badges (non-superbadge)
     requiredWhen: ['displayBadgeCount'],
-    params: { count: 5, filter: null }
+    params: { count: 5, filter: null },
   },
 
   GET_TRAILHEAD_BADGES_SUPERBADGE: {
     // Fetch superbadges specifically
-    requiredWhen: [
-      'displaySuperbadgeCount',
-      'displaySuperbadges',
-      'displayLastXSuperbadges'
-    ],
-    params: { count: 100, filter: 'SUPERBADGE' }
+    requiredWhen: ['displaySuperbadgeCount', 'displaySuperbadges', 'displayLastXSuperbadges'],
+    params: { count: 100, filter: 'SUPERBADGE' },
   },
 
   GET_MVP_STATUS: {
     // Always required - MVP status determines if ribbon is shown
     alwaysRequired: true,
-    params: {}
+    params: {},
   },
 
   GET_STAMPS: {
     // Fetch event stamps
     requiredWhen: ['displayStampCount'],
-    params: { first: 10 }
-  }
+    params: { first: 100 },
+  },
 };
 
 /**
@@ -121,7 +117,7 @@ function calculateRequiredQueries(options) {
     if (isQueryRequired(config, options)) {
       requiredQueries.push({
         name: queryName,
-        params: config.params || {}
+        params: config.params || {},
       });
     }
   }
@@ -148,7 +144,7 @@ function isQueryRequired(config, options) {
 
   // Check if ANY dependent option is enabled (OR logic)
   if (config.requiredWhen && Array.isArray(config.requiredWhen)) {
-    return config.requiredWhen.some(optionKey => options[optionKey] === true);
+    return config.requiredWhen.some((optionKey) => options[optionKey] === true);
   }
 
   // If no dependencies defined, don't fetch
@@ -164,7 +160,7 @@ function isQueryRequired(config, options) {
 function getAllQueries() {
   return Object.entries(QUERY_DEPENDENCIES).map(([name, config]) => ({
     name,
-    params: config.params || {}
+    params: config.params || {},
   }));
 }
 
@@ -177,8 +173,4 @@ function getQueryDependencies() {
   return QUERY_DEPENDENCIES;
 }
 
-export {
-  calculateRequiredQueries,
-  getQueryDependencies,
-  QUERY_DEPENDENCIES
-};
+export { calculateRequiredQueries, getQueryDependencies, QUERY_DEPENDENCIES };
