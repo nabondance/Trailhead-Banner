@@ -122,7 +122,10 @@ export default async function handler(req, res) {
 
     // Calculate which queries are needed based on options
     const requiredQueries = calculateRequiredQueries(options);
-    console.log(`[Banner] Required queries (${requiredQueries.length}):`, requiredQueries.map(q => q.name).join(', '));
+    console.log(
+      `[Banner] Required queries (${requiredQueries.length}):`,
+      requiredQueries.map((q) => q.name).join(', ')
+    );
 
     // Build the graphqlQueries array dynamically based on required queries
     const graphqlQueries = requiredQueries.map(({ name, params }) => {
@@ -187,7 +190,7 @@ export default async function handler(req, res) {
       }
 
       // Collect all info messages
-      const infoMessages = [...getMaintenanceInfoMessages(certificationsData.certifications)];
+      const infoMessages = [...getMaintenanceInfoMessages(certificationsData.certifications || [])];
       // Future: Add other info message types here
 
       // Calculate total time and add to timings
