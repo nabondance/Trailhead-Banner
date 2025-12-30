@@ -9,12 +9,77 @@ import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
 import { getMaintenanceInfoMessages } from '../../utils/certificationMaintenanceUtils';
 import { validateUsernameWithGraphQL } from '../../utils/usernameValidation';
+import { calculateRequiredQueries } from '../../utils/queryDependencyCalculator';
 
 export const config = {
   api: {
     bodyParser: {
       sizeLimit: '5mb', // Set limit to 5MB
     },
+  },
+};
+
+/**
+ * Query configuration map
+ * Maps query names from the dependency calculator to their GraphQL query objects and endpoints
+ */
+const QUERY_MAP = {
+  GET_TRAILBLAZER_RANK: {
+    query: GET_TRAILBLAZER_RANK,
+    url: 'https://profile.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      slug: username,
+      hasSlug: true,
+      ...params,
+    }),
+  },
+  GET_USER_CERTIFICATIONS: {
+    query: GET_USER_CERTIFICATIONS,
+    url: 'https://profile.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      slug: username,
+      hasSlug: true,
+      count: params.count || 100,
+    }),
+  },
+  GET_TRAILHEAD_BADGES: {
+    query: GET_TRAILHEAD_BADGES,
+    url: 'https://profile.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      slug: username,
+      hasSlug: true,
+      count: params.count || 5,
+      after: null,
+      filter: params.filter || null,
+    }),
+  },
+  GET_TRAILHEAD_BADGES_SUPERBADGE: {
+    query: GET_TRAILHEAD_BADGES,
+    url: 'https://profile.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      slug: username,
+      hasSlug: true,
+      count: params.count || 100,
+      after: null,
+      filter: 'SUPERBADGE',
+    }),
+  },
+  GET_MVP_STATUS: {
+    query: GET_MVP_STATUS,
+    url: 'https://community.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      userSlug: username,
+      queryMvp: true,
+      ...params,
+    }),
+  },
+  GET_STAMPS: {
+    query: GET_STAMPS,
+    url: 'https://mobile.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      slug: username,
+      first: params.first || 10,
+    }),
   },
 };
 
@@ -55,63 +120,23 @@ export default async function handler(req, res) {
       console.log(`[Banner] Skipping username validation for '${options.username}' (matches lastValidatedUsername)`);
     }
 
-    const graphqlQueries = [
-      {
-        query: GET_TRAILBLAZER_RANK,
-        variables: {
-          slug: options.username,
-          hasSlug: true,
-        },
-        url: 'https://profile.api.trailhead.com/graphql',
-      },
-      {
-        query: GET_USER_CERTIFICATIONS,
-        variables: {
-          slug: options.username,
-          hasSlug: true,
-          count: 100,
-        },
-        url: 'https://profile.api.trailhead.com/graphql',
-      },
-      {
-        query: GET_TRAILHEAD_BADGES,
-        variables: {
-          slug: options.username,
-          hasSlug: true,
-          count: 5,
-          after: null,
-          filter: null,
-        },
-        url: 'https://profile.api.trailhead.com/graphql',
-      },
-      {
-        query: GET_TRAILHEAD_BADGES,
-        variables: {
-          slug: options.username,
-          hasSlug: true,
-          count: 100,
-          after: null,
-          filter: 'SUPERBADGE',
-        },
-        url: 'https://profile.api.trailhead.com/graphql',
-      },
-      {
-        query: GET_MVP_STATUS,
-        variables: {
-          userSlug: options.username,
-          queryMvp: true,
-        },
-        url: 'https://community.api.trailhead.com/graphql',
-      },
-      {
-        query: GET_STAMPS,
-        variables: {
-          slug: options.username,
-          first: 10,
-        },
-        url: 'https://mobile.api.trailhead.com/graphql',
-      },
-    ];
+    // Calculate which queries are needed based on options
+    const requiredQueries = calculateRequiredQueries(options);
+    console.log(`[Banner] Required queries (${requiredQueries.length}):`, requiredQueries.map(q => q.name).join(', '));
+
+    // Build the graphqlQueries array dynamically based on required queries
+    const graphqlQueries = requiredQueries.map(({ name, params }) => {
+      const queryConfig = QUERY_MAP[name];
+      if (!queryConfig) {
+        throw new Error(`Unknown query: ${name}`);
+      }
+      return {
+        name, // Include name for response mapping
+        query: queryConfig.query,
+        variables: queryConfig.buildVariables(options.username, params),
+        url: queryConfig.url,
+      };
+    });
 
     try {
       // Perform the GraphQL queries in parallel using the utils class with caching
@@ -120,19 +145,24 @@ export default async function handler(req, res) {
         graphqlQueries,
         options.username
       );
-      const [rankResponse, certificationsResponse, badgesResponse, superbadgesResponse, mvpResponse, stampsResponse] =
-        responses;
       timings.graphql_queries_ms = new Date().getTime() - graphqlStart;
       timings.graphql_breakdown = timingBreakdown;
       timings.cache_summary = cacheSummary;
 
-      // Extract the data from the responses
-      const rankData = rankResponse.data?.data?.profile?.trailheadStats || {};
-      const certificationsData = certificationsResponse.data?.data?.profile?.credential || {};
-      const badgesData = badgesResponse.data?.data?.profile || {};
-      const superbadgesData = superbadgesResponse.data?.data?.profile || {};
-      const mvpData = mvpResponse.data?.data?.profileData || {};
-      const stampsData = stampsResponse.data?.data?.earnedStamps || {};
+      // Map responses by query name for easy access
+      const responseMap = {};
+      responses.forEach((response, index) => {
+        const queryName = graphqlQueries[index].name;
+        responseMap[queryName] = response;
+      });
+
+      // Extract the data from the responses (with fallbacks for queries that weren't executed)
+      const rankData = responseMap.GET_TRAILBLAZER_RANK?.data?.data?.profile?.trailheadStats || {};
+      const certificationsData = responseMap.GET_USER_CERTIFICATIONS?.data?.data?.profile?.credential || {};
+      const badgesData = responseMap.GET_TRAILHEAD_BADGES?.data?.data?.profile || {};
+      const superbadgesData = responseMap.GET_TRAILHEAD_BADGES_SUPERBADGE?.data?.data?.profile || {};
+      const mvpData = responseMap.GET_MVP_STATUS?.data?.data?.profileData || {};
+      const stampsData = responseMap.GET_STAMPS?.data?.data?.earnedStamps || {};
 
       // Generate the image
       const imageGenStart = new Date().getTime();
