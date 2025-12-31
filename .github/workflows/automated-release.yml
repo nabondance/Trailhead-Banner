@@ -17,16 +17,20 @@ on:
         description: 'Release notes (optional)'
         required: false
         type: string
+  push:
+    branches:
+      - main
 
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
       pull-requests: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
@@ -117,11 +121,6 @@ jobs:
 
           PR_BODY="## Release v${{ steps.new_version.outputs.version }}
 
-          <!-- display-start -->
-          # Features
-          -  ...
-          <!-- display-end -->
-
           ## What's Changed
           $RELEASE_NOTES
 
@@ -168,7 +167,13 @@ jobs:
             CHANGELOG_URL=""
           fi
 
-          RELEASE_BODY="## What's Changed
+          RELEASE_BODY="
+          <!-- display-start -->
+          # Features
+          -  ...
+          <!-- display-end -->
+
+          ## What's Changed
 
           $RELEASE_NOTES
 
@@ -223,7 +228,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get version from package.json
         id: version
