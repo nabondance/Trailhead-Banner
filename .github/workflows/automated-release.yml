@@ -117,11 +117,6 @@ jobs:
 
           PR_BODY="## Release v${{ steps.new_version.outputs.version }}
 
-          <!-- display-start -->
-          # Features
-          -  ...
-          <!-- display-end -->
-
           ## What's Changed
           $RELEASE_NOTES
 
@@ -168,7 +163,13 @@ jobs:
             CHANGELOG_URL=""
           fi
 
-          RELEASE_BODY="## What's Changed
+          RELEASE_BODY="
+          <!-- display-start -->
+          # Features
+          -  ...
+          <!-- display-end -->
+
+          ## What's Changed
 
           $RELEASE_NOTES
 
