@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import '../styles/globals.css';
 import banners from '../data/banners.json';
-import searchQueries from '../data/searchQueries.json';
 
 const BannerCard = ({ src, alt, description, credit, onClick, isUnoptimized }) => (
   <div className='example-card'>
@@ -42,21 +41,7 @@ const BackgroundLibraryPage = () => {
   return (
     <div className='background-library-container'>
       <h1>Background Library</h1>
-      <h2>You can find many LinkedIn backgrounds online</h2>
-      <ul>
-        {searchQueries.map((item, index) => (
-          <li key={index}>
-            <a
-              href={`https://www.google.com/search?tbm=isch&q=${item.query}`}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-      <h2>You can also select an example background for your banner</h2>
+      <h2>Find the perfect backdrop for your achievements</h2>
       <div className='library-grid'>
         {banners.map((example, index) => (
           <BannerCard
