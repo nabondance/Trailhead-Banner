@@ -17,10 +17,14 @@ on:
         description: 'Release notes (optional)'
         required: false
         type: string
+  push:
+    branches:
+      - main
 
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
       pull-requests: write
