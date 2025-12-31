@@ -839,37 +839,6 @@ legend {
   text-decoration: none;
 }
 
-.examples-container {
-  padding: 20px;
-  text-align: center;
-  margin-bottom: 100px; /* Add more space under the cards container */
-}
-
-.examples-container h1 {
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  color: var(--text-contrast);
-}
-
-.examples-container h2 {
-  font-size: 1.5em;
-  margin-bottom: 30px;
-  color: var(--text-contrast);
-}
-
-.examples-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
-  margin-top: 20px; /* Increase space on top of the example grid */
-}
-
-@media (width <= 768px) {
-  .examples-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .example-card {
   padding: 30px;
   padding-bottom: 10px;
@@ -916,6 +885,42 @@ legend {
   margin-top: 10px;
   font-size: 1em;
   color: var(--text-contrast);
+}
+
+/* Generic page container and grid classes */
+.page-container {
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 100px;
+}
+
+.page-container h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  color: var(--text-contrast);
+}
+
+.page-container h2 {
+  font-size: 1.5em;
+  margin-bottom: 30px;
+  color: var(--text-contrast);
+}
+
+.page-container h3 {
+  color: var(--text-contrast);
+}
+
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+@media (width <= 768px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .fullscreen-overlay {
@@ -1037,24 +1042,6 @@ legend {
   text-decoration: none;
 }
 
-.background-library-container {
-  padding: 20px;
-  text-align: center;
-  margin-bottom: 100px; /* Add more space under the cards container */
-}
-
-.library-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-@media (width <= 768px) {
-  .library-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (width <= 1024px) {
   .trailhead-banner-header h2 {
     font-size: 1.2em;
@@ -1124,38 +1111,6 @@ legend {
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   z-index: 1000;
   transition: opacity 0.3s;
-}
-
-.background-library-container h1 {
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  color: var(--primary);
-}
-
-.background-library-container h2 {
-  font-size: 1.5em;
-  margin-bottom: 20px;
-  color: var(--secondary);
-}
-
-.background-library-container ul {
-  list-style-type: none; /* Remove the dot */
-  padding-left: 0; /* Remove padding */
-  margin-bottom: 20px;
-}
-
-.background-library-container ul li {
-  font-size: 1.2em;
-  margin-bottom: 5px; /* Make the space between them smaller */
-}
-
-.background-library-container ul li a {
-  color: var(--primary);
-  text-decoration: none;
-}
-
-.background-library-container ul li a:hover {
-  text-decoration: underline;
 }
 
 .credit {
