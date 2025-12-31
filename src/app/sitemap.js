@@ -4,7 +4,6 @@ export default async function sitemap() {
   // Define your static routes
   const routes = [
     '', // home page
-    '/about',
     '/background-library',
     '/examples',
     '/how-to',
