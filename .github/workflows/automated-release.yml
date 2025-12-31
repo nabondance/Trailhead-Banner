@@ -21,6 +21,9 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -95,7 +98,7 @@ jobs:
 
       - name: Commit version bump
         run: |
-          git add package.json package-lock.json pnpm-lock.yaml
+          git add -A
           git commit -m "release: v${{ steps.new_version.outputs.version }}"
 
       - name: Push release branch
@@ -159,8 +162,10 @@ jobs:
           LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$LAST_TAG" ]; then
             CHANGELOG=$(git log "$LAST_TAG..HEAD" --oneline --pretty=format:"- %s" | grep -v "^- Merge pull request" | head -20)
+            CHANGELOG_URL="**Full Changelog**: https://github.com/nabondance/Trailhead-Banner/compare/$LAST_TAG...${{ steps.new_version.outputs.tag }}"
           else
             CHANGELOG="- Initial release"
+            CHANGELOG_URL=""
           fi
 
           RELEASE_BODY="## What's Changed
@@ -170,7 +175,7 @@ jobs:
           ### Commits
           $CHANGELOG
 
-          **Full Changelog**: https://github.com/nabondance/Trailhead-Banner/compare/$LAST_TAG...${{ steps.new_version.outputs.tag }}
+          $CHANGELOG_URL
 
           ---
           *This release was created automatically. It will be published when the release PR is merged.*"
@@ -213,6 +218,8 @@ jobs:
   # This job runs after the release PR is merged to publish the release
   publish-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
     steps:
       - name: Checkout repository
