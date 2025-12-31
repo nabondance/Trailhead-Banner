@@ -39,10 +39,11 @@ const BackgroundLibraryPage = () => {
   };
 
   return (
-    <div className='background-library-container'>
+    <div className='page-container'>
       <h1>Background Library</h1>
       <h2>Find the perfect backdrop for your achievements</h2>
-      <div className='library-grid'>
+      <h3>Click on an image to see it fullscreen.</h3>
+      <div className='page-grid'>
         {banners.map((example, index) => (
           <BannerCard
             key={index}
