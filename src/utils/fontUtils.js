@@ -54,8 +54,6 @@ class FontUtils {
         return;
       }
 
-      console.debug(`Found ${ttfFiles.length} font file(s):`, ttfFiles);
-
       // Load each .ttf file
       for (const ttfFile of ttfFiles) {
         try {
@@ -71,16 +69,13 @@ class FontUtils {
           // Store the mapping for dynamic access
           const baseName = ttfFile.split(/[-_]/)[0].toLowerCase().replace('.ttf', '');
           this.#loadedFonts.set(baseName, fontFamily);
-
-          console.debug(`Font loaded: ${ttfFile} as "${fontFamily}"`);
         } catch (fontError) {
           console.error(`Error loading font ${ttfFile}:`, fontError);
         }
       }
 
       this.#fontsLoaded = true;
-      console.debug(`Successfully loaded ${ttfFiles.length} font file(s)`);
-      console.debug('Available font families:', this.getAvailableFontFamilies());
+      console.debug(`${ttfFiles.length} Available font families:`, this.getAvailableFontFamilies());
     } catch (error) {
       console.error('Error loading all fonts:', error);
       // Continue execution even if fonts fail to load - will fallback to system fonts
