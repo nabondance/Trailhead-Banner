@@ -35,9 +35,7 @@ class SupabaseUtils {
 
         // Calculate exponential backoff delay: 1s, 2s, 4s
         const delay = initialDelay * Math.pow(2, attempt);
-        console.warn(
-          `Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms due to: ${error.message}`
-        );
+        console.warn(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms due to: ${error.message}`);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
