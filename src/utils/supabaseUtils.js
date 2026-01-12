@@ -1,5 +1,6 @@
 import packageJson from '../../package.json';
 import { createClient } from '@supabase/supabase-js';
+import { getHighestAgentblazerRankPerYear } from './dataUtils';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -132,6 +133,7 @@ class SupabaseUtils {
         badges: data.rankData?.earnedBadgesCount,
         trails: data.rankData?.completedTrailCount,
       },
+      agentblazerData: getHighestAgentblazerRankPerYear(data.agentblazerData?.learnerStatusLevels),
       certificationsData: {
         certifications:
           data.certificationsData?.certifications?.map((cert) => ({
