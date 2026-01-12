@@ -1,4 +1,5 @@
 // Utility functions for processing rewind data
+import { getHighestAgentblazerRankPerYear } from './dataUtils';
 
 // Filter data to only include items from the specified year
 export function filterDataByYear(data, year) {
@@ -27,7 +28,15 @@ export function filterDataByYear(data, year) {
 }
 
 // Generate a summary of the user's year in review
-export function generateRewindSummary({ rankData, certificationsData, stampsData, yearlyData, year, username }) {
+export function generateRewindSummary({
+  rankData,
+  certificationsData,
+  stampsData,
+  yearlyData,
+  year,
+  username,
+  agentblazerData,
+}) {
   const summary = {
     username,
     year,
@@ -39,7 +48,7 @@ export function generateRewindSummary({ rankData, certificationsData, stampsData
     currentPoints: rankData.earnedPointsSum || 0,
     currentBadges: rankData.earnedBadgesCount || 0,
     currentTrails: rankData.completedTrailCount || 0,
-    agentblazerRank: getAgentblazerRankForYear(rankData.learnerStatusLevels, year),
+    agentblazerRank: getAgentblazerRankForYear(agentblazerData?.learnerStatusLevels, year),
   };
 
   // Add monthly breakdown for certifications and stamps
@@ -101,29 +110,22 @@ export function getAgentblazerRankForYear(learnerStatusLevels, year) {
     return null;
   }
 
-  const yearStart = new Date(`${year}-01-01`);
-  const yearEnd = new Date(`${year + 1}-01-01`);
+  // Use the utility function to get the highest rank per year (already filtered for completed ranks)
+  const highestRanksPerYear = getHighestAgentblazerRankPerYear(learnerStatusLevels);
 
-  // Find the highest level Agentblazer rank achieved in the specified year
-  const yearlyAgentblazerRanks = learnerStatusLevels.filter((level) => {
-    if (!level.completedAt) return false;
-    const completedDate = new Date(level.completedAt);
-    return completedDate >= yearStart && completedDate < yearEnd;
-  });
+  // Find the rank for the specified year
+  const rankForYear = highestRanksPerYear.find((rank) => rank.year === year.toString());
 
-  if (yearlyAgentblazerRanks.length === 0) {
+  if (!rankForYear) {
     return null;
   }
 
-  // Return the highest level achieved (assuming higher level numbers are better)
-  const highestRank = yearlyAgentblazerRanks.reduce((max, current) => (current.level > max.level ? current : max));
-
   return {
-    statusName: highestRank.statusName,
-    title: highestRank.title,
-    level: highestRank.level,
-    imageUrl: highestRank.imageUrl,
-    completedAt: highestRank.completedAt,
+    statusName: 'Agentblazer',
+    title: rankForYear.title,
+    level: rankForYear.level,
+    imageUrl: rankForYear.imageUrl,
+    completedAt: rankForYear.completedAt,
   };
 }
 
