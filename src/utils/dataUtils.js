@@ -78,6 +78,8 @@ export const logOptions = (options) => {
   });
   console.log('Display Options:', {
     rankLogo: options.displayRankLogo,
+    agentblazerRank: options.displayAgentblazerRank,
+    agentblazerRankDisplay: options.agentblazerRankDisplay,
   });
   console.log('Counter Options:', {
     textColor: options.textColor,

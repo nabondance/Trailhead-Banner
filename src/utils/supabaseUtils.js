@@ -95,7 +95,9 @@ class SupabaseUtils {
             th_sb: thb_data.superbadgesData?.earnedAwards?.edges || [],
             th_stamps: thb_data.stampsData,
             th_mvp: thb_data.mvp,
-            th_agentblazer: `${thb_data.learnerStatusLevels?.statusName}-${thb_data.learnerStatusLevels?.title}`,
+            th_agentblazer: thb_data.learnerStatusLevels
+              ? `${thb_data.learnerStatusLevels.statusName}-${thb_data.learnerStatusLevels.title}-${thb_data.learnerStatusLevels.edition}`
+              : null,
             timings: originalTimings,
           },
         ]);
@@ -122,11 +124,20 @@ class SupabaseUtils {
       thb_version: packageJson.version,
       bannerHash: data.bannerHash,
       mvp: data.mvpData?.isMvp || false,
-      learnerStatusLevels: {
-        statusName: data.rankData?.learnerStatusLevels?.[0]?.statusName,
-        title: data.rankData?.learnerStatusLevels?.[0]?.title,
-        level: data.rankData?.learnerStatusLevels?.[0]?.level,
-      },
+      learnerStatusLevels: (() => {
+        // Find the active status level from agentblazerData
+        const activeStatus = data.agentblazerData?.learnerStatusLevels?.find((level) => level.active === true);
+        if (activeStatus) {
+          return {
+            statusName: activeStatus.statusName,
+            title: activeStatus.title,
+            level: activeStatus.level,
+            edition: activeStatus.edition,
+            active: activeStatus.active,
+          };
+        }
+        return null;
+      })(),
       rankData: {
         rank: data.rankData?.rank?.title,
         points: data.rankData?.earnedPointsSum,
