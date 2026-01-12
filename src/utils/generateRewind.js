@@ -7,7 +7,7 @@ const FontUtils = require('./fontUtils');
 import { getImage, getLocal } from './cacheUtils';
 
 export const generateRewind = async (options) => {
-  const { username, year, rankData, certificationsData, stampsData } = options;
+  const { username, year, rankData, certificationsData, stampsData, agentblazerData } = options;
 
   // Timing instrumentation
   const timings = {};
@@ -33,6 +33,7 @@ export const generateRewind = async (options) => {
     yearlyData,
     year,
     username,
+    agentblazerData,
   });
   timings.summary_generation_ms = Date.now() - stepStartTime;
 
@@ -108,7 +109,7 @@ async function generateRewindImage(options) {
     if (rewindSummary.agentblazerRank) {
       await drawAgentblazerSection(ctx, rewindSummary.agentblazerRank);
       // Current Agentblazer rank section
-      await drawAgentblazerRankSection(ctx, rewindSummary.agentblazerRank);
+      await drawAgentblazerRankSection(ctx, rewindSummary.agentblazerRank, year);
     } else {
       await drawMotivationSection(ctx, rewindSummary);
     }
@@ -273,7 +274,7 @@ async function drawRankSection(ctx, rankData, logoX = null, logoY = null) {
   }
 }
 
-async function drawAgentblazerRankSection(ctx, agentblazerRank, logoX = null, logoY = null) {
+async function drawAgentblazerRankSection(ctx, agentblazerRank, year, logoX = null, logoY = null) {
   // Load and draw Agentblazer image below the text
   if (agentblazerRank?.statusName === 'Agentblazer') {
     // Use provided coordinates or default values
@@ -282,7 +283,7 @@ async function drawAgentblazerRankSection(ctx, agentblazerRank, logoX = null, lo
     const logoHeight = 400;
 
     try {
-      const agentBlazerBuffer = await getLocal(`${agentblazerRank.title}.png`, 'Agentblazer', 'high');
+      const agentBlazerBuffer = await getLocal(`${agentblazerRank.title}.png`, 'Agentblazer', 'high', year.toString());
       const agentblazerImage = await loadImage(agentBlazerBuffer);
       const logoWidth = (agentblazerImage.width / agentblazerImage.height) * logoHeight;
 

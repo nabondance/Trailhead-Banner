@@ -55,14 +55,18 @@ export const getImage = async (imageUrl, folder = 'images') => {
   }
 };
 
-export const getLocal = async (name, type, resolution = 'normal') => {
+export const getLocal = async (name, type, resolution = 'normal', additionalFilter) => {
   const baseDir = path.join(process.cwd(), 'src/assets/logos');
   let imageDir;
 
   if (type === 'Rank') {
     imageDir = path.join(baseDir, 'Rank');
   } else if (type === 'Agentblazer') {
-    imageDir = path.join(baseDir, 'Agentblazer');
+    if (additionalFilter) {
+      imageDir = path.join(baseDir, 'Agentblazer', additionalFilter);
+    } else {
+      imageDir = path.join(baseDir, 'Agentblazer');
+    }
   } else if (type === 'Product') {
     imageDir = path.join(baseDir, 'Product');
   } else {

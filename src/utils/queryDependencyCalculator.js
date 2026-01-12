@@ -21,13 +21,7 @@
 const QUERY_DEPENDENCIES = {
   GET_TRAILBLAZER_RANK: {
     // Fetch if user wants to display any rank-related data
-    requiredWhen: [
-      'displayBadgeCount',
-      'displayTrailCount',
-      'displayPointCount',
-      'displayRankLogo',
-      'displayAgentblazerRank',
-    ],
+    requiredWhen: ['displayBadgeCount', 'displayTrailCount', 'displayPointCount', 'displayRankLogo'],
     params: {},
   },
 
@@ -64,6 +58,12 @@ const QUERY_DEPENDENCIES = {
     // Fetch event stamps
     requiredWhen: ['displayStampCount'],
     params: { first: 100 },
+  },
+
+  GET_AGENTBLAZER_RANK: {
+    // Fetch Agentblazer status with additional fields (edition, medalImageUrl, active)
+    requiredWhen: ['displayAgentblazerRank'],
+    params: {},
   },
 };
 

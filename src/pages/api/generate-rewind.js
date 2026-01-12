@@ -1,6 +1,7 @@
 import GET_TRAILBLAZER_RANK from '../../graphql/queries/getTrailblazerRank';
 import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications';
 import GET_STAMPS from '../../graphql/queries/getStamps';
+import GET_AGENTBLAZER_RANK from '../../graphql/queries/getAgentblazerRank';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
 import { generateRewind } from '../../utils/generateRewind';
@@ -82,6 +83,14 @@ export default async function handler(req, res) {
       },
       url: 'https://mobile.api.trailhead.com/graphql',
     },
+    {
+      query: GET_AGENTBLAZER_RANK,
+      variables: {
+        slug: username,
+        hasSlug: true,
+      },
+      url: 'https://profile.api.trailhead.com/graphql',
+    },
   ];
 
   try {
@@ -91,7 +100,7 @@ export default async function handler(req, res) {
       graphqlQueries,
       username
     );
-    const [rankResponse, certificationsResponse, stampsResponse] = responses;
+    const [rankResponse, certificationsResponse, stampsResponse, agentblazerResponse] = responses;
     timings.graphql_queries_ms = new Date().getTime() - graphqlStart;
     timings.graphql_breakdown = timingBreakdown;
     timings.cache_summary = cacheSummary;
@@ -108,6 +117,7 @@ export default async function handler(req, res) {
     const rankData = rankResponse.data?.data?.profile?.trailheadStats || {};
     const certificationsData = certificationsResponse.data?.data?.profile?.credential || {};
     const stampsData = stampsResponse.data?.data?.earnedStamps || {};
+    const agentblazerData = agentblazerResponse.data?.data?.profile?.trailheadStats || {};
 
     // Validate essential data is present
     if (!rankData.rank && !certificationsData.certifications && !stampsData.edges) {
@@ -125,6 +135,7 @@ export default async function handler(req, res) {
       rankData,
       certificationsData,
       stampsData,
+      agentblazerData,
     });
     timings.image_generation_ms = new Date().getTime() - imageGenStart;
 

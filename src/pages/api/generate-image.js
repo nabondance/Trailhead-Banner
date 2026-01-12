@@ -4,6 +4,7 @@ import GET_USER_CERTIFICATIONS from '../../graphql/queries/getUserCertifications
 import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
 import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import GET_STAMPS from '../../graphql/queries/getStamps';
+import GET_AGENTBLAZER_RANK from '../../graphql/queries/getAgentblazerRank';
 import { generateImage } from '../../utils/generateImage';
 import SupabaseUtils from '../../utils/supabaseUtils';
 import GraphQLUtils from '../../utils/graphqlUtils';
@@ -79,6 +80,15 @@ const QUERY_MAP = {
     buildVariables: (username, params) => ({
       slug: username,
       first: params.first || 10,
+    }),
+  },
+  GET_AGENTBLAZER_RANK: {
+    query: GET_AGENTBLAZER_RANK,
+    url: 'https://profile.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      slug: username,
+      hasSlug: true,
+      ...params,
     }),
   },
 };
@@ -166,6 +176,7 @@ export default async function handler(req, res) {
       const superbadgesData = responseMap.GET_TRAILHEAD_BADGES_SUPERBADGE?.data?.data?.profile || {};
       const mvpData = responseMap.GET_MVP_STATUS?.data?.data?.profileData || {};
       const stampsData = responseMap.GET_STAMPS?.data?.data?.earnedStamps || {};
+      const agentblazerData = responseMap.GET_AGENTBLAZER_RANK?.data?.data?.profile?.trailheadStats || {};
 
       // Generate the image
       const imageGenStart = new Date().getTime();
@@ -177,6 +188,7 @@ export default async function handler(req, res) {
         superbadgesData,
         mvpData,
         stampsData,
+        agentblazerData,
       });
       timings.image_generation_ms = new Date().getTime() - imageGenStart;
 
@@ -217,6 +229,7 @@ export default async function handler(req, res) {
         rankData: rankData,
         mvpData: mvpData,
         stampsData: stampsData,
+        agentblazerData: agentblazerData,
         timings: timings,
       };
       SupabaseUtils.updateBannerCounter(thb_data).catch((error) => {
@@ -231,6 +244,7 @@ export default async function handler(req, res) {
         superbadgesData,
         mvpData,
         stampsData,
+        agentblazerData,
         imageUrl,
         warnings,
         infoMessages,
