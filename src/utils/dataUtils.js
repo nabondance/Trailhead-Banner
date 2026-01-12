@@ -33,8 +33,10 @@ export const getHighestAgentblazerRankPerYear = (learnerStatusLevels) => {
     return [];
   }
 
-  // Filter only Agentblazer status levels
-  const agentblazerLevels = learnerStatusLevels.filter((level) => level.statusName === 'Agentblazer');
+  // Filter only Agentblazer status levels that are completed (progress === 100 or has completedAt date)
+  const agentblazerLevels = learnerStatusLevels.filter(
+    (level) => level.statusName === 'Agentblazer' && (level.progress === 100 || level.completedAt)
+  );
 
   // Group by edition (year) and get the highest level for each year
   const highestByYear = {};
