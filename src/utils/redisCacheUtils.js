@@ -7,7 +7,7 @@ import { Redis } from '@upstash/redis';
  * with graceful fallback if Redis is unavailable.
  */
 class RedisCacheUtils {
-  static CACHE_TTL_SECONDS = 600; // 10 minutes
+  static CACHE_TTL_SECONDS = 900; // 15 minutes
   static redisClient = null;
   static redisAvailable = null;
 
