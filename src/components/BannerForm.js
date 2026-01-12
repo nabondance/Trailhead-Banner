@@ -106,6 +106,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displaySalesforceCertifications: true,
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
+    agentblazerRankDisplay: 'current',
   });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
@@ -424,6 +425,30 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
             </label>
             <Tooltip id='agentblazer-tooltip' place='top' delayShow={200} className='react-tooltip'>
               Agentblazer is the AI-focused ranking system on Trailhead
+            </Tooltip>
+            {options.displayAgentblazerRank && (
+              <label className='picklist'>
+                Agentblazer Display Mode:
+                <select
+                  value={options.agentblazerRankDisplay}
+                  onChange={(e) => setOptions({ ...options, agentblazerRankDisplay: e.target.value })}
+                >
+                  <option value='current'>Current</option>
+                  <option value='allTimeHigh'>All Time High</option>
+                </select>
+                <span
+                  className='option-info'
+                  data-tooltip-id='agentblazer-mode-tooltip'
+                  tabIndex='0'
+                  aria-label='More information'
+                >
+                  <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+                </span>
+              </label>
+            )}
+            <Tooltip id='agentblazer-mode-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Current: Shows your active Agentblazer rank for the current year. All Time High: Shows your highest
+              Agentblazer level achieved across all years
             </Tooltip>
           </fieldset>
           <fieldset>

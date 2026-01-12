@@ -2,7 +2,7 @@ const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { getLocalCertificationData, logOptions } = require('./dataUtils');
+const { getLocalCertificationData, logOptions, getHighestAgentblazerRankPerYear } = require('./dataUtils');
 const {
   calculateCertificationsDesign,
   sortCertifications,
@@ -282,22 +282,36 @@ export const generateImage = async (options) => {
   }
   timings.counters_draw_ms = Date.now() - stepStartTime;
 
-  // learnerStatusLevels
+  // learnerStatusLevels (Agentblazer)
   stepStartTime = Date.now();
-  if (options.rankData.learnerStatusLevels) {
-    for (const learnerStatusLevel of options.rankData.learnerStatusLevels) {
-      // Agentblazer Rank
-      if (learnerStatusLevel.statusName === 'Agentblazer' && options.displayAgentblazerRank) {
-        try {
-          const agentBlazerBuffer = await getLocal(`${learnerStatusLevel.title}.png`, 'Agentblazer');
-          const agentBlazerImage = await loadImage(agentBlazerBuffer);
-          const agentBlazerLogoHeight = 100;
-          const agentBlazerLogoWidth = (agentBlazerImage.width / agentBlazerImage.height) * agentBlazerLogoHeight;
-          ctx.drawImage(agentBlazerImage, 370, 5, agentBlazerLogoWidth, agentBlazerLogoHeight);
-        } catch (error) {
-          console.error(`Error loading Agentblazer logo ${learnerStatusLevel.title}:`, error);
-          warnings.push(`Error loading Agentblazer logo ${learnerStatusLevel.title}: ${error.message}`);
+  if (options.displayAgentblazerRank && options.agentblazerData?.learnerStatusLevels) {
+    // Get the highest rank per year using the utility function
+    const highestRanksPerYear = getHighestAgentblazerRankPerYear(options.agentblazerData.learnerStatusLevels);
+
+    let selectedRank = null;
+    if (options.agentblazerRankDisplay === 'allTimeHigh') {
+      // Find the highest level across all years
+      selectedRank = highestRanksPerYear.reduce((highest, current) => {
+        if (!highest || current.level > highest.level) {
+          return current;
         }
+        return highest;
+      }, null);
+    } else {
+      // Default: show current active rank (the most recent year, or the one marked as active)
+      selectedRank = highestRanksPerYear.find((rank) => rank.active === true) || highestRanksPerYear[0];
+    }
+
+    if (selectedRank) {
+      try {
+        const agentBlazerBuffer = await getLocal(`${selectedRank.title}.png`, 'Agentblazer');
+        const agentBlazerImage = await loadImage(agentBlazerBuffer);
+        const agentBlazerLogoHeight = 100;
+        const agentBlazerLogoWidth = (agentBlazerImage.width / agentBlazerImage.height) * agentBlazerLogoHeight;
+        ctx.drawImage(agentBlazerImage, 370, 5, agentBlazerLogoWidth, agentBlazerLogoHeight);
+      } catch (error) {
+        console.error(`Error loading Agentblazer logo ${selectedRank.title}:`, error);
+        warnings.push(`Error loading Agentblazer logo ${selectedRank.title}: ${error.message}`);
       }
     }
   }
