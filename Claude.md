@@ -95,11 +95,11 @@ src/
 
 ## Code Style & Conventions
 
-- **Formatting**: Prettier (enforced by husky pre-commit)
+- **Formatting**: Prettier + Stylelint (enforced by husky pre-commit)
 - **Commits**: Conventional commits `type(scope): description`
   - Common types: `feat, fix, docs, style, refactor, perf, build, chore`
   - Common scopes: `core, deps, ui, config, util, release`
-- **Scripts**: Always run `pnpm format:all:fix` before committing
+- **Format Code**: Use `/format` skill (token-optimized, shows only errors or OK/FAILED status)
 
 ## Common Tasks
 
@@ -130,6 +130,12 @@ src/
 - **GraphQL failures**: Check cache TTL and Trailhead API status
 - **Validation errors**: See `src/utils/usernameValidation.js` rules
 - **Build errors**: Ensure using `pnpm`, not `npm`
+
+## Claude Code Skills
+
+Token-optimized commands available:
+
+- **`/format`** - Run prettier + stylelint with minimal output (only shows errors or OK/FAILED)
 
 ## Token-Saving References
 
