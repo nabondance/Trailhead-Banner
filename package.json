@@ -37,8 +37,8 @@
     "format:stylelint:fix": "stylelint '**/*.{css,scss}' --fix"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,scss,md,yml}": "npx prettier --write  --list-different",
-    "*.{css,scss}": "npx stylelint --fix"
+    "*.{js,jsx,ts,tsx,json,css,scss,md,yml}": "pnpm exec prettier --write --list-different",
+    "*.{css,scss}": "pnpm exec stylelint --fix"
   },
   "husky": {
     "hooks": {

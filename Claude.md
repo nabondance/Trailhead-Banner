@@ -38,9 +38,38 @@ Generates LinkedIn banner images from Trailhead user data (badges, certification
 ## Architecture Patterns
 
 ### Data Flow
+
+```mermaid
+graph TB
+    A[User Input] --> B[BannerForm Component]
+    B --> C[POST /api/validate-username]
+    C --> D{Valid?}
+    D -->|No| E[Show Error]
+    D -->|Yes| F[POST /api/generate-image]
+    F --> G[graphqlUtils.js]
+    G --> H{Redis Cache Hit?}
+    H -->|Yes| I[Return Cached Data]
+    H -->|No| J[Trailhead GraphQL API]
+    J --> K[Cache in Redis<br/>15min TTL]
+    K --> I
+    I --> L[generateImage.js]
+    L --> M[drawUtils.js<br/>Canvas Operations]
+    M --> N{Storage Type?}
+    N -->|Base64| O[Return Base64]
+    N -->|Blob| P[Upload to Vercel Blob]
+    P --> Q[Return Blob URL]
+    O --> R[User Downloads]
+    Q --> R
+
+    style H fill:#e1f5ff
+    style K fill:#ffe1e1
+    style M fill:#e1ffe1
 ```
-User Input → Validation → GraphQL Fetch → Redis Cache → Canvas Generation → Blob Storage → Download
-```
+
+**Key Points:**
+- All GraphQL queries cached for 15min to reduce Trailhead API load
+- Canvas rendering happens server-side using @napi-rs/canvas
+- Images can be returned as base64 or uploaded to Vercel Blob for sharing
 
 ### GraphQL Queries
 - All queries in `src/graphql/queries/`
