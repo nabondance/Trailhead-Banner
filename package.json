@@ -37,7 +37,7 @@
     "format:stylelint:fix": "stylelint '**/*.{css,scss}' --fix"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,css,scss,md,yml}": "pnpm exec prettier --write --list-different",
+    "*.{js,jsx,ts,tsx,json,css,scss,md,yml,sh}": "pnpm exec prettier --write --list-different",
     "*.{css,scss}": "pnpm exec stylelint --fix"
   },
   "husky": {
@@ -77,6 +77,7 @@
     "lint-staged": "^16.2.7",
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
+    "prettier-plugin-sh": "^0.18.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "stylelint": "^16.26.1",
     "stylelint-config-standard": "^39.0.1",

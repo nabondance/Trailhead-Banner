@@ -18,8 +18,8 @@ echo ""
 
 # Show versions
 echo "Environment:"
-echo "- Node: $(node --version 2>/dev/null || echo 'not found')"
-echo "- pnpm: $(pnpm --version 2>/dev/null || echo 'not installed')"
+echo "- Node: $(node --version 2> /dev/null || echo 'not found')"
+echo "- pnpm: $(pnpm --version 2> /dev/null || echo 'not installed')"
 echo ""
 
 # Check dependencies
@@ -29,8 +29,8 @@ if [ ! -d "node_modules" ]; then
 fi
 
 # Git status (concise)
-echo "Git Branch: $(git branch --show-current 2>/dev/null || echo 'unknown')"
-CHANGES=$(git status --short 2>/dev/null | wc -l)
+echo "Git Branch: $(git branch --show-current 2> /dev/null || echo 'unknown')"
+CHANGES=$(git status --short 2> /dev/null | wc -l)
 if [ "$CHANGES" -gt 0 ]; then
   echo "Uncommitted changes: $CHANGES files"
 else
