@@ -87,7 +87,7 @@ graph TB
 
 ### Directory Structure
 
-```
+```text
 src/
 ├── app/              # Next.js App Router pages
 ├── pages/api/        # API routes (Pages Router)
