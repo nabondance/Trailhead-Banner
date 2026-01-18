@@ -46,3 +46,6 @@ megalinter-reports/
 
 # vscode
 .vscode/
+
+# claude code dev server
+.dev-server.pid
