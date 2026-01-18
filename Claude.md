@@ -144,6 +144,10 @@ Token-optimized commands available:
 
 - **`/format`** - Check formatting (non-destructive, shows OK/ISSUES + top 3 errors)
 - **`/format-fix`** - Auto-fix formatting issues (runs prettier + stylelint fix)
+- **`/build`** - Validate build (shows OK or top 5 errors with duration)
+- **`/dev-start`** - Start dev server in background (zero output, waits until ready)
+- **`/dev-stop`** - Stop background dev server (cleanup)
+- **`/img-test [username]`** - Test image generation API (requires dev server, default: nabondance)
 
 ## Token-Saving References
 
