@@ -1,31 +1,32 @@
 #!/bin/bash
-# Format skill - Run prettier and stylelint with minimal output
+# Format check skill - Check formatting without modifying files
 # Usage: /format
 
 set -e
 
-echo "Formatting..."
+echo "Checking format..."
 
-# Run prettier (suppress success output, show only errors)
-if pnpm format:prettier:fix > /dev/null 2>&1; then
+# Run prettier check (suppress success output, show only errors)
+if pnpm format:prettier > /dev/null 2>&1; then
   PRETTIER_STATUS="OK"
 else
-  PRETTIER_STATUS="FAILED"
-  pnpm format:prettier:fix 2>&1 | grep -E "error|Error|✖" || true
+  PRETTIER_STATUS="ISSUES"
+  pnpm format:prettier 2>&1 | grep -E "error|Error|✖|Code style issues" | head -3 || true
 fi
 
-# Run stylelint (suppress success output, show only errors)
-if pnpm format:stylelint:fix > /dev/null 2>&1; then
+# Run stylelint check (suppress success output, show only errors)
+if pnpm format:stylelint > /dev/null 2>&1; then
   STYLELINT_STATUS="OK"
 else
-  STYLELINT_STATUS="FAILED"
-  pnpm format:stylelint:fix 2>&1 | grep -E "error|Error|✖" || true
+  STYLELINT_STATUS="ISSUES"
+  pnpm format:stylelint 2>&1 | grep -E "error|Error|✖|problem" | head -3 || true
 fi
 
 # Summary (token-optimized)
 echo "Prettier: $PRETTIER_STATUS | Stylelint: $STYLELINT_STATUS"
 
 # Exit with error if any failed
-if [ "$PRETTIER_STATUS" = "FAILED" ] || [ "$STYLELINT_STATUS" = "FAILED" ]; then
+if [ "$PRETTIER_STATUS" = "ISSUES" ] || [ "$STYLELINT_STATUS" = "ISSUES" ]; then
+  echo "Run /format-fix to auto-fix issues"
   exit 1
 fi

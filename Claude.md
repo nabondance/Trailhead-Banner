@@ -99,7 +99,7 @@ src/
 - **Commits**: Conventional commits `type(scope): description`
   - Common types: `feat, fix, docs, style, refactor, perf, build, chore`
   - Common scopes: `core, deps, ui, config, util, release`
-- **Format Code**: Use `/format` skill (token-optimized, shows only errors or OK/FAILED status)
+- **Format Code**: Use `/format` to check or `/format-fix` to auto-fix (token-optimized)
 
 ## Common Tasks
 
@@ -135,7 +135,8 @@ src/
 
 Token-optimized commands available:
 
-- **`/format`** - Run prettier + stylelint with minimal output (only shows errors or OK/FAILED)
+- **`/format`** - Check formatting (non-destructive, shows OK/ISSUES + top 3 errors)
+- **`/format-fix`** - Auto-fix formatting issues (runs prettier + stylelint fix)
 
 ## Token-Saving References
 
