@@ -18,7 +18,7 @@ fi
 
 # Build minimal request payload with required options
 PAYLOAD=$(
-  cat <<EOF
+  cat << EOF
 {
   "username": "$USERNAME",
   "backgroundColor": "#5badd6",
