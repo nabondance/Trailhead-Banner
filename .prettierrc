@@ -4,5 +4,6 @@
   "tabWidth": 2,
   "printWidth": 120,
   "singleQuote": true,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "plugins": ["prettier-plugin-sh"]
 }
