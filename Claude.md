@@ -5,9 +5,9 @@
 **IMPORTANT: This project uses `pnpm`, NOT `npm` or `yarn`.**
 
 ```bash
-pnpm install   # Install dependencies
-pnpm dev       # Start dev server (uses turbopack)
-pnpm build     # Production build
+pnpm install # Install dependencies
+pnpm dev     # Start dev server (uses turbopack)
+pnpm build   # Production build
 ```
 
 ## Tech Stack
@@ -26,14 +26,14 @@ Generates LinkedIn banner images from Trailhead user data (badges, certification
 
 ## Critical Files (Read These First)
 
-| File | Purpose |
-|------|---------|
-| `src/utils/generateImage.js` | Core image generation logic |
-| `src/utils/drawUtils.js` | Canvas drawing operations |
-| `src/utils/graphqlUtils.js` | Trailhead API integration |
-| `src/pages/api/generate-image.js` | Main API endpoint |
-| `src/data/banners.json` | Background image metadata |
-| `src/components/BannerForm.js` | Main user interface |
+| File                              | Purpose                     |
+| --------------------------------- | --------------------------- |
+| `src/utils/generateImage.js`      | Core image generation logic |
+| `src/utils/drawUtils.js`          | Canvas drawing operations   |
+| `src/utils/graphqlUtils.js`       | Trailhead API integration   |
+| `src/pages/api/generate-image.js` | Main API endpoint           |
+| `src/data/banners.json`           | Background image metadata   |
+| `src/components/BannerForm.js`    | Main user interface         |
 
 ## Architecture Patterns
 
@@ -67,22 +67,26 @@ graph TB
 ```
 
 **Key Points:**
+
 - All GraphQL queries cached for 15min to reduce Trailhead API load
 - Canvas rendering happens server-side using @napi-rs/canvas
 - Images can be returned as base64 or uploaded to Vercel Blob for sharing
 
 ### GraphQL Queries
+
 - All queries in `src/graphql/queries/`
 - Cached via `redisCacheUtils.js`
 - Error handling in `graphqlUtils.js`
 
 ### Image Generation
+
 1. Fetch user data from Trailhead API
 2. Validate with `usernameValidation.js` and `imageValidation.js`
 3. Draw on canvas using `drawUtils.js`
 4. Return base64 or upload to Vercel Blob
 
 ### Directory Structure
+
 ```
 src/
 ├── app/              # Next.js App Router pages
@@ -104,15 +108,18 @@ src/
 ## Common Tasks
 
 ### Add New Background Image
+
 1. Add to `public/assets/background-library/`
 2. Update `src/data/banners.json` with metadata
 3. Verify in background library page
 
 ### Modify Banner Layout
+
 - Edit `src/utils/drawUtils.js` for positioning
 - Edit `src/utils/generateImage.js` for overall logic
 
 ### Update Trailhead Data Fetching
+
 - Queries: `src/graphql/queries/`
 - Processing: `src/utils/dataUtils.js`
 - Caching: `src/utils/redisCacheUtils.js` (15min TTL)
@@ -141,6 +148,7 @@ Token-optimized commands available:
 ## Token-Saving References
 
 Instead of asking for details, read these directly:
+
 - Username validation rules → `src/utils/usernameValidation.js`
 - Image validation logic → `src/utils/imageValidation.js`
 - API endpoint patterns → `src/pages/api/*.js`
