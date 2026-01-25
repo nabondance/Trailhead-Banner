@@ -19,4 +19,4 @@ pnpm install
 pnpm dev
 ```
 
-For more information, visit: https://github.com/nabondance/Trailhead-Banner
+For more information, visit the [Trailhead-Banner repository](https://github.com/nabondance/Trailhead-Banner).
