@@ -1,0 +1,38 @@
+[
+  {
+    "id": "badge",
+    "label": "Badge",
+    "color": "#1f80c0",
+    "defaultSelected": true
+  },
+  {
+    "id": "superbadge",
+    "label": "Superbadge",
+    "color": "#f9a825",
+    "defaultSelected": true
+  },
+  {
+    "id": "certification",
+    "label": "Certification",
+    "color": "#8a00c4",
+    "defaultSelected": true
+  },
+  {
+    "id": "trail",
+    "label": "Trail",
+    "color": "#06482A",
+    "defaultSelected": false
+  },
+  {
+    "id": "point",
+    "label": "Point",
+    "color": "#18477D",
+    "defaultSelected": false
+  },
+  {
+    "id": "stamp",
+    "label": "Stamp",
+    "color": "#00B3A4",
+    "defaultSelected": false
+  }
+]

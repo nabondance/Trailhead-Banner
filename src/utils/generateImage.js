@@ -198,83 +198,36 @@ export const generateImage = async (options) => {
     const badgeCounterYDelta = counterConfig.badgeCounterYDelta;
     const badgeCounterX = rankLogoWidth + 40;
 
-    if (options.displayBadgeCount && badgeCount > 0) {
-      await drawBadgeCounter(
-        ctx,
-        'Badge',
-        badgeCount,
-        badgeCounterX,
-        badgeCounterYPosition,
-        badgeScale,
-        options.badgeLabelColor,
-        '#1f80c0'
-      );
-      badgeCounterYPosition += badgeCounterYDelta;
-    }
-    if (options.displaySuperbadgeCount && superbadgeCount > 0) {
-      await drawBadgeCounter(
-        ctx,
-        'Superbadge',
-        superbadgeCount,
-        badgeCounterX,
-        badgeCounterYPosition,
-        badgeScale,
-        options.badgeLabelColor,
-        '#f9a825'
-      );
-      badgeCounterYPosition += badgeCounterYDelta;
-    }
-    if (options.displayCertificationCount && certificationCount > 0) {
-      await drawBadgeCounter(
-        ctx,
-        'Certification',
-        certificationCount,
-        badgeCounterX,
-        badgeCounterYPosition,
-        badgeScale,
-        options.badgeLabelColor,
-        '#8a00c4'
-      );
-      badgeCounterYPosition += badgeCounterYDelta;
-    }
-    if (options.displayTrailCount && trailCount > 0) {
-      await drawBadgeCounter(
-        ctx,
-        'Trail',
-        trailCount,
-        badgeCounterX,
-        badgeCounterYPosition,
-        badgeScale,
-        options.badgeLabelColor,
-        '#06482A'
-      );
-      badgeCounterYPosition += badgeCounterYDelta;
-    }
-    if (options.displayPointCount && pointCount != 0) {
-      await drawBadgeCounter(
-        ctx,
-        'Point',
-        pointCount,
-        badgeCounterX,
-        badgeCounterYPosition,
-        badgeScale,
-        options.badgeLabelColor,
-        '#18477D'
-      );
-      badgeCounterYPosition += badgeCounterYDelta;
-    }
-    if (options.displayStampCount && stampCount > 0) {
-      await drawBadgeCounter(
-        ctx,
-        'Stamp',
-        stampCount,
-        badgeCounterX,
-        badgeCounterYPosition,
-        badgeScale,
-        options.badgeLabelColor,
-        '#00B3A4'
-      );
-      badgeCounterYPosition += badgeCounterYDelta;
+    // Define counter mapping
+    const COUNTER_MAP = {
+      badge: { data: badgeCount, label: 'Badge', color: '#1f80c0' },
+      superbadge: { data: superbadgeCount, label: 'Superbadge', color: '#f9a825' },
+      certification: { data: certificationCount, label: 'Certification', color: '#8a00c4' },
+      trail: { data: trailCount, label: 'Trail', color: '#06482A' },
+      point: { data: pointCount, label: 'Point', color: '#18477D' },
+      stamp: { data: stampCount, label: 'Stamp', color: '#00B3A4' },
+    };
+
+    // Loop over user-defined order
+    const counterOrder = options.counterOrder || [];
+    for (const counterId of counterOrder) {
+      const counter = COUNTER_MAP[counterId];
+      if (!counter) continue;
+
+      const shouldShow = counterId === 'point' ? counter.data != 0 : counter.data > 0;
+      if (shouldShow) {
+        await drawBadgeCounter(
+          ctx,
+          counter.label,
+          counter.data,
+          badgeCounterX,
+          badgeCounterYPosition,
+          badgeScale,
+          options.badgeLabelColor,
+          counter.color
+        );
+        badgeCounterYPosition += badgeCounterYDelta;
+      }
     }
   } catch (error) {
     console.error('Error drawing counter as badges:', error);
