@@ -3,6 +3,8 @@ name: img-test
 description: Test image generation API with optional username (default nabondance)
 ---
 
+# Image Generation Test
+
 Test the image generation API endpoint with a Trailhead username.
 
 Run the image test script which will:

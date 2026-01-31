@@ -3,6 +3,8 @@ name: format-fix
 description: Auto-fix code formatting issues (prettier + stylelint)
 ---
 
+# Format Fix
+
 Automatically fix code formatting issues using prettier and stylelint.
 
 Run the format fix script which will:

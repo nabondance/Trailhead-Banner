@@ -3,6 +3,8 @@ name: format
 description: Check code formatting (prettier + stylelint) without modifying files
 ---
 
+# Format Check
+
 Check code formatting using prettier and stylelint without making any changes.
 
 Run the format check script which will:

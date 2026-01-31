@@ -3,6 +3,8 @@ name: dev-stop
 description: Stop background dev server
 ---
 
+# Dev Server Stop
+
 Stop the background Next.js development server cleanly.
 
 Run the dev server stop script which will:
