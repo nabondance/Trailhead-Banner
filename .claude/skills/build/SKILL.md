@@ -3,6 +3,8 @@ name: build
 description: Validate production build
 ---
 
+# Build Validation
+
 Validate the production build with minimal, token-optimized output.
 
 Run the build validation script which will:
