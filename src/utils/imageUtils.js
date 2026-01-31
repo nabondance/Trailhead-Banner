@@ -105,14 +105,7 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
 };
 
 const getCountersConfig = (options) => {
-  const counter = [
-    options.displayBadgeCount,
-    options.displaySuperbadgeCount,
-    options.displayCertificationCount,
-    options.displayTrailCount,
-    options.displayPointCount,
-    options.displayStampCount,
-  ].filter(Boolean).length;
+  const counter = options.counterOrder?.length || 0;
 
   let badgeCounterScale = 1;
 

@@ -21,30 +21,32 @@
 const QUERY_DEPENDENCIES = {
   GET_TRAILBLAZER_RANK: {
     // Fetch if user wants to display any rank-related data
-    requiredWhen: ['displayBadgeCount', 'displayTrailCount', 'displayPointCount', 'displayRankLogo'],
+    requiredWhen: ['displayRankLogo'],
+    requiredWhenCounter: ['badge', 'trail', 'point'],
     params: {},
   },
 
   GET_USER_CERTIFICATIONS: {
     // Fetch if user wants to display certifications in any form
     requiredWhen: [
-      'displayCertificationCount',
       'displaySalesforceCertifications',
       'displayAccreditedProfessionalCertifications',
       'displayLastXCertifications',
     ],
+    requiredWhenCounter: ['certification'],
     params: { count: 100 },
   },
 
   GET_TRAILHEAD_BADGES: {
     // Fetch general badges (non-superbadge)
-    requiredWhen: ['displayBadgeCount'],
+    requiredWhenCounter: ['badge'],
     params: { count: 5, filter: null },
   },
 
   GET_TRAILHEAD_BADGES_SUPERBADGE: {
     // Fetch superbadges specifically
-    requiredWhen: ['displaySuperbadgeCount', 'displaySuperbadges', 'displayLastXSuperbadges'],
+    requiredWhen: ['displaySuperbadges', 'displayLastXSuperbadges'],
+    requiredWhenCounter: ['superbadge'],
     params: { count: 100, filter: 'SUPERBADGE' },
   },
 
@@ -56,7 +58,7 @@ const QUERY_DEPENDENCIES = {
 
   GET_STAMPS: {
     // Fetch event stamps
-    requiredWhen: ['displayStampCount'],
+    requiredWhenCounter: ['stamp'],
     params: { first: 100 },
   },
 
@@ -71,12 +73,7 @@ const QUERY_DEPENDENCIES = {
  * Calculate which queries need to be executed based on user options
  *
  * @param {Object} options - User options from BannerForm
- * @param {boolean} options.displayBadgeCount - Show badge count
- * @param {boolean} options.displaySuperbadgeCount - Show superbadge count
- * @param {boolean} options.displayCertificationCount - Show certification count
- * @param {boolean} options.displayTrailCount - Show trail count
- * @param {boolean} options.displayPointCount - Show point count
- * @param {boolean} options.displayStampCount - Show stamp count
+ * @param {Array<string>} options.counterOrder - Array of selected counter IDs (e.g., ['badge', 'superbadge', 'certification'])
  * @param {boolean} options.displayRankLogo - Show rank logo
  * @param {boolean} options.displaySuperbadges - Show superbadge details
  * @param {boolean} options.displayAgentblazerRank - Show Agentblazer rank
@@ -90,9 +87,7 @@ const QUERY_DEPENDENCIES = {
  * @example
  * // User only wants badges and points, no certifications
  * calculateRequiredQueries({
- *   displayBadgeCount: true,
- *   displayPointCount: true,
- *   displayCertificationCount: false
+ *   counterOrder: ['badge', 'point']
  * });
  * // Returns: [
  * //   { name: 'GET_TRAILBLAZER_RANK', params: {} },
@@ -130,7 +125,8 @@ function calculateRequiredQueries(options) {
  *
  * A query is required if:
  * - It's marked as alwaysRequired (e.g., MVP status), OR
- * - At least ONE of its dependent options is set to true (OR logic)
+ * - At least ONE of its dependent options is set to true (OR logic), OR
+ * - At least ONE of its required counter IDs is in the counterOrder array
  *
  * @param {Object} config - Query configuration from QUERY_DEPENDENCIES
  * @param {Object} options - User options
@@ -140,6 +136,13 @@ function isQueryRequired(config, options) {
   // Always fetch if marked as required (e.g., MVP for ribbon)
   if (config.alwaysRequired === true) {
     return true;
+  }
+
+  // Check counter-based dependencies
+  if (config.requiredWhenCounter && Array.isArray(config.requiredWhenCounter)) {
+    const counterOrder = options.counterOrder || [];
+    const hasRequiredCounter = config.requiredWhenCounter.some((counterId) => counterOrder.includes(counterId));
+    if (hasRequiredCounter) return true;
   }
 
   // Check if ANY dependent option is enabled (OR logic)

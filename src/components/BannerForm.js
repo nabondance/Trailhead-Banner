@@ -12,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from 'react-tooltip';
 import bannerBackground from '../data/banners.json';
+import COUNTERS_CONFIG from '../data/counters.json';
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
 import { validateImageUrl } from '../utils/imageValidation';
 import {
@@ -22,6 +23,7 @@ import {
   handlePredefinedImageChange,
   getBackgroundPreviewSrc,
 } from '../utils/backgroundUtils';
+import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 
 const BackgroundPreview = ({ src, backgroundColor }) => {
   const canvasRef = React.useRef(null);
@@ -79,12 +81,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     username: '',
     backgroundColor: '#5badd6',
     backgroundImageUrl: '',
-    displayBadgeCount: true,
-    displaySuperbadgeCount: true,
-    displayCertificationCount: true,
-    displayTrailCount: false,
-    displayPointCount: false,
-    displayStampCount: false,
+    selectedCounters: COUNTERS_CONFIG.filter((c) => c.defaultSelected),
     displayRankLogo: true,
     displaySuperbadges: true,
     includeExpiredCertifications: false,
@@ -221,8 +218,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
     const backgroundImageUrl = getBackgroundPreviewSrc(options);
 
+    // Transform selectedCounters to counterOrder for API
+    const counterOrder = options.selectedCounters.map((c) => c.id);
+
     await onSubmit({
       ...options,
+      counterOrder,
       backgroundImageUrl,
       lastValidatedUsername, // Pass to backend for validation caching
       lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
@@ -348,54 +349,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
-            <label>
-              <input
-                type='checkbox'
-                checked={options.displayBadgeCount}
-                onChange={(e) => setOptions({ ...options, displayBadgeCount: e.target.checked })}
-              />
-              <span className='option-label-text'>Show Badge Count</span>
-            </label>
-            <label>
-              <input
-                type='checkbox'
-                checked={options.displaySuperbadgeCount}
-                onChange={(e) => setOptions({ ...options, displaySuperbadgeCount: e.target.checked })}
-              />
-              <span className='option-label-text'>Show Superbadge Count</span>
-            </label>
-            <label>
-              <input
-                type='checkbox'
-                checked={options.displayCertificationCount}
-                onChange={(e) => setOptions({ ...options, displayCertificationCount: e.target.checked })}
-              />
-              <span className='option-label-text'>Show Certification Count</span>
-            </label>
-            <label>
-              <input
-                type='checkbox'
-                checked={options.displayTrailCount}
-                onChange={(e) => setOptions({ ...options, displayTrailCount: e.target.checked })}
-              />
-              <span className='option-label-text'>Show Trail Count</span>
-            </label>
-            <label>
-              <input
-                type='checkbox'
-                checked={options.displayPointCount}
-                onChange={(e) => setOptions({ ...options, displayPointCount: e.target.checked })}
-              />
-              <span className='option-label-text'>Show Point Count</span>
-            </label>
-            <label>
-              <input
-                type='checkbox'
-                checked={options.displayStampCount}
-                onChange={(e) => setOptions({ ...options, displayStampCount: e.target.checked })}
-              />
-              <span className='option-label-text'>Show Stamp Count</span>
-            </label>
+            <DragAndDropCounterSelector
+              selectedCounters={options.selectedCounters}
+              onCountersChange={(newCounters) => setOptions({ ...options, selectedCounters: newCounters })}
+              maxCounters={5}
+            />
           </fieldset>
           <fieldset>
             <legend>Display Options</legend>

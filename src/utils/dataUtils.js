@@ -83,12 +83,8 @@ export const logOptions = (options) => {
   });
   console.log('Counter Options:', {
     textColor: options.textColor,
-    badgeCount: options.displayBadgeCount,
-    superbadgeCount: options.displaySuperbadgeCount,
-    certificationCount: options.displayCertificationCount,
-    trailCount: options.displayTrailCount,
-    pointCount: options.displayPointCount,
-    stampCount: options.displayStampCount,
+    counterOrder: options.counterOrder,
+    counterCount: options.counterOrder?.length || 0,
   });
   console.log('Badge Options:', {
     labelColor: options.badgeLabelColor,
