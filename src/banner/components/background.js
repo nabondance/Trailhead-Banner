@@ -16,44 +16,98 @@ import { getImage } from '../../utils/cacheUtils.js';
  */
 async function isValidImageType(url) {
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error('Non-OK response:', response.status);
+    // Validate URL protocol (only allow http/https)
+    const parsedUrl = new URL(url);
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      console.error('Invalid protocol:', parsedUrl.protocol);
       return false;
     }
 
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.startsWith('image/')) {
-      return true;
-    }
-
-    // Fallback to checking URL patterns if content-type is not reliable
-    const urlWithoutParams = url.split('?')[0];
-    const extension = path.extname(urlWithoutParams).toLowerCase();
-
-    if (extension) {
-      switch (extension) {
-        case '.jpg':
-        case '.jpeg':
-        case '.png':
-        case '.webp':
-        case '.gif':
-          return true;
-        default:
-          break;
-      }
-    }
-
-    // Check common image patterns in URL
-    const imagePatterns = [
-      '/image/',
-      'profile-displaybackgroundimage',
-      '/img/',
-      '/photo/',
-      'media.licdn.com',
+    // Check for localhost and private IP ranges to prevent SSRF
+    const hostname = parsedUrl.hostname.toLowerCase();
+    const privateRanges = [
+      'localhost',
+      '127.',
+      '10.',
+      '172.16.',
+      '172.17.',
+      '172.18.',
+      '172.19.',
+      '172.20.',
+      '172.21.',
+      '172.22.',
+      '172.23.',
+      '172.24.',
+      '172.25.',
+      '172.26.',
+      '172.27.',
+      '172.28.',
+      '172.29.',
+      '172.30.',
+      '172.31.',
+      '192.168.',
+      '169.254.', // Link-local
+      '[::1]', // IPv6 localhost
+      'fe80:', // IPv6 link-local
     ];
 
-    return imagePatterns.some((pattern) => url.toLowerCase().includes(pattern));
+    if (privateRanges.some((range) => hostname.startsWith(range))) {
+      console.error('Private/internal address blocked:', hostname);
+      return false;
+    }
+
+    // Use AbortController with timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        console.error('Non-OK response:', response.status);
+        return false;
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.startsWith('image/')) {
+        return true;
+      }
+
+      // Fallback to checking URL patterns if content-type is not reliable
+      const urlWithoutParams = url.split('?')[0];
+      const extension = path.extname(urlWithoutParams).toLowerCase();
+
+      if (extension) {
+        switch (extension) {
+          case '.jpg':
+          case '.jpeg':
+          case '.png':
+          case '.webp':
+          case '.gif':
+            return true;
+          default:
+            break;
+        }
+      }
+
+      // Check common image patterns in URL
+      const imagePatterns = [
+        '/image/',
+        'profile-displaybackgroundimage',
+        '/img/',
+        '/photo/',
+        'media.licdn.com',
+      ];
+
+      return imagePatterns.some((pattern) => url.toLowerCase().includes(pattern));
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        console.error('Request timeout for URL:', url);
+      }
+      throw fetchError;
+    }
   } catch (error) {
     console.error('Error validating image URL:', error);
     return false;

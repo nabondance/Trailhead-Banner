@@ -21,12 +21,18 @@ function filterCertifications(certifications, options) {
     return [];
   }
 
+  // Default all display flags to true when undefined
+  const includeExpired = options.includeExpiredCertifications ?? false;
+  const includeRetired = options.includeRetiredCertifications ?? false;
+  const displaySalesforce = options.displaySalesforceCertifications ?? true;
+  const displayAccredited = options.displayAccreditedProfessionalCertifications ?? true;
+
   return certifications.filter(
     (cert) =>
-      (options.includeExpiredCertifications || cert.status.expired === false) &&
-      (options.includeRetiredCertifications || cert.status.title !== 'Retired') &&
-      (options.displaySalesforceCertifications || cert.title.includes('Accredited Professional')) &&
-      (options.displayAccreditedProfessionalCertifications || !cert.title.includes('Accredited Professional'))
+      (includeExpired || cert.status.expired === false) &&
+      (includeRetired || cert.status.title !== 'Retired') &&
+      (displaySalesforce || cert.title.includes('Accredited Professional')) &&
+      (displayAccredited || !cert.title.includes('Accredited Professional'))
   );
 }
 

@@ -21,7 +21,11 @@ const DEFAULT_RANK_HEIGHT = 40;
 async function prepareRankLogo(rankData, options, canvasHeight) {
   const startTime = Date.now();
   const warnings = [];
+
+  // Default options
+  options = options || {};
   const scalingFactor = options.scalingFactor || 1.2;
+  const shouldRender = options.displayRankLogo ?? true;
   const topPartRatio = 1 / 4; // Top 1/4 of canvas
 
   // Check if rank data exists
@@ -62,7 +66,7 @@ async function prepareRankLogo(rankData, options, canvasHeight) {
     const rankLogoWidth = (rankLogo.width / rankLogo.height) * rankLogoHeight;
 
     return {
-      shouldRender: options.displayRankLogo,
+      shouldRender: shouldRender,
       image: rankLogo,
       width: rankLogoWidth,
       height: rankLogoHeight,

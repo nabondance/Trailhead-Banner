@@ -138,8 +138,8 @@ function getAgentblazerTimings(prepared) {
  */
 function getAgentblazerDimensions(prepared) {
   return {
-    width: prepared.width,
-    height: prepared.height,
+    width: prepared?.width ?? 0,
+    height: prepared?.height ?? 0,
   };
 }
 

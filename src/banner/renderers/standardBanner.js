@@ -100,7 +100,8 @@ async function generateStandardBanner(data, options) {
   const rankDimensions = RankLogo.getRankLogoDimensions(rankLogoPrep);
 
   // 3. Counters (to the right of rank logo)
-  const counterStartX = rankDimensions.unscaledWidth + 40;
+  // Use scaled width and only offset if rank logo is actually rendered
+  const counterStartX = rankLogoPrep.shouldRender ? rankDimensions.width + 40 : 40;
   const counterStartY = 5;
   const countersRenderTiming = await Counters.renderCounters(ctx, countersPrep, counterStartX, counterStartY, options.badgeLabelColor);
   timings.counters_draw_ms = countersRenderTiming.render_ms;

@@ -105,13 +105,25 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
   let superbadgeSpacing = 10;
   const superbadgeAvailableWidth = layout.availableWidth;
 
-  // Calculate total width required for superbadges
-  const totalSuperbadgeWidth =
-    validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
+  // Handle single-item case to avoid division by zero
+  let totalSuperbadgeWidth;
+  if (validImages.length === 1) {
+    superbadgeSpacing = 0;
+    totalSuperbadgeWidth = superbadgeLogoWidth;
+  } else {
+    // Calculate total width required for superbadges
+    totalSuperbadgeWidth =
+      validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
 
-  // Adjust spacing if total width exceeds available space
-  if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
-    superbadgeSpacing = (superbadgeAvailableWidth - validImages.length * superbadgeLogoWidth) / (validImages.length - 1);
+    // Adjust spacing if total width exceeds available space
+    if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
+      superbadgeSpacing = (superbadgeAvailableWidth - validImages.length * superbadgeLogoWidth) / (validImages.length - 1);
+      // Clamp spacing to non-negative value
+      superbadgeSpacing = Math.max(0, superbadgeSpacing);
+      // Recalculate total width with adjusted spacing
+      totalSuperbadgeWidth =
+        validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
+    }
   }
 
   // Calculate starting X position based on alignment
