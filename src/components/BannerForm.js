@@ -296,6 +296,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 <option value='upload'>Upload Image</option>
                 <option value='customUrl'>Custom URL</option>
                 <option value='monochromatic'>Solid Color</option>
+                <option value='procedural'>Procedural</option>
               </select>
             </label>
             {options.backgroundKind === 'monochromatic' && (
@@ -303,6 +304,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 Background Color:
                 <input type='color' value={options.backgroundColor} onChange={handleColorChange} />
               </label>
+            )}
+            {options.backgroundKind === 'procedural' && (
+              <p className='helper-text'>
+                Generates a unique background based on your username and rank. Same username always produces the same
+                pattern.
+              </p>
             )}
             {options.backgroundKind === 'upload' && (
               <label>
@@ -345,7 +352,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 ))}
               </div>
             )}
-            <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+            {options.backgroundKind !== 'procedural' && (
+              <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+            )}
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
