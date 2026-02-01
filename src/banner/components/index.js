@@ -12,13 +12,4 @@ import * as Agentblazer from './agentblazer.js';
 import * as MvpRibbon from './mvpRibbon.js';
 import * as Watermark from './watermark.js';
 
-export {
-  Background,
-  RankLogo,
-  Counters,
-  Certifications,
-  Superbadges,
-  Agentblazer,
-  MvpRibbon,
-  Watermark,
-};
+export { Background, RankLogo, Counters, Certifications, Superbadges, Agentblazer, MvpRibbon, Watermark };

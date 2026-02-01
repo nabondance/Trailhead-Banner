@@ -112,17 +112,16 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
     totalSuperbadgeWidth = superbadgeLogoWidth;
   } else {
     // Calculate total width required for superbadges
-    totalSuperbadgeWidth =
-      validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
+    totalSuperbadgeWidth = validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
 
     // Adjust spacing if total width exceeds available space
     if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
-      superbadgeSpacing = (superbadgeAvailableWidth - validImages.length * superbadgeLogoWidth) / (validImages.length - 1);
+      superbadgeSpacing =
+        (superbadgeAvailableWidth - validImages.length * superbadgeLogoWidth) / (validImages.length - 1);
       // Clamp spacing to non-negative value
       superbadgeSpacing = Math.max(0, superbadgeSpacing);
       // Recalculate total width with adjusted spacing
-      totalSuperbadgeWidth =
-        validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
+      totalSuperbadgeWidth = validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
     }
   }
 
@@ -229,10 +228,4 @@ function getSuperbadgesCounts(prepared) {
   return prepared?.counts || { total: 0, displayed: 0, hidden: 0 };
 }
 
-export {
-  prepareSuperbadges,
-  renderSuperbadges,
-  getSuperbadgesWarnings,
-  getSuperbadgesTimings,
-  getSuperbadgesCounts,
-};
+export { prepareSuperbadges, renderSuperbadges, getSuperbadgesWarnings, getSuperbadgesTimings, getSuperbadgesCounts };

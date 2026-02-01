@@ -35,7 +35,7 @@ const RIGHT_PART_RATIO = 7 / 10;
  * @param {Object} options - Generation options
  * @returns {Promise<Object>} Banner result { bannerUrl, warnings, hash, timings }
  */
-async function generateStandardBanner(data, options) {
+async function generateStandardBanner(data, options = {}) {
   const startTime = Date.now();
   const warnings = [];
   const timings = {};
@@ -97,13 +97,32 @@ async function generateStandardBanner(data, options) {
 
   // 2. Rank Logo (top-left)
   await RankLogo.renderRankLogo(ctx, rankLogoPrep, 0, 0);
-  const rankDimensions = RankLogo.getRankLogoDimensions(rankLogoPrep);
 
   // 3. Counters (to the right of rank logo)
-  // Use scaled width and only offset if rank logo is actually rendered
-  const counterStartX = rankLogoPrep.shouldRender ? rankDimensions.width + 40 : 40;
-  const counterStartY = 5;
-  const countersRenderTiming = await Counters.renderCounters(ctx, countersPrep, counterStartX, counterStartY, options.badgeLabelColor);
+  // Use scaled width and only render if rank logo is actually rendered
+  let countersRenderTiming = { render_ms: 0 };
+  if (rankLogoPrep.shouldRender) {
+    const rankDimensions = RankLogo.getRankLogoDimensions(rankLogoPrep);
+    const counterStartX = rankDimensions.width + 40;
+    const counterStartY = 5;
+    countersRenderTiming = await Counters.renderCounters(
+      ctx,
+      countersPrep,
+      counterStartX,
+      counterStartY,
+      options.badgeLabelColor
+    );
+  } else {
+    const counterStartX = 40;
+    const counterStartY = 5;
+    countersRenderTiming = await Counters.renderCounters(
+      ctx,
+      countersPrep,
+      counterStartX,
+      counterStartY,
+      options.badgeLabelColor
+    );
+  }
   timings.counters_draw_ms = countersRenderTiming.render_ms;
 
   // 4. Agentblazer (top area, fixed position)
@@ -111,13 +130,23 @@ async function generateStandardBanner(data, options) {
 
   // 5. Certifications (bottom area)
   const certifYPosition = CANVAS_HEIGHT * TOP_PART_RATIO + 20;
-  const certificationsRenderTiming = await Certifications.renderCertifications(ctx, certificationsPrep, 0, certifYPosition);
+  const certificationsRenderTiming = await Certifications.renderCertifications(
+    ctx,
+    certificationsPrep,
+    0,
+    certifYPosition
+  );
   timings.certifications_render_ms = certificationsRenderTiming.render_ms;
 
   // 6. Superbadges (top-right area)
   const superbadgeAbsoluteX = CANVAS_WIDTH - superbadgeLayout.availableWidth;
   const superbadgeY = 10;
-  const superbadgesRenderTiming = await Superbadges.renderSuperbadges(ctx, superbadgesPrep, superbadgeAbsoluteX, superbadgeY);
+  const superbadgesRenderTiming = await Superbadges.renderSuperbadges(
+    ctx,
+    superbadgesPrep,
+    superbadgeAbsoluteX,
+    superbadgeY
+  );
   timings.superbadges_render_ms = superbadgesRenderTiming.render_ms;
 
   // 7. MVP Ribbon (top-right corner, rotated)
@@ -125,7 +154,8 @@ async function generateStandardBanner(data, options) {
 
   // 8. Watermark (bottom-right corner)
   await Watermark.renderWatermark(ctx, watermarkPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
-  timings.mvp_watermark_ms = MvpRibbon.getMvpRibbonTimings(mvpRibbonPrep).load_ms + Watermark.getWatermarkTimings(watermarkPrep).load_ms;
+  timings.mvp_watermark_ms =
+    MvpRibbon.getMvpRibbonTimings(mvpRibbonPrep).load_ms + Watermark.getWatermarkTimings(watermarkPrep).load_ms;
 
   // ============================================================
   // PHASE 3: COLLECT WARNINGS AND ENCODE
@@ -160,8 +190,4 @@ async function generateStandardBanner(data, options) {
   return { bannerUrl, warnings, hash, timings };
 }
 
-export {
-  generateStandardBanner,
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-};
+export { generateStandardBanner, CANVAS_WIDTH, CANVAS_HEIGHT };

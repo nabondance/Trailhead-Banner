@@ -36,9 +36,53 @@ export const getImage = async (imageUrl, folder = 'images') => {
     throw new Error('Cropped version not found in cache');
   }
 
+  // Validate URL protocol (only allow http/https)
+  try {
+    const parsedUrl = new URL(imageUrl);
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      throw new Error(`Invalid protocol: ${parsedUrl.protocol}`);
+    }
+
+    // Check for localhost and private IP ranges to prevent SSRF
+    const hostname = parsedUrl.hostname.toLowerCase();
+    const privateRanges = [
+      'localhost',
+      '127.',
+      '10.',
+      '172.16.',
+      '172.17.',
+      '172.18.',
+      '172.19.',
+      '172.20.',
+      '172.21.',
+      '172.22.',
+      '172.23.',
+      '172.24.',
+      '172.25.',
+      '172.26.',
+      '172.27.',
+      '172.28.',
+      '172.29.',
+      '172.30.',
+      '172.31.',
+      '192.168.',
+      '169.254.', // Link-local
+      '::1', // IPv6 localhost (URL.hostname returns without brackets)
+      'fe80:', // IPv6 link-local
+    ];
+
+    if (privateRanges.some((range) => hostname.startsWith(range))) {
+      throw new Error(`Private/internal address blocked: ${hostname}`);
+    }
+  } catch (error) {
+    console.error(`URL validation failed for ${imageUrl}:`, error);
+    throw new Error(`Invalid or blocked URL: ${error.message}`);
+  }
+
   try {
     const response = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
+      timeout: 10000, // 10 second timeout
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',

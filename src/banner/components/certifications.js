@@ -62,8 +62,6 @@ async function prepareCertifications(certificationsData, options, layout) {
   const displayedCertifications = certifications.length;
   const hiddenCertifications = totalCertifications - displayedCertifications;
 
-  let certificationsLogos = [];
-
   // Track detailed timing
   const certTimings = {
     getImage_times: [],
@@ -78,135 +76,143 @@ async function prepareCertifications(certificationsData, options, layout) {
 
   // Download all certification logos in parallel
   const logoPromises = certifications.map(async (cert) => {
-    if (cert.logoUrl) {
+    if (!cert.logoUrl) {
+      return null;
+    }
+
+    try {
+      console.debug('Loading certification logo from URL:', cert.logoUrl);
+
+      let logo;
+      let getImageTime = 0;
+      let loadImageTime = 0;
+      let cropTime = 0;
+
+      // Try to get pre-cropped version first
+      const getImageStart = Date.now();
       try {
-        console.debug('Loading certification logo from URL:', cert.logoUrl);
+        const croppedLogoResult = await getImage(cert.logoUrl, 'certifications_cropped');
+        getImageTime = Date.now() - getImageStart;
+        certTimings.getImage_times.push(getImageTime);
+        certTimings.cropped_cache_hits++;
 
-        let logo;
-        let getImageTime = 0;
-        let loadImageTime = 0;
-        let cropTime = 0;
-
-        // Try to get pre-cropped version first
-        const getImageStart = Date.now();
-        try {
-          const croppedLogoResult = await getImage(cert.logoUrl, 'certifications_cropped');
-          getImageTime = Date.now() - getImageStart;
-          certTimings.getImage_times.push(getImageTime);
-          certTimings.cropped_cache_hits++;
-
-          // Track original blob cache status
-          if (croppedLogoResult.cacheHit) {
-            certTimings.blob_cache_hits++;
-          } else {
-            certTimings.blob_cache_misses++;
-          }
-
-          const croppedLogoBuffer = croppedLogoResult.buffer || croppedLogoResult;
-
-          // Load the already-cropped image
-          const loadImageStart = Date.now();
-          logo = await loadImage(croppedLogoBuffer);
-          loadImageTime = Date.now() - loadImageStart;
-          certTimings.loadImage_times.push(loadImageTime);
-
-          // No cropping needed!
-          cropTime = 0;
-          certTimings.cropImage_times.push(cropTime);
-        } catch (error) {
-          // Cropped version not cached - do full processing
-          console.debug(`Cropped cache miss for ${cert.title}, processing now...`);
-          certTimings.cropped_cache_misses++;
-
-          const certificationLogoResult = await getImage(cert.logoUrl, 'certifications');
-          getImageTime = Date.now() - getImageStart;
-          certTimings.getImage_times.push(getImageTime);
-
-          // Track cache hits/misses
-          if (certificationLogoResult.cacheHit) {
-            certTimings.blob_cache_hits++;
-          } else {
-            certTimings.blob_cache_misses++;
-          }
-
-          const certificationLogoBuffer = certificationLogoResult.buffer || certificationLogoResult;
-
-          // Time loadImage
-          const loadImageStart = Date.now();
-          logo = await loadImage(certificationLogoBuffer);
-          loadImageTime = Date.now() - loadImageStart;
-          certTimings.loadImage_times.push(loadImageTime);
-
-          // Time cropImage
-          const cropStart = Date.now();
-          logo = cropImage(logo); // Crop the logo to remove extra space
-          cropTime = Date.now() - cropStart;
-          certTimings.cropImage_times.push(cropTime);
-
-          // Cache the cropped version for next time (non-blocking)
-          try {
-            const croppedBuffer = logo.toBuffer('image/png');
-            const croppedFileName = getCertificationFileName(cert.logoUrl);
-
-            // Upload cropped version (don't await - let it happen in background)
-            uploadImage(croppedBuffer, croppedFileName, 'certifications_cropped').catch((err) =>
-              console.error(`Failed to cache cropped image for ${cert.title}:`, err)
-            );
-          } catch (cacheError) {
-            console.error(`Error caching cropped image for ${cert.title}:`, cacheError);
-            // Continue - caching failure shouldn't break generation
-          }
+        // Track original blob cache status
+        if (croppedLogoResult.cacheHit) {
+          certTimings.blob_cache_hits++;
+        } else {
+          certTimings.blob_cache_misses++;
         }
 
-        // Grayscale if needed
-        if (cert.status.expired) {
-          const grayscaleStart = Date.now();
-          console.debug(`[GRAYSCALE] Before: logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
+        const croppedLogoBuffer = croppedLogoResult.buffer || croppedLogoResult;
 
-          // Convert logo to canvas if it's an Image
-          let sourceCanvas;
-          if (logo.constructor.name === 'Image') {
-            sourceCanvas = createCanvas(logo.width, logo.height);
-            const sourceCtx = sourceCanvas.getContext('2d');
-            sourceCtx.drawImage(logo, 0, 0);
-          } else {
-            sourceCanvas = logo;
-          }
+        // Load the already-cropped image
+        const loadImageStart = Date.now();
+        logo = await loadImage(croppedLogoBuffer);
+        loadImageTime = Date.now() - loadImageStart;
+        certTimings.loadImage_times.push(loadImageTime);
 
-          // Apply grayscale filter
-          logo = applyGrayscaleToCanvas(sourceCanvas);
-
-          // Verify grayscale was applied
-          const verifyCtx = logo.getContext('2d');
-          const verifyData = verifyCtx.getImageData(100, 100, 1, 1).data;
-          console.debug(`[GRAYSCALE] After applyGrayscaleToCanvas, pixel at (100,100): R:${verifyData[0]} G:${verifyData[1]} B:${verifyData[2]}`);
-          console.debug(`[GRAYSCALE] After: logo is now ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
-
-          const grayscaleTime = Date.now() - grayscaleStart;
-          certTimings.grayscale_times.push(grayscaleTime);
-        }
-
-        const certificationLocalData = getLocalCertificationData(cert);
-        certificationsLogos.push({
-          logo,
-          expired: cert.status.expired,
-          retired: cert.status.title == 'Retired',
-          dateCompleted: cert.dateCompleted,
-          title: cert.title,
-          product: cert.product,
-          category: certificationLocalData?.category || '',
-          difficulty: certificationLocalData?.difficulty || '',
-        });
+        // No cropping needed!
+        cropTime = 0;
+        certTimings.cropImage_times.push(cropTime);
       } catch (error) {
-        console.error(`Error loading logo for ${cert.title}:`, error);
-        warnings.push(`Error loading logo for ${cert.title}: ${error.message}`);
+        // Cropped version not cached - do full processing
+        console.debug(`Cropped cache miss for ${cert.title}, processing now...`);
+        certTimings.cropped_cache_misses++;
+
+        const certificationLogoResult = await getImage(cert.logoUrl, 'certifications');
+        getImageTime = Date.now() - getImageStart;
+        certTimings.getImage_times.push(getImageTime);
+
+        // Track cache hits/misses
+        if (certificationLogoResult.cacheHit) {
+          certTimings.blob_cache_hits++;
+        } else {
+          certTimings.blob_cache_misses++;
+        }
+
+        const certificationLogoBuffer = certificationLogoResult.buffer || certificationLogoResult;
+
+        // Time loadImage
+        const loadImageStart = Date.now();
+        logo = await loadImage(certificationLogoBuffer);
+        loadImageTime = Date.now() - loadImageStart;
+        certTimings.loadImage_times.push(loadImageTime);
+
+        // Time cropImage
+        const cropStart = Date.now();
+        logo = cropImage(logo); // Crop the logo to remove extra space
+        cropTime = Date.now() - cropStart;
+        certTimings.cropImage_times.push(cropTime);
+
+        // Cache the cropped version for next time (non-blocking)
+        try {
+          const croppedBuffer = logo.toBuffer('image/png');
+          const croppedFileName = getCertificationFileName(cert.logoUrl);
+
+          // Upload cropped version (don't await - let it happen in background)
+          uploadImage(croppedBuffer, croppedFileName, 'certifications_cropped').catch((err) =>
+            console.error(`Failed to cache cropped image for ${cert.title}:`, err)
+          );
+        } catch (cacheError) {
+          console.error(`Error caching cropped image for ${cert.title}:`, cacheError);
+          // Continue - caching failure shouldn't break generation
+        }
       }
+
+      // Grayscale if needed
+      if (cert.status.expired) {
+        const grayscaleStart = Date.now();
+        console.debug(`[GRAYSCALE] Before: logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
+
+        // Convert logo to canvas if it's an Image
+        let sourceCanvas;
+        if (logo.constructor.name === 'Image') {
+          sourceCanvas = createCanvas(logo.width, logo.height);
+          const sourceCtx = sourceCanvas.getContext('2d');
+          sourceCtx.drawImage(logo, 0, 0);
+        } else {
+          sourceCanvas = logo;
+        }
+
+        // Apply grayscale filter
+        logo = applyGrayscaleToCanvas(sourceCanvas);
+
+        // Verify grayscale was applied with safe coordinates
+        const verifyCtx = logo.getContext('2d');
+        const sampleX = Math.min(logo.width - 1, Math.max(0, Math.floor(logo.width / 2)));
+        const sampleY = Math.min(logo.height - 1, Math.max(0, Math.floor(logo.height / 2)));
+        const verifyData = verifyCtx.getImageData(sampleX, sampleY, 1, 1).data;
+        console.debug(
+          `[GRAYSCALE] After applyGrayscaleToCanvas, pixel at (${sampleX},${sampleY}): R:${verifyData[0]} G:${verifyData[1]} B:${verifyData[2]}`
+        );
+        console.debug(`[GRAYSCALE] After: logo is now ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
+
+        const grayscaleTime = Date.now() - grayscaleStart;
+        certTimings.grayscale_times.push(grayscaleTime);
+      }
+
+      const certificationLocalData = getLocalCertificationData(cert);
+      return {
+        logo,
+        expired: cert.status.expired,
+        retired: cert.status.title == 'Retired',
+        dateCompleted: cert.dateCompleted,
+        title: cert.title,
+        product: cert.product,
+        category: certificationLocalData?.category || '',
+        difficulty: certificationLocalData?.difficulty || '',
+      };
+    } catch (error) {
+      console.error(`Error loading logo for ${cert.title}:`, error);
+      warnings.push(`Error loading logo for ${cert.title}: ${error.message}`);
+      return null;
     }
   });
 
-  // Wait for all logos to be downloaded
+  // Wait for all logos to be downloaded and preserve order
   const certLogosStart = Date.now();
-  await Promise.all(logoPromises);
+  const logoResults = await Promise.all(logoPromises);
+  let certificationsLogos = logoResults.filter(Boolean);
   const downloadMs = Date.now() - certLogosStart;
 
   // Calculate statistics
@@ -238,7 +244,11 @@ async function prepareCertifications(certificationsData, options, layout) {
   console.log('Certification Processing Breakdown:', JSON.stringify(detailedTimings, null, 2));
 
   // Sort certification logos
-  certificationsLogos = sortCertifications(certificationsLogos, options.certificationSort, options.certificationSortOrder);
+  certificationsLogos = sortCertifications(
+    certificationsLogos,
+    options.certificationSort,
+    options.certificationSortOrder
+  );
 
   // Add "+X" badge if certifications are hidden
   if (hiddenCertifications > 0) {
@@ -298,11 +308,11 @@ async function renderCertifications(ctx, prepared, startX, startY) {
   }
 
   const { logos, layout } = prepared;
-  const certifSpacing = 5;
+  const certifSpacing = layout.spacing || 5;
 
   let currentY = startY;
   let currentLine = 0;
-  let currentX = startX + layout.logoLineStartX[currentLine];
+  let currentX = startX + (layout.logoLineStartX[currentLine] ?? 0);
 
   for (let i = 0; i < logos.length; i++) {
     const { logo, retired, expired, title } = logos[i];
@@ -316,12 +326,18 @@ async function renderCertifications(ctx, prepared, startX, startY) {
     }
 
     if (expired) {
-      console.debug(`[RENDER] Expired cert: ${title}, logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
+      console.debug(
+        `[RENDER] Expired cert: ${title}, logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`
+      );
       // Try to verify the logo still has grayscale
       if (logo.getContext) {
         const testCtx = logo.getContext('2d');
-        const testPixel = testCtx.getImageData(100, 100, 1, 1).data;
-        console.debug(`[RENDER] Canvas pixel at (100,100): R:${testPixel[0]} G:${testPixel[1]} B:${testPixel[2]}`);
+        const sampleX = Math.min(logo.width - 1, Math.max(0, Math.floor(logo.width / 2)));
+        const sampleY = Math.min(logo.height - 1, Math.max(0, Math.floor(logo.height / 2)));
+        const testPixel = testCtx.getImageData(sampleX, sampleY, 1, 1).data;
+        console.debug(
+          `[RENDER] Canvas pixel at (${sampleX},${sampleY}): R:${testPixel[0]} G:${testPixel[1]} B:${testPixel[2]}`
+        );
       }
     }
 
@@ -331,7 +347,7 @@ async function renderCertifications(ctx, prepared, startX, startY) {
     // Move to the next row if the current row is full
     if ((i + 1) % layout.maxLogosPerLine === 0) {
       currentLine++;
-      currentX = startX + layout.logoLineStartX[currentLine];
+      currentX = startX + (layout.logoLineStartX[currentLine] ?? 0);
       currentY += layout.logoHeight + certifSpacing;
     }
   }

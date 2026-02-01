@@ -21,7 +21,7 @@ import { drawBadgeCounter } from '../../utils/drawUtils.js';
  * @param {string} options.badgeLabelColor - Label color for counter badges
  * @returns {Promise<Object>} Prepared counter data
  */
-async function prepareCounters(data, options) {
+async function prepareCounters(data, options = {}) {
   const startTime = Date.now();
   const warnings = [];
 
@@ -107,7 +107,16 @@ async function renderCounters(ctx, prepared, startX, startY, badgeLabelColor) {
 
   for (const counter of counters) {
     try {
-      await drawBadgeCounter(ctx, counter.label, counter.value, startX, currentY, badgeScale, badgeLabelColor, counter.color);
+      await drawBadgeCounter(
+        ctx,
+        counter.label,
+        counter.value,
+        startX,
+        currentY,
+        badgeScale,
+        badgeLabelColor,
+        counter.color
+      );
       currentY += yDelta;
     } catch (error) {
       console.error(`Error drawing ${counter.label} counter:`, error);
@@ -156,10 +165,4 @@ function getCountersLayout(prepared) {
   };
 }
 
-export {
-  prepareCounters,
-  renderCounters,
-  getCountersWarnings,
-  getCountersTimings,
-  getCountersLayout,
-};
+export { prepareCounters, renderCounters, getCountersWarnings, getCountersTimings, getCountersLayout };

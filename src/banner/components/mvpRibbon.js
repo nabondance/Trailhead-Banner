@@ -68,11 +68,11 @@ async function renderMvpRibbon(ctx, prepared, canvasWidth) {
     return;
   }
 
+  // Save context state before modifying
+  ctx.save();
+
   // Reset transparency
   ctx.globalAlpha = 1.0;
-
-  // Save context state for rotation
-  ctx.save();
 
   // Position and rotate ribbon in top-right corner
   const width = prepared.width;
@@ -104,9 +104,4 @@ function getMvpRibbonTimings(prepared) {
   return prepared?.timings || {};
 }
 
-export {
-  prepareMvpRibbon,
-  renderMvpRibbon,
-  getMvpRibbonWarnings,
-  getMvpRibbonTimings,
-};
+export { prepareMvpRibbon, renderMvpRibbon, getMvpRibbonWarnings, getMvpRibbonTimings };

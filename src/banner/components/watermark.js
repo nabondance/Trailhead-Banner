@@ -88,9 +88,4 @@ function getWatermarkTimings(prepared) {
   return prepared?.timings || {};
 }
 
-export {
-  prepareWatermark,
-  renderWatermark,
-  getWatermarkWarnings,
-  getWatermarkTimings,
-};
+export { prepareWatermark, renderWatermark, getWatermarkWarnings, getWatermarkTimings };

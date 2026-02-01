@@ -47,7 +47,7 @@ async function isValidImageType(url) {
       '172.31.',
       '192.168.',
       '169.254.', // Link-local
-      '[::1]', // IPv6 localhost
+      '::1', // IPv6 localhost (URL.hostname returns without brackets)
       'fe80:', // IPv6 link-local
     ];
 
@@ -92,13 +92,7 @@ async function isValidImageType(url) {
       }
 
       // Check common image patterns in URL
-      const imagePatterns = [
-        '/image/',
-        'profile-displaybackgroundimage',
-        '/img/',
-        '/photo/',
-        'media.licdn.com',
-      ];
+      const imagePatterns = ['/image/', 'profile-displaybackgroundimage', '/img/', '/photo/', 'media.licdn.com'];
 
       return imagePatterns.some((pattern) => url.toLowerCase().includes(pattern));
     } catch (fetchError) {
@@ -263,9 +257,4 @@ function getBackgroundTimings(prepared) {
   return prepared?.timings || {};
 }
 
-export {
-  prepareBackground,
-  renderBackground,
-  getBackgroundWarnings,
-  getBackgroundTimings,
-};
+export { prepareBackground, renderBackground, getBackgroundWarnings, getBackgroundTimings };

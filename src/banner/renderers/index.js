@@ -5,6 +5,4 @@
 
 import { generateStandardBanner } from './standardBanner.js';
 
-export {
-  generateStandardBanner,
-};
+export { generateStandardBanner };

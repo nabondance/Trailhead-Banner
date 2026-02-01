@@ -146,10 +146,4 @@ function getRankLogoDimensions(prepared) {
   };
 }
 
-export {
-  prepareRankLogo,
-  renderRankLogo,
-  getRankLogoWarnings,
-  getRankLogoTimings,
-  getRankLogoDimensions,
-};
+export { prepareRankLogo, renderRankLogo, getRankLogoWarnings, getRankLogoTimings, getRankLogoDimensions };
