@@ -1,20 +1,24 @@
-const { createCanvas, loadImage } = require('@napi-rs/canvas');
+import { createCanvas, loadImage, ImageData } from '@napi-rs/canvas';
 
+const applyGrayscaleToCanvas = (sourceCanvas) => {
+  console.debug(`applyGrayscaleToCanvas called with dimensions: ${sourceCanvas.width}x${sourceCanvas.height}`);
+
+  // Create a new canvas for the grayscale version
+  const grayCanvas = createCanvas(sourceCanvas.width, sourceCanvas.height);
+  const grayCtx = grayCanvas.getContext('2d');
+
+  // Apply grayscale filter and draw the source
+  grayCtx.filter = 'grayscale(100%)';
+  grayCtx.drawImage(sourceCanvas, 0, 0);
+
+  console.debug(`Grayscale filter applied using ctx.filter`);
+
+  return grayCanvas;
+};
+
+// Legacy function kept for compatibility
 const applyGrayscale = (ctx, x, y, width, height) => {
-  const imageData = ctx.getImageData(x, y, width, height);
-  const data = imageData.data;
-
-  for (let i = 0; i < data.length; i += 4) {
-    const isTransparent = data[i + 3] === 0;
-    if (!isTransparent) {
-      // Apply grayscale to non-transparent pixels
-      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      data[i] = avg; // Red
-      data[i + 1] = avg; // Green
-      data[i + 2] = avg; // Blue
-    }
-  }
-  ctx.putImageData(imageData, x, y);
+  console.debug(`applyGrayscale (legacy) called - this should not be used anymore`);
 };
 
 const cropImage = (image) => {
@@ -920,8 +924,9 @@ function drawStylizedText(ctx, text, fontSize, x, y, style) {
   ctx.restore();
 }
 
-module.exports = {
+export {
   applyGrayscale,
+  applyGrayscaleToCanvas,
   cropImage,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,

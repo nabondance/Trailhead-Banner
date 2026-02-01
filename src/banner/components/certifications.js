@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { getLocalCertificationData } from '../../utils/dataUtils.js';
 import { calculateCertificationsDesign, sortCertifications } from '../../utils/imageUtils.js';
-import { applyGrayscale, cropImage, generatePlusXCertificationsSvg } from '../../utils/drawUtils.js';
+import { applyGrayscaleToCanvas, cropImage, generatePlusXCertificationsSvg } from '../../utils/drawUtils.js';
 import { getImage, getCertificationFileName } from '../../utils/cacheUtils.js';
 import { uploadImage } from '../../utils/blobUtils.js';
 
@@ -161,11 +161,27 @@ async function prepareCertifications(certificationsData, options, layout) {
         // Grayscale if needed
         if (cert.status.expired) {
           const grayscaleStart = Date.now();
-          const tempCanvas = createCanvas(logo.width, logo.height);
-          const tempCtx = tempCanvas.getContext('2d');
-          tempCtx.drawImage(logo, 0, 0);
-          applyGrayscale(tempCtx, 0, 0, logo.width, logo.height);
-          logo = tempCanvas;
+          console.debug(`[GRAYSCALE] Before: logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
+
+          // Convert logo to canvas if it's an Image
+          let sourceCanvas;
+          if (logo.constructor.name === 'Image') {
+            sourceCanvas = createCanvas(logo.width, logo.height);
+            const sourceCtx = sourceCanvas.getContext('2d');
+            sourceCtx.drawImage(logo, 0, 0);
+          } else {
+            sourceCanvas = logo;
+          }
+
+          // Apply grayscale filter
+          logo = applyGrayscaleToCanvas(sourceCanvas);
+
+          // Verify grayscale was applied
+          const verifyCtx = logo.getContext('2d');
+          const verifyData = verifyCtx.getImageData(100, 100, 1, 1).data;
+          console.debug(`[GRAYSCALE] After applyGrayscaleToCanvas, pixel at (100,100): R:${verifyData[0]} G:${verifyData[1]} B:${verifyData[2]}`);
+          console.debug(`[GRAYSCALE] After: logo is now ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
+
           const grayscaleTime = Date.now() - grayscaleStart;
           certTimings.grayscale_times.push(grayscaleTime);
         }
@@ -289,13 +305,24 @@ async function renderCertifications(ctx, prepared, startX, startY) {
   let currentX = startX + layout.logoLineStartX[currentLine];
 
   for (let i = 0; i < logos.length; i++) {
-    const { logo, retired } = logos[i];
+    const { logo, retired, expired, title } = logos[i];
 
     // Set transparency for retired certifications
     if (retired) {
+      console.debug(`Applying 50% transparency to retired cert: ${title}`);
       ctx.globalAlpha = 0.5;
     } else {
       ctx.globalAlpha = 1.0;
+    }
+
+    if (expired) {
+      console.debug(`[RENDER] Expired cert: ${title}, logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
+      // Try to verify the logo still has grayscale
+      if (logo.getContext) {
+        const testCtx = logo.getContext('2d');
+        const testPixel = testCtx.getImageData(100, 100, 1, 1).data;
+        console.debug(`[RENDER] Canvas pixel at (100,100): R:${testPixel[0]} G:${testPixel[1]} B:${testPixel[2]}`);
+      }
     }
 
     ctx.drawImage(logo, currentX, currentY, layout.logoWidth, layout.logoHeight);
