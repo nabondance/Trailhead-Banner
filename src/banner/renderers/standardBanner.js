@@ -139,8 +139,8 @@ async function generateStandardBanner(data, options = {}) {
 
   // 8. Watermark (bottom-right corner)
   await Watermark.renderWatermark(ctx, watermarkPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
-  timings.mvp_watermark_ms =
-    MvpRibbon.getMvpRibbonTimings(mvpRibbonPrep).load_ms + Watermark.getWatermarkTimings(watermarkPrep).load_ms;
+  timings.mvp_ribbon_load_ms = MvpRibbon.getMvpRibbonTimings(mvpRibbonPrep).load_ms;
+  timings.watermark_load_ms = Watermark.getWatermarkTimings(watermarkPrep).load_ms;
 
   // ============================================================
   // PHASE 3: COLLECT WARNINGS AND ENCODE
