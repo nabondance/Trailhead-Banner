@@ -125,9 +125,14 @@ export const generateImage = async (options) => {
         break;
       case 'procedural':
         // Generate unique procedural background seeded by username
-        const username = options.rankData?.profileUser?.Slug || options.rankData?.profileUser?.Id || 'default';
-        const rank = options.rankData?.rank?.title || 'Scout';
-        drawProceduralBannerBackground(ctx, canvas.width, canvas.height, username, rank);
+        // Username comes directly from options, rank from rankData query
+        drawProceduralBannerBackground(
+          ctx,
+          canvas.width,
+          canvas.height,
+          options.username || 'default',
+          options.rankData?.rank?.title || 'Scout'
+        );
         break;
       default:
         ctx.fillStyle = options.backgroundColor;

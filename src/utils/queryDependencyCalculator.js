@@ -21,8 +21,10 @@
 const QUERY_DEPENDENCIES = {
   GET_TRAILBLAZER_RANK: {
     // Fetch if user wants to display any rank-related data
+    // Also required for procedural background (uses rank for accent color)
     requiredWhen: ['displayRankLogo'],
     requiredWhenCounter: ['badge', 'trail', 'point'],
+    requiredWhenBackgroundKind: ['procedural'],
     params: {},
   },
 
@@ -74,6 +76,7 @@ const QUERY_DEPENDENCIES = {
  *
  * @param {Object} options - User options from BannerForm
  * @param {Array<string>} options.counterOrder - Array of selected counter IDs (e.g., ['badge', 'superbadge', 'certification'])
+ * @param {string} options.backgroundKind - Background type ('library', 'upload', 'customUrl', 'monochromatic', 'procedural')
  * @param {boolean} options.displayRankLogo - Show rank logo
  * @param {boolean} options.displaySuperbadges - Show superbadge details
  * @param {boolean} options.displayAgentblazerRank - Show Agentblazer rank
@@ -126,7 +129,8 @@ function calculateRequiredQueries(options) {
  * A query is required if:
  * - It's marked as alwaysRequired (e.g., MVP status), OR
  * - At least ONE of its dependent options is set to true (OR logic), OR
- * - At least ONE of its required counter IDs is in the counterOrder array
+ * - At least ONE of its required counter IDs is in the counterOrder array, OR
+ * - The backgroundKind matches one of the requiredWhenBackgroundKind values
  *
  * @param {Object} config - Query configuration from QUERY_DEPENDENCIES
  * @param {Object} options - User options
@@ -143,6 +147,13 @@ function isQueryRequired(config, options) {
     const counterOrder = options.counterOrder || [];
     const hasRequiredCounter = config.requiredWhenCounter.some((counterId) => counterOrder.includes(counterId));
     if (hasRequiredCounter) return true;
+  }
+
+  // Check backgroundKind-based dependencies (e.g., procedural background needs rank data)
+  if (config.requiredWhenBackgroundKind && Array.isArray(config.requiredWhenBackgroundKind)) {
+    if (config.requiredWhenBackgroundKind.includes(options.backgroundKind)) {
+      return true;
+    }
   }
 
   // Check if ANY dependent option is enabled (OR logic)
