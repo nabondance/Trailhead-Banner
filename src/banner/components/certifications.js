@@ -16,7 +16,7 @@ import { uploadImage } from '../../utils/blobUtils.js';
  * @param {Object} options - Filtering options
  * @returns {Array} Filtered certifications
  */
-function filterCertifications(certifications, options) {
+function filterCertifications(certifications, options = {}) {
   if (!certifications || !Array.isArray(certifications)) {
     return [];
   }
@@ -43,7 +43,7 @@ function filterCertifications(certifications, options) {
  * @param {Object} layout - Layout constraints { availableWidth, availableHeight, spacing }
  * @returns {Promise<Object>} Prepared certification data
  */
-async function prepareCertifications(certificationsData, options, layout) {
+async function prepareCertifications(certificationsData, options = {}, layout) {
   const startTime = Date.now();
   const warnings = [];
 
