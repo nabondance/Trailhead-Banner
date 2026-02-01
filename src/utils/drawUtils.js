@@ -1,8 +1,6 @@
 import { createCanvas, loadImage, ImageData } from '@napi-rs/canvas';
 
 const applyGrayscaleToCanvas = (sourceCanvas) => {
-  console.debug(`applyGrayscaleToCanvas called with dimensions: ${sourceCanvas.width}x${sourceCanvas.height}`);
-
   // Create a new canvas for the grayscale version
   const grayCanvas = createCanvas(sourceCanvas.width, sourceCanvas.height);
   const grayCtx = grayCanvas.getContext('2d');
@@ -11,14 +9,7 @@ const applyGrayscaleToCanvas = (sourceCanvas) => {
   grayCtx.filter = 'grayscale(100%)';
   grayCtx.drawImage(sourceCanvas, 0, 0);
 
-  console.debug(`Grayscale filter applied using ctx.filter`);
-
   return grayCanvas;
-};
-
-// Legacy function kept for compatibility
-const applyGrayscale = (ctx, x, y, width, height) => {
-  console.debug(`applyGrayscale (legacy) called - this should not be used anymore`);
 };
 
 const cropImage = (image) => {
@@ -925,7 +916,6 @@ function drawStylizedText(ctx, text, fontSize, x, y, style) {
 }
 
 export {
-  applyGrayscale,
   applyGrayscaleToCanvas,
   cropImage,
   drawBadgeCounter,

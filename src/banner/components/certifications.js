@@ -162,7 +162,6 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
       // Grayscale if needed
       if (cert.status.expired) {
         const grayscaleStart = Date.now();
-        console.debug(`[GRAYSCALE] Before: logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
 
         // Convert logo to canvas if it's an Image
         let sourceCanvas;
@@ -176,16 +175,6 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
 
         // Apply grayscale filter
         logo = applyGrayscaleToCanvas(sourceCanvas);
-
-        // Verify grayscale was applied with safe coordinates
-        const verifyCtx = logo.getContext('2d');
-        const sampleX = Math.min(logo.width - 1, Math.max(0, Math.floor(logo.width / 2)));
-        const sampleY = Math.min(logo.height - 1, Math.max(0, Math.floor(logo.height / 2)));
-        const verifyData = verifyCtx.getImageData(sampleX, sampleY, 1, 1).data;
-        console.debug(
-          `[GRAYSCALE] After applyGrayscaleToCanvas, pixel at (${sampleX},${sampleY}): R:${verifyData[0]} G:${verifyData[1]} B:${verifyData[2]}`
-        );
-        console.debug(`[GRAYSCALE] After: logo is now ${logo.constructor.name}, size ${logo.width}x${logo.height}`);
 
         const grayscaleTime = Date.now() - grayscaleStart;
         certTimings.grayscale_times.push(grayscaleTime);
@@ -315,30 +304,13 @@ async function renderCertifications(ctx, prepared, startX, startY) {
   let currentX = startX + (layout.logoLineStartX[currentLine] ?? 0);
 
   for (let i = 0; i < logos.length; i++) {
-    const { logo, retired, expired, title } = logos[i];
+    const { logo, retired } = logos[i];
 
     // Set transparency for retired certifications
     if (retired) {
-      console.debug(`Applying 50% transparency to retired cert: ${title}`);
       ctx.globalAlpha = 0.5;
     } else {
       ctx.globalAlpha = 1.0;
-    }
-
-    if (expired) {
-      console.debug(
-        `[RENDER] Expired cert: ${title}, logo is ${logo.constructor.name}, size ${logo.width}x${logo.height}`
-      );
-      // Try to verify the logo still has grayscale
-      if (logo.getContext) {
-        const testCtx = logo.getContext('2d');
-        const sampleX = Math.min(logo.width - 1, Math.max(0, Math.floor(logo.width / 2)));
-        const sampleY = Math.min(logo.height - 1, Math.max(0, Math.floor(logo.height / 2)));
-        const testPixel = testCtx.getImageData(sampleX, sampleY, 1, 1).data;
-        console.debug(
-          `[RENDER] Canvas pixel at (${sampleX},${sampleY}): R:${testPixel[0]} G:${testPixel[1]} B:${testPixel[2]}`
-        );
-      }
     }
 
     ctx.drawImage(logo, currentX, currentY, layout.logoWidth, layout.logoHeight);
