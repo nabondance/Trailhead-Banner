@@ -2,7 +2,7 @@ const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const path = require('path');
 const crypto = require('crypto');
 const { filterDataByYear, generateRewindSummary } = require('./rewindUtils');
-const { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawStylizedText } = require('./drawUtils');
+import { getRankAccentColor, getAgentblazerStyle, drawGeometricElements, drawStylizedText } from './drawUtils.js';
 const FontUtils = require('./fontUtils');
 import { getImage, getLocal } from './cacheUtils';
 
