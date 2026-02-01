@@ -522,6 +522,202 @@ function drawGeometricShapes(ctx, rankColors, random) {
   }
 }
 
+// Draw procedural banner background - seeded by username for consistent, unique patterns
+// Optimized for banner dimensions (1584 × 396px)
+function drawProceduralBannerBackground(ctx, width, height, username, rank) {
+  // Create seeded random based on username for consistent patterns
+  const seed = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const random = (index) => (Math.sin(seed + index * 1.414) + 1) / 2;
+
+  // Get rank accent color
+  const rankColor = getRankAccentColor(rank);
+
+  // Dark base background
+  ctx.fillStyle = '#181818';
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.save();
+
+  // Draw banner-specific elements
+  drawBannerWaves(ctx, width, height, rankColor, random);
+  drawBannerShapes(ctx, width, height, rankColor, random);
+  drawBannerAccents(ctx, width, height, rankColor, random);
+
+  ctx.restore();
+}
+
+// Draw horizontal flowing waves - perfect for wide banner format
+function drawBannerWaves(ctx, width, height, color, random) {
+  ctx.strokeStyle = color;
+
+  // Main flowing wave across top area
+  ctx.lineWidth = 4;
+  ctx.globalAlpha = 0.25;
+  ctx.beginPath();
+  const wave1Y = 30 + random(1) * 60;
+  ctx.moveTo(-50, wave1Y);
+  for (let x = 0; x <= width + 100; x += 20) {
+    const progress = x / width;
+    const waveY = wave1Y + Math.sin(progress * Math.PI * 3 + random(2) * Math.PI) * (25 + random(3) * 20);
+    ctx.lineTo(x, waveY);
+  }
+  ctx.stroke();
+
+  // Secondary wave in middle area
+  ctx.lineWidth = 6;
+  ctx.globalAlpha = 0.15;
+  ctx.beginPath();
+  const wave2Y = height * 0.4 + random(4) * 40;
+  ctx.moveTo(-50, wave2Y);
+  for (let x = 0; x <= width + 100; x += 25) {
+    const progress = x / width;
+    const waveY = wave2Y + Math.sin(progress * Math.PI * 2.5 + random(5) * Math.PI) * (30 + random(6) * 25);
+    ctx.lineTo(x, waveY);
+  }
+  ctx.stroke();
+
+  // Subtle wave near bottom
+  ctx.lineWidth = 3;
+  ctx.globalAlpha = 0.2;
+  ctx.beginPath();
+  const wave3Y = height * 0.75 + random(7) * 30;
+  ctx.moveTo(-50, wave3Y);
+  for (let x = 0; x <= width + 100; x += 15) {
+    const progress = x / width;
+    const waveY = wave3Y + Math.sin(progress * Math.PI * 4 + random(8) * Math.PI) * (15 + random(9) * 15);
+    ctx.lineTo(x, waveY);
+  }
+  ctx.stroke();
+
+  // Diagonal flowing lines (subtle, in corners)
+  ctx.lineWidth = 2;
+  ctx.globalAlpha = 0.1;
+  const diagonalCount = 3 + Math.floor(random(10) * 3);
+  for (let i = 0; i < diagonalCount; i++) {
+    ctx.beginPath();
+    const startX = random(11 + i) * width * 0.3;
+    const startY = -20 + random(12 + i) * 40;
+    const endX = startX + 200 + random(13 + i) * 300;
+    const endY = height + 20;
+
+    ctx.moveTo(startX, startY);
+    // Add slight curve to diagonal
+    const midX = (startX + endX) / 2 + (random(14 + i) - 0.5) * 100;
+    const midY = (startY + endY) / 2;
+    ctx.quadraticCurveTo(midX, midY, endX, endY);
+    ctx.stroke();
+  }
+}
+
+// Draw subtle geometric shapes scattered across banner
+function drawBannerShapes(ctx, width, height, color, random) {
+  ctx.fillStyle = color;
+
+  // Small circles (positioned to not interfere with main content)
+  const circleCount = 4 + Math.floor(random(20) * 3);
+  for (let i = 0; i < circleCount; i++) {
+    const x = random(21 + i * 2) * width;
+    const y = random(22 + i * 2) * height;
+    const radius = 4 + random(23 + i) * 12;
+
+    ctx.globalAlpha = 0.12 + random(24 + i) * 0.1;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  // Small triangles
+  const triangleCount = 2 + Math.floor(random(30) * 2);
+  for (let i = 0; i < triangleCount; i++) {
+    const x = random(31 + i * 2) * width;
+    const y = random(32 + i * 2) * height;
+    const size = 8 + random(33 + i) * 15;
+    const rotation = random(34 + i) * Math.PI * 2;
+
+    ctx.globalAlpha = 0.1 + random(35 + i) * 0.08;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.beginPath();
+    ctx.moveTo(0, -size * 0.6);
+    ctx.lineTo(-size * 0.5, size * 0.4);
+    ctx.lineTo(size * 0.5, size * 0.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Small rectangles/squares
+  const rectCount = 2 + Math.floor(random(40) * 2);
+  for (let i = 0; i < rectCount; i++) {
+    const x = random(41 + i * 2) * width;
+    const y = random(42 + i * 2) * height;
+    const w = 10 + random(43 + i) * 25;
+    const h = 6 + random(44 + i) * 15;
+    const rotation = random(45 + i) * Math.PI * 0.5; // 0-90 degrees
+
+    ctx.globalAlpha = 0.1 + random(46 + i) * 0.08;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+}
+
+// Draw corner and edge accent elements
+function drawBannerAccents(ctx, width, height, color, random) {
+  ctx.strokeStyle = color;
+
+  // Top-left corner accent (small cross pattern)
+  ctx.lineWidth = 3;
+  ctx.globalAlpha = 0.2;
+  const tlSize = 40 + random(50) * 30;
+  ctx.beginPath();
+  ctx.moveTo(0, tlSize * 0.4);
+  ctx.lineTo(tlSize, tlSize * 0.4);
+  ctx.moveTo(tlSize * 0.4, 0);
+  ctx.lineTo(tlSize * 0.4, tlSize);
+  ctx.stroke();
+
+  // Bottom-left corner accent
+  ctx.globalAlpha = 0.15;
+  const blSize = 30 + random(51) * 25;
+  ctx.beginPath();
+  ctx.moveTo(0, height - blSize * 0.5);
+  ctx.lineTo(blSize, height - blSize * 0.5);
+  ctx.moveTo(blSize * 0.5, height);
+  ctx.lineTo(blSize * 0.5, height - blSize);
+  ctx.stroke();
+
+  // Right edge decorative dots
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.12;
+  const dotCount = 3 + Math.floor(random(52) * 3);
+  for (let i = 0; i < dotCount; i++) {
+    const dotY = (height / (dotCount + 1)) * (i + 1) + (random(53 + i) - 0.5) * 30;
+    const dotX = width - 15 - random(54 + i) * 30;
+    const dotRadius = 3 + random(55 + i) * 5;
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, dotRadius, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  // Subtle gradient overlay from edges (vignette-like effect)
+  const gradientLeft = ctx.createLinearGradient(0, 0, width * 0.15, 0);
+  gradientLeft.addColorStop(0, color);
+  gradientLeft.addColorStop(1, 'transparent');
+  ctx.globalAlpha = 0.05;
+  ctx.fillStyle = gradientLeft;
+  ctx.fillRect(0, 0, width * 0.15, height);
+
+  const gradientRight = ctx.createLinearGradient(width, 0, width * 0.85, 0);
+  gradientRight.addColorStop(0, color);
+  gradientRight.addColorStop(1, 'transparent');
+  ctx.fillStyle = gradientRight;
+  ctx.fillRect(width * 0.85, 0, width * 0.15, height);
+}
+
 // Draw corner accent elements
 function drawCornerAccents(ctx, rankColors) {
   // Top-left corner accent
@@ -728,4 +924,5 @@ module.exports = {
   drawZigzagPattern,
   drawGeometricShapes,
   drawCornerAccents,
+  drawProceduralBannerBackground,
 };

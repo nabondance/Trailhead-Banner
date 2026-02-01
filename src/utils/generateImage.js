@@ -15,6 +15,7 @@ const {
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
+  drawProceduralBannerBackground,
 } = require('./drawUtils');
 import { getImage, getLocal, getCertificationFileName } from './cacheUtils';
 import { uploadImage } from './blobUtils';
@@ -121,6 +122,12 @@ export const generateImage = async (options) => {
       case 'monochromatic':
         ctx.fillStyle = options.backgroundColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        break;
+      case 'procedural':
+        // Generate unique procedural background seeded by username
+        const username = options.rankData?.profileUser?.Slug || options.rankData?.profileUser?.Id || 'default';
+        const rank = options.rankData?.rank?.title || 'Scout';
+        drawProceduralBannerBackground(ctx, canvas.width, canvas.height, username, rank);
         break;
       default:
         ctx.fillStyle = options.backgroundColor;
