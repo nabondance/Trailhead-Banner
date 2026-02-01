@@ -139,15 +139,21 @@ async function prepareBackground(options) {
       case 'customUrl':
       case 'upload':
         if (options.backgroundImageUrl) {
-          // For upload, backgroundImageUrl is a data URL (already validated)
-          // For custom URLs, validate first
-          if (options.backgroundKind === 'customUrl' && !(await isValidImageType(options.backgroundImageUrl))) {
-            throw new Error('Unsupported image type');
+          let bgImage;
+
+          if (options.backgroundKind === 'upload') {
+            // For upload, backgroundImageUrl is a data URL - load directly
+            bgImage = await loadImage(options.backgroundImageUrl);
+          } else {
+            // For custom URLs, validate first then use getImage
+            if (!(await isValidImageType(options.backgroundImageUrl))) {
+              throw new Error('Unsupported image type');
+            }
+            const bgImageResult = await getImage(options.backgroundImageUrl, 'background');
+            const bgImageBuffer = bgImageResult.buffer || bgImageResult;
+            bgImage = await loadImage(bgImageBuffer);
           }
 
-          const bgImageResult = await getImage(options.backgroundImageUrl, 'background');
-          const bgImageBuffer = bgImageResult.buffer || bgImageResult;
-          const bgImage = await loadImage(bgImageBuffer);
           backgroundData = { type: 'image', image: bgImage };
         }
         break;
