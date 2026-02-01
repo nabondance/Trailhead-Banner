@@ -352,7 +352,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 ))}
               </div>
             )}
-            <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+            {options.backgroundKind !== 'procedural' && (
+              <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+            )}
           </fieldset>
           <fieldset>
             <legend>Counter Options</legend>
