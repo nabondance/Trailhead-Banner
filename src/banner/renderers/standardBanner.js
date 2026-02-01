@@ -101,7 +101,7 @@ async function generateStandardBanner(data, options = {}) {
   // 3. Counters (fixed position in top area)
   const counterStartX = 160;
   const counterStartY = 5;
-  countersRenderTiming = await Counters.renderCounters(
+  const countersRenderTiming = await Counters.renderCounters(
     ctx,
     countersPrep,
     counterStartX,
