@@ -255,7 +255,7 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
       certificationsLogos.map(({ logo }) => logo),
       layout.availableWidth,
       layout.availableHeight,
-      layout.spacing || 5,
+      layout.spacing ?? 5,
       options.certificationAlignment
     );
   }
@@ -297,7 +297,7 @@ async function renderCertifications(ctx, prepared, startX, startY) {
   }
 
   const { logos, layout } = prepared;
-  const certifSpacing = layout.spacing || 5;
+  const certifSpacing = layout.spacing ?? 5;
 
   let currentY = startY;
   let currentLine = 0;
