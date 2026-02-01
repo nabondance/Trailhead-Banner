@@ -98,31 +98,16 @@ async function generateStandardBanner(data, options = {}) {
   // 2. Rank Logo (top-left)
   await RankLogo.renderRankLogo(ctx, rankLogoPrep, 0, 0);
 
-  // 3. Counters (to the right of rank logo)
-  // Use scaled width and only render if rank logo is actually rendered
-  let countersRenderTiming = { render_ms: 0 };
-  if (rankLogoPrep.shouldRender) {
-    const rankDimensions = RankLogo.getRankLogoDimensions(rankLogoPrep);
-    const counterStartX = rankDimensions.width + 40;
-    const counterStartY = 5;
-    countersRenderTiming = await Counters.renderCounters(
-      ctx,
-      countersPrep,
-      counterStartX,
-      counterStartY,
-      options.badgeLabelColor
-    );
-  } else {
-    const counterStartX = 40;
-    const counterStartY = 5;
-    countersRenderTiming = await Counters.renderCounters(
-      ctx,
-      countersPrep,
-      counterStartX,
-      counterStartY,
-      options.badgeLabelColor
-    );
-  }
+  // 3. Counters (fixed position in top area)
+  const counterStartX = 160;
+  const counterStartY = 5;
+  countersRenderTiming = await Counters.renderCounters(
+    ctx,
+    countersPrep,
+    counterStartX,
+    counterStartY,
+    options.badgeLabelColor
+  );
   timings.counters_draw_ms = countersRenderTiming.render_ms;
 
   // 4. Agentblazer (top area, fixed position)
