@@ -99,30 +99,19 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
     };
   }
 
-  // Calculate superbadge layout
+  // Calculate superbadge layout with overlapping (matching old behavior)
   const superbadgeLogoHeight = layout.logoHeight;
   const superbadgeLogoWidth = superbadgeLogoHeight; // Assuming square logos
-  let superbadgeSpacing = 10;
+  let superbadgeSpacing = 10; // Default spacing
   const superbadgeAvailableWidth = layout.availableWidth;
 
-  // Handle single-item case to avoid division by zero
-  let totalSuperbadgeWidth;
-  if (validImages.length === 1) {
-    superbadgeSpacing = 0;
-    totalSuperbadgeWidth = superbadgeLogoWidth;
-  } else {
-    // Calculate total width required for superbadges
-    totalSuperbadgeWidth = validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
+  // Calculate total width required for superbadges
+  const totalSuperbadgeWidth = validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
 
-    // Adjust spacing if total width exceeds available space
-    if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
-      superbadgeSpacing =
-        (superbadgeAvailableWidth - validImages.length * superbadgeLogoWidth) / (validImages.length - 1);
-      // Clamp spacing to non-negative value
-      superbadgeSpacing = Math.max(0, superbadgeSpacing);
-      // Recalculate total width with adjusted spacing
-      totalSuperbadgeWidth = validImages.length * superbadgeLogoWidth + (validImages.length - 1) * superbadgeSpacing;
-    }
+  // Adjust spacing if total width exceeds available space (can go negative for overlap)
+  if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
+    superbadgeSpacing =
+      (superbadgeAvailableWidth - validImages.length * superbadgeLogoWidth) / (validImages.length - 1);
   }
 
   // Calculate starting X position based on alignment
@@ -130,7 +119,7 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
 
   if (totalSuperbadgeWidth > superbadgeAvailableWidth) {
     // When compressed, always start from left edge of available area
-    superbadgeStartX = 0; // Relative to the available area
+    superbadgeStartX = 0;
   } else {
     // When there's enough space, apply alignment
     if (options.superbadgeAlignment === 'left') {
@@ -170,7 +159,7 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
 }
 
 /**
- * Render superbadges to canvas
+ * Render superbadges to canvas (with overlapping if needed)
  * @param {CanvasRenderingContext2D} ctx - Canvas context
  * @param {Object} prepared - Prepared superbadge data from prepareSuperbadges()
  * @param {number} absoluteX - Absolute X position for the available area
@@ -189,6 +178,7 @@ async function renderSuperbadges(ctx, prepared, absoluteX, y) {
   const { images, layout } = prepared;
   let currentX = absoluteX + layout.startX;
 
+  // Render badges with spacing (can be negative for overlapping effect)
   for (const logo of images) {
     if (logo) {
       ctx.drawImage(logo, currentX, y, layout.logoWidth, layout.logoHeight);
