@@ -47,6 +47,11 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
   const startTime = Date.now();
   const warnings = [];
 
+  // Validate layout parameters
+  if (!layout || !Number.isFinite(layout.availableWidth) || !Number.isFinite(layout.availableHeight)) {
+    throw new Error('prepareCertifications: missing or invalid layout.availableWidth/availableHeight');
+  }
+
   // Filter certifications
   let certifications = filterCertifications(certificationsData?.certifications, options);
   const totalCertifications = certifications.length;
@@ -297,6 +302,15 @@ async function renderCertifications(ctx, prepared, startX, startY) {
   }
 
   const { logos, layout } = prepared;
+
+  // Guard against missing layout
+  if (!layout) {
+    console.warn('No layout data available for certifications rendering');
+    return {
+      render_ms: 0,
+    };
+  }
+
   const certifSpacing = layout.spacing ?? 5;
 
   let currentY = startY;
