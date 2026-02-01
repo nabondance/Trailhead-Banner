@@ -3,16 +3,16 @@
  * Composable rendering components for banner generation
  */
 
-const Background = require('./background');
-const RankLogo = require('./rankLogo');
-const Counters = require('./counters');
-const Certifications = require('./certifications');
-const Superbadges = require('./superbadges');
-const Agentblazer = require('./agentblazer');
-const MvpRibbon = require('./mvpRibbon');
-const Watermark = require('./watermark');
+import * as Background from './background.js';
+import * as RankLogo from './rankLogo.js';
+import * as Counters from './counters.js';
+import * as Certifications from './certifications.js';
+import * as Superbadges from './superbadges.js';
+import * as Agentblazer from './agentblazer.js';
+import * as MvpRibbon from './mvpRibbon.js';
+import * as Watermark from './watermark.js';
 
-module.exports = {
+export {
   Background,
   RankLogo,
   Counters,

@@ -1,5 +1,5 @@
-const { getCountersConfig, getCounterPointText } = require('../../utils/imageUtils');
-const { drawBadgeCounter } = require('../../utils/drawUtils');
+import { getCountersConfig, getCounterPointText } from '../../utils/imageUtils.js';
+import { drawBadgeCounter } from '../../utils/drawUtils.js';
 
 /**
  * Counter Badges Component
@@ -156,7 +156,7 @@ function getCountersLayout(prepared) {
   };
 }
 
-module.exports = {
+export {
   prepareCounters,
   renderCounters,
   getCountersWarnings,

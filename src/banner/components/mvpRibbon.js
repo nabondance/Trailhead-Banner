@@ -1,5 +1,5 @@
-const { loadImage } = require('@napi-rs/canvas');
-const path = require('path');
+import { loadImage } from '@napi-rs/canvas';
+import path from 'path';
 
 /**
  * MVP Ribbon Component
@@ -104,7 +104,7 @@ function getMvpRibbonTimings(prepared) {
   return prepared?.timings || {};
 }
 
-module.exports = {
+export {
   prepareMvpRibbon,
   renderMvpRibbon,
   getMvpRibbonWarnings,

@@ -1,5 +1,5 @@
-const { loadImage } = require('@napi-rs/canvas');
-const path = require('path');
+import { loadImage } from '@napi-rs/canvas';
+import path from 'path';
 
 /**
  * Watermark Component
@@ -88,7 +88,7 @@ function getWatermarkTimings(prepared) {
   return prepared?.timings || {};
 }
 
-module.exports = {
+export {
   prepareWatermark,
   renderWatermark,
   getWatermarkWarnings,

@@ -1,5 +1,5 @@
-const { loadImage } = require('@napi-rs/canvas');
-const { getImage, getLocal } = require('../../utils/cacheUtils');
+import { loadImage } from '@napi-rs/canvas';
+import { getImage, getLocal } from '../../utils/cacheUtils.js';
 
 /**
  * Rank Logo Component
@@ -142,7 +142,7 @@ function getRankLogoDimensions(prepared) {
   };
 }
 
-module.exports = {
+export {
   prepareRankLogo,
   renderRankLogo,
   getRankLogoWarnings,

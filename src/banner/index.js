@@ -3,10 +3,10 @@
  * Component-based banner generation system
  */
 
-const components = require('./components');
-const renderers = require('./renderers');
+import * as components from './components/index.js';
+import * as renderers from './renderers/index.js';
 
-module.exports = {
+export {
   components,
   renderers,
 };

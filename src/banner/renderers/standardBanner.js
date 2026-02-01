@@ -1,6 +1,6 @@
-const { createCanvas } = require('@napi-rs/canvas');
-const crypto = require('crypto');
-const {
+import { createCanvas } from '@napi-rs/canvas';
+import crypto from 'crypto';
+import {
   Background,
   RankLogo,
   Counters,
@@ -9,7 +9,7 @@ const {
   Agentblazer,
   MvpRibbon,
   Watermark,
-} = require('../components');
+} from '../components/index.js';
 
 /**
  * Standard Banner Renderer
@@ -159,7 +159,7 @@ async function generateStandardBanner(data, options) {
   return { bannerUrl, warnings, hash, timings };
 }
 
-module.exports = {
+export {
   generateStandardBanner,
   CANVAS_WIDTH,
   CANVAS_HEIGHT,

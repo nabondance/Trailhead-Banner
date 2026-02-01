@@ -1,6 +1,6 @@
-const { logOptions } = require('./dataUtils');
-const { generateStandardBanner } = require('../banner/renderers/standardBanner');
-require('./fonts');
+import { logOptions } from './dataUtils.js';
+import { generateStandardBanner } from '../banner/renderers/standardBanner.js';
+import './fonts.js';
 
 /**
  * Generate banner image using component-based renderer

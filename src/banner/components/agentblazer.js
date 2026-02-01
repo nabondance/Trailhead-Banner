@@ -1,6 +1,6 @@
-const { loadImage } = require('@napi-rs/canvas');
-const { getLocal } = require('../../utils/cacheUtils');
-const { getHighestAgentblazerRankPerYear } = require('../../utils/dataUtils');
+import { loadImage } from '@napi-rs/canvas';
+import { getLocal } from '../../utils/cacheUtils.js';
+import { getHighestAgentblazerRankPerYear } from '../../utils/dataUtils.js';
 
 /**
  * Agentblazer Rank Component
@@ -143,7 +143,7 @@ function getAgentblazerDimensions(prepared) {
   };
 }
 
-module.exports = {
+export {
   prepareAgentblazer,
   renderAgentblazer,
   getAgentblazerWarnings,

@@ -1,8 +1,8 @@
-const { loadImage } = require('@napi-rs/canvas');
-const path = require('path');
-const fs = require('fs');
-const { drawProceduralBannerBackground } = require('../../utils/drawUtils');
-const { getImage } = require('../../utils/cacheUtils');
+import { loadImage } from '@napi-rs/canvas';
+import path from 'path';
+import fs from 'fs';
+import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
+import { getImage } from '../../utils/cacheUtils.js';
 
 /**
  * Background Component
@@ -209,7 +209,7 @@ function getBackgroundTimings(prepared) {
   return prepared?.timings || {};
 }
 
-module.exports = {
+export {
   prepareBackground,
   renderBackground,
   getBackgroundWarnings,

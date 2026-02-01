@@ -1,9 +1,9 @@
-const { createCanvas, loadImage } = require('@napi-rs/canvas');
-const { getLocalCertificationData } = require('../../utils/dataUtils');
-const { calculateCertificationsDesign, sortCertifications } = require('../../utils/imageUtils');
-const { applyGrayscale, cropImage, generatePlusXCertificationsSvg } = require('../../utils/drawUtils');
-const { getImage, getCertificationFileName } = require('../../utils/cacheUtils');
-const { uploadImage } = require('../../utils/blobUtils');
+import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { getLocalCertificationData } from '../../utils/dataUtils.js';
+import { calculateCertificationsDesign, sortCertifications } from '../../utils/imageUtils.js';
+import { applyGrayscale, cropImage, generatePlusXCertificationsSvg } from '../../utils/drawUtils.js';
+import { getImage, getCertificationFileName } from '../../utils/cacheUtils.js';
+import { uploadImage } from '../../utils/blobUtils.js';
 
 /**
  * Certifications Grid Component
@@ -338,7 +338,7 @@ function getCertificationsCounts(prepared) {
   return prepared?.counts || { total: 0, displayed: 0, hidden: 0 };
 }
 
-module.exports = {
+export {
   prepareCertifications,
   renderCertifications,
   getCertificationsWarnings,

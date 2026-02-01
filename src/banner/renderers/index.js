@@ -3,8 +3,8 @@
  * Different banner type composers
  */
 
-const { generateStandardBanner } = require('./standardBanner');
+import { generateStandardBanner } from './standardBanner.js';
 
-module.exports = {
+export {
   generateStandardBanner,
 };

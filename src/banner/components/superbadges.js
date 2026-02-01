@@ -1,6 +1,6 @@
-const { loadImage } = require('@napi-rs/canvas');
-const { generatePlusXSuperbadgesSvg } = require('../../utils/drawUtils');
-const { getImage } = require('../../utils/cacheUtils');
+import { loadImage } from '@napi-rs/canvas';
+import { generatePlusXSuperbadgesSvg } from '../../utils/drawUtils.js';
+import { getImage } from '../../utils/cacheUtils.js';
 
 /**
  * Superbadges Component
@@ -217,7 +217,7 @@ function getSuperbadgesCounts(prepared) {
   return prepared?.counts || { total: 0, displayed: 0, hidden: 0 };
 }
 
-module.exports = {
+export {
   prepareSuperbadges,
   renderSuperbadges,
   getSuperbadgesWarnings,
