@@ -165,7 +165,7 @@ Instead of asking for details, read these directly:
 
 ### Directory Structure
 
-```
+```text
 src/banner/
 ├── components/        # Reusable components (background, logos, certifications)
 │   ├── background.js
