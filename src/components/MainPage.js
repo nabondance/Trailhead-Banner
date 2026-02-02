@@ -39,7 +39,7 @@ const MainPage = () => {
     setMainInfo([]); // Clear previous info messages using empty array
 
     try {
-      const response = await fetch('/api/generate-image', {
+      const response = await fetch('/api/banner/standard', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

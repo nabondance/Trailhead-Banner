@@ -142,7 +142,7 @@ const RewindPage = () => {
 
     try {
       console.debug('Generating Trailhead Rewind for:', username);
-      const response = await fetch('/api/generate-rewind', {
+      const response = await fetch('/api/banner/rewind', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, year: YEAR }),

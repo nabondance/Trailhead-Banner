@@ -5,11 +5,11 @@
     }
   },
   "functions": {
-    "src/pages/api/generate-image.js": {
+    "src/pages/api/banner/standard.js": {
       "maxDuration": 20,
       "memory": 1024
     },
-    "src/pages/api/generate-rewind.js": {
+    "src/pages/api/banner/rewind.js": {
       "maxDuration": 20,
       "memory": 1024
     },
