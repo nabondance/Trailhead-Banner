@@ -104,7 +104,7 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
   return certifications;
 };
 
-const getCountersConfig = (options) => {
+const getCountersConfig = (options = {}) => {
   const counter = options.counterOrder?.length || 0;
 
   let badgeCounterScale = 1;

@@ -1,20 +1,15 @@
-const { createCanvas, loadImage } = require('@napi-rs/canvas');
+import { createCanvas, loadImage, ImageData } from '@napi-rs/canvas';
 
-const applyGrayscale = (ctx, x, y, width, height) => {
-  const imageData = ctx.getImageData(x, y, width, height);
-  const data = imageData.data;
+const applyGrayscaleToCanvas = (sourceCanvas) => {
+  // Create a new canvas for the grayscale version
+  const grayCanvas = createCanvas(sourceCanvas.width, sourceCanvas.height);
+  const grayCtx = grayCanvas.getContext('2d');
 
-  for (let i = 0; i < data.length; i += 4) {
-    const isTransparent = data[i + 3] === 0;
-    if (!isTransparent) {
-      // Apply grayscale to non-transparent pixels
-      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      data[i] = avg; // Red
-      data[i + 1] = avg; // Green
-      data[i + 2] = avg; // Blue
-    }
-  }
-  ctx.putImageData(imageData, x, y);
+  // Apply grayscale filter and draw the source
+  grayCtx.filter = 'grayscale(100%)';
+  grayCtx.drawImage(sourceCanvas, 0, 0);
+
+  return grayCanvas;
 };
 
 const cropImage = (image) => {
@@ -920,8 +915,8 @@ function drawStylizedText(ctx, text, fontSize, x, y, style) {
   ctx.restore();
 }
 
-module.exports = {
-  applyGrayscale,
+export {
+  applyGrayscaleToCanvas,
   cropImage,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
