@@ -89,13 +89,13 @@ export function createTimingTracker() {
  */
 export function handleBannerError(error, res, context = 'banner', metadata = {}) {
   console.error(`Error generating ${context}:`, {
-    message: error.message,
-    stack: error.stack,
+    message: error?.message || String(error),
+    stack: error?.stack,
     ...metadata,
   });
 
   // Network connection errors
-  if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+  if (error?.code === 'ENOTFOUND' || error?.code === 'ECONNREFUSED') {
     return res.status(503).json({
       error: 'Service unavailable',
       message: 'Unable to connect to Trailhead services. Please try again later.',
@@ -103,9 +103,9 @@ export function handleBannerError(error, res, context = 'banner', metadata = {})
   }
 
   // HTTP response errors
-  if (error.response) {
+  if (error?.response) {
     const status = error.response.status;
-    console.error('Response data:', error.response.data);
+    console.error('Response data:', error.response?.data);
     console.error('Response status:', status);
 
     if (status === 404) {
@@ -136,7 +136,7 @@ export function handleBannerError(error, res, context = 'banner', metadata = {})
   }
 
   // Request errors (no response received)
-  if (error.request) {
+  if (error?.request) {
     console.error('Request failed:', error.request);
     return res.status(503).json({
       error: 'Network error',

@@ -28,9 +28,17 @@ export default async function handler(req, res) {
 
   const startTime = Date.now();
   const timings = createTimingTracker();
-  const options = req.body;
+  const options = req.body || {};
 
   try {
+    // Validate required fields
+    if (!options.username) {
+      return res.status(400).json({
+        error: 'Username is required',
+        validationError: true,
+      });
+    }
+
     // Username validation (with caching optimization)
     const shouldValidate = !options.lastValidatedUsername || options.lastValidatedUsername !== options.username;
 
@@ -141,6 +149,6 @@ export default async function handler(req, res) {
       timings: allTimings,
     });
   } catch (error) {
-    return handleBannerError(error, res, 'standard banner', { username: options.username });
+    return handleBannerError(error, res, 'standard banner', { username: options?.username });
   }
 }

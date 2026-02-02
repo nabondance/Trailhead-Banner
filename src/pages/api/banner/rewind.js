@@ -46,7 +46,7 @@ export default async function handler(req, res) {
 
   const startTime = Date.now();
   const timings = createTimingTracker();
-  const { username: rawUsername, year = 2025 } = req.body;
+  const { username: rawUsername, year = 2025 } = req.body || {};
 
   // Sanitize and validate input
   const username = sanitizeUsername(rawUsername);
@@ -158,6 +158,6 @@ export default async function handler(req, res) {
       timings: allTimings,
     });
   } catch (error) {
-    return handleBannerError(error, res, 'rewind', { username, year });
+    return handleBannerError(error, res, 'rewind', { username: username ?? 'unknown', year: year ?? 'unknown' });
   }
 }
