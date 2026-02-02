@@ -4,6 +4,7 @@ import { getMaintenanceInfoMessages } from '../../../utils/certificationMaintena
 import { validateUsername, validateContentLength } from '../../../banner/api/validators';
 import { buildStandardQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, createTimingTracker, handleBannerError } from '../../../banner/api/shared';
+import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 export const config = {
   api: {

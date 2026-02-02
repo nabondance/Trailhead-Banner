@@ -2,6 +2,7 @@ import SupabaseUtils from '../../../utils/supabaseUtils';
 import { generateRewind } from '../../../utils/generateRewind';
 import { buildRewindQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, createTimingTracker, handleBannerError } from '../../../banner/api/shared';
+import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 /**
  * Input validation helper
