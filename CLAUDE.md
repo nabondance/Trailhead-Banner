@@ -26,14 +26,14 @@ Generates LinkedIn banner images from Trailhead user data (badges, certification
 
 ## Critical Files (Read These First)
 
-| File                              | Purpose                     |
-| --------------------------------- | --------------------------- |
-| `src/utils/generateImage.js`      | Core image generation logic |
-| `src/utils/drawUtils.js`          | Canvas drawing operations   |
-| `src/utils/graphqlUtils.js`       | Trailhead API integration   |
-| `src/pages/api/generate-image.js` | Main API endpoint           |
-| `src/data/banners.json`           | Background image metadata   |
-| `src/components/BannerForm.js`    | Main user interface         |
+| File                                     | Purpose                      |
+| ---------------------------------------- | ---------------------------- |
+| `src/banner/renderers/standardBanner.js` | Standard banner renderer     |
+| `src/banner/api/shared.js`               | Shared API utilities         |
+| `src/utils/graphqlUtils.js`              | Trailhead API integration    |
+| `src/pages/api/banner/standard.js`       | Standard banner API endpoint |
+| `src/data/banners.json`                  | Background image metadata    |
+| `src/components/BannerForm.js`           | Main user interface          |
 
 ## Architecture Patterns
 
@@ -45,7 +45,7 @@ graph TB
     B --> C[POST /api/validate-username]
     C --> D{Valid?}
     D -->|No| E[Show Error]
-    D -->|Yes| F[POST /api/generate-image]
+    D -->|Yes| F[POST /api/banner/standard]
     F --> G[graphqlUtils.js]
     G --> H{Redis Cache Hit?}
     H -->|Yes| I[Return Cached Data]

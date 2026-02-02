@@ -43,7 +43,7 @@ EOF
 
 # Call the API and capture response
 START=$(date +%s)
-RESPONSE=$(curl -s -X POST http://localhost:3000/api/generate-image \
+RESPONSE=$(curl -s -X POST http://localhost:3000/api/banner/standard \
   -H "Content-Type: application/json" \
   -d "$PAYLOAD")
 END=$(date +%s)

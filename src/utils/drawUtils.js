@@ -87,14 +87,49 @@ const cropImage = (image) => {
   return croppedCanvas;
 };
 
+// Load and cache the Anta font as base64
+let antaFontBase64 = null;
+function getAntaFontBase64() {
+  if (!antaFontBase64) {
+    const fs = require('fs');
+    const path = require('path');
+    const fontPath = path.join(process.cwd(), 'public/assets/fonts/Anta-Regular.ttf');
+
+    try {
+      const fontBuffer = fs.readFileSync(fontPath);
+      antaFontBase64 = fontBuffer.toString('base64');
+    } catch (error) {
+      // Fallback: try relative to this file
+      const fallbackPath = path.join(__dirname, '../../public/assets/fonts/Anta-Regular.ttf');
+      try {
+        const fontBuffer = fs.readFileSync(fallbackPath);
+        antaFontBase64 = fontBuffer.toString('base64');
+      } catch (fallbackError) {
+        throw new Error('Could not load Anta font from any path');
+      }
+    }
+  }
+  return antaFontBase64;
+}
+
 const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor) => {
   let labelToDisplay = label;
   if (message != 0) {
     labelToDisplay += 's';
   }
 
+  const fontBase64 = getAntaFontBase64();
   const counterBadgeSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="35" role="img">
-      <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Anta';
+        src: url(data:font/truetype;base64,${fontBase64}) format('truetype');
+        font-weight: normal;
+        font-style: normal;
+      }
+    </style>
+  </defs>
   <linearGradient id="s" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
         <stop offset="1" stop-opacity=".1" />
