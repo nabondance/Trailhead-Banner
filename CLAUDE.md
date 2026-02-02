@@ -163,7 +163,7 @@ Instead of asking for details, read these directly:
 
 ## Banner Component Architecture
 
-### Directory Structure
+### Banner Directory Structure
 
 ```text
 src/banner/
