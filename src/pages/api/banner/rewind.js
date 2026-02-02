@@ -2,38 +2,25 @@ import SupabaseUtils from '../../../utils/supabaseUtils';
 import { generateRewind } from '../../../utils/generateRewind';
 import { buildRewindQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, createTimingTracker, handleBannerError } from '../../../banner/api/shared';
+import { validateUsername } from '../../../banner/api/validators';
 import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
+};
+
 /**
- * Input validation helper
+ * Validate year parameter
  */
-function validateInput(username, year) {
-  const errors = [];
-
-  if (!username) {
-    errors.push('Username is required');
-  } else if (typeof username !== 'string') {
-    errors.push('Username must be a string');
-  } else if (username.length < 4) {
-    errors.push('Username must be at least 4 characters long');
-  } else if (username.length > 64) {
-    errors.push('Username is too long (max 64 characters)');
-  } else if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
-    errors.push('Username contains invalid characters');
-  }
-
+function validateYear(year) {
   if (year && (typeof year !== 'number' || year < 2020 || year > new Date().getFullYear() + 1)) {
-    errors.push('Invalid year provided');
+    return { valid: false, error: 'Invalid year provided' };
   }
-
-  return errors;
-}
-
-/**
- * Sanitize username input
- */
-function sanitizeUsername(username) {
-  return username?.toString().trim().toLowerCase().substring(0, 64);
+  return { valid: true };
 }
 
 export default async function handler(req, res) {
@@ -46,16 +33,30 @@ export default async function handler(req, res) {
 
   const startTime = Date.now();
   const timings = createTimingTracker();
-  const { username: rawUsername, year = 2025 } = req.body || {};
+  const { username, year = 2025 } = req.body || {};
 
-  // Sanitize and validate input
-  const username = sanitizeUsername(rawUsername);
-  const validationErrors = validateInput(username, year);
-
-  if (validationErrors.length > 0) {
+  // Validate username
+  if (!username) {
     return res.status(400).json({
-      error: 'Invalid input',
-      details: validationErrors,
+      error: 'Username is required',
+      validationError: true,
+    });
+  }
+
+  const usernameValidation = await validateUsername(username);
+  if (!usernameValidation.valid) {
+    return res.status(400).json({
+      error: usernameValidation.message,
+      validationError: true,
+    });
+  }
+
+  // Validate year
+  const yearValidation = validateYear(year);
+  if (!yearValidation.valid) {
+    return res.status(400).json({
+      error: yearValidation.error,
+      validationError: true,
     });
   }
 
