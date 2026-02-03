@@ -60,8 +60,8 @@ importers:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       npm:
-        specifier: ^11.2.0
-        version: 11.4.1
+        specifier: ^11.8.0
+        version: 11.8.0
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -2219,8 +2219,8 @@ packages:
     resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
 
-  npm@11.4.1:
-    resolution: {integrity: sha512-/O5DiEFmtvnF0EU1+5VlDpcItpSKH3l+3fQOl3hkZ3ilGN+jJlGxxi/zb0rEK+zxd8pGyifVPyS1ORkMjZGAKw==}
+  npm@11.8.0:
+    resolution: {integrity: sha512-n19sJeW+RGKdkHo8SCc5xhSwkKhQUFfZaFzSc+EsYXLjSqIV0tl72aDYQVuzVvfrbysGwdaQsNLNy58J10EBSQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
     bundledDependencies:
@@ -2229,6 +2229,7 @@ packages:
       - '@npmcli/config'
       - '@npmcli/fs'
       - '@npmcli/map-workspaces'
+      - '@npmcli/metavuln-calculator'
       - '@npmcli/package-json'
       - '@npmcli/promise-spawn'
       - '@npmcli/redact'
@@ -2266,7 +2267,6 @@ packages:
       - ms
       - node-gyp
       - nopt
-      - normalize-package-data
       - npm-audit-report
       - npm-install-checks
       - npm-package-arg
@@ -5340,7 +5340,7 @@ snapshots:
 
   normalize-range@0.1.2: {}
 
-  npm@11.4.1: {}
+  npm@11.8.0: {}
 
   num2fraction@1.2.2: {}
 
