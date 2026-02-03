@@ -10,13 +10,13 @@ importers:
     dependencies:
       '@dnd-kit/core':
         specifier: ^6.3.1
-        version: 6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 6.3.1(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
       '@dnd-kit/sortable':
         specifier: ^10.0.0
-        version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.1.0(react@19.2.4))(react@19.2.4))(react@19.2.4)
       '@dnd-kit/utilities':
         specifier: ^3.2.2
-        version: 3.2.2(react@19.1.0)
+        version: 3.2.2(react@19.2.4)
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.7.2
         version: 6.7.2
@@ -25,7 +25,7 @@ importers:
         version: 6.7.2
       '@fortawesome/react-fontawesome':
         specifier: ^3.1.1
-        version: 3.1.1(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.1.0)
+        version: 3.1.1(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.2.4)
       '@napi-rs/canvas':
         specifier: ^0.1.89
         version: 0.1.89
@@ -34,7 +34,7 @@ importers:
         version: 2.50.3
       '@theme-toggles/react':
         specifier: ^4.1.0
-        version: 4.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 4.1.0(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
       '@upstash/redis':
         specifier: ^1.36.1
         version: 1.36.1
@@ -43,7 +43,7 @@ importers:
         version: 1.1.1
       '@vercel/speed-insights':
         specifier: ^1.3.1
-        version: 1.3.1(next@16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 1.3.1(next@16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.2.4))(react@19.2.4))(react@19.2.4)
       axios:
         specifier: ^1.13.4
         version: 1.13.4
@@ -55,28 +55,28 @@ importers:
         version: 0.3.7
       next:
         specifier: 16.1.6
-        version: 16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
       next-themes:
         specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 0.4.6(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
       npm:
         specifier: ^11.8.0
         version: 11.8.0
       react:
-        specifier: ^19.0.0
-        version: 19.1.0
+        specifier: ^19.2.4
+        version: 19.2.4
       react-dom:
         specifier: ^19.0.0
-        version: 19.1.0(react@19.1.0)
+        version: 19.1.0(react@19.2.4)
       react-github-btn:
         specifier: ^1.4.0
-        version: 1.4.0(react@19.1.0)
+        version: 1.4.0(react@19.2.4)
       react-select:
         specifier: ^5.10.2
-        version: 5.10.2(@types/react@19.2.7)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 5.10.2(@types/react@19.2.7)(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
       react-tooltip:
         specifier: ^5.30.0
-        version: 5.30.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 5.30.0(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -2593,8 +2593,8 @@ packages:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
 
-  react@19.1.0:
-    resolution: {integrity: sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==}
+  react@19.2.4:
+    resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
     engines: {node: '>=0.10.0'}
 
   readdirp@3.6.0:
@@ -3229,29 +3229,29 @@ snapshots:
     dependencies:
       postcss-selector-parser: 7.1.1
 
-  '@dnd-kit/accessibility@3.1.1(react@19.1.0)':
+  '@dnd-kit/accessibility@3.1.1(react@19.2.4)':
     dependencies:
-      react: 19.1.0
+      react: 19.2.4
       tslib: 2.8.1
 
-  '@dnd-kit/core@6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@dnd-kit/core@6.3.1(react-dom@19.1.0(react@19.2.4))(react@19.2.4)':
     dependencies:
-      '@dnd-kit/accessibility': 3.1.1(react@19.1.0)
-      '@dnd-kit/utilities': 3.2.2(react@19.1.0)
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      '@dnd-kit/accessibility': 3.1.1(react@19.2.4)
+      '@dnd-kit/utilities': 3.2.2(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.1.0(react@19.2.4)
       tslib: 2.8.1
 
-  '@dnd-kit/sortable@10.0.0(@dnd-kit/core@6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+  '@dnd-kit/sortable@10.0.0(@dnd-kit/core@6.3.1(react-dom@19.1.0(react@19.2.4))(react@19.2.4))(react@19.2.4)':
     dependencies:
-      '@dnd-kit/core': 6.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@dnd-kit/utilities': 3.2.2(react@19.1.0)
-      react: 19.1.0
+      '@dnd-kit/core': 6.3.1(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
+      '@dnd-kit/utilities': 3.2.2(react@19.2.4)
+      react: 19.2.4
       tslib: 2.8.1
 
-  '@dnd-kit/utilities@3.2.2(react@19.1.0)':
+  '@dnd-kit/utilities@3.2.2(react@19.2.4)':
     dependencies:
-      react: 19.1.0
+      react: 19.2.4
       tslib: 2.8.1
 
   '@dual-bundle/import-meta-resolve@4.2.1': {}
@@ -3300,17 +3300,17 @@ snapshots:
 
   '@emotion/memoize@0.9.0': {}
 
-  '@emotion/react@11.14.0(@types/react@19.2.7)(react@19.1.0)':
+  '@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.4)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/babel-plugin': 11.13.5
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
-      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.1.0)
+      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.2.4)
       '@emotion/utils': 1.4.2
       '@emotion/weak-memoize': 0.4.0
       hoist-non-react-statics: 3.3.2
-      react: 19.1.0
+      react: 19.2.4
     optionalDependencies:
       '@types/react': 19.2.7
     transitivePeerDependencies:
@@ -3328,9 +3328,9 @@ snapshots:
 
   '@emotion/unitless@0.10.0': {}
 
-  '@emotion/use-insertion-effect-with-fallbacks@1.2.0(react@19.1.0)':
+  '@emotion/use-insertion-effect-with-fallbacks@1.2.0(react@19.2.4)':
     dependencies:
-      react: 19.1.0
+      react: 19.2.4
 
   '@emotion/utils@1.4.2': {}
 
@@ -3410,10 +3410,10 @@ snapshots:
     dependencies:
       '@fortawesome/fontawesome-common-types': 6.7.2
 
-  '@fortawesome/react-fontawesome@3.1.1(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.1.0)':
+  '@fortawesome/react-fontawesome@3.1.1(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.2.4)':
     dependencies:
       '@fortawesome/fontawesome-svg-core': 6.7.2
-      react: 19.1.0
+      react: 19.2.4
 
   '@humanfs/core@0.19.1': {}
 
@@ -3739,10 +3739,10 @@ snapshots:
     transitivePeerDependencies:
       - ts-node
 
-  '@theme-toggles/react@4.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@theme-toggles/react@4.1.0(react-dom@19.1.0(react@19.2.4))(react@19.2.4)':
     dependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      react: 19.2.4
+      react-dom: 19.1.0(react@19.2.4)
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
@@ -3937,10 +3937,10 @@ snapshots:
       throttleit: 2.1.0
       undici: 5.28.5
 
-  '@vercel/speed-insights@1.3.1(next@16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+  '@vercel/speed-insights@1.3.1(next@16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.2.4))(react@19.2.4))(react@19.2.4)':
     optionalDependencies:
-      next: 16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      react: 19.1.0
+      next: 16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
@@ -5299,21 +5299,21 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next-themes@0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  next-themes@0.4.6(react-dom@19.1.0(react@19.2.4))(react@19.2.4):
     dependencies:
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      react: 19.2.4
+      react-dom: 19.1.0(react@19.2.4)
 
-  next@16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  next@16.1.6(@babel/core@7.28.6)(react-dom@19.1.0(react@19.2.4))(react@19.2.4):
     dependencies:
       '@next/env': 16.1.6
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.9.19
       caniuse-lite: 1.0.30001766
       postcss: 8.4.31
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      styled-jsx: 5.1.6(@babel/core@7.28.6)(react@19.1.0)
+      react: 19.2.4
+      react-dom: 19.1.0(react@19.2.4)
+      styled-jsx: 5.1.6(@babel/core@7.28.6)(react@19.2.4)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.1.6
       '@next/swc-darwin-x64': 16.1.6
@@ -5560,52 +5560,52 @@ snapshots:
 
   quick-lru@5.1.1: {}
 
-  react-dom@19.1.0(react@19.1.0):
+  react-dom@19.1.0(react@19.2.4):
     dependencies:
-      react: 19.1.0
+      react: 19.2.4
       scheduler: 0.26.0
 
-  react-github-btn@1.4.0(react@19.1.0):
+  react-github-btn@1.4.0(react@19.2.4):
     dependencies:
       github-buttons: 2.29.1
-      react: 19.1.0
+      react: 19.2.4
 
   react-is@16.13.1: {}
 
-  react-select@5.10.2(@types/react@19.2.7)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  react-select@5.10.2(@types/react@19.2.7)(react-dom@19.1.0(react@19.2.4))(react@19.2.4):
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/cache': 11.14.0
-      '@emotion/react': 11.14.0(@types/react@19.2.7)(react@19.1.0)
+      '@emotion/react': 11.14.0(@types/react@19.2.7)(react@19.2.4)
       '@floating-ui/dom': 1.7.4
       '@types/react-transition-group': 4.4.12(@types/react@19.2.7)
       memoize-one: 6.0.0
       prop-types: 15.8.1
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-      react-transition-group: 4.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      use-isomorphic-layout-effect: 1.2.1(@types/react@19.2.7)(react@19.1.0)
+      react: 19.2.4
+      react-dom: 19.1.0(react@19.2.4)
+      react-transition-group: 4.4.5(react-dom@19.1.0(react@19.2.4))(react@19.2.4)
+      use-isomorphic-layout-effect: 1.2.1(@types/react@19.2.7)(react@19.2.4)
     transitivePeerDependencies:
       - '@types/react'
       - supports-color
 
-  react-tooltip@5.30.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  react-tooltip@5.30.0(react-dom@19.1.0(react@19.2.4))(react@19.2.4):
     dependencies:
       '@floating-ui/dom': 1.7.4
       classnames: 2.5.1
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      react: 19.2.4
+      react-dom: 19.1.0(react@19.2.4)
 
-  react-transition-group@4.4.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  react-transition-group@4.4.5(react-dom@19.1.0(react@19.2.4))(react@19.2.4):
     dependencies:
       '@babel/runtime': 7.28.4
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
+      react: 19.2.4
+      react-dom: 19.1.0(react@19.2.4)
 
-  react@19.1.0: {}
+  react@19.2.4: {}
 
   readdirp@3.6.0:
     dependencies:
@@ -5911,10 +5911,10 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.6(@babel/core@7.28.6)(react@19.1.0):
+  styled-jsx@5.1.6(@babel/core@7.28.6)(react@19.2.4):
     dependencies:
       client-only: 0.0.1
-      react: 19.1.0
+      react: 19.2.4
     optionalDependencies:
       '@babel/core': 7.28.6
 
@@ -6136,9 +6136,9 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  use-isomorphic-layout-effect@1.2.1(@types/react@19.2.7)(react@19.1.0):
+  use-isomorphic-layout-effect@1.2.1(@types/react@19.2.7)(react@19.2.4):
     dependencies:
-      react: 19.1.0
+      react: 19.2.4
     optionalDependencies:
       '@types/react': 19.2.7
 
