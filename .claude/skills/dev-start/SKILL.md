@@ -1,6 +1,10 @@
 ---
 name: dev-start
 description: Start dev server in background
+disable-model-invocation: true
+allowed-tools:
+  - Bash(bash ~/.claude/skills/dev-start/dev-start.sh)
+  - Bash(bash .claude/skills/dev-start/dev-start.sh)
 ---
 
 # Dev Server Start
@@ -14,4 +18,8 @@ Run the dev server start script which will:
 3. Wait for server to be ready (polls <http://localhost:3000>)
 4. Show minimal confirmation when ready
 
-Execute: `bash ../dev-start.sh`
+Execute the dev-start script from the project root:
+
+```bash
+bash .claude/skills/dev-start/dev-start.sh
+```

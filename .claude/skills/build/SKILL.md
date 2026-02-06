@@ -1,6 +1,10 @@
 ---
 name: build
 description: Validate production build
+disable-model-invocation: true
+allowed-tools:
+  - Bash(bash ~/.claude/skills/build/build.sh)
+  - Bash(bash .claude/skills/build/build.sh)
 ---
 
 # Build Validation
@@ -13,4 +17,8 @@ Run the build validation script which will:
 2. Show OK status with duration, or FAILED with top 5 error lines
 3. Return appropriate exit code
 
-Execute: `bash ../build.sh`
+Execute the build script from the project root:
+
+```bash
+bash .claude/skills/build/build.sh
+```

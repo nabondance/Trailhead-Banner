@@ -1,6 +1,11 @@
 ---
 name: img-test
 description: Test image generation API with optional username (default nabondance)
+argument-hint: "[username]"
+disable-model-invocation: true
+allowed-tools:
+  - Bash(bash ~/.claude/skills/img-test/img-test.sh *)
+  - Bash(bash .claude/skills/img-test/img-test.sh)
 ---
 
 # Image Generation Test
@@ -16,4 +21,8 @@ Run the image test script which will:
 
 Usage: `/img-test` (uses default username) or `/img-test <username>`
 
-Execute: `bash ../img-test.sh "$@"`
+Execute the img-test script from the project root:
+
+```bash
+bash .claude/skills/img-test/img-test.sh $ARGUMENTS
+```
