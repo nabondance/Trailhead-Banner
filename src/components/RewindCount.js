@@ -29,7 +29,7 @@ const RewindCount = forwardRef((props, ref) => {
   const fetchCount = async () => {
     const { count: newCount, error } = await supabase
       .from('rewinds')
-      .select('id', { count: 'exact', head: true })
+      .select('id', { count: 'estimated', head: true })
       .eq('source_env', process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development');
 
     if (error) {
