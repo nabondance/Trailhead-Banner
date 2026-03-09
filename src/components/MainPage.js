@@ -9,7 +9,6 @@ import BannerForm from './BannerForm';
 import ProductionWarning from './ProductionWarning';
 import BannerCount from './BannerCount';
 import AnnouncementBanner from './AnnouncementBanner';
-import '../styles/globals.css';
 import packageJson from '../../package.json';
 
 const PoweredByThink2 = dynamic(() => import('./PoweredByThink2'), {

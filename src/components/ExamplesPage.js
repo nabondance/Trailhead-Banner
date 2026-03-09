@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import '../styles/globals.css';
 import examples from '../data/examples.json';
 
 const ExampleCard = ({ number, description, onClick, isUnoptimized }) => {
