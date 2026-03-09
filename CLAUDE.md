@@ -18,7 +18,7 @@ pnpm build   # Production build
 - **Canvas**: @napi-rs/canvas (for image generation)
 - **Deployment**: Vercel
 - **Caching**: Upstash Redis (15min TTL for GraphQL)
-- **Storage**: Vercel Blob (for generated images)
+- **Asset Cache**: Vercel Blob (certification logo images cached server-side)
 
 ## Project Purpose
 
@@ -54,12 +54,8 @@ graph TB
     K --> I
     I --> L[generateImage.js]
     L --> M[drawUtils.js<br/>Canvas Operations]
-    M --> N{Storage Type?}
-    N -->|Base64| O[Return Base64]
-    N -->|Blob| P[Upload to Vercel Blob]
-    P --> Q[Return Blob URL]
-    O --> R[User Downloads]
-    Q --> R
+    M --> N[Return Base64]
+    N --> O[Display in Browser]
 
     style H fill:#e1f5ff
     style K fill:#ffe1e1
@@ -70,7 +66,8 @@ graph TB
 
 - All GraphQL queries cached for 15min to reduce Trailhead API load
 - Canvas rendering happens server-side using @napi-rs/canvas
-- Images can be returned as base64 or uploaded to Vercel Blob for sharing
+- API responses (`/api/banner/**`) return the generated banner as base64 for direct browser display
+- Vercel Blob is used internally as an asset cache for certification logo images (`src/utils/blobUtils.js`, `src/utils/cacheUtils.js`); it is not used to store or share generated banners
 
 ### GraphQL Queries
 
@@ -83,7 +80,7 @@ graph TB
 1. Fetch user data from Trailhead API
 2. Validate with `usernameValidation.js` and `imageValidation.js`
 3. Draw on canvas using `drawUtils.js`
-4. Return base64 or upload to Vercel Blob
+4. Return base64 and display in browser
 
 ### Directory Structure
 
@@ -129,7 +126,7 @@ src/
 - **Trailhead GraphQL API**: Source of user data (cached)
 - **@napi-rs/canvas**: Server-side canvas rendering
 - **Upstash Redis**: Query result caching
-- **Vercel Blob**: Generated image storage
+- **Vercel Blob**: Server-side asset cache for certification logo images (not used for generated banners)
 
 ## Debugging Quick Tips
 
