@@ -7,7 +7,6 @@ import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from 
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
 import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import RewindCount from './RewindCount';
-import '../styles/globals.css';
 import packageJson from '../../package.json';
 
 const RewindPage = () => {

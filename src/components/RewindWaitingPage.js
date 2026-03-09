@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import '../styles/globals.css';
 
 const RewindWaitingPage = () => {
   return (

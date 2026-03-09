@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import NavDropdown from './NavDropdown';
 
 const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
-import '../styles/globals.css';
 
 const TrailheadBannerHeader = () => {
   const currentMonth = new Date().getMonth(); // 0 = January, 11 = December

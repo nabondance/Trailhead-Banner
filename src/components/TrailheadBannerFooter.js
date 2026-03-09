@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import GitHubButton from 'react-github-btn';
 import { useTheme } from 'next-themes';
-import '../styles/globals.css';
 
 const TrailheadBannerFooter = () => {
   const [buttonSize, setButtonSize] = useState('large');

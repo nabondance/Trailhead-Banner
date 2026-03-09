@@ -1,5 +1,7 @@
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
+import '../styles/globals.css';
+
 import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
 import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
 

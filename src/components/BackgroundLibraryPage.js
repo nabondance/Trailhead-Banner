@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import '../styles/globals.css';
 import banners from '../data/banners.json';
 
 const BannerCard = ({ src, alt, description, credit, onClick, isUnoptimized }) => (
