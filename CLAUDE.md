@@ -18,6 +18,7 @@ pnpm build   # Production build
 - **Canvas**: @napi-rs/canvas (for image generation)
 - **Deployment**: Vercel
 - **Caching**: Upstash Redis (15min TTL for GraphQL)
+- **Asset Cache**: Vercel Blob (certification logo images cached server-side)
 
 ## Project Purpose
 
@@ -65,7 +66,8 @@ graph TB
 
 - All GraphQL queries cached for 15min to reduce Trailhead API load
 - Canvas rendering happens server-side using @napi-rs/canvas
-- Images are returned as base64 and displayed directly in the browser
+- API responses (`/api/banner/**`) return the generated banner as base64 for direct browser display
+- Vercel Blob is used internally as an asset cache for certification logo images (`src/utils/blobUtils.js`, `src/utils/cacheUtils.js`); it is not used to store or share generated banners
 
 ### GraphQL Queries
 
@@ -124,6 +126,7 @@ src/
 - **Trailhead GraphQL API**: Source of user data (cached)
 - **@napi-rs/canvas**: Server-side canvas rendering
 - **Upstash Redis**: Query result caching
+- **Vercel Blob**: Server-side asset cache for certification logo images (not used for generated banners)
 
 ## Debugging Quick Tips
 
