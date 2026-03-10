@@ -34,5 +34,41 @@
     "label": "Stamp",
     "color": "#00B3A4",
     "defaultSelected": false
+  },
+  {
+    "id": "best-answer",
+    "label": "Best Answer",
+    "color": "#F0B800",
+    "defaultSelected": false
+  },
+  {
+    "id": "answer",
+    "label": "Answer",
+    "color": "#C88000",
+    "defaultSelected": false
+  },
+  {
+    "id": "question",
+    "label": "Question",
+    "color": "#9A6200",
+    "defaultSelected": false
+  },
+  {
+    "id": "follower",
+    "label": "Follower",
+    "color": "#E0357A",
+    "defaultSelected": false
+  },
+  {
+    "id": "following",
+    "label": "Following",
+    "color": "#B02860",
+    "defaultSelected": false
+  },
+  {
+    "id": "group",
+    "label": "Group",
+    "color": "#801D48",
+    "defaultSelected": false
   }
 ]

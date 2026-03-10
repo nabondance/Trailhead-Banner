@@ -75,6 +75,7 @@ export default async function handler(req, res) {
     const mvpData = responseMap.GET_MVP_STATUS?.data?.data?.profileData || {};
     const stampsData = responseMap.GET_STAMPS?.data?.data?.earnedStamps || {};
     const agentblazerData = responseMap.GET_AGENTBLAZER_RANK?.data?.data?.profile?.trailheadStats || {};
+    const communityData = responseMap.GET_COMMUNITY_STATS?.data?.data?.profileData || {};
 
     // Generate banner (call renderer directly)
     timings.start('image_generation');
@@ -87,6 +88,7 @@ export default async function handler(req, res) {
         mvpData,
         stampsData,
         agentblazerData,
+        communityData,
       },
       options
     );
@@ -128,6 +130,7 @@ export default async function handler(req, res) {
       mvpData,
       stampsData,
       agentblazerData,
+      communityData,
       timings: allTimings,
     };
     SupabaseUtils.updateBannerCounter(thb_data).catch((error) => {
@@ -143,6 +146,7 @@ export default async function handler(req, res) {
       mvpData,
       stampsData,
       agentblazerData,
+      communityData,
       imageUrl,
       warnings,
       infoMessages,

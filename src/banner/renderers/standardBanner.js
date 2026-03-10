@@ -32,6 +32,7 @@ const RIGHT_PART_RATIO = 7 / 10;
  * @param {Object} data.mvpData - MVP data from API
  * @param {Object} data.agentblazerData - Agentblazer data from API
  * @param {Object} data.stampsData - Stamps data from API
+ * @param {Object} data.communityData - Community Q&A stats from API
  * @param {Object} options - Generation options
  * @returns {Promise<Object>} Banner result { bannerUrl, warnings, hash, timings }
  */

@@ -98,6 +98,7 @@ class SupabaseUtils {
             th_agentblazer: thb_data.learnerStatusLevels
               ? `${thb_data.learnerStatusLevels.statusName}-${thb_data.learnerStatusLevels.title}-${thb_data.learnerStatusLevels.edition}`
               : null,
+            th_community: thb_data.communityData,
             timings: originalTimings,
           },
         ]);
@@ -190,6 +191,14 @@ class SupabaseUtils {
               linkUrl: edge.node.linkUrl,
             },
           })) || [],
+      },
+      communityData: {
+        answers: data.communityData?.questionAndAnswersStats?.answersCount ?? null,
+        bestAnswers: data.communityData?.questionAndAnswersStats?.bestAnswersCount ?? null,
+        questions: data.communityData?.questionAndAnswersStats?.questionsCount ?? null,
+        followers: data.communityData?.communityConnections?.followers?.totalCount ?? null,
+        following: data.communityData?.communityConnections?.following?.totalCount ?? null,
+        groups: data.communityData?.communityConnections?.groups?.totalCount ?? null,
       },
     };
     return cleanedData;
