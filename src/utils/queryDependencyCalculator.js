@@ -69,6 +69,12 @@ const QUERY_DEPENDENCIES = {
     requiredWhen: ['displayAgentblazerRank'],
     params: {},
   },
+
+  GET_COMMUNITY_STATS: {
+    // Fetch community Q&A stats (answers, questions, best answers) & connections (followers, following, groups)
+    requiredWhenCounter: ['answer', 'best-answer', 'question', 'follower', 'following', 'group'],
+    params: {},
+  },
 };
 
 /**

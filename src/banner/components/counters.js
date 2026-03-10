@@ -3,7 +3,8 @@ import { drawBadgeCounter } from '../../utils/drawUtils.js';
 
 /**
  * Counter Badges Component
- * Renders badge counters (Badges, Superbadges, Certifications, Trails, Points, Stamps)
+ * Renders badge counters (Badges, Superbadges, Certifications, Trails, Points, Stamps,
+ * Answers, Best Answers, Questions, Followers, Following, Groups)
  */
 
 /**
@@ -14,6 +15,7 @@ import { drawBadgeCounter } from '../../utils/drawUtils.js';
  * @param {Object} data.certificationsData - Certifications data from API
  * @param {Object} data.rankData - Rank data (for trail count and points)
  * @param {Object} data.stampsData - Stamps data from API
+ * @param {Object} data.communityData - Community Q&A stats and connections from API
  * @param {Object} options - Component options
  * @param {Array<string>} options.counterOrder - Order of counters to display
  * @param {boolean} options.includeExpiredCertifications - Include expired certs in count
@@ -38,6 +40,12 @@ async function prepareCounters(data, options = {}) {
   const trailCount = data.rankData?.completedTrailCount || 0;
   const pointCount = getCounterPointText(data.rankData?.earnedPointsSum || 0);
   const stampCount = data.stampsData?.totalCount || 0;
+  const answerCount = data.communityData?.questionAndAnswersStats?.answersCount || 0;
+  const bestAnswerCount = data.communityData?.questionAndAnswersStats?.bestAnswersCount || 0;
+  const questionCount = data.communityData?.questionAndAnswersStats?.questionsCount || 0;
+  const followerCount = data.communityData?.communityConnections?.followers?.totalCount || 0;
+  const followingCount = data.communityData?.communityConnections?.following?.totalCount || 0;
+  const groupCount = data.communityData?.communityConnections?.groups?.totalCount || 0;
 
   // Define counter mapping
   const COUNTER_MAP = {
@@ -47,6 +55,12 @@ async function prepareCounters(data, options = {}) {
     trail: { data: trailCount, label: 'Trail', color: '#06482A' },
     point: { data: pointCount, label: 'Point', color: '#18477D' },
     stamp: { data: stampCount, label: 'Stamp', color: '#00B3A4' },
+    answer: { data: answerCount, label: 'Answer', color: '#C88000' },
+    'best-answer': { data: bestAnswerCount, label: 'Best Answer', color: '#F0B800' },
+    question: { data: questionCount, label: 'Question', color: '#9A6200' },
+    follower: { data: followerCount, label: 'Follower', color: '#E0357A' },
+    following: { data: followingCount, label: 'Following', color: '#B02860' },
+    group: { data: groupCount, label: 'Group', color: '#801D48' },
   };
 
   // Get counter configuration (scale and spacing)

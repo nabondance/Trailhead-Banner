@@ -9,6 +9,7 @@ import GET_TRAILHEAD_BADGES from '../../graphql/queries/getTrailheadBadges';
 import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import GET_STAMPS from '../../graphql/queries/getStamps';
 import GET_AGENTBLAZER_RANK from '../../graphql/queries/getAgentblazerRank';
+import GET_COMMUNITY_STATS from '../../graphql/queries/getCommunityStats';
 import { calculateRequiredQueries } from '../../utils/queryDependencyCalculator';
 
 /**
@@ -80,6 +81,13 @@ export const QUERY_MAP = {
       slug: username,
       hasSlug: true,
       ...params,
+    }),
+  },
+  GET_COMMUNITY_STATS: {
+    query: GET_COMMUNITY_STATS,
+    url: 'https://community.api.trailhead.com/graphql',
+    buildVariables: (username) => ({
+      userSlug: username,
     }),
   },
 };
