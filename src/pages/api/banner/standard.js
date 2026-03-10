@@ -39,23 +39,16 @@ export default async function handler(req, res) {
       });
     }
 
-    // Username validation (with caching optimization)
-    const shouldValidate = !options.lastValidatedUsername || options.lastValidatedUsername !== options.username;
+    // Username validation
+    timings.start('username_validation');
+    const validation = await validateUsername(options.username);
+    timings.end('username_validation');
 
-    if (shouldValidate) {
-      timings.start('username_validation');
-      const validation = await validateUsername(options.username);
-      timings.end('username_validation');
-
-      if (!validation.valid) {
-        return res.status(400).json({
-          error: validation.message,
-          validationError: true,
-        });
-      }
-    } else {
-      timings.add('username_validation_ms', 0);
-      console.log(`[Banner] Skipping username validation for '${options.username}' (matches lastValidatedUsername)`);
+    if (!validation.valid) {
+      return res.status(400).json({
+        error: validation.message,
+        validationError: true,
+      });
     }
 
     // Build and fetch GraphQL queries
