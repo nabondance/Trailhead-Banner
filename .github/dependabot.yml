@@ -9,9 +9,23 @@ updates:
       npm-development:
         dependency-type: development
         update-types:
+          - major
           - minor
           - patch
       npm-production:
         dependency-type: production
         update-types:
+          - major
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        update-types:
+          - major
+          - minor
           - patch
