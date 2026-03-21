@@ -1,7 +1,11 @@
 {
   "name": "trailhead-banner",
   "version": "1.20.0",
-  "private": false,
+  "private": true,
+  "packageManager": "pnpm@10.29.3",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "author": "nabondance",
   "homepage": "https://thb.nabondance.me/",
   "repository": {

@@ -19,6 +19,7 @@ pnpm build   # Production build
 - **Deployment**: Vercel
 - **Caching**: Upstash Redis (15min TTL for GraphQL)
 - **Asset Cache**: Vercel Blob (certification logo images cached server-side)
+- **Analytics DB**: Supabase (tracks banner/rewind generations and errors)
 
 ## Project Purpose
 
@@ -127,6 +128,7 @@ src/
 - **@napi-rs/canvas**: Server-side canvas rendering
 - **Upstash Redis**: Query result caching
 - **Vercel Blob**: Server-side asset cache for certification logo images (not used for generated banners)
+- **Supabase**: Analytics database — tracks every banner/rewind generation (`banners`, `rewinds` tables) and errors (`errors` table); implemented in `src/utils/supabaseUtils.js`, requires `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` env vars
 
 ## Debugging Quick Tips
 
