@@ -4,7 +4,7 @@ import { getHighestAgentblazerRankPerYear } from './dataUtils';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 class SupabaseUtils {
   /**
@@ -74,6 +74,10 @@ class SupabaseUtils {
   }
 
   static async updateBannerCounter(thb_data) {
+    if (!supabase) {
+      console.log('[Supabase] Credentials not configured, skipping banner counter update.');
+      return;
+    }
     const originalTimings = thb_data.timings; // Save timings before cleaning
     thb_data = SupabaseUtils.cleanData(thb_data);
     try {
@@ -205,6 +209,10 @@ class SupabaseUtils {
   }
 
   static async updateRewindCounter(rewind_data) {
+    if (!supabase) {
+      console.log('[Supabase] Credentials not configured, skipping rewind counter update.');
+      return;
+    }
     try {
       const result = await SupabaseUtils.retryWithBackoff(async () => {
         const { data, error } = await supabase.from('rewinds').insert([
@@ -251,6 +259,10 @@ class SupabaseUtils {
   }
 
   static async updateErrors(errors_data) {
+    if (!supabase) {
+      console.log('[Supabase] Credentials not configured, skipping error update.');
+      return;
+    }
     try {
       const result = await SupabaseUtils.retryWithBackoff(async () => {
         const { data, error } = await supabase.from('errors').insert([
