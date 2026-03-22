@@ -1,0 +1,53 @@
+---
+name: Blob Cleanup
+
+on:
+  schedule:
+    # Every Sunday at 03:00 UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (list blobs that would be deleted without deleting)'
+        type: boolean
+        default: false
+
+# ─────────────────────────────────────────────
+# RETENTION POLICY
+# Blobs older than this many days are deleted.
+# ─────────────────────────────────────────────
+env:
+  RETENTION_DAYS: '30'
+  BLOB_PREFIX: 'pr-previews/'
+
+jobs:
+  cleanup:
+    name: Clean up old PR preview blobs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Delete expired blobs
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: node .github/scripts/blob-cleanup/cleanup.mjs
