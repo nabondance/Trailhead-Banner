@@ -1,0 +1,6 @@
+reviews:
+  auto_review:
+    enabled: false
+    drafts: false
+    labels:
+      - 'coderabbit'
