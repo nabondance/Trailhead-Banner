@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Think2",
+    "url": "https://think2.ai/trailhead-banner",
+    "image": "/assets/logos/think2-urls-5-large.svg",
+    "tier": "powered_by",
+    "badge": ""
+  },
+  {
+    "username": "nvuillam",
+    "name": "Nicolas Vuillamy",
+    "url": "https://github.com/nvuillam",
+    "image": "https://github.com/nvuillam.png",
+    "tier": "sponsor"
+  }
+]

@@ -4,6 +4,7 @@ import '../styles/globals.css';
 
 import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
 import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
+import Sponsors from '../components/Sponsors';
 
 import ThemeProvider from '../components/ThemeProvider';
 
@@ -146,6 +147,7 @@ export default function RootLayout({ children }) {
             <TrailheadBannerHeader />
           </header>
           <main>{children}</main>
+          <Sponsors />
           <TrailheadBannerFooter />
         </ThemeProvider>
       </body>

@@ -54,7 +54,6 @@ body {
   --warning-color: #dd7a01;
   --error-color: #ba0517;
   --think2-yellow: #f2eb0a;
-  --think2-blue: #00b9b9;
   --tooltip-bg: #1f1f1f;
 }
 
@@ -80,7 +79,6 @@ body {
   --warning-color: #dd7a01;
   --error-color: #ba0517;
   --think2-yellow: #f2eb0a;
-  --think2-blue: #00b9b9;
   --tooltip-bg: #1f1f1f;
 }
 
@@ -1784,6 +1782,218 @@ select:focus {
   transition: transform 0.3s ease-in-out;
   position: relative;
   z-index: -1;
+}
+
+/* Sponsors Section */
+.sponsors-section {
+  max-width: min(800px, 100vw);
+  margin: 0 auto 16px;
+  padding: 16px;
+  text-align: center;
+}
+
+.sponsors-title {
+  display: inline-block;
+  font-size: 1.6em;
+  font-weight: bold;
+  color: var(--text-contrast);
+  margin: 0 0 6px;
+  text-decoration: none;
+}
+
+.sponsors-title:hover {
+  text-decoration: underline;
+}
+
+.sponsors-label {
+  font-size: 0.9em;
+  color: var(--text-contrast);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.sponsors-tier {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.sponsors-tier-label {
+  display: block;
+  font-size: 0.62em;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faded);
+  margin-bottom: 3px;
+}
+
+.sponsors-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.sponsors-marquee {
+  overflow-x: hidden;
+  padding: 4px 0;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.sponsors-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 8px;
+  padding: 2px 0;
+  animation: sponsors-marquee 25s linear infinite;
+}
+
+.sponsors-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes sponsors-marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sponsors-marquee-track {
+    animation: none;
+  }
+}
+
+/* Powered By card */
+.powered-by-card {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 4 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.powered-by-card:hover {
+  transform: scale(1.02);
+}
+
+.powered-by-bg {
+  object-fit: cover;
+  object-position: center;
+}
+
+.powered-by-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: linear-gradient(to top, rgb(0 0 0 / 50%), rgb(0 0 0 / 0%) 60%);
+}
+
+.powered-by-name {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--think2-yellow);
+}
+
+.powered-by-badge {
+  font-size: 0.65em;
+  background: rgb(255 255 255 / 20%);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / 30%);
+}
+
+/* Hall of Fame card */
+.hof-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid gold;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+  background: rgb(255 215 0 / 5%);
+}
+
+.hof-card:hover {
+  transform: scale(1.04);
+}
+
+.hof-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hof-name {
+  font-size: 0.85em;
+  font-weight: bold;
+  color: var(--text-contrast);
+}
+
+/* Sponsor pill */
+.sponsor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.sponsor-pill:hover {
+  transform: scale(1.04);
+}
+
+.sponsor-pill-name {
+  font-size: 0.8em;
+  color: var(--text-contrast);
+}
+
+/* Supporter pill */
+.supporter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.supporter-pill:hover {
+  transform: scale(1.04);
+}
+
+.supporter-pill-name {
+  font-size: 0.75em;
+  color: var(--text-contrast);
+}
+
+/* Shared avatar */
+.sponsor-avatar {
+  border-radius: 50%;
 }
 
 .flipped-text {

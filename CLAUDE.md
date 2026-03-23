@@ -1,4 +1,4 @@
-# Claude Code Context - Trailhead-Banner
+# Claude Code Context - Trailhead Banner
 
 ## Quick Start
 
