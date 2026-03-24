@@ -1,4 +1,4 @@
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB — crop happens client-side before API submission
 
 export const validateImageFile = (file) => {
   if (!file.type.startsWith('image/')) {
@@ -6,7 +6,7 @@ export const validateImageFile = (file) => {
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return { valid: false, message: 'Image file is too large. Maximum size is 5MB' };
+    return { valid: false, message: 'Image file is too large. Maximum size is 20MB' };
   }
 
   return { valid: true };

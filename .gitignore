@@ -49,3 +49,6 @@ megalinter-reports/
 
 # claude dev server
 .dev-server.pid
+
+# claude settings
+.claude/settings.local.json
