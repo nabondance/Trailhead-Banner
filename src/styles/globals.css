@@ -1498,6 +1498,75 @@ select:focus {
   }
 }
 
+.crop-editor {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: var(--middleground);
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+.crop-editor h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: var(--text-contrast);
+}
+
+.crop-border {
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.crop-container {
+  position: relative;
+  width: 100%;
+  min-height: 60px;
+}
+
+.crop-skip-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+.crop-skip-message {
+  margin: 8px 0 0;
+  font-size: 0.85em;
+  color: var(--text-contrast);
+  text-align: center;
+}
+
+.crop-controls {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoom-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zoom-slider {
+  flex: 1;
+  cursor: pointer;
+}
+
+.zoom-slider:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.crop-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .qrcode-container {
   position: relative;
   width: 100%;

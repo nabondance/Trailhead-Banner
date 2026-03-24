@@ -24,6 +24,8 @@ import {
   getBackgroundPreviewSrc,
 } from '../utils/backgroundUtils';
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
+import ImageCropEditor from './ImageCropEditor';
+import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 
 const BackgroundPreview = ({ src, backgroundColor }) => {
   const canvasRef = React.useRef(null);
@@ -106,6 +108,10 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     agentblazerRankDisplay: 'current',
   });
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [isCropSkipped, setIsCropSkipped] = useState(false);
+  const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
+  const [cropZoom, setCropZoom] = useState(1);
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
@@ -152,7 +158,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   };
 
   const handleImageChange = async (e) => {
+    if (!e.target.files[0]) return;
     await handleFileChange(e.target.files[0], setBackgroundImageUrlError, setOptions, setUploadedFile);
+    setCroppedAreaPixels(null);
+    setIsCropSkipped(false);
+    setCropPosition({ x: 0, y: 0 });
+    setCropZoom(1);
   };
 
   const handlePredefinedImage = (src) => {
@@ -197,7 +208,21 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
       return;
     }
 
-    const backgroundImageUrl = getBackgroundPreviewSrc(options);
+    let backgroundImageUrl = getBackgroundPreviewSrc(options);
+
+    if (options.backgroundKind === 'upload' && options.backgroundImageUrl) {
+      try {
+        if (!isCropSkipped && croppedAreaPixels) {
+          backgroundImageUrl = await getCroppedImage(options.backgroundImageUrl, croppedAreaPixels);
+        } else {
+          backgroundImageUrl = await resizeImageForPayload(options.backgroundImageUrl);
+        }
+      } catch (err) {
+        setMainError(new Error('Failed to process image. Please try again.'));
+        setIsGenerating(false);
+        return;
+      }
+    }
 
     // Transform selectedCounters to counterOrder for API
     const counterOrder = options.selectedCounters.map((c) => c.id);
@@ -215,7 +240,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
 
   // Form itself
   return (
-    <form onSubmit={handleSubmit} className='form'>
+    <form onSubmit={handleSubmit} className='form' noValidate>
       <div className='input-container'>
         <input
           type='text'
@@ -332,8 +357,23 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 ))}
               </div>
             )}
-            {options.backgroundKind !== 'procedural' && (
-              <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+            {options.backgroundKind === 'upload' && uploadedFile ? (
+              <ImageCropEditor
+                imageSrc={options.backgroundImageUrl}
+                onCropComplete={setCroppedAreaPixels}
+                isCropSkipped={isCropSkipped}
+                onSkip={() => setIsCropSkipped(true)}
+                onReset={() => setIsCropSkipped(false)}
+                cropPosition={cropPosition}
+                onCropPositionChange={setCropPosition}
+                cropZoom={cropZoom}
+                onCropZoomChange={setCropZoom}
+              />
+            ) : (
+              options.backgroundKind !== 'procedural' &&
+              options.backgroundKind !== 'upload' && (
+                <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+              )
             )}
           </fieldset>
           <fieldset>
