@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * Background Component
@@ -120,7 +121,8 @@ async function isValidImageType(url) {
  * @returns {Promise<Object>} Prepared background data
  */
 async function prepareBackground(options) {
-  const startTime = Date.now();
+  const timer = new Timer();
+  timer.start('load');
   const warnings = [];
   let backgroundData = null;
 
@@ -200,9 +202,7 @@ async function prepareBackground(options) {
   return {
     data: backgroundData,
     warnings,
-    timings: {
-      load_ms: Date.now() - startTime,
-    },
+    timings: timer.end('load').get(),
   };
 }
 
@@ -254,13 +254,4 @@ function getBackgroundWarnings(prepared) {
   return prepared?.warnings || [];
 }
 
-/**
- * Get timings from background preparation
- * @param {Object} prepared - Prepared background data
- * @returns {Object} Timings
- */
-function getBackgroundTimings(prepared) {
-  return prepared?.timings || {};
-}
-
-export { prepareBackground, renderBackground, getBackgroundWarnings, getBackgroundTimings };
+export { prepareBackground, renderBackground, getBackgroundWarnings };

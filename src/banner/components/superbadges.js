@@ -1,6 +1,7 @@
 import { loadImage } from '@napi-rs/canvas';
 import { generatePlusXSuperbadgesSvg } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * Superbadges Component
@@ -19,7 +20,7 @@ import { getImage } from '../../utils/cacheUtils.js';
  * @returns {Promise<Object>} Prepared superbadge data
  */
 async function prepareSuperbadges(superbadgesData, options, layout) {
-  const startTime = Date.now();
+  const timer = new Timer();
   const warnings = [];
 
   if (!options.displaySuperbadges) {
@@ -28,10 +29,7 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
       images: [],
       layout: null,
       warnings,
-      timings: {
-        download_ms: 0,
-        prep_ms: 0,
-      },
+      timings: timer.get(),
     };
   }
 
@@ -51,6 +49,8 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
   const hiddenSuperbadges = totalSuperbadges - displayedSuperbadges;
 
   // Download all superbadge logos in parallel
+  timer.start('total');
+  timer.start('download');
   const superbadgeLogoPromises = superbadgeLogos.map(async (logoUrl) => {
     try {
       const logoResult = await getImage(logoUrl, 'superbadges');
@@ -65,9 +65,8 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
   });
 
   // Wait for all superbadge logos to be downloaded
-  const superbadgesDownloadStart = Date.now();
   const superbadgeLogosImages = await Promise.all(superbadgeLogoPromises);
-  const downloadMs = Date.now() - superbadgesDownloadStart;
+  timer.end('download');
 
   // Add "+X" badge if superbadges are hidden
   if (hiddenSuperbadges > 0) {
@@ -82,6 +81,8 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
   const validImages = superbadgeLogosImages.filter((img) => img !== null);
 
   if (validImages.length === 0) {
+    timer.end('total');
+    timer.set('prep_ms', timer.timings.total_ms - timer.timings.download_ms);
     return {
       shouldRender: false,
       images: [],
@@ -92,10 +93,7 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
         hidden: hiddenSuperbadges,
       },
       warnings,
-      timings: {
-        download_ms: downloadMs,
-        prep_ms: Date.now() - startTime - downloadMs,
-      },
+      timings: timer.get(),
     };
   }
 
@@ -132,7 +130,8 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
     }
   }
 
-  const prepMs = Date.now() - startTime - downloadMs;
+  timer.end('total');
+  timer.set('prep_ms', timer.timings.total_ms - timer.timings.download_ms);
 
   return {
     shouldRender: true,
@@ -150,11 +149,7 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
       hidden: hiddenSuperbadges,
     },
     warnings,
-    timings: {
-      download_ms: downloadMs,
-      prep_ms: prepMs,
-      count: displayedSuperbadges,
-    },
+    timings: timer.get(),
   };
 }
 
@@ -166,13 +161,12 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
  * @param {number} y - Y position
  */
 async function renderSuperbadges(ctx, prepared, absoluteX, y) {
-  const renderStart = Date.now();
+  const timer = new Timer();
+  timer.start('render');
 
   if (!prepared.shouldRender || !prepared.images || prepared.images.length === 0) {
     console.debug('No superbadges to render');
-    return {
-      render_ms: 0,
-    };
+    return timer.end('render').get();
   }
 
   const { images, layout } = prepared;
@@ -186,9 +180,7 @@ async function renderSuperbadges(ctx, prepared, absoluteX, y) {
     }
   }
 
-  return {
-    render_ms: Date.now() - renderStart,
-  };
+  return timer.end('render').get();
 }
 
 /**
@@ -201,15 +193,6 @@ function getSuperbadgesWarnings(prepared) {
 }
 
 /**
- * Get timings from superbadge preparation/rendering
- * @param {Object} prepared - Prepared superbadge data
- * @returns {Object} Timings
- */
-function getSuperbadgesTimings(prepared) {
-  return prepared?.timings || {};
-}
-
-/**
  * Get superbadge counts
  * @param {Object} prepared - Prepared superbadge data
  * @returns {Object} Counts
@@ -218,4 +201,4 @@ function getSuperbadgesCounts(prepared) {
   return prepared?.counts || { total: 0, displayed: 0, hidden: 0 };
 }
 
-export { prepareSuperbadges, renderSuperbadges, getSuperbadgesWarnings, getSuperbadgesTimings, getSuperbadgesCounts };
+export { prepareSuperbadges, renderSuperbadges, getSuperbadgesWarnings, getSuperbadgesCounts };

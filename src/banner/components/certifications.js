@@ -4,6 +4,7 @@ import { calculateCertificationsDesign, sortCertifications } from '../../utils/i
 import { applyGrayscaleToCanvas, cropImage, generatePlusXCertificationsSvg } from '../../utils/drawUtils.js';
 import { getImage, getCertificationFileName } from '../../utils/cacheUtils.js';
 import { uploadImage } from '../../utils/blobUtils.js';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * Certifications Grid Component
@@ -44,7 +45,8 @@ function filterCertifications(certifications, options = {}) {
  * @returns {Promise<Object>} Prepared certification data
  */
 async function prepareCertifications(certificationsData, options = {}, layout) {
-  const startTime = Date.now();
+  const timer = new Timer();
+  timer.start('total');
   const warnings = [];
 
   // Validate layout parameters
@@ -80,6 +82,7 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
   };
 
   // Download all certification logos in parallel
+  timer.start('download');
   const logoPromises = certifications.map(async (cert) => {
     if (!cert.logoUrl) {
       return null;
@@ -204,10 +207,9 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
   });
 
   // Wait for all logos to be downloaded and preserve order
-  const certLogosStart = Date.now();
   const logoResults = await Promise.all(logoPromises);
+  timer.end('download');
   let certificationsLogos = logoResults.filter(Boolean);
-  const downloadMs = Date.now() - certLogosStart;
 
   // Calculate statistics
   const sum = (arr) => arr.reduce((a, b) => a + b, 0);
@@ -265,7 +267,9 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
     );
   }
 
-  const prepMs = Date.now() - startTime - downloadMs;
+  timer.end('total');
+  timer.set('prep_ms', timer.timings.total_ms - timer.timings.download_ms);
+  timer.set('detailed', detailedTimings);
 
   return {
     logos: certificationsLogos,
@@ -276,11 +280,7 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
       hidden: hiddenCertifications,
     },
     warnings,
-    timings: {
-      download_ms: downloadMs,
-      prep_ms: prepMs,
-      detailed: detailedTimings,
-    },
+    timings: timer.get(),
   };
 }
 
@@ -292,13 +292,12 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
  * @param {number} startY - Starting Y position
  */
 async function renderCertifications(ctx, prepared, startX, startY) {
-  const renderStart = Date.now();
+  const timer = new Timer();
+  timer.start('render');
 
   if (!prepared.logos || prepared.logos.length === 0) {
     console.debug('No certifications to render');
-    return {
-      render_ms: 0,
-    };
+    return timer.end('render').get();
   }
 
   const { logos, layout } = prepared;
@@ -306,9 +305,7 @@ async function renderCertifications(ctx, prepared, startX, startY) {
   // Guard against missing layout
   if (!layout) {
     console.warn('No layout data available for certifications rendering');
-    return {
-      render_ms: 0,
-    };
+    return timer.end('render').get();
   }
 
   const certifSpacing = layout.spacing ?? 5;
@@ -341,9 +338,7 @@ async function renderCertifications(ctx, prepared, startX, startY) {
   // Reset transparency
   ctx.globalAlpha = 1.0;
 
-  return {
-    render_ms: Date.now() - renderStart,
-  };
+  return timer.end('render').get();
 }
 
 /**
@@ -353,15 +348,6 @@ async function renderCertifications(ctx, prepared, startX, startY) {
  */
 function getCertificationsWarnings(prepared) {
   return prepared?.warnings || [];
-}
-
-/**
- * Get timings from certification preparation/rendering
- * @param {Object} prepared - Prepared certification data
- * @returns {Object} Timings
- */
-function getCertificationsTimings(prepared) {
-  return prepared?.timings || {};
 }
 
 /**
@@ -377,7 +363,6 @@ export {
   prepareCertifications,
   renderCertifications,
   getCertificationsWarnings,
-  getCertificationsTimings,
   getCertificationsCounts,
   filterCertifications, // Export for reuse
 };

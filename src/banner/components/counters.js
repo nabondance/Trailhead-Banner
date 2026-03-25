@@ -1,5 +1,6 @@
 import { getCountersConfig, getCounterPointText } from '../../utils/imageUtils.js';
 import { drawBadgeCounter } from '../../utils/drawUtils.js';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * Counter Badges Component
@@ -24,7 +25,8 @@ import { drawBadgeCounter } from '../../utils/drawUtils.js';
  * @returns {Promise<Object>} Prepared counter data
  */
 async function prepareCounters(data, options = {}) {
-  const startTime = Date.now();
+  const timer = new Timer();
+  timer.start('prepare');
   const warnings = [];
 
   // Extract counts from data
@@ -89,9 +91,7 @@ async function prepareCounters(data, options = {}) {
     counters: countersToDisplay,
     config: counterConfig,
     warnings,
-    timings: {
-      prepare_ms: Date.now() - startTime,
-    },
+    timings: timer.end('prepare').get(),
   };
 }
 
@@ -104,13 +104,12 @@ async function prepareCounters(data, options = {}) {
  * @param {string} badgeLabelColor - Label color for badges
  */
 async function renderCounters(ctx, prepared, startX, startY, badgeLabelColor) {
-  const startTime = Date.now();
+  const timer = new Timer();
+  timer.start('render');
 
   if (!prepared.counters || prepared.counters.length === 0) {
     console.debug('No counters to render');
-    return {
-      render_ms: 0,
-    };
+    return timer.end('render').get();
   }
 
   const { counters, config } = prepared;
@@ -138,9 +137,7 @@ async function renderCounters(ctx, prepared, startX, startY, badgeLabelColor) {
     }
   }
 
-  return {
-    render_ms: Date.now() - startTime,
-  };
+  return timer.end('render').get();
 }
 
 /**
@@ -150,15 +147,6 @@ async function renderCounters(ctx, prepared, startX, startY, badgeLabelColor) {
  */
 function getCountersWarnings(prepared) {
   return prepared?.warnings || [];
-}
-
-/**
- * Get timings from counter preparation
- * @param {Object} prepared - Prepared counter data
- * @returns {Object} Timings
- */
-function getCountersTimings(prepared) {
-  return prepared?.timings || {};
 }
 
 /**
@@ -179,4 +167,4 @@ function getCountersLayout(prepared) {
   };
 }
 
-export { prepareCounters, renderCounters, getCountersWarnings, getCountersTimings, getCountersLayout };
+export { prepareCounters, renderCounters, getCountersWarnings, getCountersLayout };

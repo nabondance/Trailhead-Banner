@@ -1,5 +1,6 @@
 import { loadImage } from '@napi-rs/canvas';
 import path from 'path';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * Watermark Component
@@ -12,24 +13,20 @@ import path from 'path';
  * @returns {Promise<Object>} Prepared watermark data with image and dimensions
  */
 async function prepareWatermark(options = {}) {
-  const startTime = Date.now();
+  const timer = new Timer();
+  timer.start('load');
   const warnings = [];
 
   try {
     const thbSvgPath = path.join(process.cwd(), 'src', 'assets', 'watermarks', 'thb-small.svg');
     const thbSvg = await loadImage(thbSvgPath);
 
-    const width = 160;
-    const height = 20;
-
     return {
       image: thbSvg,
-      width,
-      height,
+      width: 160,
+      height: 20,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   } catch (error) {
     console.error('Error loading watermark:', error);
@@ -40,9 +37,7 @@ async function prepareWatermark(options = {}) {
       width: 160,
       height: 20,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   }
 }
@@ -79,13 +74,4 @@ function getWatermarkWarnings(prepared) {
   return prepared?.warnings || [];
 }
 
-/**
- * Get timings from watermark preparation
- * @param {Object} prepared - Prepared watermark data
- * @returns {Object} Timings
- */
-function getWatermarkTimings(prepared) {
-  return prepared?.timings || {};
-}
-
-export { prepareWatermark, renderWatermark, getWatermarkWarnings, getWatermarkTimings };
+export { prepareWatermark, renderWatermark, getWatermarkWarnings };

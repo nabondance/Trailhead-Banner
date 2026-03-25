@@ -1,6 +1,7 @@
 import { loadImage } from '@napi-rs/canvas';
 import { getLocal } from '../../utils/cacheUtils.js';
 import { getHighestAgentblazerRankPerYear } from '../../utils/dataUtils.js';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * Agentblazer Rank Component
@@ -16,7 +17,7 @@ import { getHighestAgentblazerRankPerYear } from '../../utils/dataUtils.js';
  * @returns {Promise<Object>} Prepared Agentblazer data
  */
 async function prepareAgentblazer(agentblazerData, options) {
-  const startTime = Date.now();
+  const timer = new Timer();
   const warnings = [];
 
   if (!options.displayAgentblazerRank || !agentblazerData?.learnerStatusLevels) {
@@ -26,12 +27,11 @@ async function prepareAgentblazer(agentblazerData, options) {
       width: 0,
       height: 0,
       warnings,
-      timings: {
-        load_ms: 0,
-      },
+      timings: timer.get(),
     };
   }
 
+  timer.start('load');
   try {
     // Get the highest rank per year
     const highestRanksPerYear = getHighestAgentblazerRankPerYear(agentblazerData.learnerStatusLevels);
@@ -57,9 +57,7 @@ async function prepareAgentblazer(agentblazerData, options) {
         width: 0,
         height: 0,
         warnings,
-        timings: {
-          load_ms: Date.now() - startTime,
-        },
+        timings: timer.end('load').get(),
       };
     }
 
@@ -76,9 +74,7 @@ async function prepareAgentblazer(agentblazerData, options) {
       height: logoHeight,
       rank: selectedRank,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   } catch (error) {
     console.error('Error loading Agentblazer logo:', error);
@@ -90,9 +86,7 @@ async function prepareAgentblazer(agentblazerData, options) {
       width: 0,
       height: 0,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   }
 }
@@ -123,15 +117,6 @@ function getAgentblazerWarnings(prepared) {
 }
 
 /**
- * Get timings from Agentblazer preparation
- * @param {Object} prepared - Prepared Agentblazer data
- * @returns {Object} Timings
- */
-function getAgentblazerTimings(prepared) {
-  return prepared?.timings || {};
-}
-
-/**
  * Get Agentblazer dimensions for layout calculations
  * @param {Object} prepared - Prepared Agentblazer data
  * @returns {Object} Width and height
@@ -143,10 +128,4 @@ function getAgentblazerDimensions(prepared) {
   };
 }
 
-export {
-  prepareAgentblazer,
-  renderAgentblazer,
-  getAgentblazerWarnings,
-  getAgentblazerTimings,
-  getAgentblazerDimensions,
-};
+export { prepareAgentblazer, renderAgentblazer, getAgentblazerWarnings, getAgentblazerDimensions };
