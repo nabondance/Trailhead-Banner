@@ -58,13 +58,13 @@ async function generateStandardBanner(data, options = {}) {
     Watermark.prepareWatermark(),
   ]);
 
-  timings.background_load_ms = Background.getBackgroundTimings(backgroundPrep).load_ms;
-  timings.rank_logo_load_ms = RankLogo.getRankLogoTimings(rankLogoPrep).load_ms;
-  timings.agentblazer_load_ms = Agentblazer.getAgentblazerTimings(agentblazerPrep).load_ms;
+  timings.background_load_ms = backgroundPrep.timings?.load_ms;
+  timings.rank_logo_load_ms = rankLogoPrep.timings?.load_ms;
+  timings.agentblazer_load_ms = agentblazerPrep.timings?.load_ms;
 
   // Prepare counters (needs rank logo dimensions)
   const countersPrep = await Counters.prepareCounters(data, options);
-  timings.counters_prepare_ms = Counters.getCountersTimings(countersPrep).prepare_ms;
+  timings.counters_prepare_ms = countersPrep.timings?.prepare_ms;
 
   // Prepare certifications (needs layout constraints)
   const certLayout = {
@@ -73,10 +73,10 @@ async function generateStandardBanner(data, options = {}) {
     spacing: 5,
   };
   const certificationsPrep = await Certifications.prepareCertifications(data.certificationsData, options, certLayout);
-  timings.certifications_download_ms = certificationsPrep.timings.download_ms;
-  timings.certifications_prep_ms = certificationsPrep.timings.prep_ms;
+  timings.certifications_download_ms = certificationsPrep.timings?.download_ms;
+  timings.certifications_prep_ms = certificationsPrep.timings?.prep_ms;
   timings.certifications_count = certificationsPrep.counts.displayed;
-  timings.certifications_detailed = certificationsPrep.timings.detailed;
+  timings.certifications_detailed = certificationsPrep.timings?.detailed;
 
   // Prepare superbadges (needs layout constraints)
   const superbadgeLayout = {
@@ -84,7 +84,7 @@ async function generateStandardBanner(data, options = {}) {
     logoHeight: CANVAS_HEIGHT * TOP_PART_RATIO * 0.9,
   };
   const superbadgesPrep = await Superbadges.prepareSuperbadges(data.superbadgesData, options, superbadgeLayout);
-  timings.superbadges_download_ms = Superbadges.getSuperbadgesTimings(superbadgesPrep).download_ms;
+  timings.superbadges_download_ms = superbadgesPrep.timings?.download_ms;
   timings.superbadges_count = Superbadges.getSuperbadgesCounts(superbadgesPrep).displayed;
 
   timings.preparation_total_ms = Date.now() - prepareStartTime;
@@ -109,7 +109,7 @@ async function generateStandardBanner(data, options = {}) {
     counterStartY,
     options.badgeLabelColor
   );
-  timings.counters_draw_ms = countersRenderTiming.render_ms;
+  timings.counters_draw_ms = countersRenderTiming?.render_ms;
 
   // 4. Agentblazer (top area, fixed position)
   await Agentblazer.renderAgentblazer(ctx, agentblazerPrep, 370, 5);
@@ -122,7 +122,7 @@ async function generateStandardBanner(data, options = {}) {
     0,
     certifYPosition
   );
-  timings.certifications_render_ms = certificationsRenderTiming.render_ms;
+  timings.certifications_render_ms = certificationsRenderTiming?.render_ms;
 
   // 6. Superbadges (top-right area)
   const superbadgeAbsoluteX = CANVAS_WIDTH - superbadgeLayout.availableWidth;
@@ -133,15 +133,15 @@ async function generateStandardBanner(data, options = {}) {
     superbadgeAbsoluteX,
     superbadgeY
   );
-  timings.superbadges_render_ms = superbadgesRenderTiming.render_ms;
+  timings.superbadges_render_ms = superbadgesRenderTiming?.render_ms;
 
   // 7. MVP Ribbon (top-right corner, rotated)
   await MvpRibbon.renderMvpRibbon(ctx, mvpRibbonPrep, CANVAS_WIDTH);
 
   // 8. Watermark (bottom-right corner)
   await Watermark.renderWatermark(ctx, watermarkPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
-  timings.mvp_ribbon_load_ms = MvpRibbon.getMvpRibbonTimings(mvpRibbonPrep).load_ms;
-  timings.watermark_load_ms = Watermark.getWatermarkTimings(watermarkPrep).load_ms;
+  timings.mvp_ribbon_load_ms = mvpRibbonPrep.timings?.load_ms;
+  timings.watermark_load_ms = watermarkPrep.timings?.load_ms;
 
   // ============================================================
   // PHASE 3: COLLECT WARNINGS AND ENCODE

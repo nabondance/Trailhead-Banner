@@ -1,5 +1,6 @@
 import { loadImage } from '@napi-rs/canvas';
 import { getImage, getLocal } from '../../utils/cacheUtils.js';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * Rank Logo Component
@@ -19,7 +20,7 @@ const DEFAULT_RANK_HEIGHT = 40;
  * @returns {Promise<Object>} Prepared rank logo data
  */
 async function prepareRankLogo(rankData, options, canvasHeight) {
-  const startTime = Date.now();
+  const timer = new Timer();
   const warnings = [];
 
   // Default options
@@ -38,12 +39,11 @@ async function prepareRankLogo(rankData, options, canvasHeight) {
       height: DEFAULT_RANK_HEIGHT,
       scalingFactor,
       warnings,
-      timings: {
-        load_ms: 0,
-      },
+      timings: timer.get(),
     };
   }
 
+  timer.start('load');
   try {
     let rankLogoBuffer;
     let rankLogo;
@@ -72,9 +72,7 @@ async function prepareRankLogo(rankData, options, canvasHeight) {
       height: rankLogoHeight,
       scalingFactor,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   } catch (error) {
     const rankUrl = rankData.rank?.imageUrl || 'unknown';
@@ -88,9 +86,7 @@ async function prepareRankLogo(rankData, options, canvasHeight) {
       height: DEFAULT_RANK_HEIGHT,
       scalingFactor,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   }
 }
@@ -124,15 +120,6 @@ function getRankLogoWarnings(prepared) {
 }
 
 /**
- * Get timings from rank logo preparation
- * @param {Object} prepared - Prepared rank logo data
- * @returns {Object} Timings
- */
-function getRankLogoTimings(prepared) {
-  return prepared?.timings || {};
-}
-
-/**
  * Get rank logo dimensions for layout calculations
  * @param {Object} prepared - Prepared rank logo data
  * @returns {Object} Width and height (scaled)
@@ -146,4 +133,4 @@ function getRankLogoDimensions(prepared) {
   };
 }
 
-export { prepareRankLogo, renderRankLogo, getRankLogoWarnings, getRankLogoTimings, getRankLogoDimensions };
+export { prepareRankLogo, renderRankLogo, getRankLogoWarnings, getRankLogoDimensions };

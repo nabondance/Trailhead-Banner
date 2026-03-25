@@ -1,5 +1,6 @@
 import { loadImage } from '@napi-rs/canvas';
 import path from 'path';
+import { Timer } from '../../utils/timerUtils.js';
 
 /**
  * MVP Ribbon Component
@@ -13,7 +14,7 @@ import path from 'path';
  * @returns {Promise<Object>} Prepared MVP ribbon data
  */
 async function prepareMvpRibbon(mvpData) {
-  const startTime = Date.now();
+  const timer = new Timer();
   const warnings = [];
 
   if (!mvpData?.isMvp) {
@@ -21,12 +22,11 @@ async function prepareMvpRibbon(mvpData) {
       shouldRender: false,
       image: null,
       warnings,
-      timings: {
-        load_ms: 0,
-      },
+      timings: timer.get(),
     };
   }
 
+  timer.start('load');
   try {
     const mvpSvgPath = path.join(process.cwd(), 'src', 'assets', 'ribbons', 'mvp.svg');
     const mvpSvg = await loadImage(mvpSvgPath);
@@ -37,9 +37,7 @@ async function prepareMvpRibbon(mvpData) {
       width: 200,
       height: 40,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   } catch (error) {
     console.error('Error loading MVP ribbon:', error);
@@ -49,9 +47,7 @@ async function prepareMvpRibbon(mvpData) {
       shouldRender: false,
       image: null,
       warnings,
-      timings: {
-        load_ms: Date.now() - startTime,
-      },
+      timings: timer.end('load').get(),
     };
   }
 }
@@ -95,13 +91,4 @@ function getMvpRibbonWarnings(prepared) {
   return prepared?.warnings || [];
 }
 
-/**
- * Get timings from MVP ribbon preparation
- * @param {Object} prepared - Prepared MVP ribbon data
- * @returns {Object} Timings
- */
-function getMvpRibbonTimings(prepared) {
-  return prepared?.timings || {};
-}
-
-export { prepareMvpRibbon, renderMvpRibbon, getMvpRibbonWarnings, getMvpRibbonTimings };
+export { prepareMvpRibbon, renderMvpRibbon, getMvpRibbonWarnings };
