@@ -1,5 +1,32 @@
 import { extractDisplayContent, filterReleases } from '../../utils/releasesUtils';
 
+export const metadata = {
+  title: 'Releases – Trailhead Banner',
+  description: 'See what is new in Trailhead Banner: changelog, feature updates, and release history.',
+  alternates: { canonical: 'https://thb.nabondance.me/releases' },
+  openGraph: {
+    title: 'Releases – Trailhead Banner',
+    description: 'See what is new in Trailhead Banner: changelog, feature updates, and release history.',
+    url: 'https://thb.nabondance.me/releases',
+    siteName: 'Trailhead Banner',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Trailhead Banner – LinkedIn Banner for Salesforce Trailblazers',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Releases – Trailhead Banner',
+    description: 'See what is new in Trailhead Banner: changelog, feature updates, and release history.',
+    images: ['/og-image.png'],
+  },
+};
+
 export default async function ReleasesPage() {
   try {
     const res = await fetch('https://api.github.com/repos/nabondance/trailhead-banner/releases', {

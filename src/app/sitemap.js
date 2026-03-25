@@ -1,25 +1,20 @@
 export default async function sitemap() {
   const baseUrl = 'https://thb.nabondance.me';
 
-  // Define your static routes
   const routes = [
-    '', // home page
-    '/background-library',
-    '/examples',
-    '/how-to',
-    '/legal',
-    '/releases',
-    '/rewind',
+    { path: '', priority: 1.0, changeFrequency: 'daily' },
+    { path: '/examples', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/how-to', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/background-library', priority: 0.7, changeFrequency: 'weekly' },
+    { path: '/rewind', priority: 0.6, changeFrequency: 'weekly' },
+    { path: '/releases', priority: 0.6, changeFrequency: 'weekly' },
+    { path: '/legal', priority: 0.5, changeFrequency: 'yearly' },
   ];
 
-  // Create sitemap entries for static routes
-  const staticRoutesSitemap = routes.map((route) => ({
-    url: `${baseUrl}${route}`,
+  return routes.map(({ path, priority, changeFrequency }) => ({
+    url: `${baseUrl}${path}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: route === '' ? 1 : 0.8,
+    changeFrequency,
+    priority,
   }));
-
-  // combine all the sitemap entries into a single array
-  return [...staticRoutesSitemap];
 }

@@ -31,13 +31,39 @@ const InterFont = Inter({
   display: 'swap',
 });
 
+const siteUrl = 'https://thb.nabondance.me';
+const ogImage = {
+  url: '/og-image.png',
+  width: 1200,
+  height: 630,
+  alt: 'Trailhead Banner – LinkedIn Banner for Salesforce Trailblazers',
+};
+
 export const metadata = {
+  metadataBase: new URL(siteUrl),
   title: 'Trailhead Banner',
   description: 'Generate your LinkedIn Banner with your Trailhead data',
-  url: 'https://thb.nabondance.me',
   keywords: 'Trailhead, LinkedIn, Banner, Header, Generator, Salesforce, Trailblazer, open-source',
   authors: [{ name: 'nabondance', url: 'https://nabondance.me' }],
   publisher: 'nabondance',
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    title: 'Trailhead Banner',
+    description: 'Generate your LinkedIn Banner with your Trailhead data',
+    url: siteUrl,
+    siteName: 'Trailhead Banner',
+    type: 'website',
+    locale: 'en_US',
+    images: [ogImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Trailhead Banner',
+    description: 'Generate your LinkedIn Banner with your Trailhead data',
+    images: ['/og-image.png'],
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '32x32' },
@@ -52,10 +78,31 @@ export const metadata = {
   },
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Trailhead Banner',
+  url: 'https://thb.nabondance.me',
+  description: 'Generate your LinkedIn Banner with your Trailhead data',
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  author: {
+    '@type': 'Person',
+    name: 'nabondance',
+    url: 'https://nabondance.me',
+  },
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang='en'>
       <head>
+        <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <link rel='icon' href='/favicon.ico' sizes='32x32' />
         <link rel='icon' href='/favicon-16x16.png' sizes='16x16' type='image/png' />
         <link rel='icon' href='/favicon-32x32.png' sizes='32x32' type='image/png' />
