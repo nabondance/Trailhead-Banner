@@ -127,6 +127,7 @@ When **adding** a new page, also update:
 
 1. `src/app/sitemap.js` — add an entry with appropriate `priority` and `changeFrequency`
 2. `public/llms.txt` — add a line under `## Pages` with the URL and a one-line description
+3. `public/llms-full.txt` — add the page under `## Pages` and update any relevant sections (API, features, etc.)
 
 When **removing** a page, remove it from both files as well.
 

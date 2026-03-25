@@ -1,0 +1,72 @@
+# Trailhead Banner — Full Reference for AI Agents
+
+> A free, open-source web application that generates custom LinkedIn banner images
+> from a Salesforce Trailhead user's profile data (badges, certifications, rank,
+> MVP status, AgentBlazer rank). Available at https://thb.nabondance.me.
+
+## Site Purpose
+
+Trailhead Banner lets Salesforce professionals showcase their Trailhead achievements
+on LinkedIn by automatically generating a personalised banner image (1584×396px PNG).
+Users enter their Trailhead username and receive a downloadable banner image showing
+their rank, certifications, superbadges, badge counts, and more.
+
+## Pages
+
+- https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
+- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn.
+- https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
+- https://thb.nabondance.me/background-library — Browse all 32 available background images for the banner.
+- https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
+- https://thb.nabondance.me/releases — Changelog and release history.
+- https://thb.nabondance.me/legal — Terms of use and privacy information.
+
+## Banner Content
+
+A generated banner (1584×396px) includes the following elements:
+
+- **Rank logo** — Trailblazer rank (e.g. Ranger, Mountaineer, Expeditioner, Double Star Ranger)
+- **Counters** — Badge count, superbadge count, certification count, stamp count
+- **AgentBlazer rank** — AgentBlazer status if the user has one
+- **Certifications** — Logos for all earned Salesforce certifications (expired shown in greyscale, retired at 50% opacity)
+- **Superbadges** — Logos for earned superbadges
+- **MVP ribbon** — Top-right corner ribbon for Salesforce MVP/All-Star MVP holders
+- **Background** — Chosen from a library of 32 Salesforce/Trailblazer themed backgrounds
+- **Watermark** — Trailhead Banner branding (bottom-right corner)
+
+## How To Use
+
+1. Go to https://thb.nabondance.me
+2. Enter a Trailhead username (e.g. `nabondance`) — not an email, not a full URL
+3. Optionally customise: choose a background, adjust badge label colour, upload a custom background
+4. Click Generate — the banner appears within ~1 second
+5. Download the PNG and upload it to LinkedIn as your profile banner
+
+### Username Rules
+
+- Must be the plain username (e.g. `nabondance`), not a URL or email
+- The Trailhead profile must be public
+- Certifications must be set to public in Trailhead settings
+
+## Background Library
+
+30+ backgrounds are available, themed around Salesforce events, locations, and Trailblazer.me imagery.
+Examples: Australia, Japan, France, Highland Waterfalls, Tropical Beach, and more.
+Full list visible at https://thb.nabondance.me/background-library.
+
+Users can also provide a custom background via URL or image upload.
+
+## Technical Details
+
+- **Output format:** PNG, returned as base64 data URL
+- **Canvas size:** 1584×396px (standard LinkedIn banner dimensions)
+- **Data source:** Salesforce Trailhead GraphQL API (cached 15 minutes via Upstash Redis)
+- **Rendering:** Server-side canvas via @napi-rs/canvas
+- **Generation time:** ~300–800ms end-to-end
+- **Framework:** Next.js 16, deployed on Vercel
+- **No account required, no user data stored**
+- **Open-source:** https://github.com/nabondance/trailhead-banner
+
+## Author
+
+nabondance — https://nabondance.me

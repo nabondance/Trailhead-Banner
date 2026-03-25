@@ -20,6 +20,11 @@ their Trailhead username and receive a downloadable PNG banner.
 - https://thb.nabondance.me/releases — Changelog and release history.
 - https://thb.nabondance.me/legal — Terms of use and privacy information.
 
+## Full Reference
+
+A more detailed reference for AI agents (API docs, banner content, technical details) is available at:
+https://thb.nabondance.me/llms-full.txt
+
 ## Key Facts
 
 - Free and open-source (GitHub: nabondance/trailhead-banner)
