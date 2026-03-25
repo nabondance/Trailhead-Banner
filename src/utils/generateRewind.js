@@ -181,7 +181,7 @@ async function drawHeader(ctx, year, username) {
   ctx.font = FontUtils.getFontString('bold', 120, FontUtils.getFontFamily('dela-gothic-one'));
 
   // Layer 1: Blue offset/underline shadow (drawn first, behind)
-  ctx.fillStyle = '#009edb'; // Trailhead-Banner blue
+  ctx.fillStyle = '#009edb'; // Trailhead Banner blue
   ctx.fillText(`Trailhead  Rewind`, 1080 + 12, yPosition + 12); // Offset down
 
   // Layer 2: White main text (on top)
@@ -222,7 +222,7 @@ async function drawYearSection(ctx, year) {
   ctx.font = FontUtils.getFontString('200', 400, FontUtils.getFontFamily('dela-gothic-one'));
 
   // Layer 1: Blue offset/underline shadow (drawn first, behind)
-  ctx.fillStyle = '#009edb'; // Trailhead-Banner blue
+  ctx.fillStyle = '#009edb'; // Trailhead Banner blue
   ctx.fillText(`${year}`, 20, 20);
 
   // Layer 2: White main text (on top)

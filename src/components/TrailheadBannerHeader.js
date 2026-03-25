@@ -29,7 +29,7 @@ const TrailheadBannerHeader = () => {
         <Link href='/'>
           <Image
             src='/assets/logos/trailhead-banner-logo.svg'
-            alt='Trailhead-Banner Logo'
+            alt='Trailhead Banner Logo'
             width={120}
             height={120}
             priority
@@ -37,7 +37,7 @@ const TrailheadBannerHeader = () => {
         </Link>
       </div>
       <div className='header-content'>
-        <h1>Trailhead-Banner</h1>
+        <h1>Trailhead Banner</h1>
         <h2>Generate your LinkedIn Banner with your Trailhead data</h2>
         <nav className='header-nav'>
           <NavDropdown label='Generators' options={generatorsOptions} defaultUrl='/' />
