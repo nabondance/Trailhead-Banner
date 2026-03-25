@@ -45,7 +45,7 @@ const TrailheadBannerFooter = () => {
         </GitHubButton>
       </div>
       <a href='https://nabondance.me' target='_blank' rel='noopener noreferrer' className='footer-link'>
-        &copy; {new Date().getFullYear() === 2025 ? '2025' : `2025-${new Date().getFullYear()}`} Trailhead-Banner by
+        &copy; {new Date().getFullYear() === 2025 ? '2025' : `2025-${new Date().getFullYear()}`} Trailhead Banner by
         /nabondance.me powered by Think2
       </a>
     </footer>

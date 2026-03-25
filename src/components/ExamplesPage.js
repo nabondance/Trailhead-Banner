@@ -43,7 +43,7 @@ const ExamplesPage = () => {
   return (
     <div className='page-container'>
       <h1>Examples</h1>
-      <h2>Check out some examples of LinkedIn banners generated with Trailhead-Banner</h2>
+      <h2>Check out some examples of LinkedIn banners generated with Trailhead Banner</h2>
       <h3>Click on an image to see it fullscreen.</h3>
       <div className='page-grid'>
         {examples.map((example, index) => (
