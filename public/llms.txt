@@ -1,0 +1,30 @@
+# Trailhead Banner
+
+> A free, open-source web application that generates custom LinkedIn banner images
+> from a Salesforce Trailhead user's profile data (badges, certifications, rank,
+> MVP status). Available at https://thb.nabondance.me.
+
+## Site Purpose
+
+Trailhead Banner lets Salesforce professionals showcase their Trailhead achievements
+on LinkedIn by automatically generating a personalised banner image. Users enter
+their Trailhead username and receive a downloadable PNG banner.
+
+## Pages
+
+- https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
+- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn.
+- https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
+- https://thb.nabondance.me/background-library — Browse available background images for the banner.
+- https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
+- https://thb.nabondance.me/releases — Changelog and release history.
+- https://thb.nabondance.me/legal — Terms of use and privacy information.
+
+## Key Facts
+
+- Free and open-source (GitHub: nabondance/trailhead-banner)
+- Data fetched live from Salesforce Trailhead GraphQL API
+- Banner generated server-side as a PNG, returned as base64
+- No account required, no data stored
+- Built with Next.js, deployed on Vercel
+- Author: nabondance (https://nabondance.me)
