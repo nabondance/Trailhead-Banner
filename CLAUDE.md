@@ -105,6 +105,31 @@ src/
 
 ## Common Tasks
 
+### Create or Edit a Page
+
+When creating a new page or editing an existing one, always add or update the `export const metadata` block at the top of the `page.js` file. Every page must have:
+
+- `title` — unique, descriptive, under 60 characters
+- `description` — unique, 1–2 sentences summarising the page content
+- `alternates.canonical` — absolute URL of the page
+- `openGraph` — title, description, url, siteName (`'Trailhead Banner'`), type (`'website'`), images (always include `{ url: '/og-image.png', width: 1200, height: 630, alt: '...' }`)
+- `twitter` — card (`'summary_large_image'`), title, description, images (`['/og-image.png']`)
+
+**OG images:** most pages use `/og-image.png` (default, 1200×630px). Exceptions:
+
+- `/rewind` uses `/og-image-rewind.png` — distinct seasonal identity
+
+> **Important:** page-level `openGraph` replaces (not merges) the layout default — always repeat the `images` array or the OG image will be lost.
+
+See any existing page (e.g. `src/app/examples/page.js`) as a reference.
+
+When **adding** a new page, also update:
+
+1. `src/app/sitemap.js` — add an entry with appropriate `priority` and `changeFrequency`
+2. `public/llms.txt` — add a line under `## Pages` with the URL and a one-line description
+
+When **removing** a page, remove it from both files as well.
+
 ### Add New Background Image
 
 1. Add to `public/assets/background-library/`
