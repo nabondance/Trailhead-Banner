@@ -19,8 +19,13 @@ import COUNTERS_CONFIG from '@/data/counters.json';
 
 const MAX_COUNTERS = 5;
 
-export default function DragAndDropCounterSelector({ selectedCounters, onCountersChange, maxCounters = MAX_COUNTERS }) {
-  const availableCounters = COUNTERS_CONFIG.filter(
+export default function DragAndDropCounterSelector({
+  selectedCounters,
+  onCountersChange,
+  maxCounters = MAX_COUNTERS,
+  countersConfig = COUNTERS_CONFIG,
+}) {
+  const availableCounters = countersConfig.filter(
     (counter) => !selectedCounters.find((selected) => selected.id === counter.id)
   );
 

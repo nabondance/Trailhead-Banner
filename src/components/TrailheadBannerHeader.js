@@ -13,6 +13,7 @@ const TrailheadBannerHeader = () => {
 
   const generatorsOptions = [
     { value: '/', label: 'Banner Generator' },
+    { value: '/company', label: 'Company Banner', isNew: true },
     ...(isRewindActive ? [{ value: '/rewind', label: 'Trailhead Rewind', isNew: true }] : []),
   ];
 

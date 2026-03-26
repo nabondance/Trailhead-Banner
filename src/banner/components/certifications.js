@@ -1,7 +1,12 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { getLocalCertificationData } from '../../utils/dataUtils.js';
 import { calculateCertificationsDesign, sortCertifications } from '../../utils/imageUtils.js';
-import { applyGrayscaleToCanvas, cropImage, generatePlusXCertificationsSvg } from '../../utils/drawUtils.js';
+import {
+  applyGrayscaleToCanvas,
+  cropImage,
+  generatePlusXCertificationsSvg,
+  generateCountBadgeSvg,
+} from '../../utils/drawUtils.js';
 import { getImage, getCertificationFileName } from '../../utils/cacheUtils.js';
 import { uploadImage } from '../../utils/blobUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
@@ -61,9 +66,9 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
   // Sort certifications
   certifications = sortCertifications(certifications, options.certificationSort, options.certificationSortOrder);
 
-  // Limit to last X if requested
+  // Limit to first X after sorting
   if (options.displayLastXCertifications && options.lastXCertifications) {
-    certifications = certifications.slice(-options.lastXCertifications);
+    certifications = certifications.slice(0, options.lastXCertifications);
   }
 
   const displayedCertifications = certifications.length;
@@ -198,6 +203,7 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
         product: cert.product,
         category: certificationLocalData?.category || '',
         difficulty: certificationLocalData?.difficulty || '',
+        count: cert.count ?? 1,
       };
     } catch (error) {
       console.error(`Error loading logo for ${cert.title}:`, error);
@@ -246,6 +252,18 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
     options.certificationSortOrder
   );
 
+  // Pre-load count badge SVG images for sharp rendering (company banner only)
+  if (options.showCertCount) {
+    await Promise.all(
+      certificationsLogos.map(async (entry) => {
+        if (entry && entry.count > 1) {
+          const svg = generateCountBadgeSvg(entry.count, '#009edb');
+          entry.countBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`);
+        }
+      })
+    );
+  }
+
   // Add "+X" badge if certifications are hidden
   if (hiddenCertifications > 0) {
     const plusXBadgeSvg = generatePlusXCertificationsSvg(hiddenCertifications);
@@ -279,6 +297,7 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
       displayed: displayedCertifications,
       hidden: hiddenCertifications,
     },
+    showCertCount: options.showCertCount ?? false,
     warnings,
     timings: timer.get(),
   };
@@ -310,12 +329,14 @@ async function renderCertifications(ctx, prepared, startX, startY) {
 
   const certifSpacing = layout.spacing ?? 5;
 
+  const showCertCount = prepared.showCertCount ?? false;
+
   let currentY = startY;
   let currentLine = 0;
   let currentX = startX + (layout.logoLineStartX[currentLine] ?? 0);
 
   for (let i = 0; i < logos.length; i++) {
-    const { logo, retired } = logos[i];
+    const { logo, retired, count, countBadgeImage } = logos[i];
 
     // Set transparency for retired certifications
     if (retired) {
@@ -325,6 +346,16 @@ async function renderCertifications(ctx, prepared, startX, startY) {
     }
 
     ctx.drawImage(logo, currentX, currentY, layout.logoWidth, layout.logoHeight);
+
+    // Draw ×N badge at bottom-right of the cert icon (company banner only)
+    if (showCertCount && count > 1 && countBadgeImage) {
+      const badgeRadius = layout.logoHeight * 0.14;
+      const badgeCX = currentX + layout.logoWidth - badgeRadius * 1.8;
+      const badgeCY = currentY + layout.logoHeight - badgeRadius * 0.9;
+      ctx.globalAlpha = 1.0;
+      ctx.drawImage(countBadgeImage, badgeCX - badgeRadius, badgeCY - badgeRadius, badgeRadius * 2, badgeRadius * 2);
+    }
+
     currentX += layout.logoWidth + certifSpacing;
 
     // Move to the next row if the current row is full

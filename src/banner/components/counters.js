@@ -29,16 +29,22 @@ async function prepareCounters(data, options = {}) {
   timer.start('prepare');
   const warnings = [];
 
-  // Extract counts from data
-  const badgeCount = data.badgesData?.trailheadStats?.earnedBadgesCount || 0;
-  const superbadgeCount = data.superbadgesData?.trailheadStats?.superbadgeCount || 0;
-  const certificationCount = (
-    data.certificationsData?.certifications?.filter(
-      (cert) =>
-        (options.includeExpiredCertifications || cert.status.expired === false) &&
-        (options.includeRetiredCertifications || cert.status.title !== 'Retired')
-    ) || []
-  ).length;
+  // Company-specific counters (pre-computed by companyDataUtils)
+  // When present, these override the standard calculations for shared counter types.
+  const cc = data.companyCounters || {};
+
+  // Extract counts from data (company pre-computed values take precedence)
+  const badgeCount = cc.badge ?? data.badgesData?.trailheadStats?.earnedBadgesCount ?? 0;
+  const superbadgeCount = cc.superbadge ?? data.superbadgesData?.trailheadStats?.superbadgeCount ?? 0;
+  const certificationCount =
+    cc.certification ??
+    (
+      data.certificationsData?.certifications?.filter(
+        (cert) =>
+          (options.includeExpiredCertifications || cert.status.expired === false) &&
+          (options.includeRetiredCertifications || cert.status.title !== 'Retired')
+      ) || []
+    ).length;
   const trailCount = data.rankData?.completedTrailCount || 0;
   const pointCount = getCounterPointText(data.rankData?.earnedPointsSum || 0);
   const stampCount = data.stampsData?.totalCount || 0;
@@ -63,6 +69,11 @@ async function prepareCounters(data, options = {}) {
     follower: { data: followerCount, label: 'Follower', color: '#E0357A' },
     following: { data: followingCount, label: 'Following', color: '#B02860' },
     group: { data: groupCount, label: 'Group', color: '#801D48' },
+    // Company-only counters
+    people: { data: cc.people || 0, label: 'Trailblazer', color: '#1f80c0' },
+    ranger: { data: cc.ranger || 0, label: 'Ranger', color: '#06482A' },
+    mvp: { data: cc.mvp || 0, label: 'MVP', color: '#E0357A' },
+    cta: { data: cc.cta || 0, label: 'CTA', color: '#C23934' },
   };
 
   // Get counter configuration (scale and spacing)

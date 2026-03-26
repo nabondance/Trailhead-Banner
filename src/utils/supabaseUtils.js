@@ -258,6 +258,47 @@ class SupabaseUtils {
     }
   }
 
+  static async updateCompanyBannerCounter(data) {
+    if (!supabase) {
+      console.log('[Supabase] Credentials not configured, skipping company banner counter update.');
+      return;
+    }
+    try {
+      const result = await SupabaseUtils.retryWithBackoff(async () => {
+        const { error } = await supabase.from('company_banners').insert([
+          {
+            thb_source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+            thb_version: packageJson.version,
+            thb_processing_time: data.processing_time,
+            thb_banner_hash: data.team_hash,
+            thb_team_size: data.team_size,
+            thb_count_resolved: data.resolved_count,
+            thb_count_failed: data.failed_count,
+            thb_failed_users: data.failed_users,
+            th_count_cert: data.cert_count,
+            th_count_active_cert: data.active_cert_count,
+            th_count_badge: data.badge_count,
+            th_count_sb: data.sb_count,
+            th_count_mvp: data.mvp_count,
+            th_count_ranger: data.ranger_count,
+            th_count_cta: data.cta_count,
+            thb_agentblazer: data.agentblazer,
+            thb_options: data.options,
+            thb_csv_requested: data.csv_requested,
+            thb_timings: data.timings,
+          },
+        ]);
+
+        if (error) {
+          throw new Error('Failed to add company banner: ' + error.message);
+        }
+      });
+      return result;
+    } catch (error) {
+      console.error('Error adding company banner (after retries):', error.message);
+    }
+  }
+
   static async updateErrors(errors_data) {
     if (!supabase) {
       console.log('[Supabase] Credentials not configured, skipping error update.');
