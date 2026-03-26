@@ -95,6 +95,16 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
     });
   } else if (sortOption === 'difficulty') {
     certifications.sort((a, b) => a.difficulty - b.difficulty);
+  } else if (sortOption === 'count') {
+    // Company banner: sort ascending; descendant reversal below will flip to most-held-first
+    certifications.sort((a, b) => (a.count ?? 1) - (b.count ?? 1));
+  } else if (sortOption === 'first-won') {
+    // Company banner: sort by earliest dateCompleted across the team
+    certifications.sort((a, b) => {
+      const dateA = a.dateCompleted ? new Date(normalizeDate(a.dateCompleted)) : new Date(0);
+      const dateB = b.dateCompleted ? new Date(normalizeDate(b.dateCompleted)) : new Date(0);
+      return dateA - dateB;
+    });
   }
 
   if (sortOrder === 'descendant') {
