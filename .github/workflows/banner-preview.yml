@@ -26,10 +26,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
           cache: pnpm
@@ -39,7 +39,7 @@ jobs:
         run: pnpm install
 
       - name: Restore Next.js build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .next/cache
           key: nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**/*.js', 'src/**/*.ts', 'src/**/*.tsx') }}
