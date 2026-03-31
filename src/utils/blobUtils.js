@@ -9,6 +9,7 @@ export const uploadImage = async (fileBuffer, fileName, folder = 'images') => {
     const blob = await put(filePath, fileBuffer, {
       access: 'public',
       addRandomSuffix: false,
+      allowOverwrite: true,
     });
     return blob.url;
   } catch (error) {
