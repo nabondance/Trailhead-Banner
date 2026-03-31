@@ -98,7 +98,7 @@
     "postcss": "^8.5.8",
     "prettier": "^3.8.1",
     "prettier-plugin-sh": "^0.18.0",
-    "stylelint": "^17.5.0",
+    "stylelint": "^17.6.0",
     "stylelint-config-standard": "^40.0.0"
   }
 }
