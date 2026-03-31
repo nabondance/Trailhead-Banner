@@ -17,7 +17,7 @@ on:
 # Blobs older than this many days are deleted.
 # ─────────────────────────────────────────────
 env:
-  RETENTION_DAYS: '30'
+  RETENTION_DAYS: '10'
   BLOB_PREFIX: 'pr-previews/'
 
 jobs:
