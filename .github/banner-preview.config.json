@@ -1,5 +1,5 @@
 {
-  "usernames": ["nabondance", "anna", "toddhalfpenny", "gauravkheterpal", "babup", "mrousseaux"],
+  "usernames": ["nabondance", "anna", "stevemo", "gauravkheterpal", "babup", "mrousseaux"],
 
   "defaultOptions": {
     "_description": "Exact website defaults — library background index 5, default counters",
@@ -89,7 +89,7 @@
       "counterOrder": ["certification", "superbadge", "badge"]
     },
 
-    "toddhalfpenny": {
+    "stevemo": {
       "_description": "Community focus — answer/follower counters, agentblazer lifetime, right-aligned certs",
       "backgroundKind": "procedural",
       "backgroundLibraryUrl": "/assets/background-library/hero-block__variation-2.png",
