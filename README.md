@@ -1,4 +1,4 @@
-# Trailhead-Banner
+# Trailhead Banner
 
 ![Vercel](https://vercelbadge.vercel.app/api/nabondance/trailhead-banner)
 [![MegaLinter](https://github.com/nabondance/Trailhead-Banner/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/nabondance/Trailhead-Banner/actions/workflows/mega-linter.yml)
@@ -23,6 +23,19 @@ Trailhead-Banner is a web application that allows users to generate LinkedIn ban
 - Display or hide various elements like badge count, superbadge count, rank logo, and certification count
 - Download the generated banner image
 - Responsive design
+
+## Powered by [Think2](https://think2.ai/trailhead-banner)
+
+A Salesforce partner focused on AI and founding sponsor of Trailhead Banner.
+Their sponsorship covers infrastructure costs and keeps this tool completely free — no ads, no cookies, no data selling.
+
+## Sponsors
+
+Thank you to everyone supporting this project ! [Become a sponsor](https://github.com/sponsors/nabondance)
+
+|                                                                                     |                                          |
+| ----------------------------------------------------------------------------------- | ---------------------------------------- |
+| [![nvuillam](https://github.com/nvuillam.png?size=40)](https://github.com/nvuillam) | [@nvuillam](https://github.com/nvuillam) |
 
 ## Thanks
 

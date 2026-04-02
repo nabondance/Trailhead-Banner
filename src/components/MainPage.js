@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useRef, Suspense } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
@@ -10,11 +9,6 @@ import ProductionWarning from './ProductionWarning';
 import BannerCount from './BannerCount';
 import AnnouncementBanner from './AnnouncementBanner';
 import packageJson from '../../package.json';
-
-const PoweredByThink2 = dynamic(() => import('./PoweredByThink2'), {
-  loading: () => null,
-  ssr: false,
-});
 
 const MainPage = () => {
   const [imageUrl, setImageUrl] = useState('');
@@ -166,9 +160,6 @@ const MainPage = () => {
           <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
-      <Suspense fallback={null}>
-        <PoweredByThink2 />
-      </Suspense>
     </div>
   );
 };
