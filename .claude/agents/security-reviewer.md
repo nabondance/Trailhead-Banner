@@ -20,11 +20,20 @@ Key areas to review (read these files first):
 ## Review Checklist
 
 ### 1. SSRF (Server-Side Request Forgery) — HIGH PRIORITY
-This project fetches external URLs for certification logo images.
-- Are private IP ranges blocked? (10.x, 172.16.x, 192.168.x, 127.x, 169.254.x)
-- Are only `https://` protocols allowed?
-- Is the URL validated before `fetch()` or `loadImage()`?
-- Could a user-supplied value reach an internal network endpoint?
+SSRF protection is already implemented in two places — verify it hasn't regressed:
+
+**`src/utils/cacheUtils.js`** (lines ~46-76) — `getImage()` blocks:
+- Private IPv4: `127.`, `10.`, `172.16–31.`, `192.168.`, `169.254.` (link-local)
+- Private IPv6: `::1`, `fe80:`
+- Protocol whitelist: `http:` and `https:` only
+- Timeout: 10s via axios
+
+**`src/banner/components/background.js`** (lines ~27-58) — custom background URL validation, identical ranges + 5s abort timeout + Content-Type `image/*` check
+
+When reviewing SSRF-sensitive changes:
+- Confirm new `loadImage()` calls go through `getImage()` from `cacheUtils.js`, not raw `fetch()`
+- Confirm the private range list hasn't been shortened
+- Check that redirects don't bypass the hostname check (redirect chain could resolve to private IP)
 
 ### 2. Input Validation
 - Does every API route validate and sanitize `req.body` / `req.query`?
