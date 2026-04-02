@@ -1,4 +1,4 @@
-import { getCountersConfig, getCounterPointText } from '../../utils/imageUtils.js';
+import { getCountersConfig, formatCounterValue } from '../../utils/imageUtils.js';
 import { drawBadgeCounter } from '../../utils/drawUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
 
@@ -40,7 +40,7 @@ async function prepareCounters(data, options = {}) {
     ) || []
   ).length;
   const trailCount = data.rankData?.completedTrailCount || 0;
-  const pointCount = getCounterPointText(data.rankData?.earnedPointsSum || 0);
+  const pointCount = data.rankData?.earnedPointsSum || 0;
   const stampCount = data.stampsData?.totalCount || 0;
   const answerCount = data.communityData?.questionAndAnswersStats?.answersCount || 0;
   const bestAnswerCount = data.communityData?.questionAndAnswersStats?.bestAnswersCount || 0;
@@ -76,12 +76,12 @@ async function prepareCounters(data, options = {}) {
     const counter = COUNTER_MAP[counterId];
     if (!counter) continue;
 
-    const shouldShow = counterId === 'point' ? counter.data != 0 : counter.data > 0;
+    const shouldShow = counter.data > 0;
     if (shouldShow) {
       countersToDisplay.push({
         id: counterId,
         label: counter.label,
-        value: counter.data,
+        value: formatCounterValue(counter.data),
         color: counter.color,
       });
     }
