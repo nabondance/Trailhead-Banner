@@ -129,16 +129,16 @@ const getCountersConfig = (options = {}) => {
   return { counter, badgeCounterScale, badgeCounterYDelta };
 };
 
-const getCounterPointText = (points) => {
-  if (points < 1000) return points.toString();
-  if (points < 1_000_000) return `${Math.floor(points / 1000)}k`;
-  if (points < 1_000_000_000) return `${Math.floor(points / 1_000_000)}M`;
-  return `${Math.floor(points / 1_000_000_000)}B`;
+const formatCounterValue = (value) => {
+  if (value < 10_000) return value.toString();
+  if (value < 1_000_000) return `${Math.floor(value / 1000)}k`;
+  if (value < 1_000_000_000) return `${Math.floor(value / 1_000_000)}M`;
+  return `${Math.floor(value / 1_000_000_000)}B`;
 };
 
 module.exports = {
   calculateCertificationsDesign,
   sortCertifications,
   getCountersConfig,
-  getCounterPointText,
+  formatCounterValue,
 };
