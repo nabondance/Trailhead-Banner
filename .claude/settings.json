@@ -14,7 +14,7 @@
       "Bash(pnpm format:stylelint:fix)",
       "Bash(curl -s http://localhost:3000:*)",
       "Bash(curl -s -X POST http://localhost:3000:*)",
-      "Read(/Users/nabondance/.claude/:*)",
+      "Read(/Users/nabondance/.claude/**)",
       "Bash(wc -c /Users/nabondance/.claude/:*)",
       "Bash(ls /Users/nabondance/.claude/:*)"
     ]
