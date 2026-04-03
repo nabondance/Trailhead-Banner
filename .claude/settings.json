@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash .claude/skills/:*)",
+      "Bash(bash .claude/hooks/:*)",
+      "Bash(cd /Users/nabondance/Git/Trailhead-Banner && bash .claude/skills/:*)",
+      "Bash(cd /Users/nabondance/Git/Trailhead-Banner && bash .claude/hooks/:*)",
+      "Bash(pnpm build)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm install)",
+      "Bash(pnpm format:prettier)",
+      "Bash(pnpm format:prettier:fix)",
+      "Bash(pnpm format:stylelint)",
+      "Bash(pnpm format:stylelint:fix)",
+      "Bash(curl -s http://localhost:3000:*)",
+      "Bash(curl -s -X POST http://localhost:3000:*)",
+      "Read(/Users/nabondance/.claude/**)",
+      "Bash(wc -c /Users/nabondance/.claude/:*)",
+      "Bash(ls /Users/nabondance/.claude/:*)"
+    ]
+  }
+}
