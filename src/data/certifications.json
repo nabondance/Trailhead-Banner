@@ -15,6 +15,10 @@
     "category": "ai",
     "difficulty": 5
   },
+  "Salesforce Certified Agentforce Life Sciences Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
   "Salesforce Certified Agentforce Specialist": {
     "category": "ai",
     "difficulty": 5
@@ -74,6 +78,10 @@
   "Salesforce Certified Data Architect": {
     "category": "architect",
     "difficulty": 8
+  },
+  "Salesforce Certified Data 360 Consultant": {
+    "category": "consultant",
+    "difficulty": 6
   },
   "Salesforce Certified Data Cloud Consultant": {
     "category": "consultant",
