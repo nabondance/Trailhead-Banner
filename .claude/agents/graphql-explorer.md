@@ -13,11 +13,11 @@ You are the GraphQL specialist for the Trailhead-Banner project. You have deep k
 
 There are three Trailhead GraphQL endpoints used by this project:
 
-| Endpoint | Used For |
-| -------- | -------- |
-| `https://profile.api.trailhead.com/graphql` | Rank, badges, certifications, agentblazer |
-| `https://community.api.trailhead.com/graphql` | MVP status, community stats |
-| `https://mobile.api.trailhead.com/graphql` | Stamps (event badges) |
+| Endpoint                                      | Used For                                  |
+| --------------------------------------------- | ----------------------------------------- |
+| `https://profile.api.trailhead.com/graphql`   | Rank, badges, certifications, agentblazer |
+| `https://community.api.trailhead.com/graphql` | MVP status, community stats               |
+| `https://mobile.api.trailhead.com/graphql`    | Stamps (event badges)                     |
 
 All endpoints accept `POST` with `Content-Type: application/json` and body `{ query, variables }`. No auth headers are needed for public profiles.
 
@@ -25,16 +25,16 @@ All endpoints accept `POST` with `Content-Type: application/json` and body `{ qu
 
 All queries live in `src/graphql/queries/`. Here is the complete map:
 
-| Query Name (QUERY_MAP key) | File | Endpoint | Key Response Path |
-| -------------------------- | ---- | -------- | ----------------- |
-| `GET_TRAILBLAZER_RANK` | `getTrailblazerRank.js` | profile.api | `data.data.profile.trailheadStats` |
-| `GET_USER_CERTIFICATIONS` | `getUserCertifications.js` | profile.api | `data.data.profile.credential` |
-| `GET_TRAILHEAD_BADGES` | `getTrailheadBadges.js` | profile.api | `data.data.profile` |
-| `GET_TRAILHEAD_BADGES_SUPERBADGE` | `getTrailheadBadges.js` (reused, filter=SUPERBADGE) | profile.api | `data.data.profile` |
-| `GET_MVP_STATUS` | `getMvpStatus.js` | community.api | `data.data.profileData` |
-| `GET_STAMPS` | `getStamps.js` | mobile.api | `data.data.earnedStamps` |
-| `GET_AGENTBLAZER_RANK` | `getAgentblazerRank.js` | profile.api | `data.data.profile.trailheadStats` |
-| `GET_COMMUNITY_STATS` | `getCommunityStats.js` | community.api | `data.data.profileData` |
+| Query Name (QUERY_MAP key)        | File                                                | Endpoint      | Key Response Path                  |
+| --------------------------------- | --------------------------------------------------- | ------------- | ---------------------------------- |
+| `GET_TRAILBLAZER_RANK`            | `getTrailblazerRank.js`                             | profile.api   | `data.data.profile.trailheadStats` |
+| `GET_USER_CERTIFICATIONS`         | `getUserCertifications.js`                          | profile.api   | `data.data.profile.credential`     |
+| `GET_TRAILHEAD_BADGES`            | `getTrailheadBadges.js`                             | profile.api   | `data.data.profile`                |
+| `GET_TRAILHEAD_BADGES_SUPERBADGE` | `getTrailheadBadges.js` (reused, filter=SUPERBADGE) | profile.api   | `data.data.profile`                |
+| `GET_MVP_STATUS`                  | `getMvpStatus.js`                                   | community.api | `data.data.profileData`            |
+| `GET_STAMPS`                      | `getStamps.js`                                      | mobile.api    | `data.data.earnedStamps`           |
+| `GET_AGENTBLAZER_RANK`            | `getAgentblazerRank.js`                             | profile.api   | `data.data.profile.trailheadStats` |
+| `GET_COMMUNITY_STATS`             | `getCommunityStats.js`                              | community.api | `data.data.profileData`            |
 
 ## Query Variable Patterns
 
@@ -46,7 +46,7 @@ Badge queries accept: `count` (default 5), `after` (cursor), `filter` (null or '
 
 **File:** `src/utils/redisCacheUtils.js`
 **Client:** Upstash Redis via `@upstash/redis`
-**Env vars:** `thb_KV_REST_API_URL` and `thb_KV_REST_API_TOKEN` (note: custom prefix, not UPSTASH_*)
+**Env vars:** `thb_KV_REST_API_URL` and `thb_KV_REST_API_TOKEN` (note: custom prefix, not UPSTASH\_\*)
 **TTL:** 900 seconds (15 minutes)
 **Cache key format:** `graphql:{username}:{QueryName}:{variablesHash8chars}`
 

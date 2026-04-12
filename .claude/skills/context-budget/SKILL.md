@@ -23,6 +23,7 @@ Then analyze the output:
    - SessionStart output > 100 tokens → slim hook script
 
 3. **Report format**
+
    ```text
    ALWAYS LOADED
      CLAUDE.md          ~XXX tokens
