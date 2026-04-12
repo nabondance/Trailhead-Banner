@@ -50,10 +50,7 @@ const tableRows = results.map((r) => {
 const imageSections = results
   .filter((r) => r.status === 200 && r.blobUrl)
   .map((r) => {
-    const warnBlock =
-      r.warnings.length > 0
-        ? `\n> **Warnings:**\n${r.warnings.map((w) => `> - ${w}`).join('\n')}`
-        : '';
+    const warnBlock = r.warnings.length > 0 ? `\n> **Warnings:**\n${r.warnings.map((w) => `> - ${w}`).join('\n')}` : '';
     return `### \`${r.username}\`\n![Banner for ${r.username}](${r.blobUrl})${warnBlock}`;
   });
 
@@ -83,10 +80,9 @@ if (errorRows.length > 0) {
 // Find and update existing comment, or post new one
 let comments;
 try {
-  const listRes = await fetch(
-    `https://api.github.com/repos/${repo}/issues/${prNumber}/comments?per_page=100`,
-    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
-  );
+  const listRes = await fetch(`https://api.github.com/repos/${repo}/issues/${prNumber}/comments?per_page=100`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+  });
   if (!listRes.ok) {
     const errBody = await listRes.text();
     console.error(`ERROR: Failed to list comments (${listRes.status} ${listRes.statusText}): ${errBody}`);
