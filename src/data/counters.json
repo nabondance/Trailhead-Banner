@@ -3,72 +3,112 @@
     "id": "badge",
     "label": "Badge",
     "color": "#1f80c0",
-    "defaultSelected": true
+    "defaultSelected": true,
+    "allowedIn": ["standard", "company"]
   },
   {
     "id": "superbadge",
     "label": "Superbadge",
     "color": "#f9a825",
-    "defaultSelected": true
+    "defaultSelected": true,
+    "allowedIn": ["standard", "company"]
   },
   {
     "id": "certification",
     "label": "Certification",
     "color": "#8a00c4",
-    "defaultSelected": true
+    "defaultSelected": true,
+    "allowedIn": ["standard", "company"]
   },
   {
     "id": "trail",
     "label": "Trail",
     "color": "#06482A",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "point",
     "label": "Point",
     "color": "#18477D",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "stamp",
     "label": "Stamp",
     "color": "#00B3A4",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "best-answer",
     "label": "Best Answer",
     "color": "#F0B800",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "answer",
     "label": "Answer",
     "color": "#C88000",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "question",
     "label": "Question",
     "color": "#9A6200",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "follower",
     "label": "Follower",
     "color": "#E0357A",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "following",
     "label": "Following",
     "color": "#B02860",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
   },
   {
     "id": "group",
     "label": "Group",
     "color": "#801D48",
-    "defaultSelected": false
+    "defaultSelected": false,
+    "allowedIn": ["standard"]
+  },
+  {
+    "id": "people",
+    "label": "Trailblazer",
+    "color": "#1f80c0",
+    "defaultSelected": true,
+    "allowedIn": ["company"]
+  },
+  {
+    "id": "ranger",
+    "label": "Ranger",
+    "color": "#06482A",
+    "defaultSelected": false,
+    "allowedIn": ["company"]
+  },
+  {
+    "id": "mvp",
+    "label": "MVP",
+    "color": "#E0357A",
+    "defaultSelected": false,
+    "allowedIn": ["company"]
+  },
+  {
+    "id": "cta",
+    "label": "CTA",
+    "color": "#C23934",
+    "defaultSelected": false,
+    "allowedIn": ["company"]
   }
 ]

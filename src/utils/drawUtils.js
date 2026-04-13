@@ -114,7 +114,7 @@ function getAntaFontBase64() {
 
 const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor) => {
   let labelToDisplay = label;
-  if (message != 0) {
+  if (message > 1) {
     labelToDisplay += 's';
   }
 
@@ -950,12 +950,20 @@ function drawStylizedText(ctx, text, fontSize, x, y, style) {
   ctx.restore();
 }
 
+const generateCountBadgeSvg = (count, color = '#009edb') => {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+    <circle cx="100" cy="100" r="100" fill="${color}" fill-opacity="0.7"/>
+    <text x="100" y="138" fill="#ffffff" font-family="Anta, Arial, sans-serif" font-weight="bold" font-size="110" text-anchor="middle">×${count}</text>
+  </svg>`;
+};
+
 export {
   applyGrayscaleToCanvas,
   cropImage,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
   generatePlusXCertificationsSvg,
+  generateCountBadgeSvg,
   getRankAccentColor,
   getAgentblazerStyle,
   drawStylizedText,

@@ -17,6 +17,7 @@ their rank, certifications, superbadges, badge counts, and more.
 - https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn.
 - https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
 - https://thb.nabondance.me/background-library — Browse all 32 available background images for the banner.
+- https://thb.nabondance.me/company — Generate a company/team banner aggregating multiple Trailhead profiles into a single banner with collective certifications, badges, Agentblazer levels, and optional CSV skills matrix export.
 - https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
 - https://thb.nabondance.me/releases — Changelog and release history.
 - https://thb.nabondance.me/legal — Terms of use and privacy information.
