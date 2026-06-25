@@ -73,7 +73,10 @@
     "react-tooltip": "^6.0.7"
   },
   "pnpm": {
-    "overrides": {}
+    "overrides": {
+      "postcss": "8.5.10",
+      "undici": "6.27.0"
+    }
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
