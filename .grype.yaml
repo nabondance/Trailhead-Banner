@@ -23,22 +23,15 @@ ignore:
   - vulnerability: CVE-2018-20225
 
   # --- Build/lint-time-only transitive deps (no runtime impact) ---
-  # fast-uri: pulled via ajv (JSON-schema/lint tooling), not in production tree.
-  - vulnerability: GHSA-q3j6-qgpj-74h6
-    package:
-      name: fast-uri
-  - vulnerability: GHSA-v39h-62p7-jpjc
-    package:
-      name: fast-uri
-  # js-yaml: build/lint tooling, not in production tree.
-  - vulnerability: GHSA-h67p-54hq-rp68
-    package:
-      name: js-yaml
-  # brace-expansion: glob/minimatch in tooling, not in production tree.
-  - vulnerability: GHSA-jxxr-4gwj-5jf2
-    package:
-      name: brace-expansion
-  # @babel/core: build-time transpilation only, not in production tree.
-  - vulnerability: GHSA-4x5r-pxfx-6jf8
-    package:
-      name: '@babel/core'
+  # Verified absent from the production tree via `pnpm why --prod`. These run
+  # only during CI/build, never in the deployed app, so ALL advisories on them
+  # are ignored (not just the currently-known ones) to avoid recurring upkeep.
+  # Re-evaluate a package here if it ever enters the runtime dependency tree.
+  - package:
+      name: fast-uri # via ajv → JSON-schema/lint tooling
+  - package:
+      name: js-yaml # build/lint tooling
+  - package:
+      name: brace-expansion # glob/minimatch in tooling
+  - package:
+      name: '@babel/core' # build-time transpilation
