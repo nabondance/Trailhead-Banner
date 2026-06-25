@@ -1,0 +1,44 @@
+# Grype configuration for MegaLinter.
+#
+# MegaLinter uses this repo-level file in place of its bundled default
+# (TEMPLATES/.grype.yaml). The settings below mirror that default, plus
+# documented ignore rules for advisories with no runtime impact.
+#
+# Policy:
+#   - Dependencies present in the PRODUCTION tree (verified with
+#     `pnpm why --prod <pkg>`) are remediated for real by pinning them to a
+#     patched version in package.json > pnpm.overrides (currently: undici,
+#     postcss).
+#   - Advisories in build/lint-time-only transitive deps (absent from the
+#     production tree, so not shipped or executed by the deployed app) are
+#     ignored here by their advisory ID, with the affected package noted.
+#     Each entry should be re-evaluated if the package ever enters the
+#     runtime dependency tree.
+
+# Fail on findings at or above this severity (mirrors MegaLinter default).
+fail-on-severity: 'high'
+
+ignore:
+  # Disputed/unwarranted — preserved from the MegaLinter default template.
+  - vulnerability: CVE-2018-20225
+
+  # --- Build/lint-time-only transitive deps (no runtime impact) ---
+  # fast-uri: pulled via ajv (JSON-schema/lint tooling), not in production tree.
+  - vulnerability: GHSA-q3j6-qgpj-74h6
+    package:
+      name: fast-uri
+  - vulnerability: GHSA-v39h-62p7-jpjc
+    package:
+      name: fast-uri
+  # js-yaml: build/lint tooling, not in production tree.
+  - vulnerability: GHSA-h67p-54hq-rp68
+    package:
+      name: js-yaml
+  # brace-expansion: glob/minimatch in tooling, not in production tree.
+  - vulnerability: GHSA-jxxr-4gwj-5jf2
+    package:
+      name: brace-expansion
+  # @babel/core: build-time transpilation only, not in production tree.
+  - vulnerability: GHSA-4x5r-pxfx-6jf8
+    package:
+      name: '@babel/core'

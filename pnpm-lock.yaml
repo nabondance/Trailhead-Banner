@@ -5,12 +5,8 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  fast-uri: 3.1.2
-  brace-expansion@5: 5.0.6
   postcss: 8.5.10
   undici: 6.27.0
-  js-yaml@4: 4.2.0
-  '@babel/core': 7.29.6
 
 importers:
 
@@ -148,7 +144,7 @@ packages:
     resolution: {integrity: sha512-67oXFAYr2cDLDVGLXTEABjdBJZ6drElUSI7WKp70NrpyISso3plG9SAGEF6y7zbha/wOzUByWWTJvEDVNIUGcA==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': 7.29.6
+      '@babel/core': ^7.0.0
 
   '@babel/helper-string-parser@7.27.1':
     resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
