@@ -18,6 +18,7 @@ const TrailheadBannerHeader = () => {
 
   const aboutOptions = [
     { value: '/releases', label: 'Releases' },
+    { value: '/sponsors', label: 'Sponsors' },
     { value: '/legal', label: 'Terms & Privacy' },
     { value: 'https://github.com/nabondance/Trailhead-Stats', label: 'Trailhead Stats' },
   ];

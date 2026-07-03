@@ -18,6 +18,7 @@ their Trailhead username and receive a downloadable PNG banner.
 - https://thb.nabondance.me/background-library — Browse available background images for the banner.
 - https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
 - https://thb.nabondance.me/releases — Changelog and release history.
+- https://thb.nabondance.me/sponsors — Sponsors and supporters who help keep the project running.
 - https://thb.nabondance.me/legal — Terms of use and privacy information.
 
 ## Full Reference

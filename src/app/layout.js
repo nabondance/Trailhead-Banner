@@ -147,7 +147,6 @@ export default function RootLayout({ children }) {
             <TrailheadBannerHeader />
           </header>
           <main>{children}</main>
-          <Sponsors />
           <TrailheadBannerFooter />
         </ThemeProvider>
       </body>

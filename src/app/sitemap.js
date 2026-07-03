@@ -8,6 +8,7 @@ export default async function sitemap() {
     { path: '/background-library', priority: 0.7, changeFrequency: 'weekly' },
     { path: '/rewind', priority: 0.6, changeFrequency: 'weekly' },
     { path: '/releases', priority: 0.6, changeFrequency: 'weekly' },
+    { path: '/sponsors', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/legal', priority: 0.5, changeFrequency: 'yearly' },
   ];
 
