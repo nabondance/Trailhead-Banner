@@ -8,6 +8,7 @@ import BannerForm from './BannerForm';
 import ProductionWarning from './ProductionWarning';
 import BannerCount from './BannerCount';
 import AnnouncementBanner from './AnnouncementBanner';
+import Sponsors from './Sponsors';
 import packageJson from '../../package.json';
 
 const MainPage = () => {
@@ -160,6 +161,7 @@ const MainPage = () => {
           <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
+      <Sponsors />
     </div>
   );
 };

@@ -1812,6 +1812,34 @@ select:focus {
   line-height: 1.4;
 }
 
+.sponsors-cta {
+  max-width: min(800px, 100vw);
+  margin: 0 auto 24px;
+  padding: 16px;
+  text-align: center;
+}
+
+.sponsors-cta p {
+  font-size: 0.95em;
+  color: var(--text-contrast);
+  margin: 0 0 12px;
+}
+
+.sponsors-cta-button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-weight: bold;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.sponsors-cta-button:hover {
+  opacity: 0.85;
+}
+
 .sponsors-tier {
   margin-top: 12px;
   margin-bottom: 0;
