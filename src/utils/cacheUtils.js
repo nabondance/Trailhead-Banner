@@ -83,6 +83,13 @@ export const getImage = async (imageUrl, folder = 'images') => {
     const response = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
       timeout: 10000, // 10 second timeout
+      // the private-IP blocklist above only checks the INITIAL url — following
+      // redirects would let an allowed host bounce the request to an internal
+      // address (SSRF), so refuse them outright
+      maxRedirects: 0,
+      // images only: don't buffer arbitrarily large bodies into memory
+      maxContentLength: 20 * 1024 * 1024,
+      maxBodyLength: 20 * 1024 * 1024,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',

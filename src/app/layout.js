@@ -2,9 +2,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import '../styles/globals.css';
 
-import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
-import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
-import Sponsors from '../components/Sponsors';
+import SiteChrome from '../components/SiteChrome';
 
 import ThemeProvider from '../components/ThemeProvider';
 
@@ -143,12 +141,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
-          <header className='header'>
-            <TrailheadBannerHeader />
-          </header>
-          <main>{children}</main>
-          <Sponsors />
-          <TrailheadBannerFooter />
+          <SiteChrome>{children}</SiteChrome>
         </ThemeProvider>
       </body>
     </html>
