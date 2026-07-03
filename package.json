@@ -57,6 +57,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/react-fontawesome": "^3.5.0",
     "@napi-rs/canvas": "^1.0.10",
+    "@react-three/fiber": "^9.6.1",
     "@supabase/supabase-js": "^2.117.3",
     "@theme-toggles/react": "^5.0.5",
     "@upstash/ratelimit": "^2.2.0",
@@ -67,13 +68,15 @@
     "axios": "^1.20.0",
     "countup.js": "^2.10.1",
     "fflate": "^0.8.3",
+    "mp4-muxer": "^5.2.2",
     "next": "16.4.1",
     "next-themes": "^0.4.6",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-easy-crop": "^6.2.4",
     "react-github-btn": "^1.4.0",
-    "react-tooltip": "^6.0.8"
+    "react-tooltip": "^6.0.8",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
