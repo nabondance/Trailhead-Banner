@@ -70,6 +70,9 @@ export function aggregateCompanyData(usersData, options = {}) {
   // --- Cert aggregation ---
   // Map: cert title → { cert object, holders: [{ username, dateCompleted, expired }] }
   const certMap = new Map();
+  // All cert titles for the CSV columns: unlike certMap, never filtered by the
+  // includeExpiredCertifications display option — the CSV exports full truth
+  const csvCertTitleSet = new Set();
 
   // --- Superbadge aggregation ---
   const allSuperbadges = [];
@@ -110,6 +113,7 @@ export function aggregateCompanyData(usersData, options = {}) {
     const certs = certificationsData?.certifications || [];
     let userActiveCerts = 0;
     let userExpiredCerts = 0;
+    let userRetiredCerts = 0;
     let userTotalCerts = 0;
     let hasCta = false;
 
@@ -119,17 +123,23 @@ export function aggregateCompanyData(usersData, options = {}) {
       const isExpired = cert.status?.expired === true;
       const isRetired = cert.status?.title === 'Retired';
 
-      // Skip expired if option says active only (default for company is include all-time)
-      if (!includeExpired && isExpired) continue;
-
+      // Per-user truth (feeds the CSV): count every cert regardless of the
+      // includeExpiredCertifications display option — the CSV is an audit
+      // artifact, banner options are cosmetic. Active excludes retired.
       userTotalCerts++;
       if (isExpired) {
         userExpiredCerts++;
+      } else if (isRetired) {
+        userRetiredCerts++;
       } else {
         userActiveCerts++;
       }
+      csvCertTitleSet.add(cert.title);
 
-      if (cert.title === CTA_CERT_TITLE && !isExpired) hasCta = true;
+      if (cert.title === CTA_CERT_TITLE && !isExpired && !isRetired) hasCta = true;
+
+      // Banner display: skip expired if option says active only
+      if (!includeExpired && isExpired) continue;
 
       // Add to cert map
       if (!certMap.has(cert.title)) {
@@ -184,6 +194,7 @@ export function aggregateCompanyData(usersData, options = {}) {
       certifications_total: userTotalCerts,
       certifications_active: userActiveCerts,
       certifications_expired: userExpiredCerts,
+      certifications_retired: userRetiredCerts,
       mvp: isMvp,
       agentblazer_current: currentLevel || 'none',
       agentblazer_alltime_high: allTimeHighLevel || 'none',
@@ -218,14 +229,16 @@ export function aggregateCompanyData(usersData, options = {}) {
         title: isRetired ? 'Retired' : displayExpired ? 'Expired' : 'Active',
       },
       count,
+      activeHolderCount: activeHolders.length,
       isRetired,
     });
   }
 
   const totalCerts = aggregatedCerts.reduce((sum, c) => sum + c.count, 0);
-  const activeCerts = aggregatedCerts
-    .filter((c) => !c.status.expired && !c.isRetired)
-    .reduce((sum, c) => sum + c.count, 0);
+  // Per-holder active count (matches the CSV's ACTIVE_TOTAL): a teammate's
+  // expired copy doesn't count as active just because someone else's is live,
+  // and retired certs are never "active"
+  const activeCerts = aggregatedCerts.filter((c) => !c.isRetired).reduce((sum, c) => sum + c.activeHolderCount, 0);
   return {
     // For cert grid rendering (passed as certificationsData to certifications component)
     certificationsData: {
@@ -258,11 +271,12 @@ export function aggregateCompanyData(usersData, options = {}) {
       })),
     },
 
-    // For CSV
+    // For CSV — cert columns come from the unfiltered title set so the export
+    // is complete even when display options hide certs from the banner
     perUserData,
     agentblazerCurrentLevels,
     agentblazerAllTimeLevels,
-    allCertTitles: aggregatedCerts.map((c) => c.title),
+    allCertTitles: [...csvCertTitleSet],
 
     // Metadata
     agentblazerLevels: AGENTBLAZER_LEVELS,
