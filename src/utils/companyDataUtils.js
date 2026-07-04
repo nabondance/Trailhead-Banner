@@ -2,8 +2,9 @@ import { getHighestAgentblazerRankPerYear } from './dataUtils.js';
 
 const CTA_CERT_TITLE = 'Salesforce Certified Technical Architect';
 
-// Agentblazer level display order (highest prestige first)
-const AGENTBLAZER_LEVELS = ['Legend', 'Champion', 'Innovator'];
+// Agentblazer level display order (highest prestige first).
+// API numbering: Legend=3, Innovator=2, Champion=1 — Champion is the ENTRY level.
+const AGENTBLAZER_LEVELS = ['Legend', 'Innovator', 'Champion'];
 
 /**
  * Determine the agentblazer level for a user given their raw agentblazer data and display mode.
@@ -25,8 +26,9 @@ function getUserAgentblazerLevel(agentblazerData, displayMode) {
       return highest;
     }, null);
   } else {
-    // current: most recent active rank
-    selectedRank = ranksPerYear.find((r) => r.active === true) || ranksPerYear[0];
+    // current: strictly the active rank — a lapsed past-year rank is not
+    // "current" (users who want lapsed ranks counted can pick All Time High)
+    selectedRank = ranksPerYear.find((r) => r.active === true) || null;
   }
 
   return selectedRank?.title || null;

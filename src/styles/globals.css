@@ -766,6 +766,23 @@ legend {
   }
 }
 
+.progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 10px;
+  background-color: var(--primary);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--secondary);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
 .image-container {
   text-align: center;
   margin-bottom: 20px;

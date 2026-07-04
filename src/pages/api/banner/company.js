@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { generateCompanyBanner } from '../../../banner/renderers/companyBanner';
-import { fetchCompanyData, parseUsernames } from '../../../utils/companyFetchUtils';
+import { fetchCompanyData, parseUsernames, computeQueryNeeds } from '../../../utils/companyFetchUtils';
 import { aggregateCompanyData } from '../../../utils/companyDataUtils';
 import { generateCompanyCsv } from '../../../utils/companyCsvUtils';
 import SupabaseUtils from '../../../utils/supabaseUtils';
@@ -11,6 +11,22 @@ import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 function buildTeamHash(usernames) {
   const sorted = [...usernames].sort().join(',');
   return crypto.createHash('sha256').update(sorted).digest('hex').slice(0, 12);
+}
+
+/**
+ * Options copy safe for analytics logging: uploaded images arrive as base64
+ * data-URLs (multi-MB) and must not be written to Supabase.
+ */
+function sanitizeOptionsForLogging(options) {
+  const sanitized = { ...options };
+  for (const key of ['backgroundImageUrl', 'customBackgroundImageUrl', 'companyLogoUrl']) {
+    if (typeof sanitized[key] === 'string' && sanitized[key].startsWith('data:')) {
+      sanitized[key] = '[uploaded-image]';
+    }
+  }
+  // Duplicate of counterOrder as full config objects — ids are enough
+  delete sanitized.selectedCounters;
+  return sanitized;
 }
 
 export const config = {
@@ -37,14 +53,46 @@ export default async function handler(req, res) {
   const body = req.body || {};
   const options = body.options || {};
   const rawUsernames = body.usernames;
+  // Pre-fetched data from the chunked /api/banner/company-fetch flow
+  const preFetched = Array.isArray(body.resolvedData) ? body.resolvedData : null;
 
   try {
-    // Validate usernames input
-    const usernames = Array.isArray(rawUsernames)
-      ? rawUsernames
-      : parseUsernames(typeof rawUsernames === 'string' ? rawUsernames : '');
+    let usernames;
+    let resolved;
+    let failed;
 
-    if (!usernames || usernames.length === 0) {
+    if (preFetched) {
+      // Chunked flow: the client already fetched user data chunk by chunk.
+      // The fetch time was spent in /api/banner/company-fetch invocations, so
+      // the client reports its fetch wall-time for accurate processing_time
+      // analytics (clamped to 30min to keep garbage values out of the stats).
+      const clientFetchMs = Math.min(Math.max(0, Math.round(Number(body.clientFetchMs) || 0)), 30 * 60 * 1000);
+      resolved = preFetched.filter((u) => u && typeof u.username === 'string');
+      failed = Array.isArray(body.failedUsers)
+        ? body.failedUsers.filter((f) => f && typeof f.username === 'string')
+        : [];
+      usernames = [...resolved.map((u) => u.username), ...failed.map((f) => f.username)];
+      timings.add('fetch_ms', clientFetchMs);
+    } else {
+      // Direct flow: fetch everything server-side (throttled)
+      usernames = Array.isArray(rawUsernames)
+        ? rawUsernames
+        : parseUsernames(typeof rawUsernames === 'string' ? rawUsernames : '');
+
+      if (usernames.length === 0) {
+        return res.status(400).json({
+          error: 'At least one username is required',
+          validationError: true,
+        });
+      }
+
+      timings.start('fetch');
+      console.log(`[Company Banner] Fetching data for ${usernames.length} usernames`);
+      ({ resolved, failed } = await fetchCompanyData(usernames, { queryOptions: options }));
+      timings.end('fetch');
+    }
+
+    if (usernames.length === 0) {
       return res.status(400).json({
         error: 'At least one username is required',
         validationError: true,
@@ -53,12 +101,6 @@ export default async function handler(req, res) {
 
     // Build a stable team identifier from sorted usernames
     const teamHash = buildTeamHash(usernames);
-
-    // Fetch data for all usernames in parallel
-    timings.start('fetch');
-    console.log(`[Company Banner] Fetching data for ${usernames.length} usernames`);
-    const { resolved, failed } = await fetchCompanyData(usernames);
-    timings.end('fetch');
 
     console.log(`[Company Banner] Resolved: ${resolved.length}, Failed: ${failed.length}`);
 
@@ -90,13 +132,17 @@ export default async function handler(req, res) {
     }
 
     const allTimings = timings.getAll();
-    allTimings.total_ms = Date.now() - startTime;
+    // For the chunked flow the fetch happened client-side, so include its
+    // reported duration in the total processing time
+    allTimings.total_ms = Date.now() - startTime + (preFetched ? allTimings.fetch_ms : 0);
 
     console.log(
       `[Company Banner] Total: ${allTimings.total_ms}ms | Fetch: ${allTimings.fetch_ms}ms | Agg: ${allTimings.aggregation_ms}ms | Image: ${allTimings.image_generation_ms}ms`
     );
 
-    // Analytics (non-blocking)
+    // Analytics (non-blocking). mvp_count is null when the MVP query was
+    // skipped (see computeQueryNeeds) — 0 would mean "no MVPs", not "unknown".
+    const mvpFetched = computeQueryNeeds(options).mvp;
     SupabaseUtils.updateCompanyBannerCounter({
       team_hash: teamHash,
       processing_time: allTimings.total_ms,
@@ -108,11 +154,11 @@ export default async function handler(req, res) {
       active_cert_count: aggregated.counters['active-certs'],
       badge_count: aggregated.counters.badge,
       sb_count: aggregated.counters.superbadge,
-      mvp_count: aggregated.counters.mvp,
+      mvp_count: mvpFetched ? aggregated.counters.mvp : null,
       ranger_count: aggregated.counters.ranger,
       cta_count: aggregated.counters.cta,
       agentblazer: aggregated.agentblazer,
-      options,
+      options: sanitizeOptionsForLogging(options),
       csv_requested: !!options.generateCsv,
       timings: allTimings,
     }).catch((error) => {

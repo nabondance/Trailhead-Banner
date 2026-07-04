@@ -21,6 +21,9 @@ import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 // The compact company banner only renders the first N counters (see companyBanner.js),
 // so the UI selection is capped to the same number to stay in sync.
 const MAX_COMPANY_COUNTERS = 2;
+// Usernames are fetched in chunks so Trailhead's rate limit is respected and
+// progress can be shown. Must not exceed FETCH_CHUNK_SIZE in companyFetchUtils.js.
+const FETCH_CHUNK_SIZE = 25;
 const COMPANY_COUNTERS = COUNTERS_CONFIG.filter((c) => c.allowedIn?.includes('company'));
 // Default pair: team size (Trailblazers) for context + certifications as the headline metric.
 // Superbadges/certs are already shown as graphics, so counting Trailblazers adds non-redundant info.
@@ -28,6 +31,38 @@ const DEFAULT_COMPANY_COUNTER_IDS = ['people', 'certification'];
 const DEFAULT_COMPANY_COUNTERS = DEFAULT_COMPANY_COUNTER_IDS.map((id) =>
   COMPANY_COUNTERS.find((c) => c.id === id)
 ).filter(Boolean);
+
+/**
+ * Fetch Trailhead data for usernames chunk by chunk via /api/banner/company-fetch.
+ * Sequential chunks keep the request rate under Trailhead's per-IP limit and
+ * let the UI show real progress. onProgress receives the number of usernames done.
+ */
+async function fetchUsersInChunks(usernames, onProgress, fetchOptions = {}) {
+  const resolved = [];
+  const failed = [];
+  let done = 0;
+
+  for (let i = 0; i < usernames.length; i += FETCH_CHUNK_SIZE) {
+    const chunk = usernames.slice(i, i + FETCH_CHUNK_SIZE);
+    try {
+      const response = await fetch('/api/banner/company-fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernames: chunk, options: fetchOptions }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Fetch failed');
+      resolved.push(...(data.resolved || []));
+      failed.push(...(data.failed || []));
+    } catch {
+      failed.push(...chunk.map((username) => ({ username, status: 'error' })));
+    }
+    done += chunk.length;
+    onProgress(done);
+  }
+
+  return { resolved, failed };
+}
 
 const CompanyBannerForm = () => {
   const [usernamesRaw, setUsernamesRaw] = useState('');
@@ -76,6 +111,7 @@ const CompanyBannerForm = () => {
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [fetchProgress, setFetchProgress] = useState(null); // { phase: 'fetch'|'retry'|'render', done, total }
   const [resultImageUrl, setResultImageUrl] = useState(null);
   const [resultCsvData, setResultCsvData] = useState(null);
   const [teamHash, setTeamHash] = useState('');
@@ -164,22 +200,63 @@ const CompanyBannerForm = () => {
 
     const counterOrder = options.selectedCounters.map((c) => c.id);
 
-    const payload = {
-      usernames,
-      options: {
-        ...options,
-        counterOrder,
-        backgroundImageUrl,
-        lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
-        lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
-      },
+    const bannerOptions = {
+      ...options,
+      counterOrder,
+      backgroundImageUrl,
+      lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
+      lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
     };
 
     try {
+      // Only the fields that decide which queries each user needs — not the
+      // full options (backgroundImageUrl can be a large base64 payload)
+      const fetchOptions = {
+        generateCsv: bannerOptions.generateCsv,
+        counterOrder,
+      };
+
+      // Phase 1: fetch Trailhead data in chunks with progress
+      const fetchStartTime = Date.now();
+      setFetchProgress({ phase: 'fetch', done: 0, total: usernames.length });
+      const { resolved, failed } = await fetchUsersInChunks(
+        usernames,
+        (done) => setFetchProgress({ phase: 'fetch', done, total: usernames.length }),
+        fetchOptions
+      );
+
+      // Retry rate-limited users once — Trailhead's limit usually clears quickly
+      let finalFailed = failed.filter((f) => f.status !== 'rate_limited');
+      const toRetry = failed.filter((f) => f.status === 'rate_limited').map((f) => f.username);
+      if (toRetry.length > 0) {
+        setFetchProgress({ phase: 'retry', done: 0, total: toRetry.length });
+        const retryResult = await fetchUsersInChunks(
+          toRetry,
+          (done) => setFetchProgress({ phase: 'retry', done, total: toRetry.length }),
+          fetchOptions
+        );
+        resolved.push(...retryResult.resolved);
+        finalFailed = [...finalFailed, ...retryResult.failed];
+      }
+      const clientFetchMs = Date.now() - fetchStartTime;
+
+      if (resolved.length === 0) {
+        setMainError(new Error('None of the provided usernames could be resolved. Check usernames and try again.'));
+        setFailedUsers(finalFailed);
+        return;
+      }
+
+      // Phase 2: aggregate and render the banner from the fetched data
+      setFetchProgress({ phase: 'render' });
       const response = await fetch('/api/banner/company', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          resolvedData: resolved,
+          failedUsers: finalFailed,
+          clientFetchMs,
+          options: bannerOptions,
+        }),
       });
 
       const data = await response.json();
@@ -199,6 +276,7 @@ const CompanyBannerForm = () => {
       setMainError(new Error('An unexpected error occurred. Please try again.'));
     } finally {
       setIsGenerating(false);
+      setFetchProgress(null);
     }
   };
 
@@ -631,9 +709,11 @@ const CompanyBannerForm = () => {
                     ? 'Profile is private — make it public in Trailhead settings'
                     : u.status === 'timeout'
                       ? 'Request timed out — try again later'
-                      : u.status === 'error'
-                        ? 'Unexpected error — try again later'
-                        : 'Username not found — check the spelling'}
+                      : u.status === 'rate_limited'
+                        ? 'Trailhead rate limit reached — try again in a minute'
+                        : u.status === 'error'
+                          ? 'Unexpected error — try again later'
+                          : 'Username not found — check the spelling'}
                 </li>
               ))}
             </ul>
@@ -647,10 +727,25 @@ const CompanyBannerForm = () => {
         )}
       </form>
 
-      {/* Spinner */}
+      {/* Progress */}
       {isGenerating && (
         <div className='loading-container'>
-          <p>Generating the banner...</p>
+          {fetchProgress?.phase === 'fetch' || fetchProgress?.phase === 'retry' ? (
+            <>
+              <p>
+                {fetchProgress.phase === 'retry' ? 'Retrying rate-limited Trailblazers…' : 'Fetching Trailblazer data…'}{' '}
+                {Math.min(fetchProgress.done, fetchProgress.total)}/{fetchProgress.total}
+              </p>
+              <div className='progress-bar'>
+                <div
+                  className='progress-bar-fill'
+                  style={{ width: `${Math.min(100, (fetchProgress.done / fetchProgress.total) * 100)}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <p>Generating the banner...</p>
+          )}
           <div className='loading-icon'></div>
         </div>
       )}
