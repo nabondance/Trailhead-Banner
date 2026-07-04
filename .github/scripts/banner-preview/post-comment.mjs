@@ -7,11 +7,17 @@ if (!existsSync('/tmp/banner-results.json')) {
   process.exit(0);
 }
 
-let results;
+let results, companyResult;
 try {
-  results = JSON.parse(readFileSync('/tmp/banner-results.json', 'utf8'));
+  const parsed = JSON.parse(readFileSync('/tmp/banner-results.json', 'utf8'));
+  results = parsed.standard;
+  companyResult = parsed.company ?? null;
 } catch (err) {
   console.error(`ERROR: Failed to parse banner-results.json: ${err.message}`);
+  process.exit(1);
+}
+if (!Array.isArray(results)) {
+  console.error('ERROR: Unexpected results file shape: missing "standard" array');
   process.exit(1);
 }
 
@@ -30,9 +36,10 @@ if (!repo) {
   process.exit(1);
 }
 
-const successCount = results.filter((r) => r.status === 200).length;
-const errorCount = results.length - successCount;
-const statusIcon = errorCount === 0 ? '✅' : errorCount === results.length ? '❌' : '⚠️';
+const allResults = companyResult ? [...results, companyResult] : results;
+const successCount = allResults.filter((r) => r.status === 200).length;
+const errorCount = allResults.length - successCount;
+const statusIcon = errorCount === 0 ? '✅' : errorCount === allResults.length ? '❌' : '⚠️';
 
 // Summary table
 const tableRows = results.map((r) => {
@@ -54,6 +61,43 @@ const imageSections = results
     return `### \`${r.username}\`\n![Banner for ${r.username}](${r.blobUrl})${warnBlock}`;
   });
 
+// Company banner section
+let companySection = '';
+if (companyResult) {
+  const users = companyResult.usernames.map((u) => `\`${u}\``).join(', ');
+  if (companyResult.status === 200) {
+    const t1 = companyResult.timings_ms != null ? `${companyResult.timings_ms}ms` : '-';
+    const t2 = companyResult.cached_timings_ms != null ? `${companyResult.cached_timings_ms}ms` : '-';
+    const csvText = companyResult.csv_generated ? '✅' : '❌';
+    const warnText = companyResult.warnings.length > 0 ? `⚠️ ${companyResult.warnings.length}` : '✅ 0';
+    const failedText =
+      companyResult.failedUsers.length > 0
+        ? `⚠️ ${companyResult.failedUsers.map((f) => `\`${f.username}\``).join(', ')}`
+        : '✅ none';
+    const warnBlock =
+      companyResult.warnings.length > 0
+        ? `\n> **Warnings:**\n${companyResult.warnings.map((w) => `> - ${w}`).join('\n')}`
+        : '';
+    companySection = `## 🏢 Company Banner
+
+Team: ${users}
+
+| Status | 1st call | 2nd call (cached) | CSV | Failed users | Warnings |
+|---|---|---|---|---|---|
+| ✅ OK | ${t1} | ${t2} | ${csvText} | ${failedText} | ${warnText} |
+
+![Company banner](${companyResult.blobUrl})${warnBlock}
+`;
+  } else {
+    companySection = `## 🏢 Company Banner
+
+Team: ${users}
+
+❌ **Failed:** ${companyResult.error ?? 'Unknown error'}
+`;
+  }
+}
+
 // Errors section
 const errorRows = results
   .filter((r) => r.status !== 200)
@@ -62,7 +106,7 @@ const errorRows = results
 let body = `${SENTINEL}
 ## ${statusIcon} Banner Preview
 
-Commit \`${sha}\` · [Workflow run](${runUrl}) · ${successCount}/${results.length} generated
+Commit \`${sha}\` · [Workflow run](${runUrl}) · ${successCount}/${allResults.length} generated
 
 | Username | Status | 1st call | 2nd call (cached) | Cache hits | Warnings |
 |---|---|---|---|---|---|
@@ -71,6 +115,10 @@ ${tableRows.join('\n')}
 
 if (imageSections.length > 0) {
   body += `\n---\n\n${imageSections.join('\n\n---\n\n')}\n`;
+}
+
+if (companySection) {
+  body += `\n---\n\n${companySection}`;
 }
 
 if (errorRows.length > 0) {
