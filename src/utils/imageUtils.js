@@ -145,6 +145,9 @@ const getCountersConfig = (options = {}) => {
   return { counter, badgeCounterScale, badgeCounterYDelta };
 };
 
+// Counter values are shown exactly up to 9,999, then abbreviated (13627 → 13k)
+// so they always fit the counter pill. Shared by all banner counters and the
+// +N overflow badges.
 const formatCounterValue = (value) => {
   if (value < 10_000) return value.toString();
   if (value < 1_000_000) return `${Math.floor(value / 1000)}k`;

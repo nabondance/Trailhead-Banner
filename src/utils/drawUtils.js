@@ -136,11 +136,10 @@ function getPlusStampBgBase64() {
   return plusStampBgBase64;
 }
 
-const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor, pluralize = true) => {
-  let labelToDisplay = label;
-  if (pluralize && message != 0 && message != 1) {
-    labelToDisplay += 's';
-  }
+const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor) => {
+  // Label arrives already pluralized by the caller — the message can be an
+  // abbreviated string ("13k"), so it can't be used for a numeric check here
+  const labelToDisplay = label;
 
   // Shrink the label font when it can't fit the fixed 140px label box at full size
   const labelFontSize = labelToDisplay.length > 12 ? Math.max(100, Math.floor(2400 / labelToDisplay.length)) : 200;
@@ -179,13 +178,25 @@ const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor, plu
   return counterBadgeSvg;
 };
 
-const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor, pluralize = true) => {
-  const badge = dynamicBadgeSvg(label, message, labelColor, messageColor, pluralize);
+const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor) => {
+  const badge = dynamicBadgeSvg(label, message, labelColor, messageColor);
   const badgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badge).toString('base64')}`);
   ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
 };
 
+// Shrink the +N label for large counts so it stays inside the shape
+// (font-size 200 fits up to 3 characters, e.g. "+99"). The baseline offset
+// scales with the font size so the text stays vertically centered.
+const plusXFontSize = (text) => Math.min(200, Math.floor(600 / text.length));
+
+// Same abbreviation convention as the counters: exact < 10k, then k / M / B
+const plusXText = (count) => `+${formatCounterValue(count)}`;
+
 const generatePlusXSuperbadgesSvg = (count) => {
+  const text = plusXText(count);
+  const fontSize = plusXFontSize(text);
+  // Hexagon center is y=250; at font-size 200 the baseline sits at 330
+  const baselineY = 250 + fontSize * 0.4;
   const plusXSuperbadgesSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" role="img">
       <style bx:fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
       <path
@@ -196,7 +207,7 @@ const generatePlusXSuperbadgesSvg = (count) => {
         d="M 230.349 34.434 Q 250 23.088 269.651 34.434 L 426.86 125.198 Q 446.512 136.544 446.512 159.235 L 446.512 340.765 Q 446.512 363.456 426.86 374.802 L 269.651 465.566 Q 250 476.912 230.349 465.566 L 73.14 374.802 Q 53.488 363.456 53.488 340.765 L 53.488 159.235 Q 53.488 136.544 73.14 125.198 Z"
         bx:shape="n-gon 250 250 226.912 226.912 6 0.1 1@9dde08be" style="fill:#8a00c4;"
         transform="matrix(1, 0, 0, 1, 0, 0)" />
-      <text x="250" y="330" fill="#fff" font-family="Roboto" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
+      <text x="250" y="${baselineY}" fill="#fff" font-family="Roboto" font-weight="700" font-size="${fontSize}" text-anchor="middle">${text}</text>
     </svg>`;
   return plusXSuperbadgesSvg;
 };
@@ -241,6 +252,10 @@ const generatePlusXStampsImage = async (count) => {
 };
 
 const generatePlusXCertificationsSvg = (count) => {
+  const text = plusXText(count);
+  const fontSize = plusXFontSize(text);
+  // Shield's optical center is y=~230; at font-size 200 the baseline sits at 300
+  const baselineY = 230 + fontSize * 0.35;
   const plusXCertificationsSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="500" height="500" role="img">
       <style fonts="Anta">@import url(https://fonts.googleapis.com/css2?family=Anta%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
       <g transform="translate(0,500) scale(0.100000,-0.100000)" fill="#0A9DDA" stroke="none">
@@ -251,7 +266,7 @@ const generatePlusXCertificationsSvg = (count) => {
       74 114 504 216 955 207 906 204 886 152 998 -30 65 -1209 1547 -1272 1599 -25
       20 -70 46 -100 57 -55 21 -67 21 -1068 21 -969 -1 -1014 -2 -1061 -20z"/>
       </g>
-      <text x="250" y="300" fill="#fff" font-family="Anta" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
+      <text x="250" y="${baselineY}" fill="#fff" font-family="Anta" font-weight="700" font-size="${fontSize}" text-anchor="middle">${text}</text>
     </svg>`;
   return plusXCertificationsSvg;
 };
