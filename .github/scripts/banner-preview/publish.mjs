@@ -59,10 +59,13 @@ console.log(`Publishing banner preview for PR #${prNumber}`);
 // Fork runs get no secrets: the preview server had no Redis or Blob credentials
 const isFork = headOwner.toLowerCase() !== repo.split('/')[0].toLowerCase();
 
-let allowedUsernames;
+let allowedUsernames, companyUsernames;
 try {
-  const { usernames } = JSON.parse(readFileSync(new URL('../../banner-preview.config.json', import.meta.url)));
+  const { usernames, companyBanner } = JSON.parse(
+    readFileSync(new URL('../../banner-preview.config.json', import.meta.url))
+  );
   allowedUsernames = new Set(usernames);
+  companyUsernames = Array.isArray(companyBanner?.usernames) ? companyBanner.usernames : [];
 } catch (err) {
   console.error(`ERROR: Failed to load banner-preview.config.json: ${err.message}`);
   process.exit(1);
@@ -88,6 +91,16 @@ const text = (value) =>
     .slice(0, 300);
 const num = (value) => (Number.isFinite(value) ? value : null);
 
+// Validate a banner image from the artifact before uploading it
+function readArtifactPng(name) {
+  const filePath = join(artifactDir, name);
+  if (!existsSync(filePath) || !lstatSync(filePath).isFile()) throw new Error('banner image is missing');
+  if (lstatSync(filePath).size > MAX_PNG_BYTES) throw new Error('banner image is too large');
+  const pngBuffer = readFileSync(filePath);
+  if (!pngBuffer.subarray(0, PNG_MAGIC.length).equals(PNG_MAGIC)) throw new Error('banner image is not a PNG');
+  return pngBuffer;
+}
+
 const results = [];
 let uploadFailed = false;
 for (const raw of rawResults) {
@@ -106,11 +119,7 @@ for (const raw of rawResults) {
 
   let pngBuffer;
   try {
-    const filePath = join(artifactDir, `${username}.png`);
-    if (!existsSync(filePath) || !lstatSync(filePath).isFile()) throw new Error('banner image is missing');
-    if (lstatSync(filePath).size > MAX_PNG_BYTES) throw new Error('banner image is too large');
-    pngBuffer = readFileSync(filePath);
-    if (!pngBuffer.subarray(0, PNG_MAGIC.length).equals(PNG_MAGIC)) throw new Error('banner image is not a PNG');
+    pngBuffer = readArtifactPng(`${username}.png`);
   } catch (err) {
     console.log(`  Invalid artifact for ${username}: ${err.message}`);
     results.push({ username, status: null, error: text(err.message) });
@@ -147,8 +156,52 @@ for (const raw of rawResults) {
   }
 }
 
-const successCount = results.filter((r) => r.status === 200).length;
-const errorCount = results.length - successCount;
+// Company banner — the team comes from the trusted config, the result from the artifact
+let companyResult = null;
+const companyResultsPath = join(artifactDir, 'company-results.json');
+if (companyUsernames.length > 0 && existsSync(companyResultsPath)) {
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync(companyResultsPath, 'utf8'));
+  } catch (err) {
+    raw = { status: null, error: `Failed to parse company-results.json: ${err.message}` };
+  }
+
+  if (raw?.status !== 200) {
+    companyResult = { status: num(raw?.status), error: text(raw?.error) || 'Unknown error' };
+  } else {
+    try {
+      const pngBuffer = readArtifactPng('company.png');
+      const blobPath = `pr-previews/${prNumber}/${runId}/company.png`;
+      console.log(`Uploading to blob: ${blobPath}`);
+      const blob = await put(blobPath, pngBuffer, {
+        access: 'public',
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        contentType: 'image/png',
+      });
+      console.log(`  OK → ${blob.url}`);
+      companyResult = {
+        status: 200,
+        warnings: Array.isArray(raw.warnings) ? raw.warnings.slice(0, 20).map(text) : [],
+        // Only report usernames that are part of the configured team
+        failedUsers: Array.isArray(raw.failedUsers) ? raw.failedUsers.filter((u) => companyUsernames.includes(u)) : [],
+        timings_ms: num(raw.timings_ms),
+        cached_timings_ms: num(raw.cached_timings_ms),
+        csv_generated: raw.csv_generated === true,
+        blobUrl: blob.url,
+      };
+    } catch (err) {
+      console.error(`  ERROR: Company banner publish failed: ${err.message}`);
+      companyResult = { status: null, error: 'Company banner could not be published, see the publish workflow logs' };
+      uploadFailed = true;
+    }
+  }
+}
+
+const allResults = companyResult ? [...results, companyResult] : results;
+const successCount = allResults.filter((r) => r.status === 200).length;
+const errorCount = allResults.length - successCount;
 
 // The 2nd call repeats the 1st one, so every GraphQL query should be served from Redis
 const hasCacheMiss = (r) => r.cache_hits != null && r.cache_total != null && r.cache_hits < r.cache_total;
@@ -156,7 +209,7 @@ const cacheMissCount = results.filter((r) => r.status === 200 && hasCacheMiss(r)
 // Expected on forks, a real problem otherwise
 const cacheFailed = cacheMissCount > 0 && !isFork;
 
-const statusIcon = errorCount === results.length ? '❌' : errorCount > 0 || cacheFailed ? '⚠️' : '✅';
+const statusIcon = errorCount === allResults.length ? '❌' : errorCount > 0 || cacheFailed ? '⚠️' : '✅';
 
 // Summary table
 const tableRows = results.map((r) => {
@@ -179,6 +232,43 @@ const imageSections = results
     return `### \`${r.username}\`\n![Banner for ${r.username}](${r.blobUrl})${warnBlock}`;
   });
 
+// Company banner section
+let companySection = '';
+if (companyResult) {
+  const users = companyUsernames.map((u) => `\`${u}\``).join(', ');
+  if (companyResult.status === 200) {
+    const t1 = companyResult.timings_ms != null ? `${companyResult.timings_ms}ms` : '-';
+    const t2 = companyResult.cached_timings_ms != null ? `${companyResult.cached_timings_ms}ms` : '-';
+    const csvText = companyResult.csv_generated ? '✅' : '❌';
+    const warnText = companyResult.warnings.length > 0 ? `⚠️ ${companyResult.warnings.length}` : '✅ 0';
+    const failedText =
+      companyResult.failedUsers.length > 0
+        ? `⚠️ ${companyResult.failedUsers.map((u) => `\`${u}\``).join(', ')}`
+        : '✅ none';
+    const warnBlock =
+      companyResult.warnings.length > 0
+        ? `\n> **Warnings:**\n${companyResult.warnings.map((w) => `> - ${w}`).join('\n')}`
+        : '';
+    companySection = `## 🏢 Company Banner
+
+Team: ${users}
+
+| Status | 1st call | 2nd call (cached) | CSV | Failed users | Warnings |
+|---|---|---|---|---|---|
+| ✅ OK | ${t1} | ${t2} | ${csvText} | ${failedText} | ${warnText} |
+
+![Company banner](${companyResult.blobUrl})${warnBlock}
+`;
+  } else {
+    companySection = `## 🏢 Company Banner
+
+Team: ${users}
+
+❌ **Failed:** ${companyResult.error}
+`;
+  }
+}
+
 // Errors section
 const errorRows = results
   .filter((r) => r.status !== 200)
@@ -187,7 +277,7 @@ const errorRows = results
 let body = `${SENTINEL}
 ## ${statusIcon} Banner Preview
 
-Commit \`${sha}\` · [Workflow run](${runUrl}) · ${successCount}/${results.length} generated
+Commit \`${sha}\` · [Workflow run](${runUrl}) · ${successCount}/${allResults.length} generated
 
 | Username | Status | 1st call | 2nd call (cached) | Cache hits | Warnings |
 |---|---|---|---|---|---|
@@ -202,6 +292,10 @@ if (cacheMissCount > 0) {
 
 if (imageSections.length > 0) {
   body += `\n---\n\n${imageSections.join('\n\n---\n\n')}\n`;
+}
+
+if (companySection) {
+  body += `\n---\n\n${companySection}`;
 }
 
 if (errorRows.length > 0) {
