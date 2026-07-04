@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { generateCompanyBanner } from '../../../banner/renderers/companyBanner';
 import { fetchCompanyData, parseUsernames, computeQueryNeeds } from '../../../utils/companyFetchUtils';
 import { aggregateCompanyData } from '../../../utils/companyDataUtils';
-import { generateCompanyCsv } from '../../../utils/companyCsvUtils';
+import { generateCompanyCsv, generateProductCsv } from '../../../utils/companyCsvUtils';
 import SupabaseUtils from '../../../utils/supabaseUtils';
 import { validateContentLength } from '../../../banner/api/validators';
 import { createTimingTracker, handleBannerError } from '../../../banner/api/shared';
@@ -123,11 +123,13 @@ export default async function handler(req, res) {
     timings.end('image_generation');
     timings.add('image_generation_breakdown', result.timings);
 
-    // Generate CSV if requested
+    // Generate CSVs if requested
     let csvData = null;
+    let productCsvData = null;
     if (options.generateCsv) {
       timings.start('csv_generation');
       csvData = generateCompanyCsv(aggregated, failed);
+      productCsvData = generateProductCsv(aggregated);
       timings.end('csv_generation');
     }
 
@@ -168,6 +170,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       imageUrl: result.bannerUrl,
       csvData,
+      productCsvData,
       teamHash,
       warnings: result.warnings || [],
       failedUsers: failed,

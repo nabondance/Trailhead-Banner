@@ -114,6 +114,7 @@ const CompanyBannerForm = () => {
   const [fetchProgress, setFetchProgress] = useState(null); // { phase: 'fetch'|'retry'|'render', done, total }
   const [resultImageUrl, setResultImageUrl] = useState(null);
   const [resultCsvData, setResultCsvData] = useState(null);
+  const [resultProductCsvData, setResultProductCsvData] = useState(null);
   const [teamHash, setTeamHash] = useState('');
   const [warnings, setWarnings] = useState([]);
   const [failedUsers, setFailedUsers] = useState([]);
@@ -150,15 +151,22 @@ const CompanyBannerForm = () => {
     setUploadedLogoFile(null);
   };
 
-  const handleDownloadCsv = () => {
-    if (!resultCsvData) return;
-    const blob = new Blob([resultCsvData], { type: 'text/csv' });
+  const downloadCsvFile = (content, filename) => {
+    const blob = new Blob([content], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `company-banner-${teamHash}.csv`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadCsv = () => {
+    if (!resultCsvData) return;
+    downloadCsvFile(resultCsvData, `company-banner-${teamHash}.csv`);
+    if (resultProductCsvData) {
+      downloadCsvFile(resultProductCsvData, `company-products-${teamHash}.csv`);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -166,6 +174,7 @@ const CompanyBannerForm = () => {
     setMainError(null);
     setResultImageUrl(null);
     setResultCsvData(null);
+    setResultProductCsvData(null);
     setWarnings([]);
     setFailedUsers([]);
 
@@ -269,6 +278,7 @@ const CompanyBannerForm = () => {
 
       setResultImageUrl(data.imageUrl);
       setResultCsvData(data.csvData || null);
+      setResultProductCsvData(data.productCsvData || null);
       setTeamHash(data.teamHash || '');
       setWarnings(data.warnings || []);
       setFailedUsers(data.failedUsers || []);
@@ -785,7 +795,7 @@ const CompanyBannerForm = () => {
                 style={{ marginTop: 0, cursor: 'pointer' }}
                 onClick={handleDownloadCsv}
               >
-                Download CSV
+                {resultProductCsvData ? 'Download CSVs' : 'Download CSV'}
               </button>
             )}
           </div>

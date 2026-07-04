@@ -194,3 +194,46 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
 
   return rows.join('\n');
 }
+
+/**
+ * Generate a per-product certification breakdown CSV.
+ *
+ * Columns: product, total_certifications, active_certifications, certified_people
+ *   - total_certifications: all certs of that product held across the team (incl. expired)
+ *   - active_certifications: non-expired certs of that product
+ *   - certified_people: distinct team members holding at least one cert of that product
+ *
+ * Rows are sorted by total_certifications descending, then alphabetically.
+ * Certs without a product are grouped under "Other".
+ *
+ * @param {Object} aggregated - Output from companyDataUtils.aggregateCompanyData()
+ * @returns {string} CSV content
+ */
+export function generateProductCsv(aggregated) {
+  const { perUserData } = aggregated;
+
+  // product → { total, active, people: Set<username> }
+  const productStats = new Map();
+
+  for (const user of perUserData) {
+    for (const cert of user.certs || []) {
+      const product = cert.product || 'Other';
+      if (!productStats.has(product)) {
+        productStats.set(product, { total: 0, active: 0, people: new Set() });
+      }
+      const stats = productStats.get(product);
+      stats.total++;
+      if (cert.status?.expired !== true) stats.active++;
+      stats.people.add(user.username);
+    }
+  }
+
+  const sorted = [...productStats.entries()].sort((a, b) => b[1].total - a[1].total || a[0].localeCompare(b[0]));
+
+  const rows = [buildRow(['product', 'total_certifications', 'active_certifications', 'certified_people'])];
+  for (const [product, stats] of sorted) {
+    rows.push(buildRow([product, stats.total, stats.active, stats.people.size]));
+  }
+
+  return rows.join('\n');
+}
