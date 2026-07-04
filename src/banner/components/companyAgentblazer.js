@@ -14,7 +14,7 @@ import { generateCountBadgeSvg } from '../../utils/drawUtils.js';
 // Display order: highest prestige first (left to right)
 const LEVEL_ORDER = ['Legend', 'Innovator', 'Champion'];
 
-const LOGO_HEIGHT = 100;
+const DEFAULT_LOGO_HEIGHT = 100;
 const ICON_SPACING = 8;
 const BADGE_RADIUS_RATIO = 0.18; // Badge circle size relative to icon height
 const BADGE_BG_COLOR = '#8a00c4';
@@ -27,7 +27,7 @@ const BADGE_BG_COLOR = '#8a00c4';
  * @param {number} options.agentblazerRankDisplay - Already factored into counts by companyDataUtils
  * @returns {Promise<Object>}
  */
-async function prepareCompanyAgentblazer(agentblazerCounts, options = {}) {
+async function prepareCompanyAgentblazer(agentblazerCounts, options = {}, logoHeight = DEFAULT_LOGO_HEIGHT) {
   const timer = new Timer();
   const warnings = [];
 
@@ -36,6 +36,8 @@ async function prepareCompanyAgentblazer(agentblazerCounts, options = {}) {
   }
 
   timer.start('load');
+
+  const LOGO_HEIGHT = logoHeight;
 
   const icons = [];
 
