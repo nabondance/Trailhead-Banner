@@ -52,9 +52,13 @@ function buildRow(values) {
  *
  * Columns:
  *   username, status, rank, badges, superbadges,
- *   certifications_total, certifications_active, certifications_expired,
+ *   certifications_total, certifications_active, certifications_expired, certifications_retired,
  *   mvp, agentblazer_current, agentblazer_alltime_high, cta,
- *   [one column per unique cert with [SF]/[AP] prefix]
+ *   [one column per unique cert with [SF]/[AP] prefix; cells: active|expired|retired|none]
+ *
+ * The CSV always exports the full truth: banner display options (e.g.
+ * includeExpiredCertifications) do not filter what is exported. "Active"
+ * means not expired AND not retired, matching the banner's active counter.
  *
  * Trailing rows: TOTAL, ACTIVE_TOTAL, COVERAGE_%, ACTIVE_COVERAGE_%
  * Failed users: included with status column indicating failure reason.
@@ -83,6 +87,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
     'certifications_total',
     'certifications_active',
     'certifications_expired',
+    'certifications_retired',
     'mvp',
     'agentblazer_current',
     'agentblazer_alltime_high',
@@ -98,6 +103,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
     certifications_total: 0,
     certifications_active: 0,
     certifications_expired: 0,
+    certifications_retired: 0,
     mvp: 0,
   };
   // Per cert: count of non-"none" and count of "active"
@@ -109,11 +115,12 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
     const agentblazerCurrent = currentLevelMap.get(user.username) || 'none';
     const agentblazerAllTime = allTimeLevelMap.get(user.username) || 'none';
 
-    // Build cert status map for this user
+    // Build cert status map for this user (expired wins over retired)
     const userCertMap = new Map();
     for (const cert of user.certs || []) {
       const isExpired = cert.status?.expired === true;
-      userCertMap.set(cert.title, isExpired ? 'expired' : 'active');
+      const isRetired = cert.status?.title === 'Retired';
+      userCertMap.set(cert.title, isExpired ? 'expired' : isRetired ? 'retired' : 'active');
     }
 
     const hasCta = userCertMap.has(CTA_CERT_TITLE) && userCertMap.get(CTA_CERT_TITLE) === 'active';
@@ -130,6 +137,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
     totalNumeric.certifications_total += user.certifications_total;
     totalNumeric.certifications_active += user.certifications_active;
     totalNumeric.certifications_expired += user.certifications_expired;
+    totalNumeric.certifications_retired += user.certifications_retired || 0;
     if (user.mvp) totalNumeric.mvp++;
 
     const fixedValues = [
@@ -141,6 +149,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
       user.certifications_total,
       user.certifications_active,
       user.certifications_expired,
+      user.certifications_retired || 0,
       user.mvp ? 'true' : 'false',
       agentblazerCurrent,
       agentblazerAllTime,
@@ -152,7 +161,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
 
   // --- Failed user rows ---
   for (const failed of failedUsers) {
-    const fixedValues = [failed.username, failed.status || 'not_found', '', '', '', '', '', '', '', '', '', ''];
+    const fixedValues = [failed.username, failed.status || 'not_found', ...new Array(fixedHeaders.length - 2).fill('')];
     const certValues = new Array(allCertTitles.length).fill('');
     rows.push(buildRow([...fixedValues, ...certValues]));
   }
@@ -169,6 +178,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
     totalNumeric.certifications_total,
     totalNumeric.certifications_active,
     totalNumeric.certifications_expired,
+    totalNumeric.certifications_retired,
     totalNumeric.mvp,
     '',
     '',
@@ -176,20 +186,22 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
   ];
   rows.push(buildRow([...totalFixed, ...certTotalCounts]));
 
-  // --- ACTIVE_TOTAL row ---
-  const activeTotalFixed = ['ACTIVE_TOTAL', '', '', '', '', '', totalNumeric.certifications_active, '', '', '', '', ''];
+  // --- ACTIVE_TOTAL row (certifications_active column position) ---
+  const activeTotalFixed = new Array(fixedHeaders.length).fill('');
+  activeTotalFixed[0] = 'ACTIVE_TOTAL';
+  activeTotalFixed[fixedHeaders.indexOf('certifications_active')] = totalNumeric.certifications_active;
   rows.push(buildRow([...activeTotalFixed, ...certActiveCounts]));
 
   // --- COVERAGE_% row (% of team with cert, any status) ---
   const coveragePct = certTotalCounts.map((n) => (totalUsers > 0 ? `${Math.round((n / totalUsers) * 100)}%` : '0%'));
-  const coverageFixed = ['COVERAGE_%', '', '', '', '', '', '', '', '', '', '', ''];
+  const coverageFixed = ['COVERAGE_%', ...new Array(fixedHeaders.length - 1).fill('')];
   rows.push(buildRow([...coverageFixed, ...coveragePct]));
 
   // --- ACTIVE_COVERAGE_% row ---
   const activeCoveragePct = certActiveCounts.map((n) =>
     totalUsers > 0 ? `${Math.round((n / totalUsers) * 100)}%` : '0%'
   );
-  const activeCoverageFixed = ['ACTIVE_COVERAGE_%', '', '', '', '', '', '', '', '', '', '', ''];
+  const activeCoverageFixed = ['ACTIVE_COVERAGE_%', ...new Array(fixedHeaders.length - 1).fill('')];
   rows.push(buildRow([...activeCoverageFixed, ...activeCoveragePct]));
 
   return rows.join('\n');
@@ -199,8 +211,8 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
  * Generate a per-product certification breakdown CSV.
  *
  * Columns: product, total_certifications, active_certifications, certified_people
- *   - total_certifications: all certs of that product held across the team (incl. expired)
- *   - active_certifications: non-expired certs of that product
+ *   - total_certifications: all certs of that product held across the team (incl. expired/retired)
+ *   - active_certifications: certs that are neither expired nor retired
  *   - certified_people: distinct team members holding at least one cert of that product
  *
  * Rows are sorted by total_certifications descending, then alphabetically.
@@ -223,7 +235,7 @@ export function generateProductCsv(aggregated) {
       }
       const stats = productStats.get(product);
       stats.total++;
-      if (cert.status?.expired !== true) stats.active++;
+      if (cert.status?.expired !== true && cert.status?.title !== 'Retired') stats.active++;
       stats.people.add(user.username);
     }
   }
