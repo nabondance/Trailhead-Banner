@@ -91,7 +91,9 @@ async function prepareCounters(data, options = {}) {
     if (shouldShow) {
       countersToDisplay.push({
         id: counterId,
-        label: counter.label,
+        // Pluralize from the raw count — the displayed value may be abbreviated
+        label: counter.data > 1 ? `${counter.label}s` : counter.label,
+        // All counters share the same abbreviation rule (exact < 10k, then k/M/B)
         value: formatCounterValue(counter.data),
         color: counter.color,
       });
