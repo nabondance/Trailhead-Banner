@@ -13,6 +13,14 @@
       "maxDuration": 20,
       "memory": 1024
     },
+    "src/pages/api/banner/company.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "src/pages/api/banner/company-fetch.js": {
+      "maxDuration": 20,
+      "memory": 512
+    },
     "src/pages/api/graphql-query.js": {
       "maxDuration": 10,
       "memory": 512

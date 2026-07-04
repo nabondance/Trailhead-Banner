@@ -5,13 +5,14 @@ import { generateCountBadgeSvg } from '../../utils/drawUtils.js';
 
 /**
  * Company Agentblazer Component
- * Renders up to 3 agentblazer level icons (Legend → Champion → Innovator)
+ * Renders up to 3 agentblazer level icons (Legend → Innovator → Champion)
  * with a ×N circle badge overlay when N > 1.
  *
  * Layout: dynamic width based on how many levels are present.
  */
 
-// Display order: highest prestige first (left to right)
+// Display order: highest prestige first (left to right).
+// API numbering: Legend=3, Innovator=2, Champion=1 — Champion is the ENTRY level.
 const LEVEL_ORDER = ['Legend', 'Innovator', 'Champion'];
 
 const DEFAULT_LOGO_HEIGHT = 100;
