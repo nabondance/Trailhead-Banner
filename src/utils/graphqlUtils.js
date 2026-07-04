@@ -25,9 +25,11 @@ class GraphQLUtils {
    *
    * @param {Array} queries - Array of query objects with { query, variables, url }
    * @param {string} username - Username for cache key generation
+   * @param {Object} [options]
+   * @param {number} [options.ttlSeconds] - Cache TTL override (defaults to RedisCacheUtils.CACHE_TTL_SECONDS)
    * @returns {Object} { responses, timingBreakdown, cacheSummary }
    */
-  static async performQueriesWithCache(queries, username) {
+  static async performQueriesWithCache(queries, username, { ttlSeconds } = {}) {
     const timingBreakdown = [];
     const cacheErrors = [];
     let cacheHits = 0;
@@ -81,7 +83,12 @@ class GraphQLUtils {
 
           // Store in cache asynchronously (non-blocking)
           // Only cache the serializable parts (avoid circular references)
-          if (redisAvailable) {
+          // Skip responses with GraphQL errors (e.g. rate limits) so a transient
+          // failure isn't served from cache for the whole TTL. Skip private
+          // profiles too: users make their profile public and regenerate right
+          // away, and a cached PrivateProfile would keep them "private" until expiry
+          const isPrivateProfile = graphqlResponse.data?.data?.profile?.__typename === 'PrivateProfile';
+          if (redisAvailable && !graphqlResponse.data?.errors?.length && !isPrivateProfile) {
             const cacheKey = RedisCacheUtils.generateCacheKey(username, query.query, query.variables);
             const serializableResponse = {
               data: graphqlResponse.data,
@@ -89,7 +96,7 @@ class GraphQLUtils {
               statusText: graphqlResponse.statusText,
               headers: graphqlResponse.headers,
             };
-            RedisCacheUtils.setCachedQuery(cacheKey, serializableResponse).catch((error) => {
+            RedisCacheUtils.setCachedQuery(cacheKey, serializableResponse, ttlSeconds).catch((error) => {
               cacheErrors.push(RedisCacheUtils.handleRedisError(error, 'write', queryName));
             });
           }

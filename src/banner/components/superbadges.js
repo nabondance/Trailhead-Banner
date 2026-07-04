@@ -1,5 +1,5 @@
 import { loadImage } from '@napi-rs/canvas';
-import { generatePlusXSuperbadgesSvg } from '../../utils/drawUtils.js';
+import { generatePlusXSuperbadgesSvg, generateCountBadgeSvg } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
 
@@ -36,30 +36,32 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
   const totalSuperbadges =
     superbadgesData?.earnedAwards?.edges?.filter((edge) => edge.node.award && edge.node.award.icon).length || 0;
 
-  let superbadgeLogos =
+  // Keep each superbadge's icon URL together with its `count` (how many team members
+  // earned it — only present on deduplicated company data; defaults to 1 otherwise).
+  let superbadgeEntries =
     superbadgesData?.earnedAwards?.edges
       ?.filter((edge) => edge.node.award && edge.node.award.icon)
-      .map((edge) => edge.node.award.icon) || [];
+      .map((edge) => ({ icon: edge.node.award.icon, count: edge.node.award.count ?? 1 })) || [];
 
   if (options.displayLastXSuperbadges && options.lastXSuperbadges) {
-    superbadgeLogos = superbadgeLogos.slice(-options.lastXSuperbadges);
+    superbadgeEntries = superbadgeEntries.slice(-options.lastXSuperbadges);
   }
 
-  const displayedSuperbadges = superbadgeLogos.length;
+  const displayedSuperbadges = superbadgeEntries.length;
   const hiddenSuperbadges = totalSuperbadges - displayedSuperbadges;
 
   // Download all superbadge logos in parallel
   timer.start('total');
   timer.start('download');
-  const superbadgeLogoPromises = superbadgeLogos.map(async (logoUrl) => {
+  const superbadgeLogoPromises = superbadgeEntries.map(async (entry) => {
     try {
-      const logoResult = await getImage(logoUrl, 'superbadges');
+      const logoResult = await getImage(entry.icon, 'superbadges');
       const logoBuffer = logoResult.buffer || logoResult;
       const logo = await loadImage(logoBuffer);
-      return logo;
+      return { logo, count: entry.count };
     } catch (error) {
-      console.error(`Error loading superbadge logo from URL: ${logoUrl}`, error);
-      warnings.push(`Error loading superbadge logo from URL: ${logoUrl}: ${error.message}`);
+      console.error(`Error loading superbadge logo from URL: ${entry.icon}`, error);
+      warnings.push(`Error loading superbadge logo from URL: ${entry.icon}: ${error.message}`);
       return null;
     }
   });
@@ -68,17 +70,29 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
   const superbadgeLogosImages = await Promise.all(superbadgeLogoPromises);
   timer.end('download');
 
+  // Pre-load ×N count badges for sharp rendering (company banner, when enabled)
+  if (options.superbadgeShowCount) {
+    await Promise.all(
+      superbadgeLogosImages.map(async (entry) => {
+        if (entry && entry.count > 1) {
+          const svg = generateCountBadgeSvg(entry.count, '#8a00c4');
+          entry.countBadgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`);
+        }
+      })
+    );
+  }
+
   // Add "+X" badge if superbadges are hidden
   if (hiddenSuperbadges > 0) {
     const plusXBadgeSvg = generatePlusXSuperbadgesSvg(hiddenSuperbadges);
     const plusXBadgeImage = await loadImage(
       `data:image/svg+xml;base64,${Buffer.from(plusXBadgeSvg).toString('base64')}`
     );
-    superbadgeLogosImages.push(plusXBadgeImage);
+    superbadgeLogosImages.push({ logo: plusXBadgeImage, count: 1 });
   }
 
   // Filter out null images (failed loads)
-  const validImages = superbadgeLogosImages.filter((img) => img !== null);
+  const validImages = superbadgeLogosImages.filter((entry) => entry !== null && entry.logo);
 
   if (validImages.length === 0) {
     timer.end('total');
@@ -173,9 +187,25 @@ async function renderSuperbadges(ctx, prepared, absoluteX, y) {
   let currentX = absoluteX + layout.startX;
 
   // Render badges with spacing (can be negative for overlapping effect)
-  for (const logo of images) {
-    if (logo) {
-      ctx.drawImage(logo, currentX, y, layout.logoWidth, layout.logoHeight);
+  for (const entry of images) {
+    if (entry && entry.logo) {
+      ctx.drawImage(entry.logo, currentX, y, layout.logoWidth, layout.logoHeight);
+
+      // Draw ×N badge at bottom-right when a superbadge was earned by multiple members
+      if (entry.count > 1 && entry.countBadgeImage) {
+        const badgeRadius = layout.logoHeight * 0.18;
+        const badgeCX = currentX + layout.logoWidth - badgeRadius * 1.4;
+        const badgeCY = y + layout.logoHeight - badgeRadius * 1.0;
+        ctx.globalAlpha = 1.0;
+        ctx.drawImage(
+          entry.countBadgeImage,
+          badgeCX - badgeRadius,
+          badgeCY - badgeRadius,
+          badgeRadius * 2,
+          badgeRadius * 2
+        );
+      }
+
       currentX += layout.logoWidth + layout.spacing;
     }
   }

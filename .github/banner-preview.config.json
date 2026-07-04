@@ -1,6 +1,39 @@
 {
   "usernames": ["nabondance", "anna", "stevemo", "gauravkheterpal", "babup", "mrousseaux"],
 
+  "companyBanner": {
+    "usernames": ["nabondance", "mrousseaux", "fparisi", "ajaouen"],
+    "options": {
+      "_description": "Exact company page defaults — library background index 5, people+certification counters, CSV generation",
+      "backgroundColor": "#5badd6",
+      "backgroundImageUrl": "",
+      "backgroundKind": "library",
+      "backgroundLibraryUrl": "/assets/background-library/NYC_dreamforce_1.png",
+      "customBackgroundImageUrl": "",
+      "companyLogoKind": "none",
+      "companyLogoUrl": "",
+      "counterOrder": ["people", "certification"],
+      "badgeLabelColor": "#555555",
+      "displayAgentblazerIcons": true,
+      "agentblazerRankDisplay": "current",
+      "displaySalesforceCertifications": true,
+      "displayAccreditedProfessionalCertifications": true,
+      "includeExpiredCertifications": true,
+      "certificationSort": "count",
+      "certificationSortOrder": "descendant",
+      "certificationAlignment": "center",
+      "displayLastXCertifications": false,
+      "lastXCertifications": "",
+      "displaySuperbadges": true,
+      "displayLastXSuperbadges": false,
+      "lastXSuperbadges": "",
+      "superbadgeDeduplicate": false,
+      "superbadgeShowCount": false,
+      "superbadgeAlignment": "left",
+      "generateCsv": true
+    }
+  },
+
   "defaultOptions": {
     "_description": "Exact website defaults — library background index 5, default counters",
     "backgroundKind": "library",

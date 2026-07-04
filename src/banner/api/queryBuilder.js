@@ -10,6 +10,7 @@ import GET_MVP_STATUS from '../../graphql/queries/getMvpStatus';
 import GET_STAMPS from '../../graphql/queries/getStamps';
 import GET_AGENTBLAZER_RANK from '../../graphql/queries/getAgentblazerRank';
 import GET_COMMUNITY_STATS from '../../graphql/queries/getCommunityStats';
+import GET_COMPANY_PROFILE from '../../graphql/queries/getCompanyProfile';
 import { calculateRequiredQueries } from '../../utils/queryDependencyCalculator';
 
 /**
@@ -88,6 +89,16 @@ export const QUERY_MAP = {
     url: 'https://community.api.trailhead.com/graphql',
     buildVariables: (username) => ({
       userSlug: username,
+    }),
+  },
+  GET_COMPANY_PROFILE: {
+    query: GET_COMPANY_PROFILE,
+    url: 'https://profile.api.trailhead.com/graphql',
+    buildVariables: (username, params) => ({
+      slug: username,
+      hasSlug: true,
+      count: params.count || 100,
+      filter: 'SUPERBADGE',
     }),
   },
 };
