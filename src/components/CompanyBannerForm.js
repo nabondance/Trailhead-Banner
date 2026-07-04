@@ -18,8 +18,16 @@ import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 
+// The compact company banner only renders the first N counters (see companyBanner.js),
+// so the UI selection is capped to the same number to stay in sync.
+const MAX_COMPANY_COUNTERS = 2;
 const COMPANY_COUNTERS = COUNTERS_CONFIG.filter((c) => c.allowedIn?.includes('company'));
-const DEFAULT_COMPANY_COUNTERS = COMPANY_COUNTERS.filter((c) => c.defaultSelected);
+// Default pair: team size (Trailblazers) for context + certifications as the headline metric.
+// Superbadges/certs are already shown as graphics, so counting Trailblazers adds non-redundant info.
+const DEFAULT_COMPANY_COUNTER_IDS = ['people', 'certification'];
+const DEFAULT_COMPANY_COUNTERS = DEFAULT_COMPANY_COUNTER_IDS.map((id) =>
+  COMPANY_COUNTERS.find((c) => c.id === id)
+).filter(Boolean);
 
 const CompanyBannerForm = () => {
   const [usernamesRaw, setUsernamesRaw] = useState('');
@@ -335,7 +343,7 @@ const CompanyBannerForm = () => {
               <DragAndDropCounterSelector
                 selectedCounters={options.selectedCounters}
                 onCountersChange={(newCounters) => setOptions({ ...options, selectedCounters: newCounters })}
-                maxCounters={5}
+                maxCounters={MAX_COMPANY_COUNTERS}
                 countersConfig={COMPANY_COUNTERS}
               />
             </fieldset>
