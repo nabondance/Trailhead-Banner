@@ -134,6 +134,12 @@ const getCountersConfig = (options = {}) => {
       break;
   }
 
+  // Opt-in override for compact banners (e.g. the company LinkedIn-header banner).
+  // Standard banners never set this, so their sizing is unchanged.
+  if (typeof options.badgeCounterScaleOverride === 'number') {
+    badgeCounterScale = options.badgeCounterScaleOverride;
+  }
+
   const badgeCounterYDelta = 35 * badgeCounterScale;
 
   return { counter, badgeCounterScale, badgeCounterYDelta };

@@ -6,7 +6,7 @@ import * as CompanyAgentblazer from '../components/companyAgentblazer.js';
 
 /**
  * Company Banner Renderer
- * Generates the company Trailhead banner (1584 × 396px)
+ * Generates the company Trailhead banner (1128 × 191px — LinkedIn company page header size)
  *
  * Top bar layout (left → right):
  *   [Company Logo] [Counters] [Agentblazer icons (dynamic)] [Superbadges]
@@ -14,15 +14,26 @@ import * as CompanyAgentblazer from '../components/companyAgentblazer.js';
  * Bottom area: Certification grid with optional ×N count badges
  */
 
-const CANVAS_WIDTH = 1584;
-const CANVAS_HEIGHT = 396;
-const TOP_PART_RATIO = 1 / 4; // 99px top bar
-const BOTTOM_PART_RATIO = 3 / 4; // 297px cert area
+const CANVAS_WIDTH = 1128; // LinkedIn company page header width
+const CANVAS_HEIGHT = 191; // LinkedIn company page header height
+const TOP_PART_RATIO = 1 / 4; // top bar used for agentblazer/superbadge sizing
+const BOTTOM_PART_RATIO = 3 / 4; // cert area
 
-const LOGO_SLOT_WIDTH = 160; // Same as rank logo slot in personal banner
-const COUNTER_START_X = 160; // Fixed: logo slot width
-const AGENTBLAZER_START_X = 370; // Fixed: same position as personal banner
-const AGENTBLAZER_SUPERBADGE_GAP = 10;
+// The banner is very wide and short (≈5.9:1), so the top-bar elements are
+// compressed compared to the personal banner. Positions/sizes below are tuned
+// for the 1128×191 LinkedIn company header.
+const SUPERBADGE_LOGO_HEIGHT = CANVAS_HEIGHT * TOP_PART_RATIO * 0.9; // ~43px
+
+const LOGO_SLOT_WIDTH = 92; // Logo slot (logo is height-constrained by the short canvas)
+const COUNTER_START_X = 100; // After the logo slot
+const AGENTBLAZER_START_X = 265; // After the (wider) counter column
+const AGENTBLAZER_SUPERBADGE_GAP = 8;
+const AGENTBLAZER_LOGO_HEIGHT = SUPERBADGE_LOGO_HEIGHT + 4; // Match superbadge size (slightly larger)
+const CERT_TOP_Y = 56; // Where the certification grid begins (kept high so certs get more space)
+const COUNTER_TOP_Y = 6; // Where the counter stack begins
+const MAX_COUNTERS = 2; // Show at most 2 counters on this compact banner
+const MAX_COUNTER_SCALE = 0.7; // Upper bound for the compact counter badges
+const WATERMARK_SCALE = 0.65; // Smaller watermark for this compact banner
 
 /**
  * Build superbadge data in the format expected by the Superbadges component.
@@ -77,11 +88,11 @@ async function generateCompanyBanner(aggregated, options = {}) {
 
   const superbadgesData = buildSuperbadgeData(aggregated.superbadgesData, options);
 
-  const certifYPosition = CANVAS_HEIGHT * TOP_PART_RATIO + 20; // where certs start = logo slot bottom
+  const certifYPosition = CERT_TOP_Y; // where the cert grid starts (= logo slot bottom)
   const [backgroundPrep, companyLogoPrep, companyAgentblazerPrep, watermarkPrep] = await Promise.all([
     Background.prepareBackground(options),
     CompanyLogo.prepareCompanyLogo(options, certifYPosition, LOGO_SLOT_WIDTH),
-    CompanyAgentblazer.prepareCompanyAgentblazer(aggregated.agentblazer, options),
+    CompanyAgentblazer.prepareCompanyAgentblazer(aggregated.agentblazer, options, AGENTBLAZER_LOGO_HEIGHT),
     Watermark.prepareWatermark(),
   ]);
 
@@ -89,12 +100,20 @@ async function generateCompanyBanner(aggregated, options = {}) {
   timings.company_logo_load_ms = companyLogoPrep.timings?.load_ms;
   timings.agentblazer_load_ms = companyAgentblazerPrep.timings?.load_ms;
 
-  const countersPrep = await Counters.prepareCounters(countersData, options);
+  // Counters stack vertically; cap at MAX_COUNTERS and size the stack so it spans the
+  // same vertical extent as the superbadge row (opt-in override, standard banner unaffected).
+  const limitedCounterOrder = (options.counterOrder || []).slice(0, MAX_COUNTERS);
+  const counterCount = limitedCounterOrder.length;
+  const counterScale =
+    counterCount > 0 ? Math.min(MAX_COUNTER_SCALE, SUPERBADGE_LOGO_HEIGHT / (counterCount * 35)) : MAX_COUNTER_SCALE;
+  const countersOptions = { ...options, counterOrder: limitedCounterOrder, badgeCounterScaleOverride: counterScale };
+
+  const countersPrep = await Counters.prepareCounters(countersData, countersOptions);
   timings.counters_prepare_ms = countersPrep.timings?.prepare_ms;
 
   const certLayout = {
     availableWidth: CANVAS_WIDTH,
-    availableHeight: CANVAS_HEIGHT * BOTTOM_PART_RATIO * 0.95,
+    availableHeight: CANVAS_HEIGHT - certifYPosition - 6,
     spacing: 5,
   };
   const certOptions = {
@@ -118,7 +137,7 @@ async function generateCompanyBanner(aggregated, options = {}) {
 
   const superbadgeLayout = {
     availableWidth: superbadgeAvailableWidth,
-    logoHeight: CANVAS_HEIGHT * TOP_PART_RATIO * 0.9,
+    logoHeight: SUPERBADGE_LOGO_HEIGHT,
   };
   const superbadgesPrep = await Superbadges.prepareSuperbadges(superbadgesData, options, superbadgeLayout);
   timings.superbadges_download_ms = superbadgesPrep.timings?.download_ms;
@@ -140,7 +159,7 @@ async function generateCompanyBanner(aggregated, options = {}) {
     ctx,
     countersPrep,
     COUNTER_START_X,
-    5,
+    COUNTER_TOP_Y,
     options.badgeLabelColor
   );
   timings.counters_draw_ms = countersRenderTiming?.render_ms;
@@ -162,7 +181,7 @@ async function generateCompanyBanner(aggregated, options = {}) {
   timings.superbadges_render_ms = superbadgesRenderTiming?.render_ms;
 
   // 7. Watermark (bottom-right)
-  await Watermark.renderWatermark(ctx, watermarkPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
+  await Watermark.renderWatermark(ctx, watermarkPrep, CANVAS_WIDTH, CANVAS_HEIGHT, WATERMARK_SCALE);
   timings.watermark_load_ms = watermarkPrep.timings?.load_ms;
 
   // ============================================================
