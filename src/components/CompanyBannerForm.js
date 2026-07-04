@@ -53,6 +53,7 @@ const CompanyBannerForm = () => {
     displayLastXSuperbadges: false,
     lastXSuperbadges: '',
     superbadgeDeduplicate: false,
+    superbadgeShowCount: false,
     superbadgeAlignment: 'left',
     // CSV
     generateCsv: false,
@@ -418,6 +419,29 @@ const CompanyBannerForm = () => {
                   <Tooltip id='sb-dedup-tooltip' place='top' delayShow={200} className='react-tooltip'>
                     When enabled, each superbadge appears once even if multiple team members have earned it
                   </Tooltip>
+                  {options.superbadgeDeduplicate && (
+                    <>
+                      <label>
+                        <input
+                          type='checkbox'
+                          checked={options.superbadgeShowCount}
+                          onChange={(e) => setOptions({ ...options, superbadgeShowCount: e.target.checked })}
+                        />
+                        <span className='option-label-text'>Show Count Badge (×N)</span>
+                        <span
+                          className='option-info'
+                          data-tooltip-id='sb-count-tooltip'
+                          tabIndex='0'
+                          aria-label='More information'
+                        >
+                          <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+                        </span>
+                      </label>
+                      <Tooltip id='sb-count-tooltip' place='top' delayShow={200} className='react-tooltip'>
+                        Adds a ×N badge on each superbadge showing how many team members earned it
+                      </Tooltip>
+                    </>
+                  )}
                   <label>
                     <input
                       type='checkbox'

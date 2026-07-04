@@ -72,6 +72,7 @@ export function aggregateCompanyData(usersData, options = {}) {
   // --- Superbadge aggregation ---
   const allSuperbadges = [];
   const uniqueSuperbadgeMap = new Map(); // title → first superbadge node
+  const superbadgeCountMap = new Map(); // title → number of times earned across the team
 
   // --- Counters ---
   let totalBadges = 0;
@@ -154,6 +155,7 @@ export function aggregateCompanyData(usersData, options = {}) {
       const award = edge?.node?.award;
       if (!award) continue;
       allSuperbadges.push(award);
+      superbadgeCountMap.set(award.title, (superbadgeCountMap.get(award.title) || 0) + 1);
       if (!uniqueSuperbadgeMap.has(award.title)) {
         uniqueSuperbadgeMap.set(award.title, award);
       }
@@ -246,7 +248,12 @@ export function aggregateCompanyData(usersData, options = {}) {
     // For superbadges component
     superbadgesData: {
       all: allSuperbadges,
-      unique: Array.from(uniqueSuperbadgeMap.values()),
+      // Each unique superbadge carries a `count` = how many team members earned it,
+      // used to render a ×N badge when deduplicating.
+      unique: Array.from(uniqueSuperbadgeMap.values()).map((award) => ({
+        ...award,
+        count: superbadgeCountMap.get(award.title) || 1,
+      })),
     },
 
     // For CSV
