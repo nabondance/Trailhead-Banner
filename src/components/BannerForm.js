@@ -13,6 +13,7 @@ import {
 import { Tooltip } from 'react-tooltip';
 import bannerBackground from '../data/banners.json';
 import COUNTERS_CONFIG from '../data/counters.json';
+import STAMP_CATEGORIES_CONFIG from '../data/stampCategories.json';
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
 import { validateImageUrl } from '../utils/imageValidation';
 import {
@@ -106,6 +107,9 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
     agentblazerRankDisplay: 'current',
+    displayStamps: false,
+    selectedStampCategories: STAMP_CATEGORIES_CONFIG.filter((c) => c.defaultSelected),
+    maxStampsToDisplay: '',
   });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -227,12 +231,17 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     // Transform selectedCounters to counterOrder for API
     const counterOrder = options.selectedCounters.map((c) => c.id);
 
+    // Transform selectedStampCategories to ordered category ids for API
+    const stampCategories = options.selectedStampCategories.map((c) => c.id);
+
     await onSubmit({
       ...options,
       counterOrder,
+      stampCategories,
       backgroundImageUrl,
       lastXCertifications: options.lastXCertifications ? parseInt(options.lastXCertifications) : undefined,
       lastXSuperbadges: options.lastXSuperbadges ? parseInt(options.lastXSuperbadges) : undefined,
+      maxStampsToDisplay: options.maxStampsToDisplay ? parseInt(options.maxStampsToDisplay) : undefined,
     });
 
     setIsGenerating(false);
@@ -491,6 +500,62 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
                 <option value='right'>Right</option>
               </select>
             </label>
+          </fieldset>
+          <fieldset>
+            <legend>Stamp Options</legend>
+            <label>
+              <input
+                type='checkbox'
+                checked={options.displayStamps}
+                onChange={(e) => setOptions({ ...options, displayStamps: e.target.checked })}
+              />
+              <span className='option-label-text'>Display Stamps</span>
+              <span className='option-info' data-tooltip-id='stamps-tooltip' tabIndex='0' aria-label='More information'>
+                <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+              </span>
+            </label>
+            <Tooltip id='stamps-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Show your Trailblazer stamps: Agentforce FDE Ready (highest level), Implementation Ready (one per product)
+              and event stamps
+            </Tooltip>
+            {options.displayStamps && (
+              <>
+                <DragAndDropCounterSelector
+                  selectedCounters={options.selectedStampCategories}
+                  onCountersChange={(newCategories) =>
+                    setOptions({ ...options, selectedStampCategories: newCategories })
+                  }
+                  maxCounters={STAMP_CATEGORIES_CONFIG.length}
+                  config={STAMP_CATEGORIES_CONFIG}
+                  itemLabel='category'
+                  itemLabelPlural='categories'
+                  selectedLabel='Selected Stamp Categories'
+                  availableLabel='Available Stamp Categories'
+                />
+                <label className='max-stamps-label'>
+                  Max Stamps to Display:
+                  <input
+                    type='number'
+                    value={options.maxStampsToDisplay}
+                    onChange={(e) => setOptions({ ...options, maxStampsToDisplay: e.target.value })}
+                    min='1'
+                    placeholder='No limit'
+                    className='input-number'
+                  />
+                  <span
+                    className='option-info'
+                    data-tooltip-id='max-stamps-tooltip'
+                    tabIndex='0'
+                    aria-label='More information'
+                  >
+                    <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+                  </span>
+                </label>
+                <Tooltip id='max-stamps-tooltip' place='top' delayShow={200} className='react-tooltip'>
+                  Stamps are kept in category priority order and cut at this number; the rest shows as a +X stamp
+                </Tooltip>
+              </>
+            )}
           </fieldset>
           <fieldset>
             <legend>Certification Options</legend>

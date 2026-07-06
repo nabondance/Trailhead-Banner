@@ -1,4 +1,5 @@
 import { createCanvas, loadImage, ImageData } from '@napi-rs/canvas';
+import { formatCounterValue } from './imageUtils.js';
 
 const applyGrayscaleToCanvas = (sourceCanvas) => {
   // Create a new canvas for the grayscale version
@@ -112,11 +113,15 @@ function getAntaFontBase64() {
   return antaFontBase64;
 }
 
-const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor) => {
+const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor, pluralize = true) => {
   let labelToDisplay = label;
-  if (message != 0) {
+  if (pluralize && message != 0) {
     labelToDisplay += 's';
   }
+
+  // Shrink the label font when it can't fit the fixed 140px label box at full size
+  const labelFontSize = labelToDisplay.length > 12 ? Math.max(100, Math.floor(2400 / labelToDisplay.length)) : 200;
+  const labelY = Math.round(150 + labelFontSize * 0.35); // keep the visual center fixed as the font shrinks
 
   const fontBase64 = getAntaFontBase64();
   const counterBadgeSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="35" role="img">
@@ -143,16 +148,16 @@ const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor) => 
         <rect width="200" height="35" fill="url(#s)" />
     </g>
     <g fill="#fff" text-anchor="middle" font-family="Anta" text-rendering="geometricPrecision" font-size="200">
-    <text x="700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)">${labelToDisplay}</text>
-    <text x="700" y="220" transform="scale(.1)" fill="#fff">${labelToDisplay}</text>
+    <text x="700" y="${labelY + 20}" fill="#010101" fill-opacity=".3" transform="scale(.1)" font-size="${labelFontSize}">${labelToDisplay}</text>
+    <text x="700" y="${labelY}" transform="scale(.1)" fill="#fff" font-size="${labelFontSize}">${labelToDisplay}</text>
     <text x="1700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)">${message}</text>
     <text x="1700" y="220" transform="scale(.1)" fill="#fff">${message}</text></g>
     </svg>`;
   return counterBadgeSvg;
 };
 
-const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor) => {
-  const badge = dynamicBadgeSvg(label, message, labelColor, messageColor);
+const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor, pluralize = true) => {
+  const badge = dynamicBadgeSvg(label, message, labelColor, messageColor, pluralize);
   const badgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badge).toString('base64')}`);
   ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
 };
@@ -171,6 +176,61 @@ const generatePlusXSuperbadgesSvg = (count) => {
       <text x="250" y="330" fill="#fff" font-family="Roboto" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
     </svg>`;
   return plusXSuperbadgesSvg;
+};
+
+const generatePlusXStampsSvg = (count) => {
+  // Postage-stamp proportions (6:7) matching the Trailhead stamp icons.
+  // Perforations are punched out with a mask so they stay transparent on any background.
+  const fontBase64 = getAntaFontBase64();
+
+  // Shrink the font for large counts so the label always fits the inner panel;
+  // huge counts abbreviate like counters do (12k, 3M, ...)
+  const label = `+${formatCounterValue(count)}`;
+  const fontSize = Math.min(150, Math.floor(460 / label.length));
+  const labelY = Math.round(210 + fontSize * 0.35); // panel center is y=210; offset baseline to optically center
+
+  // Perforation holes along the stamp edges, matching the official stamp icons'
+  // scallop scale (measured on the Dreamforce icon: pitch ~8.5% of width, hole
+  // radius ~3% of width, centered on the edge)
+  const holeRadius = 11;
+  const holes = [];
+  const horizontalSteps = 12;
+  for (let i = 0; i <= horizontalSteps; i++) {
+    const x = (i * 360) / horizontalSteps;
+    holes.push(`<circle cx="${x}" cy="0" r="${holeRadius}" fill="#000" />`);
+    holes.push(`<circle cx="${x}" cy="420" r="${holeRadius}" fill="#000" />`);
+  }
+  const verticalSteps = 14;
+  for (let i = 0; i <= verticalSteps; i++) {
+    const y = (i * 420) / verticalSteps;
+    holes.push(`<circle cx="0" cy="${y}" r="${holeRadius}" fill="#000" />`);
+    holes.push(`<circle cx="360" cy="${y}" r="${holeRadius}" fill="#000" />`);
+  }
+
+  const plusXStampsSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="360" height="420" role="img">
+      <defs>
+        <style>
+          @font-face {
+            font-family: 'Anta';
+            src: url(data:font/truetype;base64,${fontBase64}) format('truetype');
+          }
+        </style>
+        <linearGradient id="stampPanel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#eaf3fc" />
+          <stop offset="1" stop-color="#cfe4f7" />
+        </linearGradient>
+        <mask id="perforation">
+          <rect x="0" y="0" width="360" height="420" fill="#fff" />
+          ${holes.join('\n          ')}
+        </mask>
+      </defs>
+      <g mask="url(#perforation)">
+        <rect x="0" y="0" width="360" height="420" fill="#ffffff" />
+        <rect x="28" y="28" width="304" height="364" rx="8" fill="url(#stampPanel)" stroke="#0b5cab" stroke-width="7" />
+        <text x="180" y="${labelY}" fill="#0b5cab" font-family="Anta" font-size="${fontSize}" text-anchor="middle">${label}</text>
+      </g>
+    </svg>`;
+  return plusXStampsSvg;
 };
 
 const generatePlusXCertificationsSvg = (count) => {
@@ -955,6 +1015,7 @@ export {
   cropImage,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
+  generatePlusXStampsSvg,
   generatePlusXCertificationsSvg,
   getRankAccentColor,
   getAgentblazerStyle,

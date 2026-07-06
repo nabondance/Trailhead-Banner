@@ -9,6 +9,7 @@ import {
   Agentblazer,
   MvpRibbon,
   Watermark,
+  Stamps,
 } from '../components/index.js';
 
 /**
@@ -50,17 +51,22 @@ async function generateStandardBanner(data, options = {}) {
   // ============================================================
   let prepareStartTime = Date.now();
 
-  const [backgroundPrep, rankLogoPrep, agentblazerPrep, mvpRibbonPrep, watermarkPrep] = await Promise.all([
+  const topLogoHeight = CANVAS_HEIGHT * TOP_PART_RATIO * 0.9;
+
+  const [backgroundPrep, rankLogoPrep, agentblazerPrep, mvpRibbonPrep, watermarkPrep, stampsPrep] = await Promise.all([
     Background.prepareBackground(options),
     RankLogo.prepareRankLogo(data.rankData, options, CANVAS_HEIGHT),
     Agentblazer.prepareAgentblazer(data.agentblazerData, options),
     MvpRibbon.prepareMvpRibbon(data.mvpData),
     Watermark.prepareWatermark(),
+    Stamps.prepareStamps(data.stampsData, options, { logoHeight: topLogoHeight }),
   ]);
 
   timings.background_load_ms = backgroundPrep.timings?.load_ms;
   timings.rank_logo_load_ms = rankLogoPrep.timings?.load_ms;
   timings.agentblazer_load_ms = agentblazerPrep.timings?.load_ms;
+  timings.stamps_download_ms = stampsPrep.timings?.download_ms;
+  timings.stamps_count = Stamps.getStampsCounts(stampsPrep).displayed;
 
   // Prepare counters (needs rank logo dimensions)
   const countersPrep = await Counters.prepareCounters(data, options);
@@ -78,10 +84,37 @@ async function generateStandardBanner(data, options = {}) {
   timings.certifications_count = certificationsPrep.counts.displayed;
   timings.certifications_detailed = certificationsPrep.timings?.detailed;
 
+  // Allocate top-band width between stamps and superbadges.
+  // The midpoint is a cap, not a wall: each side is guaranteed min(natural, half)
+  // and reclaims whatever the other side doesn't use. Without stamps, superbadges
+  // keep their legacy 70% zone.
+  const AGENTBLAZER_X = 370;
+  const STAMP_ZONE_GAP = 20;
+  const agentblazerDims = Agentblazer.getAgentblazerDimensions(agentblazerPrep);
+  const stampZoneStart = AGENTBLAZER_X + (agentblazerDims.width > 0 ? agentblazerDims.width + 10 : 0);
+
+  let stampZone = null;
+  let superbadgeAvailableWidth = CANVAS_WIDTH * RIGHT_PART_RATIO;
+
+  if (stampsPrep.shouldRender) {
+    const topBandAvailable = CANVAS_WIDTH - stampZoneStart - STAMP_ZONE_GAP;
+    const superbadgesNaturalWidth = Superbadges.getSuperbadgesNaturalWidth(
+      data.superbadgesData,
+      options,
+      topLogoHeight
+    );
+    const stampsAllocatedWidth = Math.min(
+      stampsPrep.naturalWidth,
+      Math.max(topBandAvailable / 2, topBandAvailable - superbadgesNaturalWidth)
+    );
+    stampZone = { x: stampZoneStart, width: stampsAllocatedWidth };
+    superbadgeAvailableWidth = Math.max(topBandAvailable - stampsAllocatedWidth, 0);
+  }
+
   // Prepare superbadges (needs layout constraints)
   const superbadgeLayout = {
-    availableWidth: CANVAS_WIDTH * RIGHT_PART_RATIO,
-    logoHeight: CANVAS_HEIGHT * TOP_PART_RATIO * 0.9,
+    availableWidth: superbadgeAvailableWidth,
+    logoHeight: topLogoHeight,
   };
   const superbadgesPrep = await Superbadges.prepareSuperbadges(data.superbadgesData, options, superbadgeLayout);
   timings.superbadges_download_ms = superbadgesPrep.timings?.download_ms;
@@ -112,7 +145,13 @@ async function generateStandardBanner(data, options = {}) {
   timings.counters_draw_ms = countersRenderTiming?.render_ms;
 
   // 4. Agentblazer (top area, fixed position)
-  await Agentblazer.renderAgentblazer(ctx, agentblazerPrep, 370, 5);
+  await Agentblazer.renderAgentblazer(ctx, agentblazerPrep, AGENTBLAZER_X, 5);
+
+  // 4b. Stamps (top area, right of Agentblazer)
+  if (stampZone) {
+    const stampsRenderTiming = await Stamps.renderStamps(ctx, stampsPrep, stampZone.x, 10, stampZone.width);
+    timings.stamps_render_ms = stampsRenderTiming?.render_ms;
+  }
 
   // 5. Certifications (bottom area)
   const certifYPosition = CANVAS_HEIGHT * TOP_PART_RATIO + 20;
@@ -153,6 +192,7 @@ async function generateStandardBanner(data, options = {}) {
   warnings.push(...Counters.getCountersWarnings(countersPrep));
   warnings.push(...Certifications.getCertificationsWarnings(certificationsPrep));
   warnings.push(...Superbadges.getSuperbadgesWarnings(superbadgesPrep));
+  warnings.push(...Stamps.getStampsWarnings(stampsPrep));
   warnings.push(...Agentblazer.getAgentblazerWarnings(agentblazerPrep));
   warnings.push(...MvpRibbon.getMvpRibbonWarnings(mvpRibbonPrep));
   warnings.push(...Watermark.getWatermarkWarnings(watermarkPrep));

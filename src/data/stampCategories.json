@@ -1,0 +1,20 @@
+[
+  {
+    "id": "fde",
+    "label": "FDE",
+    "color": "#0B5CAB",
+    "defaultSelected": true
+  },
+  {
+    "id": "ir",
+    "label": "Implementation Ready",
+    "color": "#032D60",
+    "defaultSelected": true
+  },
+  {
+    "id": "event",
+    "label": "Event",
+    "color": "#008A7D",
+    "defaultSelected": false
+  }
+]

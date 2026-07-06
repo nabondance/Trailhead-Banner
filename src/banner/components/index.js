@@ -11,5 +11,6 @@ import * as Superbadges from './superbadges.js';
 import * as Agentblazer from './agentblazer.js';
 import * as MvpRibbon from './mvpRibbon.js';
 import * as Watermark from './watermark.js';
+import * as Stamps from './stamps.js';
 
-export { Background, RankLogo, Counters, Certifications, Superbadges, Agentblazer, MvpRibbon, Watermark };
+export { Background, RankLogo, Counters, Certifications, Superbadges, Agentblazer, MvpRibbon, Watermark, Stamps };

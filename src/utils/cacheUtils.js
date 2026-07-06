@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { downloadImage, uploadImage } from './blobUtils';
+import { getStampFileName } from './stampUtils';
 import fs from 'fs';
 import path from 'path';
 
@@ -21,6 +22,9 @@ export const getImage = async (imageUrl, folder = 'images') => {
   if (folder === 'certifications' || folder === 'certifications_cropped') {
     fileName = getCertificationFileName(imageUrl);
   }
+  if (folder === 'stamps' || folder === 'stamps_keyed') {
+    fileName = getStampFileName(imageUrl);
+  }
   let imageDownloaded = null;
   let cacheHit = false;
   try {
@@ -31,9 +35,12 @@ export const getImage = async (imageUrl, folder = 'images') => {
     console.error(`Image not found in blob storage, downloading from URL: ${imageUrl}`);
   }
 
-  // For cropped certifications folder, don't download from URL - it should only contain pre-cropped images
+  // Processed-image folders only contain pre-processed files - never download from URL into them
   if (folder === 'certifications_cropped') {
     throw new Error('Cropped version not found in cache');
+  }
+  if (folder === 'stamps_keyed') {
+    throw new Error('Keyed version not found in cache');
   }
 
   // Validate URL protocol (only allow http/https)

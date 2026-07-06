@@ -19,8 +19,17 @@ import COUNTERS_CONFIG from '@/data/counters.json';
 
 const MAX_COUNTERS = 5;
 
-export default function DragAndDropCounterSelector({ selectedCounters, onCountersChange, maxCounters = MAX_COUNTERS }) {
-  const availableCounters = COUNTERS_CONFIG.filter(
+export default function DragAndDropCounterSelector({
+  selectedCounters,
+  onCountersChange,
+  maxCounters = MAX_COUNTERS,
+  config = COUNTERS_CONFIG,
+  itemLabel = 'counter',
+  itemLabelPlural = `${itemLabel}s`,
+  selectedLabel = 'Selected Counters',
+  availableLabel = 'Available Counters',
+}) {
+  const availableCounters = config.filter(
     (counter) => !selectedCounters.find((selected) => selected.id === counter.id)
   );
 
@@ -67,13 +76,15 @@ export default function DragAndDropCounterSelector({ selectedCounters, onCounter
     <div className='counter-selector-container'>
       <div className='selected-counters-zone'>
         <div className='zone-header'>
-          <h3>Selected Counters</h3>
+          <h3>{selectedLabel}</h3>
           <span className='counter-limit-badge'>
             {selectedCounters.length}/{maxCounters}
           </span>
         </div>
         {selectedCounters.length === 0 ? (
-          <div className='empty-state'>No counters selected. Click a counter below to add it.</div>
+          <div className='empty-state'>
+            No {itemLabelPlural} selected. Click a {itemLabel} below to add it.
+          </div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={selectedCounters.map((c) => c.id)} strategy={verticalListSortingStrategy}>
@@ -87,11 +98,9 @@ export default function DragAndDropCounterSelector({ selectedCounters, onCounter
         )}
       </div>
 
-      <div className='available-counters-zone'>
-        <h3>Available Counters</h3>
-        {availableCounters.length === 0 ? (
-          <div className='empty-state'>All counters are selected.</div>
-        ) : (
+      {availableCounters.length > 0 && (
+        <div className='available-counters-zone'>
+          <h3>{availableLabel}</h3>
           <div className='counter-list'>
             {availableCounters.map((counter) => (
               <button
@@ -102,7 +111,7 @@ export default function DragAndDropCounterSelector({ selectedCounters, onCounter
                 disabled={selectedCounters.length >= maxCounters}
                 title={
                   selectedCounters.length >= maxCounters
-                    ? `Maximum ${maxCounters} counters allowed`
+                    ? `Maximum ${maxCounters} ${itemLabelPlural} allowed`
                     : `Click to add ${counter.label}`
                 }
               >
@@ -112,8 +121,8 @@ export default function DragAndDropCounterSelector({ selectedCounters, onCounter
               </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

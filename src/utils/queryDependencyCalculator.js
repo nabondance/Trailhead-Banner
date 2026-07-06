@@ -59,8 +59,9 @@ const QUERY_DEPENDENCIES = {
   },
 
   GET_STAMPS: {
-    // Fetch event stamps
-    requiredWhenCounter: ['stamp'],
+    // Fetch stamps (event + program stamps like FDE / Implementation Ready)
+    requiredWhen: ['displayStamps'],
+    requiredWhenCounter: ['stamp', 'fde-level', 'implementation-ready', 'event-stamp'],
     params: { first: 100 },
   },
 
