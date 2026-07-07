@@ -104,14 +104,21 @@ async function prepareStamps(stampsData, options = {}, layout = {}) {
 
   const images = imageResults.filter(Boolean);
 
-  // Add "+X" badge if stamps were cut by maxStampsToDisplay
+  // Add "+X" badge if stamps were cut by maxStampsToDisplay.
+  // Wrapped so a missing/corrupt stamp asset degrades to "no badge" instead of
+  // failing the whole banner (prepareStamps runs inside a Promise.all).
   if (hidden > 0 && images.length > 0) {
-    const plusXImage = await generatePlusXStampsImage(hidden);
-    images.push({
-      image: plusXImage,
-      width: (plusXImage.width / plusXImage.height) * logoHeight,
-      name: `+${hidden} stamps`,
-    });
+    try {
+      const plusXImage = await generatePlusXStampsImage(hidden);
+      images.push({
+        image: plusXImage,
+        width: (plusXImage.width / plusXImage.height) * logoHeight,
+        name: `+${hidden} stamps`,
+      });
+    } catch (error) {
+      console.error(`Error generating +${hidden} stamp badge:`, error);
+      warnings.push(`Error generating +${hidden} stamp badge: ${error.message}`);
+    }
   }
 
   if (images.length === 0) {
