@@ -60,7 +60,7 @@ async function prepareCounters(data, options = {}) {
     certification: { data: certificationCount, label: 'Certification', color: '#8a00c4' },
     trail: { data: trailCount, label: 'Trail', color: '#06482A' },
     point: { data: pointCount, label: 'Point', color: '#18477D' },
-    stamp: { data: stampCount, label: 'All Stamp', color: '#00B3A4' },
+    stamp: { data: stampCount, label: 'Stamp', color: '#00B3A4' },
     'event-stamp': { data: eventStampCount, label: 'Event Stamp', color: '#008A7D' },
     'fde-level': { data: fdeLevel, label: 'FDE Level', color: '#0B5CAB', pluralize: false },
     'implementation-ready': {
