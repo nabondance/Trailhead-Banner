@@ -113,6 +113,29 @@ function getAntaFontBase64() {
   return antaFontBase64;
 }
 
+// Load and cache the "+N" stamp background PNG (navy postage stamp with scalloped edges) as base64
+let plusStampBgBase64 = null;
+function getPlusStampBgBase64() {
+  if (!plusStampBgBase64) {
+    const fs = require('fs');
+    const path = require('path');
+    const imgPath = path.join(process.cwd(), 'public/assets/stamps/plus-stamp-bg.png');
+
+    try {
+      plusStampBgBase64 = fs.readFileSync(imgPath).toString('base64');
+    } catch (error) {
+      // Fallback: try relative to this file
+      const fallbackPath = path.join(__dirname, '../../public/assets/stamps/plus-stamp-bg.png');
+      try {
+        plusStampBgBase64 = fs.readFileSync(fallbackPath).toString('base64');
+      } catch (fallbackError) {
+        throw new Error('Could not load plus-stamp background from any path');
+      }
+    }
+  }
+  return plusStampBgBase64;
+}
+
 const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor, pluralize = true) => {
   let labelToDisplay = label;
   if (pluralize && message != 0) {
@@ -178,10 +201,15 @@ const generatePlusXSuperbadgesSvg = (count) => {
   return plusXSuperbadgesSvg;
 };
 
-const generatePlusXStampsSvg = (count) => {
-  // Postage-stamp proportions (6:7) matching the Trailhead stamp icons.
-  // Perforations are punched out with a mask so they stay transparent on any background.
+// Build the "+N" stamp as a canvas: the scalloped stamp PNG (light panel, blue
+// border, transparent perforations baked in) with the "+N" label drawn on top,
+// colored to match the border. Compositing happens on
+// the canvas rather than in SVG because the SVG engine won't render embedded raster
+// <image> data URIs — only its text. The label stays an SVG overlay so it keeps the
+// Anta webfont. Canvas is 360x420 (6:7), matching the stamp icons.
+const generatePlusXStampsImage = async (count) => {
   const fontBase64 = getAntaFontBase64();
+  const stampBgBase64 = getPlusStampBgBase64();
 
   // Shrink the font for large counts so the label always fits the inner panel;
   // huge counts abbreviate like counters do (12k, 3M, ...)
@@ -189,25 +217,13 @@ const generatePlusXStampsSvg = (count) => {
   const fontSize = Math.min(150, Math.floor(460 / label.length));
   const labelY = Math.round(210 + fontSize * 0.35); // panel center is y=210; offset baseline to optically center
 
-  // Perforation holes along the stamp edges, matching the official stamp icons'
-  // scallop scale (measured on the Dreamforce icon: pitch ~8.5% of width, hole
-  // radius ~3% of width, centered on the edge)
-  const holeRadius = 11;
-  const holes = [];
-  const horizontalSteps = 12;
-  for (let i = 0; i <= horizontalSteps; i++) {
-    const x = (i * 360) / horizontalSteps;
-    holes.push(`<circle cx="${x}" cy="0" r="${holeRadius}" fill="#000" />`);
-    holes.push(`<circle cx="${x}" cy="420" r="${holeRadius}" fill="#000" />`);
-  }
-  const verticalSteps = 14;
-  for (let i = 0; i <= verticalSteps; i++) {
-    const y = (i * 420) / verticalSteps;
-    holes.push(`<circle cx="0" cy="${y}" r="${holeRadius}" fill="#000" />`);
-    holes.push(`<circle cx="360" cy="${y}" r="${holeRadius}" fill="#000" />`);
-  }
+  const canvas = createCanvas(360, 420);
+  const ctx = canvas.getContext('2d');
 
-  const plusXStampsSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="360" height="420" role="img">
+  const bgImage = await loadImage(`data:image/png;base64,${stampBgBase64}`);
+  ctx.drawImage(bgImage, 0, 0, 360, 420);
+
+  const labelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="420" role="img">
       <defs>
         <style>
           @font-face {
@@ -215,22 +231,13 @@ const generatePlusXStampsSvg = (count) => {
             src: url(data:font/truetype;base64,${fontBase64}) format('truetype');
           }
         </style>
-        <linearGradient id="stampPanel" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#eaf3fc" />
-          <stop offset="1" stop-color="#cfe4f7" />
-        </linearGradient>
-        <mask id="perforation">
-          <rect x="0" y="0" width="360" height="420" fill="#fff" />
-          ${holes.join('\n          ')}
-        </mask>
       </defs>
-      <g mask="url(#perforation)">
-        <rect x="0" y="0" width="360" height="420" fill="#ffffff" />
-        <rect x="28" y="28" width="304" height="364" rx="8" fill="url(#stampPanel)" stroke="#0b5cab" stroke-width="7" />
-        <text x="180" y="${labelY}" fill="#0b5cab" font-family="Anta" font-size="${fontSize}" text-anchor="middle">${label}</text>
-      </g>
+      <text x="180" y="${labelY}" fill="#1b5296" font-family="Anta" font-size="${fontSize}" text-anchor="middle">${label}</text>
     </svg>`;
-  return plusXStampsSvg;
+  const labelImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(labelSvg).toString('base64')}`);
+  ctx.drawImage(labelImage, 0, 0);
+
+  return canvas;
 };
 
 const generatePlusXCertificationsSvg = (count) => {
@@ -1015,7 +1022,7 @@ export {
   cropImage,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
-  generatePlusXStampsSvg,
+  generatePlusXStampsImage,
   generatePlusXCertificationsSvg,
   getRankAccentColor,
   getAgentblazerStyle,

@@ -2,7 +2,7 @@ import { loadImage } from '@napi-rs/canvas';
 import { getImage } from '../../utils/cacheUtils.js';
 import { uploadImage } from '../../utils/blobUtils.js';
 import { selectStampsToDisplay, getStampFileName, whiteKeyStampImage } from '../../utils/stampUtils.js';
-import { generatePlusXStampsSvg } from '../../utils/drawUtils.js';
+import { generatePlusXStampsImage } from '../../utils/drawUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
 
 /**
@@ -106,8 +106,7 @@ async function prepareStamps(stampsData, options = {}, layout = {}) {
 
   // Add "+X" badge if stamps were cut by maxStampsToDisplay
   if (hidden > 0 && images.length > 0) {
-    const plusXSvg = generatePlusXStampsSvg(hidden);
-    const plusXImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(plusXSvg).toString('base64')}`);
+    const plusXImage = await generatePlusXStampsImage(hidden);
     images.push({
       image: plusXImage,
       width: (plusXImage.width / plusXImage.height) * logoHeight,
