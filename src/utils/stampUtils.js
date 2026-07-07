@@ -39,10 +39,12 @@ const classifyStamps = (edges) => {
   }
   const ir = [...irByProduct.values()].sort((a, b) => a.irProduct.localeCompare(b.irProduct));
 
-  // Events: newest first
-  const event = nodes
-    .filter((node) => node.kind?.startsWith('EVENT'))
-    .sort((a, b) => new Date(b.eventDate) - new Date(a.eventDate));
+  // Events: newest first (missing/invalid dates sort last)
+  const eventTime = (node) => {
+    const t = new Date(node.eventDate).getTime();
+    return Number.isNaN(t) ? 0 : t;
+  };
+  const event = nodes.filter((node) => node.kind?.startsWith('EVENT')).sort((a, b) => eventTime(b) - eventTime(a));
 
   return { fde, ir, event };
 };
