@@ -1,6 +1,5 @@
 {
   "usernames": ["nabondance", "anna", "stevemo", "gauravkheterpal", "babup", "mrousseaux"],
-
   "defaultOptions": {
     "_description": "Exact website defaults — library background index 5, default counters",
     "backgroundKind": "library",
@@ -27,9 +26,11 @@
     "textColor": "#000000",
     "badgeLabelColor": "#555555",
     "badgeMessageColor": "#1F80C0",
-    "counterOrder": ["badge", "superbadge", "certification"]
+    "counterOrder": ["badge", "superbadge", "certification"],
+    "displayStamps": false,
+    "stampCategories": [],
+    "maxStampsToDisplay": ""
   },
-
   "configs": {
     "nabondance": {
       "_description": "Exact website defaults — no overrides",
@@ -57,9 +58,11 @@
       "textColor": "#000000",
       "badgeLabelColor": "#555555",
       "badgeMessageColor": "#1F80C0",
-      "counterOrder": ["badge", "superbadge", "certification"]
+      "counterOrder": ["badge", "superbadge", "certification"],
+      "displayStamps": false,
+      "stampCategories": [],
+      "maxStampsToDisplay": ""
     },
-
     "anna": {
       "_description": "Certification showcase — all certs including expired/retired, ascending date sort, all counters",
       "backgroundKind": "library",
@@ -86,9 +89,11 @@
       "textColor": "#000000",
       "badgeLabelColor": "#555555",
       "badgeMessageColor": "#1F80C0",
-      "counterOrder": ["certification", "superbadge", "badge"]
+      "counterOrder": ["certification", "superbadge", "badge"],
+      "displayStamps": false,
+      "stampCategories": [],
+      "maxStampsToDisplay": ""
     },
-
     "stevemo": {
       "_description": "Community focus — answer/follower counters, agentblazer lifetime, right-aligned certs",
       "backgroundKind": "procedural",
@@ -115,9 +120,11 @@
       "textColor": "#000000",
       "badgeLabelColor": "#555555",
       "badgeMessageColor": "#1F80C0",
-      "counterOrder": ["answer", "best-answer", "question", "follower", "following"]
+      "counterOrder": ["answer", "best-answer", "question", "follower", "following"],
+      "displayStamps": false,
+      "stampCategories": [],
+      "maxStampsToDisplay": ""
     },
-
     "gauravkheterpal": {
       "_description": "Max credentials stress test — all cert types, expired + retired included, all counters",
       "backgroundKind": "library",
@@ -144,9 +151,11 @@
       "textColor": "#000000",
       "badgeLabelColor": "#555555",
       "badgeMessageColor": "#1F80C0",
-      "counterOrder": ["certification", "superbadge", "badge", "point", "trail"]
+      "counterOrder": ["certification", "superbadge", "badge", "point", "trail"],
+      "displayStamps": false,
+      "stampCategories": [],
+      "maxStampsToDisplay": ""
     },
-
     "babup": {
       "_description": "Limits stress test — last 5 certs, last 3 superbadges, minimal counters",
       "backgroundKind": "monochromatic",
@@ -173,11 +182,13 @@
       "textColor": "#000000",
       "badgeLabelColor": "#555555",
       "badgeMessageColor": "#1F80C0",
-      "counterOrder": ["badge", "trail", "point"]
+      "counterOrder": ["badge", "trail", "point"],
+      "displayStamps": false,
+      "stampCategories": [],
+      "maxStampsToDisplay": ""
     },
-
     "mrousseaux": {
-      "_description": "Untested combo — uploaded background image, white text, custom badge colors, center superbadge, stamp counter, last 3 certs, agentblazer lifetime",
+      "_description": "Stamps showcase — FDE/IR/event stamps with max cut (+X), FDE + Implementation Ready counters, uploaded background, white text, last 3 certs",
       "_backgroundLocalFile": ".github/scripts/banner-preview/test-background.jpeg",
       "backgroundKind": "upload",
       "backgroundLibraryUrl": "",
@@ -203,7 +214,10 @@
       "textColor": "#FFFFFF",
       "badgeLabelColor": "#FFFFFF",
       "badgeMessageColor": "#FFD700",
-      "counterOrder": ["certification", "badge", "stamp", "point", "trail"]
+      "counterOrder": ["certification", "badge", "stamp", "fde-level", "implementation-ready"],
+      "displayStamps": true,
+      "stampCategories": ["fde", "ir", "event"],
+      "maxStampsToDisplay": 3
     }
   }
 }

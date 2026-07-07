@@ -1,5 +1,6 @@
 import { getCountersConfig, formatCounterValue } from '../../utils/imageUtils.js';
 import { drawBadgeCounter } from '../../utils/drawUtils.js';
+import { getHighestFdeLevel, getImplementationReadyCount, getEventStampCount } from '../../utils/stampUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
 
 /**
@@ -42,6 +43,9 @@ async function prepareCounters(data, options = {}) {
   const trailCount = data.rankData?.completedTrailCount || 0;
   const pointCount = data.rankData?.earnedPointsSum || 0;
   const stampCount = data.stampsData?.totalCount || 0;
+  const fdeLevel = getHighestFdeLevel(data.stampsData?.edges);
+  const implementationReadyCount = getImplementationReadyCount(data.stampsData?.edges);
+  const eventStampCount = getEventStampCount(data.stampsData?.edges);
   const answerCount = data.communityData?.questionAndAnswersStats?.answersCount || 0;
   const bestAnswerCount = data.communityData?.questionAndAnswersStats?.bestAnswersCount || 0;
   const questionCount = data.communityData?.questionAndAnswersStats?.questionsCount || 0;
@@ -57,6 +61,14 @@ async function prepareCounters(data, options = {}) {
     trail: { data: trailCount, label: 'Trail', color: '#06482A' },
     point: { data: pointCount, label: 'Point', color: '#18477D' },
     stamp: { data: stampCount, label: 'Stamp', color: '#00B3A4' },
+    'event-stamp': { data: eventStampCount, label: 'Event Stamp', color: '#008A7D' },
+    'fde-level': { data: fdeLevel, label: 'FDE Level', color: '#0B5CAB', pluralize: false },
+    'implementation-ready': {
+      data: implementationReadyCount,
+      label: 'Impl. Ready', // kept short so it stays legible in the fixed-width badge
+      color: '#032D60',
+      pluralize: false,
+    },
     answer: { data: answerCount, label: 'Answer', color: '#C88000' },
     'best-answer': { data: bestAnswerCount, label: 'Best Answer', color: '#F0B800' },
     question: { data: questionCount, label: 'Question', color: '#9A6200' },
@@ -83,6 +95,7 @@ async function prepareCounters(data, options = {}) {
         label: counter.label,
         value: formatCounterValue(counter.data),
         color: counter.color,
+        pluralize: counter.pluralize !== false,
       });
     }
   }
@@ -128,7 +141,8 @@ async function renderCounters(ctx, prepared, startX, startY, badgeLabelColor) {
         currentY,
         badgeScale,
         badgeLabelColor,
-        counter.color
+        counter.color,
+        counter.pluralize
       );
       currentY += yDelta;
     } catch (error) {

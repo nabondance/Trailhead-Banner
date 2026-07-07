@@ -1,4 +1,5 @@
 import { createCanvas, loadImage, ImageData } from '@napi-rs/canvas';
+import { formatCounterValue } from './imageUtils.js';
 
 const applyGrayscaleToCanvas = (sourceCanvas) => {
   // Create a new canvas for the grayscale version
@@ -112,11 +113,38 @@ function getAntaFontBase64() {
   return antaFontBase64;
 }
 
-const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor) => {
+// Load and cache the "+N" stamp background PNG (navy postage stamp with scalloped edges) as base64
+let plusStampBgBase64 = null;
+function getPlusStampBgBase64() {
+  if (!plusStampBgBase64) {
+    const fs = require('fs');
+    const path = require('path');
+    const imgPath = path.join(process.cwd(), 'public/assets/stamps/plus-stamp-bg.png');
+
+    try {
+      plusStampBgBase64 = fs.readFileSync(imgPath).toString('base64');
+    } catch (error) {
+      // Fallback: try relative to this file
+      const fallbackPath = path.join(__dirname, '../../public/assets/stamps/plus-stamp-bg.png');
+      try {
+        plusStampBgBase64 = fs.readFileSync(fallbackPath).toString('base64');
+      } catch (fallbackError) {
+        throw new Error('Could not load plus-stamp background from any path');
+      }
+    }
+  }
+  return plusStampBgBase64;
+}
+
+const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor, pluralize = true) => {
   let labelToDisplay = label;
-  if (message != 0) {
+  if (pluralize && message != 0) {
     labelToDisplay += 's';
   }
+
+  // Shrink the label font when it can't fit the fixed 140px label box at full size
+  const labelFontSize = labelToDisplay.length > 12 ? Math.max(100, Math.floor(2400 / labelToDisplay.length)) : 200;
+  const labelY = Math.round(150 + labelFontSize * 0.35); // keep the visual center fixed as the font shrinks
 
   const fontBase64 = getAntaFontBase64();
   const counterBadgeSvg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="35" role="img">
@@ -143,16 +171,16 @@ const dynamicBadgeSvg = (label, message, labelColor, messageBackgroundColor) => 
         <rect width="200" height="35" fill="url(#s)" />
     </g>
     <g fill="#fff" text-anchor="middle" font-family="Anta" text-rendering="geometricPrecision" font-size="200">
-    <text x="700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)">${labelToDisplay}</text>
-    <text x="700" y="220" transform="scale(.1)" fill="#fff">${labelToDisplay}</text>
+    <text x="700" y="${labelY + 20}" fill="#010101" fill-opacity=".3" transform="scale(.1)" font-size="${labelFontSize}">${labelToDisplay}</text>
+    <text x="700" y="${labelY}" transform="scale(.1)" fill="#fff" font-size="${labelFontSize}">${labelToDisplay}</text>
     <text x="1700" y="240" fill="#010101" fill-opacity=".3" transform="scale(.1)">${message}</text>
     <text x="1700" y="220" transform="scale(.1)" fill="#fff">${message}</text></g>
     </svg>`;
   return counterBadgeSvg;
 };
 
-const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor) => {
-  const badge = dynamicBadgeSvg(label, message, labelColor, messageColor);
+const drawBadgeCounter = async (ctx, label, message, x, y, scale, labelColor, messageColor, pluralize = true) => {
+  const badge = dynamicBadgeSvg(label, message, labelColor, messageColor, pluralize);
   const badgeImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(badge).toString('base64')}`);
   ctx.drawImage(badgeImage, x, y, badgeImage.width * scale, badgeImage.height * scale);
 };
@@ -171,6 +199,45 @@ const generatePlusXSuperbadgesSvg = (count) => {
       <text x="250" y="330" fill="#fff" font-family="Roboto" font-weight="700" font-size="200" text-anchor="middle">+${count}</text>
     </svg>`;
   return plusXSuperbadgesSvg;
+};
+
+// Build the "+N" stamp as a canvas: the scalloped stamp PNG (light panel, blue
+// border, transparent perforations baked in) with the "+N" label drawn on top,
+// colored to match the border. Compositing happens on
+// the canvas rather than in SVG because the SVG engine won't render embedded raster
+// <image> data URIs — only its text. The label stays an SVG overlay so it keeps the
+// Anta webfont. Canvas is 360x420 (6:7), matching the stamp icons.
+const generatePlusXStampsImage = async (count) => {
+  const fontBase64 = getAntaFontBase64();
+  const stampBgBase64 = getPlusStampBgBase64();
+
+  // Shrink the font for large counts so the label always fits the inner panel;
+  // huge counts abbreviate like counters do (12k, 3M, ...)
+  const label = `+${formatCounterValue(count)}`;
+  const fontSize = Math.min(150, Math.floor(460 / label.length));
+  const labelY = Math.round(210 + fontSize * 0.35); // panel center is y=210; offset baseline to optically center
+
+  const canvas = createCanvas(360, 420);
+  const ctx = canvas.getContext('2d');
+
+  const bgImage = await loadImage(`data:image/png;base64,${stampBgBase64}`);
+  ctx.drawImage(bgImage, 0, 0, 360, 420);
+
+  const labelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="420" role="img">
+      <defs>
+        <style>
+          @font-face {
+            font-family: 'Anta';
+            src: url(data:font/truetype;base64,${fontBase64}) format('truetype');
+          }
+        </style>
+      </defs>
+      <text x="180" y="${labelY}" fill="#1b5296" font-family="Anta" font-size="${fontSize}" text-anchor="middle">${label}</text>
+    </svg>`;
+  const labelImage = await loadImage(`data:image/svg+xml;base64,${Buffer.from(labelSvg).toString('base64')}`);
+  ctx.drawImage(labelImage, 0, 0);
+
+  return canvas;
 };
 
 const generatePlusXCertificationsSvg = (count) => {
@@ -955,6 +1022,7 @@ export {
   cropImage,
   drawBadgeCounter,
   generatePlusXSuperbadgesSvg,
+  generatePlusXStampsImage,
   generatePlusXCertificationsSvg,
   getRankAccentColor,
   getAgentblazerStyle,

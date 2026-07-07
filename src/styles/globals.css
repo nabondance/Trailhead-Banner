@@ -2030,6 +2030,11 @@ select:focus {
   z-index: -1;
 }
 
+.max-stamps-label {
+  display: block;
+  margin-top: 1.25rem;
+}
+
 /* Drag and Drop Counter Selector Styles */
 .counter-selector-container {
   display: flex;

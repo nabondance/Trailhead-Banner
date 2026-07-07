@@ -31,8 +31,26 @@
   },
   {
     "id": "stamp",
-    "label": "Stamp",
+    "label": "All Stamp",
     "color": "#00B3A4",
+    "defaultSelected": false
+  },
+  {
+    "id": "event-stamp",
+    "label": "Event Stamp",
+    "color": "#008A7D",
+    "defaultSelected": false
+  },
+  {
+    "id": "fde-level",
+    "label": "FDE Level",
+    "color": "#0B5CAB",
+    "defaultSelected": false
+  },
+  {
+    "id": "implementation-ready",
+    "label": "Implementation Ready",
+    "color": "#032D60",
     "defaultSelected": false
   },
   {

@@ -201,4 +201,40 @@ function getSuperbadgesCounts(prepared) {
   return prepared?.counts || { total: 0, displayed: 0, hidden: 0 };
 }
 
-export { prepareSuperbadges, renderSuperbadges, getSuperbadgesWarnings, getSuperbadgesCounts };
+/**
+ * Compute the uncompressed row width superbadges would occupy, without downloading images.
+ * Mirrors the filtering/limit/"+X" logic of prepareSuperbadges (square logos, 10px spacing).
+ * Used by the renderer to allocate top-band width between stamps and superbadges.
+ * @param {Object} superbadgesData - Superbadges data from API
+ * @param {Object} options - Component options
+ * @param {number} logoHeight - Logo height (logos are square)
+ * @returns {number} Natural row width in pixels
+ */
+function getSuperbadgesNaturalWidth(superbadgesData, options, logoHeight) {
+  if (!options.displaySuperbadges) {
+    return 0;
+  }
+
+  const total =
+    superbadgesData?.earnedAwards?.edges?.filter((edge) => edge.node.award && edge.node.award.icon).length || 0;
+
+  let displayed = total;
+  if (options.displayLastXSuperbadges && options.lastXSuperbadges) {
+    displayed = Math.min(total, options.lastXSuperbadges);
+  }
+
+  const count = displayed + (total - displayed > 0 ? 1 : 0); // +1 for the "+X" badge
+  if (count === 0) {
+    return 0;
+  }
+
+  return count * logoHeight + (count - 1) * 10;
+}
+
+export {
+  prepareSuperbadges,
+  renderSuperbadges,
+  getSuperbadgesWarnings,
+  getSuperbadgesCounts,
+  getSuperbadgesNaturalWidth,
+};
