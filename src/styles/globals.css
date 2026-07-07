@@ -1345,17 +1345,25 @@ legend {
 select {
   padding: 1px;
   padding-left: 8px;
-  padding-right: 8px;
+  padding-right: 26px;
   font-size: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--background);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23003e6b' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px;
   color: var(--text-contrast);
   appearance: none;
   cursor: pointer;
   transition:
     border-color 0.3s,
     box-shadow 0.3s;
+}
+
+.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 select:focus {
