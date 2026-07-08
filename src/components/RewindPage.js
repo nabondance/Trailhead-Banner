@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faTriangleExclamation, faCircleXmark, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { extractUsernameFromUrl, validateUsernameFormat, validateUsernameWithApi } from '../utils/usernameValidation';
 import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
-import RewindCount from './RewindCount';
+import GenerationCount from './GenerationCount';
 import packageJson from '../../package.json';
 
 const RewindPage = () => {
@@ -233,7 +233,13 @@ const RewindPage = () => {
         <p>One image. One year. Your Trailhead story.</p>
       </div>
 
-      <RewindCount ref={rewindCountRef} />
+      <GenerationCount
+        ref={rewindCountRef}
+        table='rewinds'
+        elementId='rewind-countup-element'
+        className='rewind-count'
+        after=' rewinds generated, create yours now !'
+      />
       <form onSubmit={handleSubmit} className='form'>
         <div className='input-container'>
           <input

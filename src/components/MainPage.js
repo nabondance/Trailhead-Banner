@@ -6,7 +6,7 @@ import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import LinkedInBannerTutorial from './LinkedInBannerTutorial';
 import BannerForm from './BannerForm';
 import ProductionWarning from './ProductionWarning';
-import BannerCount from './BannerCount';
+import GenerationCount from './GenerationCount';
 import AnnouncementBanner from './AnnouncementBanner';
 import Sponsors from './Sponsors';
 import packageJson from '../../package.json';
@@ -77,7 +77,12 @@ const MainPage = () => {
     <div className='container'>
       <AnnouncementBanner />
       <ProductionWarning />
-      <BannerCount ref={bannerCountRef} />
+      <GenerationCount
+        ref={bannerCountRef}
+        table='banners'
+        elementId='countup-element'
+        after=' amazing banners generated and still counting !'
+      />
       <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} onValidationError={handleValidationError} />
       {loading && (
         <div className='loading-container'>
