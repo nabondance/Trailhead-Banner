@@ -1,4 +1,5 @@
 import CompanyBannerForm from '../../components/CompanyBannerForm';
+import GenerationCount from '../../components/GenerationCount';
 
 export const metadata = {
   title: 'Company Banner Generator – Trailhead Banner',
@@ -36,6 +37,12 @@ export default function CompanyPage() {
       <div className='main-content'>
         <h2>Company Banner Generator</h2>
         <p>For teams and companies : combine multiple Trailhead profiles into a single banner.</p>
+        <GenerationCount
+          table='company_banners'
+          envColumn='thb_source_env'
+          elementId='company-countup-element'
+          after=' amazing company banners generated and still counting !'
+        />
         <CompanyBannerForm />
       </div>
     </div>
