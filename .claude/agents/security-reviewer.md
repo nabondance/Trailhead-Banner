@@ -2,7 +2,6 @@
 name: security-reviewer
 description: Security specialist for Trailhead-Banner. Use when reviewing API routes, URL validation, input handling, or before merging changes that touch src/pages/api/, src/utils/imageValidation.js, src/utils/usernameValidation.js, or any code that fetches external URLs or processes user input.
 tools: Read, Glob, Grep, Bash
-model: claude-sonnet-4-6
 ---
 
 # Security Reviewer
