@@ -3,7 +3,32 @@
  * Generates a skills-matrix CSV from aggregated company data.
  */
 
+import { getCertificationsNeedingMaintenance } from './certificationMaintenanceUtils.js';
+
 const CTA_CERT_TITLE = 'Salesforce Certified Technical Architect';
+
+/**
+ * Normalise a maintenance due date to zero-padded YYYY-MM-DD for spreadsheet use.
+ *
+ * Trailhead returns non-padded dates (e.g. "2026-12-4"), so we parse the parts
+ * and pad them rather than slicing — this yields a clean format AND makes plain
+ * string comparison sort chronologically. Parsing is done from the string parts
+ * (not `new Date`) to stay timezone-independent and deterministic.
+ * @param {string} value
+ * @returns {string}
+ */
+function toDateOnly(value) {
+  if (!value) return '';
+  const str = String(value);
+  const match = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (match) {
+    const [, year, month, day] = match;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  // Fallback for any other format (e.g. full ISO timestamp)
+  const parsed = new Date(str);
+  return Number.isNaN(parsed.getTime()) ? str : parsed.toISOString().slice(0, 10);
+}
 
 /**
  * Strip common Salesforce certification prefixes and add a type tag.
@@ -245,6 +270,50 @@ export function generateProductCsv(aggregated) {
   const rows = [buildRow(['product', 'total_certifications', 'active_certifications', 'certified_people'])];
   for (const [product, stats] of sorted) {
     rows.push(buildRow([product, stats.total, stats.active, stats.people.size]));
+  }
+
+  return rows.join('\n');
+}
+
+/**
+ * Generate a per-person certification-maintenance CSV.
+ *
+ * One row per (teammate, certification) where the certification is flagged
+ * "Maintenance Due" by Trailhead — the same definition the standard banner uses.
+ * Rows are sorted by username, then by soonest due date.
+ *
+ * Columns: username, certification, product, maintenance_due_date
+ *
+ * @param {Object} aggregated - Output from companyDataUtils.aggregateCompanyData()
+ * @returns {string|null} CSV content, or null when no certifications need maintenance
+ */
+export function generateMaintenanceCsv(aggregated) {
+  const { perUserData } = aggregated;
+
+  const records = [];
+  for (const user of perUserData) {
+    for (const cert of getCertificationsNeedingMaintenance(user.certs || [])) {
+      records.push({
+        username: user.username,
+        certification: cert.title,
+        product: cert.product || '',
+        maintenance_due_date: toDateOnly(cert.maintenanceDueDate),
+      });
+    }
+  }
+
+  if (records.length === 0) return null;
+
+  records.sort(
+    (a, b) =>
+      a.username.localeCompare(b.username) ||
+      a.maintenance_due_date.localeCompare(b.maintenance_due_date) ||
+      a.certification.localeCompare(b.certification)
+  );
+
+  const rows = [buildRow(['username', 'certification', 'product', 'maintenance_due_date'])];
+  for (const r of records) {
+    rows.push(buildRow([r.username, r.certification, r.product, r.maintenance_due_date]));
   }
 
   return rows.join('\n');

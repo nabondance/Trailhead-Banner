@@ -115,6 +115,8 @@ const CompanyBannerForm = () => {
   const [resultImageUrl, setResultImageUrl] = useState(null);
   const [resultCsvData, setResultCsvData] = useState(null);
   const [resultProductCsvData, setResultProductCsvData] = useState(null);
+  const [resultMaintenanceCsvData, setResultMaintenanceCsvData] = useState(null);
+  const [maintenanceInfo, setMaintenanceInfo] = useState(null);
   const [teamHash, setTeamHash] = useState('');
   const [warnings, setWarnings] = useState([]);
   const [failedUsers, setFailedUsers] = useState([]);
@@ -167,6 +169,9 @@ const CompanyBannerForm = () => {
     if (resultProductCsvData) {
       downloadCsvFile(resultProductCsvData, `company-products-${teamHash}.csv`);
     }
+    if (resultMaintenanceCsvData) {
+      downloadCsvFile(resultMaintenanceCsvData, `company-maintenance-${teamHash}.csv`);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -175,6 +180,8 @@ const CompanyBannerForm = () => {
     setResultImageUrl(null);
     setResultCsvData(null);
     setResultProductCsvData(null);
+    setResultMaintenanceCsvData(null);
+    setMaintenanceInfo(null);
     setWarnings([]);
     setFailedUsers([]);
 
@@ -279,6 +286,8 @@ const CompanyBannerForm = () => {
       setResultImageUrl(data.imageUrl);
       setResultCsvData(data.csvData || null);
       setResultProductCsvData(data.productCsvData || null);
+      setResultMaintenanceCsvData(data.maintenanceCsvData || null);
+      setMaintenanceInfo(data.maintenanceInfo || null);
       setTeamHash(data.teamHash || '');
       setWarnings(data.warnings || []);
       setFailedUsers(data.failedUsers || []);
@@ -798,6 +807,28 @@ const CompanyBannerForm = () => {
                 {resultProductCsvData ? 'Download CSVs' : 'Download CSV'}
               </button>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Certifications needing maintenance (grouped per teammate) — placed after the
+          download buttons so a long list never pushes them out of view. */}
+      {maintenanceInfo && (
+        <div className='info-message'>
+          <p>🔔 {maintenanceInfo.header}</p>
+          <div className='maintenance-people'>
+            {maintenanceInfo.people.map((person) => (
+              <div key={person.username} className='maintenance-person'>
+                <span className='maintenance-username'>{person.username}</span>
+                <ul className='maintenance-cert-list'>
+                  {person.certs.map((cert, index) => (
+                    <li key={index}>
+                      {cert.title} <span className='maintenance-due'>— by {cert.dueDate}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       )}
