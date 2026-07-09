@@ -173,6 +173,11 @@ Token-optimized commands available:
 - **`/dev-start`** - Start dev server in background (zero output, waits until ready)
 - **`/dev-stop`** - Stop background dev server (cleanup)
 - **`/img-test [username]`** - Test image generation API (requires dev server, default: nabondance)
+- **`/verify [username...]`** - Full end-to-end check: production build + banner generation tests (default: nabondance)
+
+## Verifying Changes
+
+Before committing non-trivial changes, run `/verify`. It stops any running dev server (a production build breaks it), runs `pnpm build`, starts a fresh dev server, generates a banner via `POST /api/banner/standard` for each username, stops the server, and prints `Verify: PASS` or `FAIL`. For a quick iteration loop instead, keep a dev server up (`/dev-start`) and use `/img-test`.
 
 ## Token-Saving References
 
@@ -184,193 +189,24 @@ Instead of asking for details, read these directly:
 - Component structure → `src/components/BannerForm.js`
 - Background configs → `src/data/banners.json`
 
+## Working Docs
+
+The `docs/` folder contains two kinds of documents:
+
+- **Feature notes** — plans, open questions, and migration steps for features currently in progress
+- **Reference guides** — e.g. `docs/banner-components.md`, the full guide for banner components
+
+Before starting work on an ongoing feature, look in `docs/` for an existing note about it.
+
 ---
 
 ## Banner Component Architecture
 
-### Banner Directory Structure
+Banner code lives in `src/banner/`: `components/` holds reusable parts (background, rankLogo, counters, certifications, superbadges, agentblazer, mvpRibbon, watermark), `renderers/` holds banner implementations (standardBanner.js).
 
-```text
-src/banner/
-├── components/        # Reusable components (background, logos, certifications)
-│   ├── background.js
-│   ├── rankLogo.js
-│   ├── counters.js
-│   ├── certifications.js
-│   ├── superbadges.js
-│   ├── agentblazer.js
-│   ├── mvpRibbon.js
-│   └── watermark.js
-└── renderers/         # Banner implementations (standard, rewind, future types)
-    └── standardBanner.js
-```
+Every component exports 4 functions: `prepare*` (async — load assets, compute layout), `render*` (draw to canvas), `get*Warnings`, `get*Timings`. Renderers follow 3 phases: **prepare** (components in parallel via `Promise.all`) → **render** (sequential, for correct layering) → **collect** warnings and encode to base64.
 
-### Component Contract
-
-All components follow this 4-function pattern:
-
-```javascript
-// 1. PREPARE - Load assets, calculate layout (async, runs in parallel)
-async function prepare*(data, options = {}, layout) {
-  // Load images, process data, calculate positions
-  return { /* prepared data, warnings, timings */ };
-}
-
-// 2. RENDER - Draw to canvas (sequential for correct layering)
-async function render*(ctx, prepared, x, y) {
-  ctx.drawImage(...);  // Draw using prepared data
-  return { render_ms: timeElapsed };
-}
-
-// 3. WARNINGS - Get any issues encountered
-function get*Warnings(prepared) {
-  return prepared?.warnings || [];
-}
-
-// 4. TIMINGS - Get performance metrics
-function get*Timings(prepared) {
-  return prepared?.timings || {};
-}
-
-export { prepare*, render*, get*Warnings, get*Timings };
-```
-
-### Creating a New Banner Type
-
-Create `src/banner/renderers/myBanner.js` following the 3-phase pattern:
-
-```javascript
-import { createCanvas } from '@napi-rs/canvas';
-import * as Background from '../components/background.js';
-import * as Certifications from '../components/certifications.js';
-
-const CANVAS_WIDTH = 1584;
-const CANVAS_HEIGHT = 396;
-
-async function generateMyBanner(data, options = {}) {
-  const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-  const ctx = canvas.getContext('2d');
-
-  // PHASE 1: PREPARE (parallel when possible)
-  const [bgPrep, certsPrep] = await Promise.all([
-    Background.prepareBackground(options),
-    Certifications.prepareCertifications(data.certificationsData, options, {
-      availableWidth: CANVAS_WIDTH,
-      availableHeight: CANVAS_HEIGHT * 0.75,
-      spacing: 5,
-    }),
-  ]);
-
-  // PHASE 2: RENDER (sequential for correct layering)
-  await Background.renderBackground(ctx, bgPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
-  await Certifications.renderCertifications(ctx, certsPrep, 0, 100);
-
-  // PHASE 3: COLLECT warnings and encode
-  const warnings = [
-    ...Background.getBackgroundWarnings(bgPrep),
-    ...Certifications.getCertificationsWarnings(certsPrep),
-  ];
-
-  return {
-    bannerUrl: `data:image/png;base64,${canvas.toBuffer('image/png').toString('base64')}`,
-    warnings,
-  };
-}
-```
-
-### Creating a New Component
-
-Create `src/banner/components/myComponent.js`:
-
-```javascript
-import { createCanvas, loadImage } from '@napi-rs/canvas';
-
-async function prepareMyComponent(data, options = {}, layout) {
-  const startTime = Date.now();
-  const warnings = [];
-
-  // Load assets, process data, calculate layout
-  // ...
-
-  return {
-    // Your data for rendering
-    warnings,
-    timings: { load_ms: Date.now() - startTime },
-  };
-}
-
-async function renderMyComponent(ctx, prepared, x, y) {
-  const startTime = Date.now();
-
-  // Use ctx.drawImage(), ctx.fillRect(), etc. to draw
-  // ...
-
-  return { render_ms: Date.now() - startTime };
-}
-
-function getMyComponentWarnings(prepared) {
-  return prepared?.warnings || [];
-}
-
-function getMyComponentTimings(prepared) {
-  return prepared?.timings || {};
-}
-
-export { prepareMyComponent, renderMyComponent, getMyComponentWarnings, getMyComponentTimings };
-```
-
-### Canvas & Drawing Best Practices
-
-**Module System:** Use ES6 modules (`import`/`export`) throughout
-
-**Canvas objects work as images** - No conversion needed:
-
-```javascript
-const canvas = createCanvas(width, height);
-ctx.drawImage(canvas, x, y); // ✅ Works directly
-```
-
-**Use CSS filters for effects**:
-
-```javascript
-// ✅ Correct - CSS filter
-const grayCtx = canvas.getContext('2d');
-grayCtx.filter = 'grayscale(100%)';
-grayCtx.drawImage(sourceImage, 0, 0);
-
-// ❌ Avoid - putImageData doesn't persist properly
-ctx.putImageData(modifiedImageData, x, y);
-```
-
-**Visual effects semantics**:
-
-- Expired certifications → Grayscale (action required)
-- Retired certifications → 50% opacity (not user's fault)
-
-### Layout Patterns
-
-**Fixed positions** for predictable elements:
-
-```javascript
-const counterX = 160;
-const agentblazerX = 370;
-```
-
-**Ratio-based positions** for responsive areas:
-
-```javascript
-const bottomAreaY = CANVAS_HEIGHT * TOP_PART_RATIO + 20;
-```
-
-**Layout constraints** passed to components:
-
-```javascript
-const layout = {
-  availableWidth: CANVAS_WIDTH,
-  availableHeight: CANVAS_HEIGHT * 0.75,
-  spacing: 5,
-};
-```
+> **Before writing banner code, read `docs/banner-components.md`** — full templates for new banner types and components, canvas best practices, and layout patterns.
 
 ### Common Pitfalls
 
@@ -378,4 +214,5 @@ const layout = {
 2. **Null-safe access**: `prepared?.width ?? 0` when reading dimensions
 3. **Validate URLs**: Block private IPs, check protocols (SSRF protection)
 4. **Check edge cases**: Division by zero when only 1 item exists
-5. **Module system**: Use ES6 (`import`/`export`) throughout
+5. **Visual semantics**: expired certifications → grayscale; retired → 50% opacity
+6. **Canvas**: ES6 modules throughout; canvas objects draw directly via `drawImage`; use CSS filters (`ctx.filter`), not `putImageData`

@@ -2,7 +2,6 @@
 name: graphql-explorer
 description: Specialist for the Trailhead GraphQL API layer. Use when exploring, testing, debugging, or modifying queries in src/graphql/queries/, the cache layer (redisCacheUtils.js), the query builder (queryBuilder.js), or when you need to understand what data fields a query returns. Also use when diagnosing cache hits/misses or adding new data fields to the banner.
 tools: Bash, Read, Glob, Grep, WebFetch
-model: claude-sonnet-4-6
 ---
 
 # GraphQL Explorer
