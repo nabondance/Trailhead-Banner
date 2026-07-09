@@ -1047,6 +1047,40 @@ legend {
   text-align: left;
 }
 
+.maintenance-people {
+  text-align: left;
+  margin-top: 12px;
+}
+
+.maintenance-person {
+  margin-top: 12px;
+}
+
+.maintenance-person:first-child {
+  margin-top: 0;
+}
+
+.maintenance-username {
+  font-weight: bold;
+}
+
+.maintenance-cert-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 4px 0 0;
+}
+
+.maintenance-cert-list li {
+  margin: 2px 0;
+  font-weight: normal;
+}
+
+.maintenance-due {
+  opacity: 0.7;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
 .info-message a {
   color: var(--primary);
   text-decoration: underline;

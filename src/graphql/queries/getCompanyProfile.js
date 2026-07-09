@@ -40,6 +40,7 @@ const GET_COMPANY_PROFILE = `
           certifications {
             dateCompleted
             dateExpired
+            maintenanceDueDate
             logoUrl
             product
             status {

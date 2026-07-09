@@ -2,7 +2,8 @@ import crypto from 'crypto';
 import { generateCompanyBanner } from '../../../banner/renderers/companyBanner';
 import { fetchCompanyData, parseUsernames, computeQueryNeeds } from '../../../utils/companyFetchUtils';
 import { aggregateCompanyData } from '../../../utils/companyDataUtils';
-import { generateCompanyCsv, generateProductCsv } from '../../../utils/companyCsvUtils';
+import { generateCompanyCsv, generateProductCsv, generateMaintenanceCsv } from '../../../utils/companyCsvUtils';
+import { getTeamMaintenanceSummary } from '../../../utils/certificationMaintenanceUtils';
 import SupabaseUtils from '../../../utils/supabaseUtils';
 import { validateContentLength } from '../../../banner/api/validators';
 import { createTimingTracker, handleBannerError } from '../../../banner/api/shared';
@@ -123,13 +124,20 @@ export default async function handler(req, res) {
     timings.end('image_generation');
     timings.add('image_generation_breakdown', result.timings);
 
+    // Per-person maintenance notice — always computed (independent of CSV export),
+    // shown as an info block on the result. Null when nothing is due.
+    const maintenanceInfo = getTeamMaintenanceSummary(aggregated.perUserData);
+
     // Generate CSVs if requested
     let csvData = null;
     let productCsvData = null;
+    let maintenanceCsvData = null;
     if (options.generateCsv) {
       timings.start('csv_generation');
       csvData = generateCompanyCsv(aggregated, failed);
       productCsvData = generateProductCsv(aggregated);
+      // null when no teammate has a certification due for maintenance
+      maintenanceCsvData = generateMaintenanceCsv(aggregated);
       timings.end('csv_generation');
     }
 
@@ -171,6 +179,8 @@ export default async function handler(req, res) {
       imageUrl: result.bannerUrl,
       csvData,
       productCsvData,
+      maintenanceCsvData,
+      maintenanceInfo,
       teamHash,
       warnings: result.warnings || [],
       failedUsers: failed,
