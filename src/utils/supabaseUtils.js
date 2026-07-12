@@ -204,6 +204,15 @@ class SupabaseUtils {
         following: data.communityData?.communityConnections?.following?.totalCount ?? null,
         groups: data.communityData?.communityConnections?.groups?.totalCount ?? null,
       },
+      profileData: {
+        name: data.profileData?.name ?? null,
+        country: data.profileData?.country ?? null,
+        companyName: data.profileData?.companyName ?? null,
+        isPublicProfile: data.profileData?.isPublicProfile ?? null,
+        hasAvatar: !!data.profileData?.avatarUrl,
+        hasCustomBackground:
+          !!data.profileData?.backgroundImageUrl && !data.profileData.backgroundImageUrl.includes('/default/'),
+      },
     };
     return cleanedData;
   }

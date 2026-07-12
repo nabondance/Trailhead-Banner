@@ -5,7 +5,7 @@ const LegalPage = () => {
     <div className='legal-container'>
       <h1>Terms and Conditions</h1>
       <p>
-        <strong>Last Updated:</strong> 01/02/2025
+        <strong>Last Updated:</strong> February 1, 2025
       </p>
 
       <p>
@@ -20,7 +20,10 @@ const LegalPage = () => {
           You agree to use the Service lawfully and ethically (e.g., no spamming, automated scraping, or misuse of
           generated banners).
         </li>
-        <li>You retain ownership of the banners you create. However, we may store anonymized data for analytics.</li>
+        <li>
+          You retain ownership of the banners you create. However, we may store publicly-available profile data for
+          analytics.
+        </li>
       </ul>
 
       <h2>2. Data Storage & Privacy</h2>
@@ -64,7 +67,7 @@ const LegalPage = () => {
 
       <h1>Privacy Policy</h1>
       <p>
-        <strong>Last Updated:</strong> 01/02/2025
+        <strong>Last Updated:</strong> February 1, 2025
       </p>
 
       <p>
@@ -73,7 +76,8 @@ const LegalPage = () => {
 
       <h2>1. What Data We Collect</h2>
       <p>
-        We store <strong>Trailhead data</strong> for analytics. No other personal data is collected.
+        We store <strong>publicly-available Trailhead profile data</strong> for analytics. We do not collect any private
+        or off-platform personal data.
       </p>
 
       <h2>2. How We Use Data</h2>

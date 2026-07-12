@@ -1307,6 +1307,60 @@ legend {
   text-decoration: none;
 }
 
+/* Legal page (Terms & Privacy) */
+.legal-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  line-height: 1.7;
+  color: var(--text-contrast);
+  text-align: left;
+}
+
+.legal-container h1 {
+  font-size: 2.5em;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  color: var(--text-contrast);
+  text-align: center;
+}
+
+.legal-container h2 {
+  font-size: 1.4em;
+  margin-top: 32px;
+  margin-bottom: 10px;
+  color: var(--text-contrast);
+}
+
+.legal-container p {
+  margin-bottom: 12px;
+}
+
+.legal-container ul {
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+
+.legal-container li {
+  margin-bottom: 8px;
+}
+
+.legal-container a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.legal-container a:hover {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
+.legal-container hr {
+  margin: 40px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
 .issue-link {
   display: inline-block;
   margin-top: 10px;
