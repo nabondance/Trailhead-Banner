@@ -15,6 +15,12 @@ body {
   width: 100%;
 }
 
+/* Global keyboard focus indicator (a11y) */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 @font-face {
   font-family: Iosevka;
   src: url('/fonts/Iosevka.ttf') format('ttf');
@@ -42,6 +48,7 @@ body {
   --secondary: #8a00c4;
   --foreground: #003e6b;
   --highlight: #f60;
+  --focus-ring: var(--secondary);
   --border: #009edb;
   --text-color: #fff;
   --text-contrast: #003e6b;
@@ -67,6 +74,7 @@ body {
   --secondary: #009edb;
   --foreground: #b3b3b3;
   --highlight: #03dac6;
+  --focus-ring: var(--highlight);
   --border: #8a00c4;
   --text-color: #fff;
   --text-contrast: #fff;
@@ -433,9 +441,17 @@ main {
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--background);
-  transition: border-color 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
   flex: 1;
   color: var(--text-contrast);
+}
+
+.input:focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+  outline: none;
 }
 
 .input-file {
@@ -514,8 +530,8 @@ main {
 }
 
 .input-url:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary);
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
   outline: none;
 }
 
@@ -534,24 +550,22 @@ main {
 }
 
 .input-number:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary);
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
   outline: none;
 }
 
 .input-error {
   border-color: var(--error-color);
-  border-width: 4px;
+  box-shadow: 0 0 6px 1px var(--error-color);
 }
 
 .input-warning {
   border-color: var(--warning-color);
-  border-width: 4px;
 }
 
 .input-success {
   border-color: var(--valid-color);
-  border-width: 2px;
 }
 
 .validation-icon {
@@ -1430,8 +1444,8 @@ select {
 }
 
 select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary);
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
   outline: none;
 }
 
