@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 
 const NavDropdown = ({ label, options, defaultUrl, className = '' }) => {
   const router = useRouter();
@@ -39,12 +41,21 @@ const NavDropdown = ({ label, options, defaultUrl, className = '' }) => {
 
       {isOpen && (
         <div className='nav-dropdown-content'>
-          {options.map((option, index) => (
-            <button key={index} className='nav-dropdown-item' onClick={() => handleOptionClick(option.value)}>
-              <span>{option.label}</span>
-              {option.isNew && <span className='new-badge'>NEW</span>}
-            </button>
-          ))}
+          {options.map((option, index) => {
+            const isExternal = option.value.startsWith('http');
+            return (
+              <button
+                key={index}
+                className='nav-dropdown-item'
+                onClick={() => handleOptionClick(option.value)}
+                aria-label={isExternal ? `${option.label} (opens in a new tab)` : undefined}
+              >
+                <span>{option.label}</span>
+                {option.isNew && <span className='new-badge'>NEW</span>}
+                {isExternal && <FontAwesomeIcon icon={faArrowUpRightFromSquare} className='external-icon' />}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

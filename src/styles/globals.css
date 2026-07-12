@@ -287,6 +287,15 @@ main {
   text-decoration: underline;
 }
 
+.external-icon {
+  position: relative;
+  top: -1px;
+  margin-left: 6px;
+  font-size: 0.75em;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
 .new-badge {
   display: inline-block;
   background: linear-gradient(135deg, #ff6b6b, #ee5a24);
