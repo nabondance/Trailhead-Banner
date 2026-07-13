@@ -8,7 +8,7 @@ export const extractUsernameFromUrl = (input) => {
 
 export const validateUsernameFormat = (username) => {
   if (!username) {
-    return { valid: false, state: 'invalid', message: 'Enter an username' };
+    return { valid: false, state: 'invalid', message: 'Enter a username' };
   }
 
   if (username.startsWith('http://') || username.startsWith('https://')) {
