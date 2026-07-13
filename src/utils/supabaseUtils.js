@@ -103,6 +103,12 @@ class SupabaseUtils {
               ? `${thb_data.learnerStatusLevels.statusName}-${thb_data.learnerStatusLevels.title}-${thb_data.learnerStatusLevels.edition}`
               : null,
             th_community: thb_data.communityData,
+            th_name: thb_data.profileData?.name,
+            th_country: thb_data.profileData?.country,
+            th_company_name: thb_data.profileData?.companyName,
+            th_is_public_profile: thb_data.profileData?.isPublicProfile,
+            th_has_avatar: thb_data.profileData?.hasAvatar,
+            th_has_custom_background: thb_data.profileData?.hasCustomBackground,
             timings: originalTimings,
           },
         ]);

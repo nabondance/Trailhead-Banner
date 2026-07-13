@@ -19,6 +19,12 @@ const GET_TRAILBLAZER_RANK = `
 
   fragment PublicProfile on PublicProfile {
     __typename
+    name
+    avatarUrl
+    backgroundImageUrl
+    country
+    companyName
+    isPublicProfile
     trailheadStats {
       __typename
       earnedPointsSum
