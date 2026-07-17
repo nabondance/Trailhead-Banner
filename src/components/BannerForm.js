@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -77,7 +77,7 @@ const BackgroundPreview = ({ src, backgroundColor }) => {
   );
 };
 
-const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
+const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart }) => {
   const router = useRouter();
 
   const [options, setOptions] = useState({
@@ -121,6 +121,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
+  const usernameInputRef = useRef(null);
 
   const handleUsernameBlur = async () => {
     if (!options.username) {
@@ -179,34 +180,41 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
   };
 
   const handleSubmit = async (e) => {
-    setMainError(null);
     e.preventDefault();
+    // Clear any previous result/messages so a failed re-submit never leaves a stale banner
+    onGenerateStart?.();
+    setMainError(null);
     setIsGenerating(true);
     setShowOptions(false);
 
-    // Basic format validation on client side for immediate feedback
+    // Client-side format validation — surfaced inline under the username field
     const usernameFormatResult = validateUsernameFormat(options.username.toLowerCase());
     if (!usernameFormatResult.valid) {
-      setMainError(new Error(usernameFormatResult.message));
-      onValidationError(new Error(usernameFormatResult.message), options);
+      setValidationResult(usernameFormatResult);
+      setUsernameError(usernameFormatResult.message);
+      usernameInputRef.current?.focus();
       setIsGenerating(false);
       return;
     }
 
+    // API username validation — also surfaced inline under the field
     const usernameApiResult = await validateUsernameWithApi(options.username.toLowerCase());
+    if (!usernameApiResult.valid) {
+      setValidationResult(usernameApiResult);
+      setUsernameError(usernameApiResult.message);
+      usernameInputRef.current?.focus();
+      setIsGenerating(false);
+      return;
+    }
 
+    // Background image URL validation — a user-input (validation) error, not a server failure
     const imageUrlValidation =
       options.backgroundKind === 'customUrl'
         ? await validateImageUrl(options.customBackgroundImageUrl)
         : { valid: true };
-
-    if (!usernameApiResult.valid || !imageUrlValidation.valid) {
-      const errorMessages = [];
-      if (!usernameApiResult.valid) errorMessages.push(usernameApiResult.message);
-      if (!imageUrlValidation.valid) errorMessages.push(imageUrlValidation.message);
-
-      const validationError = new Error(`Validation failed: ${errorMessages.join('. And ')}`);
-      setMainError(validationError);
+    if (!imageUrlValidation.valid) {
+      const validationError = new Error(imageUrlValidation.message);
+      validationError.isValidation = true;
       onValidationError(validationError, options);
       setIsGenerating(false);
       return;
@@ -252,12 +260,15 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
     <form onSubmit={handleSubmit} className='form' noValidate>
       <div className='input-container'>
         <input
+          ref={usernameInputRef}
           type='text'
           value={options.username}
           onChange={handleUsernameChange}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username' // Add placeholder
           required
+          aria-invalid={usernameError ? 'true' : undefined}
+          aria-describedby={usernameError ? 'username-error' : undefined}
           className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
           name='trailhead-username'
           autoComplete='off'
@@ -294,6 +305,12 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError }) => {
           Need help? Click for guidance.
         </Tooltip>
       </div>
+      {usernameError && (
+        <p id='username-error' className='field-error' role='alert'>
+          <FontAwesomeIcon icon={faCircleXmark} className='field-error-icon' aria-hidden='true' />
+          <span>{usernameError}</span>
+        </p>
+      )}
       {!isGenerating && (
         <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
           {showOptions ? 'Hide Options' : 'More Options'}

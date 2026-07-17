@@ -65,6 +65,15 @@ const MainPage = () => {
     console.error('Validation Error:', error);
   };
 
+  // Clear the previous result (banner + messages) whenever a new generation starts,
+  // so a failed re-submit never leaves a stale banner on screen.
+  const resetResult = () => {
+    setImageUrl('');
+    setMainError(null);
+    setMainWarning([]);
+    setMainInfo([]);
+  };
+
   const handleImageClick = (src) => {
     setFullscreenImage(src);
   };
@@ -78,7 +87,12 @@ const MainPage = () => {
       <AnnouncementBanner />
       <ProductionWarning />
       <BannerCount ref={bannerCountRef} />
-      <BannerForm onSubmit={handleImageSubmit} setMainError={setMainError} onValidationError={handleValidationError} />
+      <BannerForm
+        onSubmit={handleImageSubmit}
+        setMainError={setMainError}
+        onValidationError={handleValidationError}
+        onGenerateStart={resetResult}
+      />
       {loading && (
         <div className='loading-container'>
           <p>Generating the banner...</p>
@@ -88,20 +102,22 @@ const MainPage = () => {
       {mainError && (
         <div className='error-message'>
           {mainError.message}
-          <p>
-            If the error persists, consider writing an{' '}
-            <a
-              href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(
-                generateIssueTitle(mainError)
-              )}&body=${encodeURIComponent(
-                generateIssueBody(mainError, mainWarning || [], formOptions, packageJson.version)
-              )}`}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              issue
-            </a>
-          </p>
+          {!mainError.isValidation && (
+            <p>
+              If the error persists, consider writing an{' '}
+              <a
+                href={`https://github.com/nabondance/Trailhead-Banner/issues/new?title=${encodeURIComponent(
+                  generateIssueTitle(mainError)
+                )}&body=${encodeURIComponent(
+                  generateIssueBody(mainError, mainWarning || [], formOptions, packageJson.version)
+                )}`}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                issue
+              </a>
+            </p>
+          )}
         </div>
       )}
       {imageUrl && !mainError && (

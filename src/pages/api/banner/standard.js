@@ -62,6 +62,8 @@ export default async function handler(req, res) {
 
     // Extract data from GraphQL responses (with fallbacks for queries that weren't executed)
     const rankData = responseMap.GET_TRAILBLAZER_RANK?.data?.data?.profile?.trailheadStats || {};
+    // Profile-level scalars live on `profile` itself (siblings of trailheadStats) — stored for analytics
+    const profileData = responseMap.GET_TRAILBLAZER_RANK?.data?.data?.profile || {};
     const certificationsData = responseMap.GET_USER_CERTIFICATIONS?.data?.data?.profile?.credential || {};
     const badgesData = responseMap.GET_TRAILHEAD_BADGES?.data?.data?.profile || {};
     const superbadgesData = responseMap.GET_TRAILHEAD_BADGES_SUPERBADGE?.data?.data?.profile || {};
@@ -120,6 +122,7 @@ export default async function handler(req, res) {
       badgesData,
       superbadgesData,
       rankData,
+      profileData,
       mvpData,
       stampsData,
       agentblazerData,

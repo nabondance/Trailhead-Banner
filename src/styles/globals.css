@@ -15,6 +15,12 @@ body {
   width: 100%;
 }
 
+/* Global keyboard focus indicator (a11y) */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 @font-face {
   font-family: Iosevka;
   src: url('/fonts/Iosevka.ttf') format('ttf');
@@ -42,6 +48,8 @@ body {
   --secondary: #8a00c4;
   --foreground: #003e6b;
   --highlight: #f60;
+  --focus-ring: var(--secondary);
+  --error-text: #ba0517;
   --border: #009edb;
   --text-color: #fff;
   --text-contrast: #003e6b;
@@ -67,6 +75,8 @@ body {
   --secondary: #009edb;
   --foreground: #b3b3b3;
   --highlight: #03dac6;
+  --focus-ring: var(--highlight);
+  --error-text: #ff6b6b;
   --border: #8a00c4;
   --text-color: #fff;
   --text-contrast: #fff;
@@ -287,6 +297,15 @@ main {
   text-decoration: underline;
 }
 
+.external-icon {
+  position: relative;
+  top: -1px;
+  margin-left: 6px;
+  font-size: 0.75em;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
 .new-badge {
   display: inline-block;
   background: linear-gradient(135deg, #ff6b6b, #ee5a24);
@@ -424,9 +443,17 @@ main {
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--background);
-  transition: border-color 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
   flex: 1;
   color: var(--text-contrast);
+}
+
+.input:focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+  outline: none;
 }
 
 .input-file {
@@ -505,8 +532,8 @@ main {
 }
 
 .input-url:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary);
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
   outline: none;
 }
 
@@ -525,24 +552,72 @@ main {
 }
 
 .input-number:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary);
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
   outline: none;
 }
 
 .input-error {
   border-color: var(--error-color);
-  border-width: 4px;
+  box-shadow: 0 0 6px 1px var(--error-color);
 }
 
 .input-warning {
   border-color: var(--warning-color);
-  border-width: 4px;
 }
 
 .input-success {
   border-color: var(--valid-color);
-  border-width: 2px;
+}
+
+/* Validation state keeps its color while focused (overrides the neutral focus ring)
+   so an errored field stays clearly red rather than switching to the focus color. */
+.input-error:focus {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 2px var(--error-color);
+}
+
+.input-warning:focus {
+  border-color: var(--warning-color);
+  box-shadow: 0 0 0 2px var(--warning-color);
+}
+
+.input-success:focus {
+  border-color: var(--valid-color);
+  box-shadow: 0 0 0 2px var(--valid-color);
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -7px 0 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgb(186 5 23 / 10%);
+  color: var(--error-text);
+  font-size: 0.9em;
+  line-height: 1.3;
+  text-align: left;
+  animation: field-error-in 0.18s ease-out;
+}
+
+.field-error-icon {
+  flex-shrink: 0;
+  font-size: 1.05em;
+  color: var(--error-text);
+}
+
+@keyframes field-error-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .validation-icon {
@@ -1298,6 +1373,60 @@ legend {
   text-decoration: none;
 }
 
+/* Legal page (Terms & Privacy) */
+.legal-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  line-height: 1.7;
+  color: var(--text-contrast);
+  text-align: left;
+}
+
+.legal-container h1 {
+  font-size: 2.5em;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  color: var(--text-contrast);
+  text-align: center;
+}
+
+.legal-container h2 {
+  font-size: 1.4em;
+  margin-top: 32px;
+  margin-bottom: 10px;
+  color: var(--text-contrast);
+}
+
+.legal-container p {
+  margin-bottom: 12px;
+}
+
+.legal-container ul {
+  padding-left: 20px;
+  margin-bottom: 16px;
+}
+
+.legal-container li {
+  margin-bottom: 8px;
+}
+
+.legal-container a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.legal-container a:hover {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
+.legal-container hr {
+  margin: 40px 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
 .issue-link {
   display: inline-block;
   margin-top: 10px;
@@ -1367,8 +1496,8 @@ select {
 }
 
 select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary);
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
   outline: none;
 }
 

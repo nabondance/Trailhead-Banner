@@ -103,6 +103,12 @@ class SupabaseUtils {
               ? `${thb_data.learnerStatusLevels.statusName}-${thb_data.learnerStatusLevels.title}-${thb_data.learnerStatusLevels.edition}`
               : null,
             th_community: thb_data.communityData,
+            th_name: thb_data.profileData?.name,
+            th_country: thb_data.profileData?.country,
+            th_company_name: thb_data.profileData?.companyName,
+            th_is_public_profile: thb_data.profileData?.isPublicProfile,
+            th_has_avatar: thb_data.profileData?.hasAvatar,
+            th_has_custom_background: thb_data.profileData?.hasCustomBackground,
             timings: originalTimings,
           },
         ]);
@@ -203,6 +209,15 @@ class SupabaseUtils {
         followers: data.communityData?.communityConnections?.followers?.totalCount ?? null,
         following: data.communityData?.communityConnections?.following?.totalCount ?? null,
         groups: data.communityData?.communityConnections?.groups?.totalCount ?? null,
+      },
+      profileData: {
+        name: data.profileData?.name ?? null,
+        country: data.profileData?.country ?? null,
+        companyName: data.profileData?.companyName ?? null,
+        isPublicProfile: data.profileData?.isPublicProfile ?? null,
+        hasAvatar: !!data.profileData?.avatarUrl,
+        hasCustomBackground:
+          !!data.profileData?.backgroundImageUrl && !data.profileData.backgroundImageUrl.includes('/default/'),
       },
     };
     return cleanedData;
