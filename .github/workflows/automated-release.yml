@@ -17,9 +17,13 @@ on:
         description: 'Release notes (optional)'
         required: false
         type: string
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
+
+concurrency:
+  group: automated-release
+  cancel-in-progress: false
 
 jobs:
   create-release:
@@ -111,8 +115,8 @@ jobs:
         id: create_pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NOTES: ${{ github.event.inputs.release_notes }}
         run: |
-          RELEASE_NOTES="${{ github.event.inputs.release_notes }}"
           if [ -z "$RELEASE_NOTES" ]; then
             RELEASE_NOTES="Automated release v${{ steps.new_version.outputs.version }}"
           fi
@@ -149,8 +153,8 @@ jobs:
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NOTES: ${{ github.event.inputs.release_notes }}
         run: |
-          RELEASE_NOTES="${{ github.event.inputs.release_notes }}"
           if [ -z "$RELEASE_NOTES" ]; then
             RELEASE_NOTES="Automated release v${{ steps.new_version.outputs.version }}"
           fi
@@ -158,7 +162,7 @@ jobs:
           # Generate changelog from commits since last release
           LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$LAST_TAG" ]; then
-            CHANGELOG=$(git log "$LAST_TAG..HEAD" --oneline --pretty=format:"- %s" | grep -v "^- Merge pull request" | head -20)
+            CHANGELOG=$(git log "$LAST_TAG..HEAD" --oneline --pretty=format:"- %s" | grep -v "^- Merge pull request" | head -20 || true)
             CHANGELOG_URL="**Full Changelog**: https://github.com/nabondance/Trailhead-Banner/compare/$LAST_TAG...${{ steps.new_version.outputs.tag }}"
           else
             CHANGELOG="- Initial release"
@@ -218,15 +222,25 @@ jobs:
             echo "2. Merge the PR to publish the release and trigger deployment"
           } >> "$GITHUB_STEP_SUMMARY"
 
-  # This job runs after the release PR is merged to publish the release
+  # This job runs after the release PR is merged to publish the release.
+  # Gated on the "release" label so it is independent of the merge strategy
+  # (merge commit / squash / rebase).
   publish-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, 'release:')
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'release')
+    outputs:
+      published: ${{ steps.check_release.outputs.exists }}
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Get version from package.json
         id: version
@@ -253,5 +267,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release edit "${{ steps.version.outputs.tag }}" --draft=false
+          # Retarget the tag onto the merged commit on main (the release
+          # branch may already be deleted after merge).
+          gh release edit "${{ steps.version.outputs.tag }}" \
+            --target "${{ github.event.pull_request.merge_commit_sha }}" \
+            --draft=false
           echo "✅ Release v${{ steps.version.outputs.version }} has been published!"
+
+  # Deploy to production by calling the reusable deployment workflow directly.
+  # This avoids relying on the tag push (a tag created with GITHUB_TOKEN does
+  # not trigger the push-based deployment workflow).
+  deploy-production:
+    needs: publish-release
+    if: needs.publish-release.outputs.published == 'true'
+    uses: ./.github/workflows/production-deployment.yml
+    secrets: inherit
+    with:
+      ref: ${{ github.event.pull_request.merge_commit_sha }}

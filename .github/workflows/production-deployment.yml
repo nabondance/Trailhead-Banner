@@ -7,12 +7,20 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Git ref (commit SHA) to deploy. Defaults to the triggering ref.'
+        required: false
+        type: string
 jobs:
   Deploy-Production:
     runs-on: ubuntu-latest
     environment: production
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
