@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import SupabaseUtils from '../../utils/supabaseUtils';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -18,7 +19,7 @@ export default async function handler(req, res) {
           th_username: thb_data.th_username,
           thb_processing_time: thb_data.thb_processing_time,
           source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
-          thb_options: thb_data.thb_options,
+          thb_options: SupabaseUtils.sanitizeThbOptions(thb_data.thb_options),
           thb_version: thb_data.thb_version,
           thb_banner_hash: thb_data.bannerHash,
           th_nb_points: thb_data.rankData.points,

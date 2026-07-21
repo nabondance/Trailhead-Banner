@@ -6,6 +6,15 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
+/**
+ * Detects whether a value is a Data URL (e.g. "data:image/png;base64,...").
+ * @param {unknown} value - Value to test.
+ * @returns {boolean} True when the value is a Data URL string.
+ */
+function isDataUrl(value) {
+  return typeof value === 'string' && value.startsWith('data:');
+}
+
 class SupabaseUtils {
   /**
    * Retry an async operation with exponential backoff
@@ -126,12 +135,52 @@ class SupabaseUtils {
     }
   }
 
+  /**
+   * Returns a sanitized shallow copy of banner `thb_options` that is safe to
+   * persist in the analytics database.
+   *
+   * Uploaded custom backgrounds arrive as base64 Data URLs on
+   * `backgroundImageUrl` (and, defensively, `customBackgroundImageUrl`). Each
+   * one can be hundreds of KB; storing them previously bloated the
+   * `banners.thb_options` column to hundreds of MB. This strips any such Data
+   * URL and replaces it with a lightweight `hasCustomBackgroundImage: true`
+   * flag. Normal HTTP(S) URLs are left untouched.
+   *
+   * The original object is never mutated — only the analytics record is
+   * sanitized, so banner rendering keeps using the in-memory options as-is.
+   *
+   * @param {Record<string, any> | null | undefined} options - Raw banner options.
+   * @returns {Record<string, any> | null | undefined} A sanitized shallow copy,
+   *   or the input unchanged when it is not an object.
+   */
+  static sanitizeThbOptions(options) {
+    if (!options || typeof options !== 'object') {
+      return options;
+    }
+
+    const sanitized = { ...options };
+    let hasCustomBackgroundImage = false;
+
+    for (const key of ['backgroundImageUrl', 'customBackgroundImageUrl']) {
+      if (isDataUrl(sanitized[key])) {
+        delete sanitized[key];
+        hasCustomBackgroundImage = true;
+      }
+    }
+
+    if (hasCustomBackgroundImage) {
+      sanitized.hasCustomBackgroundImage = true;
+    }
+
+    return sanitized;
+  }
+
   static cleanData(data) {
     // Clean the data as needed
     const cleanedData = {
       th_username: data.th_username,
       thb_processing_time: data.thb_processing_time,
-      thb_options: data.options,
+      thb_options: SupabaseUtils.sanitizeThbOptions(data.options),
       thb_version: packageJson.version,
       bannerHash: data.bannerHash,
       mvp: data.mvpData?.isMvp || false,
