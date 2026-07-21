@@ -153,45 +153,51 @@ jobs:
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_NOTES: ${{ github.event.inputs.release_notes }}
         run: |
-          if [ -z "$RELEASE_NOTES" ]; then
-            RELEASE_NOTES="Automated release v${{ steps.new_version.outputs.version }}"
-          fi
-
-          # Generate changelog from commits since last release
+          # Find the previous release tag (HEAD is the version-bump commit).
           LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          # Generate PR-based release notes via GitHub's API. This lists the
+          # merged pull requests since the last release (instead of raw commits)
+          # and honours .github/release.yml categorisation. The "Full Changelog"
+          # link is appended automatically.
           if [ -n "$LAST_TAG" ]; then
-            CHANGELOG=$(git log "$LAST_TAG..HEAD" --oneline --pretty=format:"- %s" | grep -v "^- Merge pull request" | head -20 || true)
-            CHANGELOG_URL="**Full Changelog**: https://github.com/nabondance/Trailhead-Banner/compare/$LAST_TAG...${{ steps.new_version.outputs.tag }}"
+            CHANGELOG=$(gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="${{ steps.new_version.outputs.tag }}" \
+              -f target_commitish="${{ steps.new_version.outputs.branch }}" \
+              -f previous_tag_name="$LAST_TAG" \
+              --jq '.body')
           else
-            CHANGELOG="- Initial release"
-            CHANGELOG_URL=""
+            CHANGELOG=$(gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${{ github.repository }}/releases/generate-notes" \
+              -f tag_name="${{ steps.new_version.outputs.tag }}" \
+              -f target_commitish="${{ steps.new_version.outputs.branch }}" \
+              --jq '.body')
           fi
 
-          RELEASE_BODY="
+          RELEASE_BODY=$(cat <<EOF
           <!-- display-start -->
           # Features
           -  ...
           <!-- display-end -->
 
-          ## What's Changed
-
-          $RELEASE_NOTES
-
-          ### Commits
           $CHANGELOG
 
-          $CHANGELOG_URL
-
           ---
-          *This release was created automatically. It will be published when the release PR is merged.*"
+          *This release was created automatically. It will be published when the release PR is merged.*
+          EOF
+          )
 
-          RELEASE_URL=$(gh release create ${{ steps.new_version.outputs.tag }} \
-            --title "Release v${{ steps.new_version.outputs.version }}" \
+          RELEASE_URL=$(gh release create "${{ steps.new_version.outputs.tag }}" \
+            --title "${{ steps.new_version.outputs.tag }}" \
             --notes "$RELEASE_BODY" \
             --draft \
-            --target ${{ steps.new_version.outputs.branch }})
+            --target "${{ steps.new_version.outputs.branch }}")
 
           echo "url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
 
