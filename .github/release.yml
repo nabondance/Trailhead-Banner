@@ -4,23 +4,40 @@
 # .github/workflows/automated-release.yml (POST /releases/generate-notes),
 # which lists merged pull requests grouped into the categories below.
 #
-# Matching notes:
-# - A PR lands in the first category it matches.
-# - "What's Changed" is the catch-all (labels: '*') minus dependency PRs, so it
-#   is listed first while still leaving dependency bumps for the second group.
-# - npm dependabot PRs carry the `dependencies` label; github-actions dependabot
-#   PRs carry `github_actions` (the labeler's sync-labels strips `dependencies`
-#   from them). Matching both catches every dependency PR, plus manual ones.
+# How matching works:
+# - GitHub wraps the whole thing under its own `## What's Changed` heading, and
+#   each category title below becomes a `### ...` subsection under it. Do NOT
+#   name a category "What's Changed" — it renders as a redundant nested heading.
+# - A PR lands in the FIRST category whose labels it matches, so ORDER MATTERS.
+# - Labels come from .github/labeler.yml, which tags PRs by changed path
+#   (`source`, `documentation`, `ci`, `config`, ...) rather than by change type,
+#   so we cannot split feat vs fix — "Changes" is the main bucket for src work.
+#
+# Ordering rationale:
+# - Dependencies is FIRST: a github-actions dependabot PR carries `github_actions`
+#   but also edits `.github/workflows/*` (→ `ci`), so it must be caught here
+#   before the CI category. npm dependabot PRs carry `dependencies`. (The
+#   labeler's sync-labels strips `dependencies` from github-actions bumps.)
+# - Changes is next so any PR touching `src/**` headlines as real work, even if
+#   it also touched docs/config/ci in passing.
+# - Documentation / CI & Config catch PRs that only touch those paths.
+# - "Other Changes" (`*`) is the final catch-all (styles, assets, tests, etc.).
 changelog:
   categories:
-    - title: What's Changed
-      labels:
-        - '*'
-      exclude:
-        labels:
-          - dependencies
-          - github_actions
-    - title: Dependencies
+    - title: ⬆️ Dependencies
       labels:
         - dependencies
         - github_actions
+    - title: 🚀 Changes
+      labels:
+        - source
+    - title: 📚 Documentation
+      labels:
+        - documentation
+    - title: 👷 CI & Config
+      labels:
+        - ci
+        - config
+    - title: 🔖 Other Changes
+      labels:
+        - '*'
