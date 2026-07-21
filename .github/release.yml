@@ -8,26 +8,26 @@
 # - GitHub wraps the whole thing under its own `## What's Changed` heading, and
 #   each category title below becomes a `### ...` subsection under it. Do NOT
 #   name a category "What's Changed" — it renders as a redundant nested heading.
-# - A PR lands in the FIRST category whose labels it matches, so ORDER MATTERS.
+# - A PR lands in the FIRST category whose labels it matches, and that same list
+#   order is the DISPLAY order. So order is chosen for how the notes read, and
+#   `exclude` is used to keep routing correct despite that order.
 # - Labels come from .github/labeler.yml, which tags PRs by changed path
 #   (`source`, `documentation`, `ci`, `config`, ...) rather than by change type,
 #   so we cannot split feat vs fix — "Changes" is the main bucket for src work.
 #
-# Ordering rationale:
-# - Dependencies is FIRST: a github-actions dependabot PR carries `github_actions`
-#   but also edits `.github/workflows/*` (→ `ci`), so it must be caught here
-#   before the CI category. npm dependabot PRs carry `dependencies`. (The
-#   labeler's sync-labels strips `dependencies` from github-actions bumps.)
-# - Changes is next so any PR touching `src/**` headlines as real work, even if
+# Ordering / exclude rationale:
+# - Changes is first so any PR touching `src/**` headlines as real work, even if
 #   it also touched docs/config/ci in passing.
 # - Documentation / CI & Config catch PRs that only touch those paths.
-# - "Other Changes" (`*`) is the final catch-all (styles, assets, tests, etc.).
+# - Dependencies is LAST (bumps are the least interesting), but a github-actions
+#   dependabot PR carries `github_actions` AND edits `.github/workflows/*` (→
+#   `ci`), and an npm bump would be swept up by the `*` catch-all. So CI & Config
+#   and Other Changes both `exclude` the dependency labels, letting those PRs
+#   fall through to the Dependencies section at the bottom. (The labeler's
+#   sync-labels strips `dependencies` from github-actions bumps, leaving
+#   `github_actions`; npm bumps carry `dependencies`.)
 changelog:
   categories:
-    - title: ⬆️ Dependencies
-      labels:
-        - dependencies
-        - github_actions
     - title: 🚀 Changes
       labels:
         - source
@@ -38,6 +38,18 @@ changelog:
       labels:
         - ci
         - config
+      exclude:
+        labels:
+          - dependencies
+          - github_actions
     - title: 🔖 Other Changes
       labels:
         - '*'
+      exclude:
+        labels:
+          - dependencies
+          - github_actions
+    - title: ⬆️ Dependencies
+      labels:
+        - dependencies
+        - github_actions
