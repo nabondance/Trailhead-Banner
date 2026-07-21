@@ -1,0 +1,26 @@
+# Configuration for GitHub's automatically generated release notes.
+#
+# Consumed by the "Create Draft Release" step in
+# .github/workflows/automated-release.yml (POST /releases/generate-notes),
+# which lists merged pull requests grouped into the categories below.
+#
+# Matching notes:
+# - A PR lands in the first category it matches.
+# - "What's Changed" is the catch-all (labels: '*') minus dependency PRs, so it
+#   is listed first while still leaving dependency bumps for the second group.
+# - npm dependabot PRs carry the `dependencies` label; github-actions dependabot
+#   PRs carry `github_actions` (the labeler's sync-labels strips `dependencies`
+#   from them). Matching both catches every dependency PR, plus manual ones.
+changelog:
+  categories:
+    - title: What's Changed
+      labels:
+        - '*'
+      exclude:
+        labels:
+          - dependencies
+          - github_actions
+    - title: Dependencies
+      labels:
+        - dependencies
+        - github_actions
