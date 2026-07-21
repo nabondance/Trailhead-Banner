@@ -279,7 +279,9 @@ jobs:
   # not trigger the push-based deployment workflow).
   deploy-production:
     needs: publish-release
-    if: needs.publish-release.outputs.published == 'true'
+    if: >-
+      needs.publish-release.result == 'success' &&
+      needs.publish-release.outputs.published == 'true'
     uses: ./.github/workflows/production-deployment.yml
     secrets: inherit
     with:
