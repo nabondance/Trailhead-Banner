@@ -15,6 +15,6 @@
     "id": "event",
     "label": "Event",
     "color": "#008A7D",
-    "defaultSelected": false
+    "defaultSelected": true
   }
 ]
