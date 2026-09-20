@@ -5,11 +5,11 @@
 echo "=== Claude Context Budget ==="
 echo ""
 
-# CLAUDE.md
-if [ -f "CLAUDE.md" ]; then
-  SIZE=$(wc -c < CLAUDE.md)
+# AGENTS.md
+if [ -f "AGENTS.md" ]; then
+  SIZE=$(wc -c < AGENTS.md)
   echo "ALWAYS LOADED"
-  printf "  %-30s ~%d tokens\n" "CLAUDE.md" "$((SIZE / 4))"
+  printf "  %-30s ~%d tokens\n" "AGENTS.md" "$((SIZE / 4))"
 fi
 
 # Hooks (output varies, estimate script size as proxy)
@@ -41,7 +41,7 @@ done
 echo ""
 # Total always-loaded
 TOTAL=0
-[ -f "CLAUDE.md" ] && TOTAL=$((TOTAL + $(wc -c < CLAUDE.md) / 4))
+[ -f "AGENTS.md" ] && TOTAL=$((TOTAL + $(wc -c < AGENTS.md) / 4))
 for f in .claude/hooks/*.sh; do
   [ -f "$f" ] && TOTAL=$((TOTAL + $(wc -c < "$f") / 4))
 done
