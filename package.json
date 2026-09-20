@@ -74,7 +74,7 @@
   },
   "pnpm": {
     "overrides": {
-      "postcss": "8.5.10",
+      "postcss": "8.5.23",
       "undici": "6.27.0"
     }
   },
@@ -85,7 +85,7 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.23",
     "prettier": "^3.8.1",
     "prettier-plugin-sh": "^0.18.0",
     "stylelint": "^17.5.0",
