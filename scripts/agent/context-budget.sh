@@ -1,8 +1,8 @@
 #!/bin/bash
-# context-budget.sh - Audit token costs of .claude/ setup
+# Audit token costs of the repository agent setup
 # Token estimates: chars / 4
 
-echo "=== Claude Context Budget ==="
+echo "=== Agent Context Budget ==="
 echo ""
 
 # AGENTS.md
@@ -13,7 +13,7 @@ if [ -f "AGENTS.md" ]; then
 fi
 
 # Hooks (output varies, estimate script size as proxy)
-for f in .claude/hooks/*.sh; do
+for f in scripts/agent/hooks/*.sh; do
   [ -f "$f" ] || continue
   SIZE=$(wc -c < "$f")
   printf "  %-30s ~%d tokens (hook script)\n" "$(basename $f)" "$((SIZE / 4))"
@@ -42,7 +42,7 @@ echo ""
 # Total always-loaded
 TOTAL=0
 [ -f "AGENTS.md" ] && TOTAL=$((TOTAL + $(wc -c < AGENTS.md) / 4))
-for f in .claude/hooks/*.sh; do
+for f in scripts/agent/hooks/*.sh; do
   [ -f "$f" ] && TOTAL=$((TOTAL + $(wc -c < "$f") / 4))
 done
 echo "TOTAL AT REST: ~$TOTAL tokens"

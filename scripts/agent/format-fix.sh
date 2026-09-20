@@ -1,6 +1,6 @@
 #!/bin/bash
-# Format fix skill - Auto-fix formatting issues
-# Usage: /format-fix
+# Auto-fix formatting issues
+# Usage: bash scripts/agent/format-fix.sh
 
 set -e
 

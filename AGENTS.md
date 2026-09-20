@@ -1,4 +1,4 @@
-# Claude Code Context - Trailhead Banner
+# Agent Context - Trailhead Banner
 
 ## Quick Start
 
@@ -101,7 +101,7 @@ src/
 - **Commits**: Conventional commits `type(scope): description`
   - Common types: `feat, fix, docs, style, refactor, perf, build, chore`
   - Common scopes: `core, deps, ui, config, util, release`
-- **Format Code**: Use `/format` to check or `/format-fix` to auto-fix (token-optimized)
+- **Format Code**: Run `bash scripts/agent/format.sh` to check or `bash scripts/agent/format-fix.sh` to auto-fix
 
 ## Common Tasks
 
@@ -163,21 +163,21 @@ When **removing** a page, remove it from both files as well.
 - **Validation errors**: See `src/utils/usernameValidation.js` rules
 - **Build errors**: Ensure using `pnpm`, not `npm`
 
-## Claude Code Skills
+## Agent Skills and Workflows
 
-Token-optimized commands available:
+Reusable skills and their direct commands:
 
-- **`/format`** - Check formatting (non-destructive, shows OK/ISSUES + top 3 errors)
-- **`/format-fix`** - Auto-fix formatting issues (runs prettier + stylelint fix)
-- **`/build`** - Validate build (shows OK or top 5 errors with duration)
-- **`/dev-start`** - Start dev server in background (zero output, waits until ready)
-- **`/dev-stop`** - Stop background dev server (cleanup)
-- **`/img-test [username]`** - Test image generation API (requires dev server, default: nabondance)
-- **`/verify [username...]`** - Full end-to-end check: production build + banner generation tests (default: nabondance)
+- **`format`** — `bash scripts/agent/format.sh`; check formatting without modifying files
+- **`format-fix`** — `bash scripts/agent/format-fix.sh`; run Prettier and Stylelint fixes
+- **`build`** — `bash scripts/agent/build.sh`; validate the production build
+- **`dev-start`** — `bash scripts/agent/dev-start.sh`; start the dev server in the background
+- **`dev-stop`** — `bash scripts/agent/dev-stop.sh`; stop the background dev server
+- **`img-test [username]`** — `bash scripts/agent/img-test.sh [username]`; test image generation
+- **`verify [username...]`** — `bash scripts/agent/verify.sh [username...]`; run the full verification workflow
 
 ## Verifying Changes
 
-Before committing non-trivial changes, run `/verify`. It stops any running dev server (a production build breaks it), runs `pnpm build`, starts a fresh dev server, generates a banner via `POST /api/banner/standard` for each username, stops the server, and prints `Verify: PASS` or `FAIL`. For a quick iteration loop instead, keep a dev server up (`/dev-start`) and use `/img-test`.
+Before committing non-trivial changes, run `bash scripts/agent/verify.sh`. It stops any running dev server (a production build breaks it), runs `pnpm build`, starts a fresh dev server, generates a banner via `POST /api/banner/standard` for each username, stops the server, and prints `Verify: PASS` or `FAIL`. For a quick iteration loop, use `bash scripts/agent/dev-start.sh` followed by `bash scripts/agent/img-test.sh`.
 
 ## Token-Saving References
 

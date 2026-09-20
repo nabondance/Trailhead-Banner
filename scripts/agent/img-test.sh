@@ -1,6 +1,6 @@
 #!/bin/bash
-# Image generation test skill - Test banner generation with minimal output
-# Usage: /img-test [username]
+# Test banner generation with minimal output
+# Usage: bash scripts/agent/img-test.sh [username]
 # Requires: Dev server running on localhost:3000
 
 set -e

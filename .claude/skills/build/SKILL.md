@@ -13,4 +13,4 @@ Run the build validation script which will:
 2. Show OK status with duration, or FAILED with top 5 error lines
 3. Return appropriate exit code
 
-Execute: `bash ../build.sh`
+Execute from the repository root: `bash scripts/agent/build.sh`

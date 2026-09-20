@@ -1,6 +1,6 @@
 #!/bin/bash
-# Build skill - Quick build validation with minimal output
-# Usage: /build
+# Quick build validation with minimal output
+# Usage: bash scripts/agent/build.sh
 
 set -e
 

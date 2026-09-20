@@ -14,4 +14,4 @@ Run the dev server stop script which will:
 3. Clean up any related processes
 4. Show minimal confirmation
 
-Execute: `bash ../dev-stop.sh`
+Execute from the repository root: `bash scripts/agent/dev-stop.sh`

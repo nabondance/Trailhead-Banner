@@ -7,7 +7,7 @@ description: Audit token costs of the .claude/ setup — skills, agents, hooks, 
 
 Run the audit script and report findings:
 
-Execute: `bash ../context-budget.sh`
+Execute from the repository root: `bash scripts/agent/context-budget.sh`
 
 Then analyze the output:
 

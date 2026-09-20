@@ -13,4 +13,4 @@ Run the format fix script which will:
 2. Apply stylelint auto-fixes
 3. Show summary of changes made
 
-Execute: `bash ../format-fix.sh`
+Execute from the repository root: `bash scripts/agent/format-fix.sh`
