@@ -6,9 +6,9 @@
 #
 # Policy:
 #   - Dependencies present in the PRODUCTION tree (verified with
-#     `pnpm why --prod <pkg>`) are remediated for real by pinning them to a
-#     patched version in package.json > pnpm.overrides (currently: undici,
-#     postcss).
+#     `pnpm why --prod <pkg>`) are remediated for real by updating direct
+#     dependencies and the lockfile. Use package.json > pnpm.overrides only
+#     while upstream ranges cannot resolve a patched version (currently: none).
 #   - Advisories in build/lint-time-only transitive deps (absent from the
 #     production tree, so not shipped or executed by the deployed app) are
 #     ignored here by their advisory ID, with the affected package noted.
