@@ -14,6 +14,6 @@ Run the image test script which will:
 3. Show response status, timing, and key details
 4. Validate image generation succeeded
 
-Usage: `/img-test` (uses default username) or `/img-test <username>`
+Usage: invoke without an argument for the default username, or pass a username.
 
-Execute: `bash ../img-test.sh "$@"`
+Execute from the repository root: `bash scripts/agent/img-test.sh "$@"`

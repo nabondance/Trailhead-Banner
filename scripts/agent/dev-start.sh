@@ -1,6 +1,6 @@
 #!/bin/bash
-# Dev server start skill - Start dev server in background with zero output
-# Usage: /dev-start
+# Start the dev server in background with zero output
+# Usage: bash scripts/agent/dev-start.sh
 
 set -e
 

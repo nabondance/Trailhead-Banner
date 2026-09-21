@@ -15,6 +15,6 @@ The script will:
 4. Test banner generation (POST /api/banner/standard) for each username (default: nabondance)
 5. Stop the dev server and print a PASS/FAIL summary
 
-Usage: `/verify` (default username) or `/verify <username> [username...]`
+Usage: invoke without arguments for the default username, or pass one or more usernames.
 
-Execute: `bash .claude/skills/verify.sh "$@"`
+Execute from the repository root: `bash scripts/agent/verify.sh "$@"`

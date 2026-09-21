@@ -12,6 +12,6 @@ Run the format check script which will:
 1. Check prettier formatting
 2. Check stylelint rules
 3. Show concise summary (OK or ISSUES with top 3 errors)
-4. Suggest running /format-fix if issues found
+4. Suggest running the `format-fix` skill if issues are found
 
-Execute: `bash ../format.sh`
+Execute from the repository root: `bash scripts/agent/format.sh`

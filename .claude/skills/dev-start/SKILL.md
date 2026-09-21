@@ -14,4 +14,4 @@ Run the dev server start script which will:
 3. Wait for server to be ready (polls <http://localhost:3000>)
 4. Show minimal confirmation when ready
 
-Execute: `bash ../dev-start.sh`
+Execute from the repository root: `bash scripts/agent/dev-start.sh`

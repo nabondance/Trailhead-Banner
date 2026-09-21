@@ -1,6 +1,6 @@
 #!/bin/bash
-# Dev server stop skill - Stop background dev server
-# Usage: /dev-stop
+# Stop the background dev server
+# Usage: bash scripts/agent/dev-stop.sh
 
 set -e
 

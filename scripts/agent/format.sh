@@ -1,6 +1,6 @@
 #!/bin/bash
-# Format check skill - Check formatting without modifying files
-# Usage: /format
+# Check formatting without modifying files
+# Usage: bash scripts/agent/format.sh
 
 set -e
 
@@ -27,6 +27,6 @@ echo "Prettier: $PRETTIER_STATUS | Stylelint: $STYLELINT_STATUS"
 
 # Exit with error if any failed
 if [ "$PRETTIER_STATUS" = "ISSUES" ] || [ "$STYLELINT_STATUS" = "ISSUES" ]; then
-  echo "Run /format-fix to auto-fix issues"
+  echo "Run bash scripts/agent/format-fix.sh to auto-fix issues"
   exit 1
 fi
