@@ -1,9 +1,24 @@
 export const extractUsernameFromUrl = (input) => {
-  const trailblazerUrlPrefix = 'https://www.salesforce.com/trailblazer/';
-  if (input.startsWith(trailblazerUrlPrefix)) {
-    return input.substring(trailblazerUrlPrefix.length).split('?')[0].split('#')[0];
+  const trimmedInput = input.trim();
+  const urlMatch = trimmedInput.match(/https?:\/\/[^\s<>"']+/i);
+  const urlCandidate = (urlMatch?.[0] || trimmedInput).replace(/[),;!?]+$/, '');
+
+  try {
+    const url = new URL(urlCandidate);
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    const isTrailblazerMeProfile = url.hostname === 'trailblazer.me' && pathParts[0]?.toLowerCase() === 'id';
+    const isSalesforceProfile =
+      (url.hostname === 'www.salesforce.com' || url.hostname === 'salesforce.com') &&
+      pathParts[0]?.toLowerCase() === 'trailblazer';
+
+    if ((isTrailblazerMeProfile || isSalesforceProfile) && pathParts.length === 2) {
+      return decodeURIComponent(pathParts[1]);
+    }
+  } catch {
+    // Plain usernames are expected input too, so an invalid URL is returned unchanged.
   }
-  return input;
+
+  return urlCandidate;
 };
 
 export const validateUsernameFormat = (username) => {

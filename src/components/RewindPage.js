@@ -53,8 +53,7 @@ const RewindPage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleUsernameChange = (e) => {
-    const input = e.target.value;
+  const updateUsername = (input) => {
     const cleanUsername = extractUsernameFromUrl(input);
 
     // Clear previous errors when user starts typing
@@ -72,6 +71,32 @@ const RewindPage = () => {
       .substring(0, 64); // Limit length
 
     setUsername(sanitizedUsername);
+  };
+
+  const handleUsernameChange = (e) => {
+    updateUsername(e.target.value);
+  };
+
+  const handleUsernamePaste = (e) => {
+    const clipboardData = e.clipboardData;
+    const pastedInput = ['text/uri-list', 'text/plain', 'text', 'text/html']
+      .map((type) => clipboardData?.getData(type))
+      .filter((value, index, values) => value && values.indexOf(value) === index)
+      .join('\n');
+
+    if (!pastedInput || !/https?:\/\//i.test(pastedInput)) {
+      return;
+    }
+
+    e.preventDefault();
+    updateUsername(pastedInput);
+  };
+
+  const handleUsernameKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.currentTarget.form?.requestSubmit();
+    }
   };
 
   const handleUsernameBlur = async () => {
@@ -236,19 +261,24 @@ const RewindPage = () => {
       <RewindCount ref={rewindCountRef} />
       <form onSubmit={handleSubmit} className='form'>
         <div className='input-container'>
-          <input
-            type='text'
+          <textarea
+            rows={1}
             value={username}
             onChange={handleUsernameChange}
+            onPaste={handleUsernamePaste}
+            onKeyDown={handleUsernameKeyDown}
             onBlur={handleUsernameBlur}
             placeholder='Enter Trailhead username'
             required
-            className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
+            className={`input username-input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
             name='trailhead-username'
             autoComplete='off'
+            autoCapitalize='none'
+            enterKeyHint='go'
+            spellCheck='false'
             data-lpignore='true'
             data-form-type='other'
-          />
+          ></textarea>
           {validationResult && (
             <div className='validation-icon' data-tooltip={validationResult.message}>
               {validationResult.state === 'ok' ? (

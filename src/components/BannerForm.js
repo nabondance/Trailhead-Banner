@@ -143,12 +143,38 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
     setValidationResult(apiResult);
   };
 
-  const handleUsernameChange = (e) => {
-    const input = e.target.value.toLowerCase();
-    const cleanUsername = extractUsernameFromUrl(input);
-    setOptions({ ...options, username: cleanUsername });
+  const updateUsername = (input) => {
+    const normalizedInput = input.toLowerCase();
+    const cleanUsername = extractUsernameFromUrl(normalizedInput);
+    setOptions((previousOptions) => ({ ...previousOptions, username: cleanUsername }));
     setValidationResult(null);
     setUsernameError('');
+  };
+
+  const handleUsernameChange = (e) => {
+    updateUsername(e.target.value);
+  };
+
+  const handleUsernamePaste = (e) => {
+    const clipboardData = e.clipboardData;
+    const pastedInput = ['text/uri-list', 'text/plain', 'text', 'text/html']
+      .map((type) => clipboardData?.getData(type))
+      .filter((value, index, values) => value && values.indexOf(value) === index)
+      .join('\n');
+
+    if (!pastedInput || !/https?:\/\//i.test(pastedInput)) {
+      return;
+    }
+
+    e.preventDefault();
+    updateUsername(pastedInput);
+  };
+
+  const handleUsernameKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.currentTarget.form?.requestSubmit();
+    }
   };
 
   const handleBackgroundChange = (e) => {
@@ -260,22 +286,27 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   return (
     <form onSubmit={handleSubmit} className='form' noValidate>
       <div className='input-container'>
-        <input
+        <textarea
           ref={usernameInputRef}
-          type='text'
+          rows={1}
           value={options.username}
           onChange={handleUsernameChange}
+          onPaste={handleUsernamePaste}
+          onKeyDown={handleUsernameKeyDown}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username' // Add placeholder
           required
           aria-invalid={usernameError ? 'true' : undefined}
           aria-describedby={usernameError ? 'username-error' : undefined}
-          className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
+          className={`input username-input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
           name='trailhead-username'
           autoComplete='off'
+          autoCapitalize='none'
+          enterKeyHint='go'
+          spellCheck='false'
           data-lpignore='true' // LastPass specific attribute to ignore
           data-form-type='other'
-        />
+        ></textarea>
         {validationResult && (
           <div
             className='validation-icon'
