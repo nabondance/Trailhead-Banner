@@ -156,7 +156,11 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   };
 
   const handleUsernamePaste = (e) => {
-    const pastedInput = e.clipboardData?.getData('text/plain') || e.clipboardData?.getData('text');
+    const clipboardData = e.clipboardData;
+    const pastedInput = ['text/uri-list', 'text/plain', 'text', 'text/html']
+      .map((type) => clipboardData?.getData(type))
+      .filter((value, index, values) => value && values.indexOf(value) === index)
+      .join('\n');
 
     if (!pastedInput || !/https?:\/\//i.test(pastedInput)) {
       return;
