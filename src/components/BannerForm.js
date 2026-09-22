@@ -143,12 +143,27 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
     setValidationResult(apiResult);
   };
 
-  const handleUsernameChange = (e) => {
-    const input = e.target.value.toLowerCase();
-    const cleanUsername = extractUsernameFromUrl(input);
-    setOptions({ ...options, username: cleanUsername });
+  const updateUsername = (input) => {
+    const normalizedInput = input.toLowerCase();
+    const cleanUsername = extractUsernameFromUrl(normalizedInput);
+    setOptions((previousOptions) => ({ ...previousOptions, username: cleanUsername }));
     setValidationResult(null);
     setUsernameError('');
+  };
+
+  const handleUsernameChange = (e) => {
+    updateUsername(e.target.value);
+  };
+
+  const handleUsernamePaste = (e) => {
+    const pastedInput = e.clipboardData?.getData('text');
+
+    if (!pastedInput || !/https?:\/\//i.test(pastedInput)) {
+      return;
+    }
+
+    e.preventDefault();
+    updateUsername(pastedInput);
   };
 
   const handleBackgroundChange = (e) => {
@@ -265,6 +280,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
           type='text'
           value={options.username}
           onChange={handleUsernameChange}
+          onPaste={handleUsernamePaste}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username' // Add placeholder
           required
