@@ -18,10 +18,10 @@ export const uploadImage = async (fileBuffer, fileName, folder = 'images') => {
   }
 };
 
-export const downloadImage = async (fileName, folder = 'images') => {
+export const downloadImage = async (fileName, folder = 'images', options = {}) => {
   try {
     const filePath = `${BLOB_BASE_URL}/${folder}/${fileName}`;
-    const response = await fetch(filePath);
+    const response = await fetch(filePath, { signal: options.signal });
     if (!response.ok) {
       throw new Error('Failed to download image:', response.statusText);
     }

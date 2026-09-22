@@ -13,6 +13,7 @@ src/banner/
 │   ├── certifications.js
 │   ├── superbadges.js
 │   ├── agentblazer.js
+│   ├── sfdxHardisBadge.js
 │   ├── mvpRibbon.js
 │   └── watermark.js
 └── renderers/         # Banner implementations (standard, rewind, future types)
@@ -160,6 +161,14 @@ ctx.putImageData(modifiedImageData, x, y);
 
 - Expired certifications → Grayscale (action required)
 - Retired certifications → 50% opacity (not user's fault)
+
+**External achievement data:** The sfdx-hardis component receives normalized badge
+metadata from the API layer. Badge records are fetched from the official Cloudity
+training endpoint, matched to the requested Trailblazer username, and rendered only
+when every published check has passed. The endpoint's banner-specific image is
+preloaded within a 2.5-second total budget so this optional integration cannot delay
+the main banner indefinitely. Treat these as training achievements, not Salesforce
+certifications.
 
 ## Layout Patterns
 

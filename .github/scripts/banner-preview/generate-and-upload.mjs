@@ -25,6 +25,7 @@ if (!runId) {
 }
 
 const results = [];
+let requiredCaseFailed = false;
 
 async function callBannerApi(username, options) {
   const res = await fetch('http://localhost:3000/api/banner/standard', {
@@ -46,11 +47,41 @@ async function callBannerApi(username, options) {
   return data;
 }
 
+function assertSfdxHardisBadge(data, username, callLabel) {
+  const badges = data.sfdxHardisBadgesData?.badges;
+  if (!Array.isArray(badges) || badges.length === 0) {
+    throw new Error(`${callLabel}: expected an sfdx-hardis badge for ${username}`);
+  }
+
+  const highest = badges.reduce((current, badge) => (!current || badge.level > current.level ? badge : current), null);
+  const trustedBannerImage =
+    typeof highest?.bannerImage === 'string' &&
+    /^https:\/\/hardisgroupcom\.github\.io\/sfdx-hardis-training\/badges\/img\/banner-level-\d+\.svg$/.test(
+      highest.bannerImage
+    );
+
+  if (!trustedBannerImage) {
+    throw new Error(`${callLabel}: badge has an invalid bannerImage: ${String(highest?.bannerImage)}`);
+  }
+  if (!(highest.checksTotal > 0 && highest.checksPassed === highest.checksTotal)) {
+    throw new Error(`${callLabel}: badge completion checks are not verified`);
+  }
+  if (data.timings?.sfdx_hardis_badge_timed_out) {
+    throw new Error(`${callLabel}: sfdx-hardis integration exceeded its time budget`);
+  }
+  if (data.timings?.image_generation_breakdown?.sfdx_hardis_badge_level !== highest.level) {
+    throw new Error(`${callLabel}: level ${highest.level} badge was returned but not prepared by the renderer`);
+  }
+
+  console.log(`  ${callLabel}: verified rendered sfdx-hardis level ${highest.level} (${highest.bannerImage})`);
+}
+
 // Repo root is 3 levels up from .github/scripts/banner-preview/
 const repoRoot = new URL('../../../', import.meta.url).pathname;
 
 for (const username of usernames) {
   let options = configs[username] ?? defaultOptions;
+  const expectSfdxHardisBadge = options._expectSfdxHardisBadge === true;
   const configLabel = configs[username] ? username : 'default';
   console.log(`Generating banner for: ${username} (config: ${configLabel})`);
   if (options._description) console.log(`  → ${options._description}`);
@@ -76,6 +107,7 @@ for (const username of usernames) {
     const firstGraphqlMs = first.timings?.graphql_queries_ms ?? null;
     const firstCacheHits = first.timings?.cache_summary?.cache_hits ?? null;
     console.log(`  1st call: ${firstMs}ms total, ${firstGraphqlMs}ms graphql (${firstCacheHits} cache hits)`);
+    if (expectSfdxHardisBadge) assertSfdxHardisBadge(first, username, '1st call');
 
     // Second call — expected cache hit
     const second = await callBannerApi(username, apiOptions);
@@ -84,6 +116,7 @@ for (const username of usernames) {
     const secondCacheHits = second.timings?.cache_summary?.cache_hits ?? null;
     const secondTotalQueries = second.timings?.cache_summary?.total_queries ?? null;
     console.log(`  2nd call: ${secondMs}ms total, ${secondGraphqlMs}ms graphql (${secondCacheHits} cache hits)`);
+    if (expectSfdxHardisBadge) assertSfdxHardisBadge(second, username, '2nd call');
 
     const warnings = second.warnings || [];
 
@@ -118,6 +151,7 @@ for (const username of usernames) {
   } catch (err) {
     console.log(`  EXCEPTION: ${err.message}`);
     results.push({ username, status: null, error: err.message });
+    if (expectSfdxHardisBadge) requiredCaseFailed = true;
   }
 
   // Small delay to avoid Trailhead rate limiting
@@ -126,3 +160,8 @@ for (const username of usernames) {
 
 writeFileSync('/tmp/banner-results.json', JSON.stringify(results, null, 2));
 console.log('Results written to /tmp/banner-results.json');
+
+if (requiredCaseFailed) {
+  console.error('ERROR: A required banner-preview integration case failed');
+  process.exitCode = 1;
+}

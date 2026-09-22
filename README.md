@@ -19,6 +19,7 @@ Trailhead-Banner is a web application that allows users to generate LinkedIn ban
 ## Features
 
 - Fetch Trailhead rank, certifications, badges, and MVP status
+- Display the highest verified Cloudity sfdx-hardis training badge
 - Customize banner background color and image
 - Display or hide various elements like badge count, superbadge count, rank logo, and certification count
 - Download the generated banner image

@@ -10,6 +10,7 @@ import {
   MvpRibbon,
   Watermark,
   Stamps,
+  SfdxHardisBadge,
 } from '../components/index.js';
 
 /**
@@ -34,6 +35,7 @@ const RIGHT_PART_RATIO = 7 / 10;
  * @param {Object} data.agentblazerData - Agentblazer data from API
  * @param {Object} data.stampsData - Stamps data from API
  * @param {Object} data.communityData - Community Q&A stats from API
+ * @param {Object} data.sfdxHardisBadgeBundle - Public badge metadata and preloaded banner image
  * @param {Object} options - Generation options
  * @returns {Promise<Object>} Banner result { bannerUrl, warnings, hash, timings }
  */
@@ -53,20 +55,26 @@ async function generateStandardBanner(data, options = {}) {
 
   const topLogoHeight = CANVAS_HEIGHT * TOP_PART_RATIO * 0.9;
 
-  const [backgroundPrep, rankLogoPrep, agentblazerPrep, mvpRibbonPrep, watermarkPrep, stampsPrep] = await Promise.all([
-    Background.prepareBackground(options),
-    RankLogo.prepareRankLogo(data.rankData, options, CANVAS_HEIGHT),
-    Agentblazer.prepareAgentblazer(data.agentblazerData, options),
-    MvpRibbon.prepareMvpRibbon(data.mvpData),
-    Watermark.prepareWatermark(),
-    Stamps.prepareStamps(data.stampsData, options, { logoHeight: topLogoHeight }),
-  ]);
+  const [backgroundPrep, rankLogoPrep, agentblazerPrep, mvpRibbonPrep, watermarkPrep, stampsPrep, sfdxHardisPrep] =
+    await Promise.all([
+      Background.prepareBackground(options),
+      RankLogo.prepareRankLogo(data.rankData, options, CANVAS_HEIGHT),
+      Agentblazer.prepareAgentblazer(data.agentblazerData, options),
+      MvpRibbon.prepareMvpRibbon(data.mvpData),
+      Watermark.prepareWatermark(),
+      Stamps.prepareStamps(data.stampsData, options, { logoHeight: topLogoHeight }),
+      SfdxHardisBadge.prepareSfdxHardisBadge(data.sfdxHardisBadgeBundle, options, {
+        logoHeight: topLogoHeight,
+      }),
+    ]);
 
   timings.background_load_ms = backgroundPrep.timings?.load_ms;
   timings.rank_logo_load_ms = rankLogoPrep.timings?.load_ms;
   timings.agentblazer_load_ms = agentblazerPrep.timings?.load_ms;
   timings.stamps_download_ms = stampsPrep.timings?.download_ms;
   timings.stamps_count = Stamps.getStampsCounts(stampsPrep).displayed;
+  timings.sfdx_hardis_badge_load_ms = sfdxHardisPrep.timings?.load_ms;
+  timings.sfdx_hardis_badge_level = sfdxHardisPrep.badge?.level;
 
   // Prepare counters (needs rank logo dimensions)
   const countersPrep = await Counters.prepareCounters(data, options);
@@ -86,28 +94,31 @@ async function generateStandardBanner(data, options = {}) {
 
   // Allocate top-band width between stamps and superbadges.
   // The midpoint is a cap, not a wall: each side is guaranteed min(natural, half)
-  // and reclaims whatever the other side doesn't use. Without stamps, superbadges
-  // keep their legacy 70% zone.
+  // and reclaims whatever the other side doesn't use. When no program badge is
+  // shown, superbadges keep their legacy 70% zone.
   const AGENTBLAZER_X = 370;
   const STAMP_ZONE_GAP = 20;
+  const SFDX_HARDIS_BADGE_GAP = 10;
   const agentblazerDims = Agentblazer.getAgentblazerDimensions(agentblazerPrep);
-  const stampZoneStart = AGENTBLAZER_X + (agentblazerDims.width > 0 ? agentblazerDims.width + 10 : 0);
+  const sfdxHardisDims = SfdxHardisBadge.getSfdxHardisBadgeDimensions(sfdxHardisPrep);
+  const sfdxHardisBadgeX = AGENTBLAZER_X + (agentblazerDims.width > 0 ? agentblazerDims.width + 10 : 0);
+  const stampZoneStart =
+    sfdxHardisBadgeX + (sfdxHardisDims.width > 0 ? sfdxHardisDims.width + SFDX_HARDIS_BADGE_GAP : 0);
 
   let stampZone = null;
   let superbadgeAvailableWidth = CANVAS_WIDTH * RIGHT_PART_RATIO;
 
-  if (stampsPrep.shouldRender) {
-    const topBandAvailable = CANVAS_WIDTH - stampZoneStart - STAMP_ZONE_GAP;
+  if (stampsPrep.shouldRender || sfdxHardisPrep.shouldRender) {
+    const topBandAvailable = Math.max(CANVAS_WIDTH - stampZoneStart - STAMP_ZONE_GAP, 0);
     const superbadgesNaturalWidth = Superbadges.getSuperbadgesNaturalWidth(
       data.superbadgesData,
       options,
       topLogoHeight
     );
-    const stampsAllocatedWidth = Math.min(
-      stampsPrep.naturalWidth,
-      Math.max(topBandAvailable / 2, topBandAvailable - superbadgesNaturalWidth)
-    );
-    stampZone = { x: stampZoneStart, width: stampsAllocatedWidth };
+    const stampsAllocatedWidth = stampsPrep.shouldRender
+      ? Math.min(stampsPrep.naturalWidth, Math.max(topBandAvailable / 2, topBandAvailable - superbadgesNaturalWidth))
+      : 0;
+    stampZone = stampsPrep.shouldRender ? { x: stampZoneStart, width: stampsAllocatedWidth } : null;
     superbadgeAvailableWidth = Math.max(topBandAvailable - stampsAllocatedWidth, 0);
   }
 
@@ -147,7 +158,10 @@ async function generateStandardBanner(data, options = {}) {
   // 4. Agentblazer (top area, fixed position)
   await Agentblazer.renderAgentblazer(ctx, agentblazerPrep, AGENTBLAZER_X, 5);
 
-  // 4b. Stamps (top area, right of Agentblazer)
+  // 4b. Highest sfdx-hardis training badge (top area, after Agentblazer)
+  await SfdxHardisBadge.renderSfdxHardisBadge(ctx, sfdxHardisPrep, sfdxHardisBadgeX, 10);
+
+  // 4c. Stamps (top area, after program badges)
   if (stampZone) {
     const stampsRenderTiming = await Stamps.renderStamps(ctx, stampsPrep, stampZone.x, 10, stampZone.width);
     timings.stamps_render_ms = stampsRenderTiming?.render_ms;
@@ -193,6 +207,7 @@ async function generateStandardBanner(data, options = {}) {
   warnings.push(...Certifications.getCertificationsWarnings(certificationsPrep));
   warnings.push(...Superbadges.getSuperbadgesWarnings(superbadgesPrep));
   warnings.push(...Stamps.getStampsWarnings(stampsPrep));
+  warnings.push(...SfdxHardisBadge.getSfdxHardisBadgeWarnings(sfdxHardisPrep));
   warnings.push(...Agentblazer.getAgentblazerWarnings(agentblazerPrep));
   warnings.push(...MvpRibbon.getMvpRibbonWarnings(mvpRibbonPrep));
   warnings.push(...Watermark.getWatermarkWarnings(watermarkPrep));

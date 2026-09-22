@@ -107,6 +107,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
     displayAccreditedProfessionalCertifications: true,
     displayAgentblazerRank: true,
     agentblazerRankDisplay: 'current',
+    displaySfdxHardisBadge: true,
     displayStamps: false,
     selectedStampCategories: STAMP_CATEGORIES_CONFIG.filter((c) => c.defaultSelected),
     maxStampsToDisplay: '',
@@ -462,6 +463,25 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
             <Tooltip id='agentblazer-mode-tooltip' place='top' delayShow={200} className='react-tooltip'>
               Current: Shows your active Agentblazer rank for the current year. All Time High: Shows your highest
               Agentblazer level achieved across all years
+            </Tooltip>
+            <label>
+              <input
+                type='checkbox'
+                checked={options.displaySfdxHardisBadge}
+                onChange={(e) => setOptions({ ...options, displaySfdxHardisBadge: e.target.checked })}
+              />
+              <span className='option-label-text'>Show sfdx-hardis Training Badge</span>
+              <span
+                className='option-info'
+                data-tooltip-id='sfdx-hardis-badge-tooltip'
+                tabIndex='0'
+                aria-label='More information'
+              >
+                <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+              </span>
+            </label>
+            <Tooltip id='sfdx-hardis-badge-tooltip' place='top' delayShow={200} className='react-tooltip'>
+              Shows your highest verified training badge for sfdx-hardis by Cloudity.
             </Tooltip>
           </fieldset>
           <fieldset>

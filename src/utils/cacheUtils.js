@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { downloadImage, uploadImage } from './blobUtils';
-import { getStampFileName } from './stampUtils';
+import { downloadImage, uploadImage } from './blobUtils.js';
+import { getStampFileName } from './stampUtils.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -17,7 +17,8 @@ export const getCertificationFileName = (imageUrl) => {
   return `${id}_${oid}_${lastMod}.png`;
 };
 
-export const getImage = async (imageUrl, folder = 'images') => {
+export const getImage = async (imageUrl, folder = 'images', options = {}) => {
+  const { signal, timeoutMs = 10000, awaitCacheWrite = true } = options;
   let fileName = imageUrl.split('/').pop();
   if (folder === 'certifications' || folder === 'certifications_cropped') {
     fileName = getCertificationFileName(imageUrl);
@@ -28,10 +29,11 @@ export const getImage = async (imageUrl, folder = 'images') => {
   let imageDownloaded = null;
   let cacheHit = false;
   try {
-    imageDownloaded = await downloadImage(fileName, folder);
+    imageDownloaded = await downloadImage(fileName, folder, { signal });
     cacheHit = true;
     return { buffer: imageDownloaded, cacheHit };
   } catch (error) {
+    if (signal?.aborted) throw error;
     console.error(`Image not found in blob storage, downloading from URL: ${imageUrl}`);
   }
 
@@ -89,15 +91,20 @@ export const getImage = async (imageUrl, folder = 'images') => {
   try {
     const response = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
-      timeout: 10000, // 10 second timeout
+      timeout: timeoutMs,
+      signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
       },
     });
     const imageBuffer = Buffer.from(response.data, 'binary');
-    // Upload the image to the blob
-    await uploadImage(imageBuffer, fileName, folder);
+    const cacheWrite = uploadImage(imageBuffer, fileName, folder);
+    if (awaitCacheWrite) {
+      await cacheWrite;
+    } else {
+      cacheWrite.catch((error) => console.error(`Failed to cache image ${imageUrl}:`, error.message));
+    }
     cacheHit = false;
     return { buffer: imageBuffer, cacheHit };
   } catch (error) {
