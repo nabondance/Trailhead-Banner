@@ -481,7 +481,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
               </span>
             </label>
             <Tooltip id='sfdx-hardis-badge-tooltip' place='top' delayShow={200} className='react-tooltip'>
-              Shows your highest verified Cloudity sfdx-hardis training badge. This is a course badge, not a
+              Shows your highest verified training badge for sfdx-hardis by Cloudity. This is a course badge, not a
               certification.
             </Tooltip>
           </fieldset>
