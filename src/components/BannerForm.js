@@ -156,7 +156,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   };
 
   const handleUsernamePaste = (e) => {
-    const pastedInput = e.clipboardData?.getData('text');
+    const pastedInput = e.clipboardData?.getData('text/plain') || e.clipboardData?.getData('text');
 
     if (!pastedInput || !/https?:\/\//i.test(pastedInput)) {
       return;
@@ -164,6 +164,13 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
 
     e.preventDefault();
     updateUsername(pastedInput);
+  };
+
+  const handleUsernameKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.currentTarget.form?.requestSubmit();
+    }
   };
 
   const handleBackgroundChange = (e) => {
@@ -275,23 +282,27 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   return (
     <form onSubmit={handleSubmit} className='form' noValidate>
       <div className='input-container'>
-        <input
+        <textarea
           ref={usernameInputRef}
-          type='text'
+          rows={1}
           value={options.username}
           onChange={handleUsernameChange}
           onPaste={handleUsernamePaste}
+          onKeyDown={handleUsernameKeyDown}
           onBlur={handleUsernameBlur} // Add onBlur event to validate username
           placeholder='Enter Trailhead username' // Add placeholder
           required
           aria-invalid={usernameError ? 'true' : undefined}
           aria-describedby={usernameError ? 'username-error' : undefined}
-          className={`input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
+          className={`input username-input ${validationResult?.state === 'invalid' ? 'input-error' : ''} ${validationResult?.state === 'private' ? 'input-warning' : ''} ${validationResult?.state === 'ok' ? 'input-success' : ''}`}
           name='trailhead-username'
           autoComplete='off'
+          autoCapitalize='none'
+          enterKeyHint='go'
+          spellCheck='false'
           data-lpignore='true' // LastPass specific attribute to ignore
           data-form-type='other'
-        />
+        ></textarea>
         {validationResult && (
           <div
             className='validation-icon'

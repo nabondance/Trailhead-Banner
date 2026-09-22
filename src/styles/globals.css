@@ -456,6 +456,12 @@ main {
   outline: none;
 }
 
+.username-input {
+  resize: none;
+  overflow: hidden;
+  font-family: inherit;
+}
+
 .input-file {
   display: inline-block;
   width: auto;
