@@ -31,6 +31,7 @@ A generated banner (1584×396px) includes the following elements:
 - **AgentBlazer rank** — AgentBlazer status if the user has one
 - **Certifications** — Logos for all earned Salesforce certifications (expired shown in greyscale, retired at 50% opacity)
 - **Superbadges** — Logos for earned superbadges
+- **sfdx-hardis training badge** — Highest verified Cloudity course badge, when earned (not a certification)
 - **MVP ribbon** — Top-right corner ribbon for Salesforce MVP/All-Star MVP holders
 - **Background** — Chosen from a library of 32 Salesforce/Trailblazer themed backgrounds
 - **Watermark** — Trailhead Banner branding (bottom-right corner)

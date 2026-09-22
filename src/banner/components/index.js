@@ -12,5 +12,17 @@ import * as Agentblazer from './agentblazer.js';
 import * as MvpRibbon from './mvpRibbon.js';
 import * as Watermark from './watermark.js';
 import * as Stamps from './stamps.js';
+import * as SfdxHardisBadge from './sfdxHardisBadge.js';
 
-export { Background, RankLogo, Counters, Certifications, Superbadges, Agentblazer, MvpRibbon, Watermark, Stamps };
+export {
+  Background,
+  RankLogo,
+  Counters,
+  Certifications,
+  Superbadges,
+  Agentblazer,
+  MvpRibbon,
+  Watermark,
+  Stamps,
+  SfdxHardisBadge,
+};

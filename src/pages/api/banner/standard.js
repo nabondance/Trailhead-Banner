@@ -4,6 +4,7 @@ import { getMaintenanceInfoMessages } from '../../../utils/certificationMaintena
 import { validateUsername, validateContentLength } from '../../../banner/api/validators';
 import { buildStandardQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, createTimingTracker, handleBannerError } from '../../../banner/api/shared';
+import { fetchSfdxHardisBadges } from '../../../utils/sfdxHardisBadgeUtils';
 import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 export const config = {
@@ -55,7 +56,11 @@ export default async function handler(req, res) {
     const queries = buildStandardQueries(options.username, options);
     console.log(`[Banner] Required queries (${queries.length}):`, queries.map((q) => q.name).join(', '));
 
-    const { responseMap, cacheSummary, timingBreakdown, totalTime } = await fetchUserData(queries, options.username);
+    const [userData, sfdxHardisBadgesData] = await Promise.all([
+      fetchUserData(queries, options.username),
+      options.displaySfdxHardisBadge === false ? Promise.resolve(null) : fetchSfdxHardisBadges(options.username),
+    ]);
+    const { responseMap, cacheSummary, timingBreakdown, totalTime } = userData;
     timings.add('graphql_queries_ms', totalTime);
     timings.add('graphql_breakdown', timingBreakdown);
     timings.add('cache_summary', cacheSummary);
@@ -84,6 +89,7 @@ export default async function handler(req, res) {
         stampsData,
         agentblazerData,
         communityData,
+        sfdxHardisBadgesData,
       },
       options
     );
@@ -143,6 +149,7 @@ export default async function handler(req, res) {
       stampsData,
       agentblazerData,
       communityData,
+      sfdxHardisBadgesData,
       imageUrl,
       warnings,
       infoMessages,

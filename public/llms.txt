@@ -29,7 +29,7 @@ https://thb.nabondance.me/llms-full.txt
 ## Key Facts
 
 - Free and open-source (GitHub: nabondance/trailhead-banner)
-- Data fetched live from Salesforce Trailhead GraphQL API
+- Data fetched live from Salesforce Trailhead GraphQL API, with optional verified sfdx-hardis training badges from Cloudity
 - Banner generated server-side as a PNG, returned as base64
 - No account required, no data stored
 - Built with Next.js, deployed on Vercel
