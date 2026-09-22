@@ -33,7 +33,6 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "test:username-validation": "node --test src/utils/usernameValidation.test.mjs",
     "lint-staged": "lint-staged",
     "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
     "format:prettier": "prettier --check --ignore-path .gitignore . !pnpm-lock.yaml",
