@@ -165,8 +165,10 @@ ctx.putImageData(modifiedImageData, x, y);
 **External achievement data:** The sfdx-hardis component receives normalized badge
 metadata from the API layer. Badge records are fetched from the official Cloudity
 training endpoint, matched to the requested Trailblazer username, and rendered only
-when every published check has passed. Treat these as training achievements, not
-Salesforce certifications.
+when every published check has passed. The endpoint's banner-specific image is
+preloaded within a 2.5-second total budget so this optional integration cannot delay
+the main banner indefinitely. Treat these as training achievements, not Salesforce
+certifications.
 
 ## Layout Patterns
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getImage } from './cacheUtils.js';
 import RedisCacheUtils from './redisCacheUtils.js';
 
 const SFDX_HARDIS_TRAINING_ORIGIN = 'https://hardisgroupcom.github.io';
@@ -7,6 +8,30 @@ const SFDX_HARDIS_BADGES_URL = `${SFDX_HARDIS_TRAINING_ORIGIN}${SFDX_HARDIS_TRAI
 const USERNAME_PATTERN = /^[a-z0-9._-]{1,60}$/i;
 const POSITIVE_CACHE_TTL_SECONDS = 600;
 const NEGATIVE_CACHE_TTL_SECONDS = 300;
+const SFDX_HARDIS_TIME_BUDGET_MS = 2500;
+
+function normalizeBannerImageUrl(value, level) {
+  if (typeof value !== 'string') return null;
+
+  try {
+    const url = new URL(value);
+    const expectedPath = `${SFDX_HARDIS_TRAINING_PATH}/badges/img/banner-level-${level}.svg`;
+    if (
+      url.origin !== SFDX_HARDIS_TRAINING_ORIGIN ||
+      url.pathname !== expectedPath ||
+      url.username ||
+      url.password ||
+      url.search ||
+      url.hash
+    ) {
+      return null;
+    }
+
+    return url.href;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Build the public badge-record URL for a Trailblazer username.
@@ -42,6 +67,7 @@ function normalizeSfdxHardisBadgeRecord(record, username) {
           const level = Number(badge?.level);
           const checksPassed = Number(badge?.checksPassed);
           const checksTotal = Number(badge?.checksTotal);
+          const bannerImage = normalizeBannerImageUrl(badge?.bannerImage, level);
 
           return (
             badge?.type === 'Achievement' &&
@@ -57,7 +83,8 @@ function normalizeSfdxHardisBadgeRecord(record, username) {
             checksTotal > 0 &&
             checksPassed === checksTotal &&
             badge?.issuer?.name === 'Cloudity' &&
-            badge?.issuer?.course === `${SFDX_HARDIS_TRAINING_ORIGIN}${SFDX_HARDIS_TRAINING_PATH}`
+            badge?.issuer?.course === `${SFDX_HARDIS_TRAINING_ORIGIN}${SFDX_HARDIS_TRAINING_PATH}` &&
+            bannerImage !== null
           );
         })
         .map((badge) => ({
@@ -68,7 +95,7 @@ function normalizeSfdxHardisBadgeRecord(record, username) {
           issuedOn: badge.issuedOn.trim(),
           checksPassed: Number(badge.checksPassed),
           checksTotal: Number(badge.checksTotal),
-          image: `${SFDX_HARDIS_BADGES_URL}/img/${encodeURIComponent(requestedUsername)}-level-${Number(badge.level)}.svg`,
+          bannerImage: normalizeBannerImageUrl(badge.bannerImage, Number(badge.level)),
         }))
         .sort((a, b) => a.level - b.level)
     : [];
@@ -110,7 +137,7 @@ async function fetchSfdxHardisBadges(username, dependencies = {}) {
   if (!url) return null;
 
   const normalizedUsername = username.trim().toLowerCase();
-  const cacheKey = `sfdx-hardis-badges:${normalizedUsername}`;
+  const cacheKey = `sfdx-hardis-badges:v2:${normalizedUsername}`;
 
   try {
     const cached = await cache.getCachedQuery(cacheKey);
@@ -123,6 +150,7 @@ async function fetchSfdxHardisBadges(username, dependencies = {}) {
   try {
     const response = await httpClient.get(url, {
       timeout: 4000,
+      signal: dependencies.signal,
       headers: { Accept: 'application/json' },
       validateStatus: (status) => status === 200 || status === 404,
     });
@@ -150,10 +178,80 @@ async function fetchSfdxHardisBadges(username, dependencies = {}) {
   }
 }
 
+/**
+ * Resolve the badge metadata and its banner-specific image within one optional
+ * time budget. A timeout aborts in-flight HTTP reads and returns enough state
+ * for the main banner request to continue without waiting on this integration.
+ *
+ * @param {string} username
+ * @param {Object} dependencies test seams and optional timeBudgetMs override
+ * @returns {Promise<Object|null>}
+ */
+async function fetchSfdxHardisBadgeBundle(username, dependencies = {}) {
+  const timeBudgetMs = dependencies.timeBudgetMs ?? SFDX_HARDIS_TIME_BUDGET_MS;
+  const imageLoader = dependencies.imageLoader || getImage;
+  const controller = new AbortController();
+  const startedAt = Date.now();
+  let badgesData = null;
+  let timeoutId;
+
+  const work = (async () => {
+    badgesData = await fetchSfdxHardisBadges(username, { ...dependencies, signal: controller.signal });
+    if (controller.signal.aborted) {
+      return { badgesData, bannerImageBuffer: null, timedOut: true, elapsedMs: Date.now() - startedAt };
+    }
+    const badge = getHighestSfdxHardisBadge(badgesData);
+    if (!badge?.bannerImage) {
+      return { badgesData, bannerImageBuffer: null, timedOut: false, elapsedMs: Date.now() - startedAt };
+    }
+
+    try {
+      const imageResult = await imageLoader(badge.bannerImage, 'sfdx_hardis_badges', {
+        signal: controller.signal,
+        timeoutMs: timeBudgetMs,
+        awaitCacheWrite: false,
+      });
+      const imageBytes = Buffer.isBuffer(imageResult) ? imageResult : imageResult.buffer || imageResult;
+      return {
+        badgesData,
+        bannerImageBuffer: Buffer.from(imageBytes),
+        timedOut: false,
+        elapsedMs: Date.now() - startedAt,
+      };
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.warn(`[sfdx-hardis badges] Unable to load banner image for ${username}:`, error.message);
+      }
+      return {
+        badgesData,
+        bannerImageBuffer: null,
+        timedOut: controller.signal.aborted,
+        elapsedMs: Date.now() - startedAt,
+      };
+    }
+  })();
+
+  const timeout = new Promise((resolve) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      console.warn(`[sfdx-hardis badges] Skipped ${username} after exceeding the ${timeBudgetMs}ms time budget`);
+      resolve({ badgesData, bannerImageBuffer: null, timedOut: true, elapsedMs: Date.now() - startedAt });
+    }, timeBudgetMs);
+  });
+
+  try {
+    return await Promise.race([work, timeout]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export {
   SFDX_HARDIS_BADGES_URL,
+  SFDX_HARDIS_TIME_BUDGET_MS,
   buildSfdxHardisBadgeUrl,
   normalizeSfdxHardisBadgeRecord,
   getHighestSfdxHardisBadge,
   fetchSfdxHardisBadges,
+  fetchSfdxHardisBadgeBundle,
 };

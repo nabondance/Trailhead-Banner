@@ -1,5 +1,4 @@
 import { loadImage } from '@napi-rs/canvas';
-import { getImage } from '../../utils/cacheUtils.js';
 import { getHighestSfdxHardisBadge } from '../../utils/sfdxHardisBadgeUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
 
@@ -18,19 +17,18 @@ function emptyResult(timer, warnings = []) {
 /**
  * Load the highest verified sfdx-hardis training badge for the top banner band.
  */
-async function prepareSfdxHardisBadge(badgesData, options = {}, layout = {}) {
+async function prepareSfdxHardisBadge(bundle, options = {}, layout = {}) {
   const timer = new Timer();
   const warnings = [];
 
   if (options.displaySfdxHardisBadge === false) return emptyResult(timer, warnings);
 
-  const badge = getHighestSfdxHardisBadge(badgesData);
-  if (!badge) return emptyResult(timer, warnings);
+  const badge = getHighestSfdxHardisBadge(bundle?.badgesData);
+  if (!badge || !bundle?.bannerImageBuffer) return emptyResult(timer, warnings);
 
   timer.start('load');
   try {
-    const imageResult = await getImage(badge.image, 'sfdx_hardis_badges');
-    const image = await loadImage(Buffer.from(imageResult.buffer || imageResult));
+    const image = await loadImage(Buffer.from(bundle.bannerImageBuffer));
     const height = layout.logoHeight || 90;
     const width = (image.width / image.height) * height;
 

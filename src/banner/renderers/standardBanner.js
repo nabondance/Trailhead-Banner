@@ -35,7 +35,7 @@ const RIGHT_PART_RATIO = 7 / 10;
  * @param {Object} data.agentblazerData - Agentblazer data from API
  * @param {Object} data.stampsData - Stamps data from API
  * @param {Object} data.communityData - Community Q&A stats from API
- * @param {Object} data.sfdxHardisBadgesData - Public sfdx-hardis training badges
+ * @param {Object} data.sfdxHardisBadgeBundle - Public badge metadata and preloaded banner image
  * @param {Object} options - Generation options
  * @returns {Promise<Object>} Banner result { bannerUrl, warnings, hash, timings }
  */
@@ -63,7 +63,7 @@ async function generateStandardBanner(data, options = {}) {
       MvpRibbon.prepareMvpRibbon(data.mvpData),
       Watermark.prepareWatermark(),
       Stamps.prepareStamps(data.stampsData, options, { logoHeight: topLogoHeight }),
-      SfdxHardisBadge.prepareSfdxHardisBadge(data.sfdxHardisBadgesData, options, {
+      SfdxHardisBadge.prepareSfdxHardisBadge(data.sfdxHardisBadgeBundle, options, {
         logoHeight: topLogoHeight,
       }),
     ]);

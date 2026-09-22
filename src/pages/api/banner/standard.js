@@ -4,7 +4,7 @@ import { getMaintenanceInfoMessages } from '../../../utils/certificationMaintena
 import { validateUsername, validateContentLength } from '../../../banner/api/validators';
 import { buildStandardQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, createTimingTracker, handleBannerError } from '../../../banner/api/shared';
-import { fetchSfdxHardisBadges } from '../../../utils/sfdxHardisBadgeUtils';
+import { fetchSfdxHardisBadgeBundle } from '../../../utils/sfdxHardisBadgeUtils';
 import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 export const config = {
@@ -56,14 +56,17 @@ export default async function handler(req, res) {
     const queries = buildStandardQueries(options.username, options);
     console.log(`[Banner] Required queries (${queries.length}):`, queries.map((q) => q.name).join(', '));
 
-    const [userData, sfdxHardisBadgesData] = await Promise.all([
+    const [userData, sfdxHardisBadgeBundle] = await Promise.all([
       fetchUserData(queries, options.username),
-      options.displaySfdxHardisBadge === false ? Promise.resolve(null) : fetchSfdxHardisBadges(options.username),
+      options.displaySfdxHardisBadge === false ? Promise.resolve(null) : fetchSfdxHardisBadgeBundle(options.username),
     ]);
     const { responseMap, cacheSummary, timingBreakdown, totalTime } = userData;
+    const sfdxHardisBadgesData = sfdxHardisBadgeBundle?.badgesData || null;
     timings.add('graphql_queries_ms', totalTime);
     timings.add('graphql_breakdown', timingBreakdown);
     timings.add('cache_summary', cacheSummary);
+    timings.add('sfdx_hardis_badge_ms', sfdxHardisBadgeBundle?.elapsedMs);
+    timings.add('sfdx_hardis_badge_timed_out', sfdxHardisBadgeBundle?.timedOut || false);
 
     // Extract data from GraphQL responses (with fallbacks for queries that weren't executed)
     const rankData = responseMap.GET_TRAILBLAZER_RANK?.data?.data?.profile?.trailheadStats || {};
@@ -89,7 +92,7 @@ export default async function handler(req, res) {
         stampsData,
         agentblazerData,
         communityData,
-        sfdxHardisBadgesData,
+        sfdxHardisBadgeBundle,
       },
       options
     );
