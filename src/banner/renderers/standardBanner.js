@@ -159,7 +159,7 @@ async function generateStandardBanner(data, options = {}) {
   await Agentblazer.renderAgentblazer(ctx, agentblazerPrep, AGENTBLAZER_X, 5);
 
   // 4b. Highest sfdx-hardis training badge (top area, after Agentblazer)
-  await SfdxHardisBadge.renderSfdxHardisBadge(ctx, sfdxHardisPrep, sfdxHardisBadgeX, 5);
+  await SfdxHardisBadge.renderSfdxHardisBadge(ctx, sfdxHardisPrep, sfdxHardisBadgeX, 10);
 
   // 4c. Stamps (top area, after program badges)
   if (stampZone) {
