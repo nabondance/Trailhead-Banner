@@ -33,6 +33,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "trail:check": "node scripts/check-trail-completion.mjs",
+    "trail:check:test": "node --test scripts/check-trail-completion.test.mjs",
     "lint-staged": "lint-staged",
     "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
     "format:prettier": "prettier --check --ignore-path .gitignore . !pnpm-lock.yaml",
