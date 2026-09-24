@@ -3,7 +3,13 @@
 import * as THREE from 'three';
 import { useEffect, useMemo, useState } from 'react';
 import { GLOBE_RADIUS, CENTER_Y, BASE_TOP_Y, snowBump } from './constants';
-import { makeEngravedNameTexture, makeHighlightTexture, loadFont } from './textures';
+import {
+  makeEngravedNameTexture,
+  makeHighlightTexture,
+  makeInteriorGlowTexture,
+  makeWoodTexture,
+  loadFont,
+} from './textures';
 
 /* Single displaced surface: the squashed sphere gets smooth drift bumps baked
    into its vertices, so the snow reads as one wind-blown mound instead of
@@ -35,8 +41,22 @@ function SnowMound() {
 /* Glass sphere with rim + specular highlight, and the snow mound floor */
 function GlobeShell() {
   const highlightTex = useMemo(() => makeHighlightTexture(), []);
+  const interiorGlowTex = useMemo(() => makeInteriorGlowTexture(), []);
+
+  useEffect(
+    () => () => {
+      highlightTex.dispose();
+      interiorGlowTex.dispose();
+    },
+    [highlightTex, interiorGlowTex]
+  );
+
   return (
     <group position={[0, CENTER_Y, 0]}>
+      {/* a quiet pool of winter light, behind the badges and snow */}
+      <sprite position={[0, 0.12, -1.5]} scale={[3.45, 3.45, 1]} renderOrder={-1}>
+        <spriteMaterial map={interiorGlowTex} transparent opacity={0.78} depthWrite={false} />
+      </sprite>
       <mesh renderOrder={10}>
         <sphereGeometry args={[GLOBE_RADIUS + 0.02, 64, 64]} />
         <meshPhongMaterial
@@ -84,6 +104,9 @@ function GlobeShell() {
 /* Wooden base with the username engraved front and center */
 function Base({ username }) {
   const [nameTex, setNameTex] = useState(null);
+  const woodTex = useMemo(() => makeWoodTexture(), []);
+
+  useEffect(() => () => woodTex.dispose(), [woodTex]);
 
   // bake the engraving only once the font is loaded, so measureText
   // sizes the arc for the real glyphs instead of the serif fallback
@@ -107,9 +130,27 @@ function Base({ username }) {
         <cylinderGeometry args={[1.78, 1.84, 0.2, 48]} />
         <meshStandardMaterial color='#d4af37' metalness={0.75} roughness={0.3} />
       </mesh>
+      {/* a fine polished edge catches light above the broader gold band */}
+      <mesh position={[0, 0.092, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[1.78, 0.026, 10, 64]} />
+        <meshStandardMaterial color='#f2d778' metalness={0.88} roughness={0.2} />
+      </mesh>
       <mesh position={[0, -0.5, 0]}>
         <cylinderGeometry args={[1.84, 2.02, 0.8, 48]} />
-        <meshStandardMaterial color='#5b3a29' roughness={0.55} />
+        <meshPhysicalMaterial
+          map={woodTex}
+          bumpMap={woodTex}
+          bumpScale={0.012}
+          roughness={0.48}
+          metalness={0.03}
+          clearcoat={0.1}
+          clearcoatRoughness={0.72}
+        />
+      </mesh>
+      {/* darker foot grounds the base and gives the tapered body more depth */}
+      <mesh position={[0, -0.915, 0]}>
+        <cylinderGeometry args={[2.02, 2.055, 0.07, 48]} />
+        <meshStandardMaterial color='#28140f' roughness={0.5} />
       </mesh>
       {nameTex &&
         (() => {

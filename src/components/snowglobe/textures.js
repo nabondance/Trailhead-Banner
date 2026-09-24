@@ -75,6 +75,59 @@ function makeHighlightTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
+/* Cool diffused light behind the contents. A dedicated texture gives the
+   globe depth without turning the whole glass shell milky or overexposed. */
+function makeInteriorGlowTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  const glow = ctx.createRadialGradient(128, 118, 0, 128, 128, 128);
+  glow.addColorStop(0, 'rgba(218,238,255,0.52)');
+  glow.addColorStop(0.38, 'rgba(139,190,244,0.3)');
+  glow.addColorStop(0.72, 'rgba(78,121,196,0.11)');
+  glow.addColorStop(1, 'rgba(45,72,130,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, 256, 256);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/* Subtle turned-walnut grain for the base. The low-contrast horizontal lines
+   follow the cylinder and add material richness without competing with the
+   engraved username. */
+function makeWoodTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  const base = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  base.addColorStop(0, '#75472f');
+  base.addColorStop(0.48, '#5b3424');
+  base.addColorStop(1, '#3b2018');
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let line = 0; line < 30; line++) {
+    const baseY = 6 + line * 8.5 + Math.sin(line * 2.17) * 2.5;
+    ctx.beginPath();
+    for (let x = -10; x <= canvas.width + 10; x += 8) {
+      const y = baseY + Math.sin(x * 0.022 + line * 1.7) * 1.8 + Math.sin(x * 0.061 - line) * 0.7;
+      if (x === -10) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = line % 3 === 0 ? 'rgba(25,10,5,0.18)' : 'rgba(240,173,99,0.065)';
+    ctx.lineWidth = line % 4 === 0 ? 1.6 : 0.8;
+    ctx.stroke();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.repeat.set(1.35, 1);
+  return tex;
+}
+
 /* Rank accent palette, mirrored from drawUtils.getRankAccentColor (drawUtils
    imports @napi-rs/canvas, which cannot load in the browser bundle) */
 const RANK_ACCENTS = {
@@ -358,4 +411,13 @@ function makeBackdropTexture(username, rankTitle, year) {
   return tex;
 }
 
-export { makeFlakeTexture, makeEngravedNameTexture, makeHighlightTexture, RANK_ACCENTS, loadFont, makeBackdropTexture };
+export {
+  makeFlakeTexture,
+  makeEngravedNameTexture,
+  makeHighlightTexture,
+  makeInteriorGlowTexture,
+  makeWoodTexture,
+  RANK_ACCENTS,
+  loadFont,
+  makeBackdropTexture,
+};
