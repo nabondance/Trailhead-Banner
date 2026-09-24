@@ -4,7 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useMemo, useRef } from 'react';
 import { CENTER, DISPLAY_SCALE } from './snowglobe/constants';
-import { makeFlakeTexture } from './snowglobe/textures';
+import { makeFlakeTexture, makePowderTexture } from './snowglobe/textures';
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
@@ -42,13 +42,14 @@ export default function SnowGlobeScene({ achievements, rank, year, username, sha
     // sideways-biased swirl: a random horizontal direction per item with a mild
     // upward kick, so the contents scatter instead of funneling to the top center
     w.items.forEach((it) => {
+      if (it.embedded) return;
       const angle = Math.random() * Math.PI * 2;
       const mag = (2.5 + Math.random() * 2.5) * (it.kick ?? 1);
       it.vel.x += Math.cos(angle) * mag;
       it.vel.z += Math.sin(angle) * mag;
       it.vel.y += (0.6 + Math.random() * 2) * (it.kick ?? 1);
     });
-    w.snowSystems.forEach(({ positions, velocities, count, kicks }) => {
+    w.snowSystems.forEach(({ positions, velocities, count, kicks, settles, alphas, sizes, baseSizes }) => {
       for (let i = 0; i < count; i++) {
         const ix = i * 3;
         const kick = kicks ? kicks[i] : 1;
@@ -67,6 +68,9 @@ export default function SnowGlobeScene({ achievements, rank, year, username, sha
         // cap the upward speed: rapid repeated shakes otherwise stack vertical
         // velocity until the whole flurry jams against the dome apex
         velocities[ix + 1] = Math.min(velocities[ix + 1] + (0.5 + Math.random() * 1.4) * kick, 2.6);
+        if (settles) settles[i] = 0;
+        if (alphas) alphas[i] = 1;
+        if (sizes && baseSizes) sizes[i] = baseSizes[i];
       }
     });
   }, [shakeNonce]);
@@ -141,9 +145,29 @@ export default function SnowGlobeScene({ achievements, rank, year, username, sha
             <GlobeShell />
             <Base username={username} />
             <Achievements world={world} achievements={tumblingItems} />
-            {/* ✳ one flake pool — every particle gets its own random size and
-                weight (gravity/drag/kick), drawn independently */}
-            <SnowSystem world={world} count={680} makeTexture={makeFlakeTexture} />
+            {/* Two visual layers, still 680 particles total: defined flakes
+                carry the foreground while softer powder adds depth. */}
+            <SnowSystem
+              world={world}
+              count={400}
+              makeTexture={makeFlakeTexture}
+              minSize={0.055}
+              maxSize={0.18}
+              opacity={0.9}
+              settledOpacity={0.22}
+            />
+            <SnowSystem
+              world={world}
+              count={280}
+              makeTexture={makePowderTexture}
+              color='#eaf4ff'
+              minSize={0.025}
+              maxSize={0.095}
+              opacity={0.68}
+              settledOpacity={0.06}
+              gravityScale={0.72}
+              kickScale={1.12}
+            />
           </group>
         </WobbleGroup>
       </Canvas>

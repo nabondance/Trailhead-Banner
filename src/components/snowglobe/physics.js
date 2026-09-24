@@ -18,19 +18,6 @@ import {
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 const ACHIEVEMENT_COLLISION_PASSES = 2;
 
-/* Give every badge a loose resting destination across the mound. The targets
-   do not lock items into a grid: they only add a gentle pull after landing,
-   while the collision solver below keeps the visible sprite faces apart. */
-function makeRestTarget(index, count) {
-  const progress = Math.sqrt((index + 0.7) / Math.max(count, 1));
-  const angle = index * GOLDEN_ANGLE;
-  const radius = MOUND_RX * 0.68 * progress;
-  return {
-    x: Math.cos(angle) * radius,
-    z: Math.sin(angle) * radius * 0.72,
-  };
-}
-
 /* Sprites always face the camera, so their meaningful overlap is in screen
    space (world X/Y), even when their Z positions differ. Two relaxed passes
    are enough for the small item cap and avoid the rigid, jittery look of a
@@ -60,23 +47,29 @@ function spreadAchievementCollisions(items) {
         const nx = dx / dist;
         const ny = dy / dist;
         const overlap = minDist - dist;
-        const invMassSum = a.invMass + b.invMass;
+        // Once an item has entered the snow it becomes part of the settled
+        // display. New arrivals move around it; embedded items never get
+        // nudged out of place by later collision passes.
+        const aInvMass = a.embedded ? 0 : a.invMass;
+        const bInvMass = b.embedded ? 0 : b.invMass;
+        const invMassSum = aInvMass + bInvMass;
+        if (invMassSum === 0) continue;
         const correction = overlap * 0.58;
 
-        a.pos.x -= nx * correction * (a.invMass / invMassSum);
-        a.pos.y -= ny * correction * (a.invMass / invMassSum);
-        b.pos.x += nx * correction * (b.invMass / invMassSum);
-        b.pos.y += ny * correction * (b.invMass / invMassSum);
+        a.pos.x -= nx * correction * (aInvMass / invMassSum);
+        a.pos.y -= ny * correction * (aInvMass / invMassSum);
+        b.pos.x += nx * correction * (bInvMass / invMassSum);
+        b.pos.y += ny * correction * (bInvMass / invMassSum);
 
         // Remove closing velocity with very low restitution. This lets badges
         // softly pile up instead of bouncing indefinitely after every shake.
         const closingSpeed = (b.vel.x - a.vel.x) * nx + (b.vel.y - a.vel.y) * ny;
         if (closingSpeed < 0) {
           const impulse = (-closingSpeed * 1.08) / invMassSum;
-          a.vel.x -= nx * impulse * a.invMass;
-          a.vel.y -= ny * impulse * a.invMass;
-          b.vel.x += nx * impulse * b.invMass;
-          b.vel.y += ny * impulse * b.invMass;
+          a.vel.x -= nx * impulse * aInvMass;
+          a.vel.y -= ny * impulse * aInvMass;
+          b.vel.x += nx * impulse * bInvMass;
+          b.vel.y += ny * impulse * bInvMass;
         }
       }
     }
@@ -87,6 +80,7 @@ function spreadAchievementCollisions(items) {
 function Achievements({ world, achievements }) {
   const [items, setItems] = useState(null);
   const spritesRef = useRef([]);
+  const shadowsRef = useRef([]);
   const tmp = useMemo(() => new THREE.Vector3(), []);
 
   useEffect(() => {
@@ -113,10 +107,7 @@ function Achievements({ world, achievements }) {
       if (cancelled) return;
       const ok = loaded.filter(Boolean);
       const sizeScale = Math.min(1, Math.sqrt(14 / Math.max(ok.length, 1)));
-      const typePriority = { rank: 0, agentblazer: 1, certification: 2, stamp: 3 };
-      const spreadOrder = [...ok].sort((a, b) => (typePriority[a.type] ?? 99) - (typePriority[b.type] ?? 99));
-      const spreadIndex = new Map(spreadOrder.map((item, index) => [item, index]));
-      const built = ok.map((a, index) => {
+      const built = ok.map((a) => {
         const size = (a.type === 'rank' ? 0.72 : a.type === 'certification' ? 0.62 : 0.55) * sizeScale;
         const img = a.tex.image;
         const aspect = Math.min(2, Math.max(0.5, img ? img.width / img.height : 1));
@@ -126,7 +117,6 @@ function Achievements({ world, achievements }) {
         const typeWeight =
           a.type === 'rank' ? 1.25 : a.type === 'certification' ? 1 : a.type === 'agentblazer' ? 0.85 : 0.7;
         const weight = typeWeight * (0.8 + Math.random() * 0.4);
-        const restTarget = makeRestTarget(spreadIndex.get(a) ?? index, ok.length);
         return {
           tex: a.tex,
           pos: randomPointInGlobe(GLOBE_RADIUS * 0.7),
@@ -140,8 +130,8 @@ function Achievements({ world, achievements }) {
           kick: 1 / weight,
           invMass: 1 / weight,
           collisionRadius: Math.max(size, size * aspect) * 0.38,
-          restX: restTarget.x,
-          restZ: restTarget.z,
+          embedded: false,
+          landedThisFrame: false,
         };
       });
       world.current.items = built;
@@ -157,6 +147,11 @@ function Achievements({ world, achievements }) {
     if (!items) return;
     const d = Math.min(dt, 0.05);
     items.forEach((it, i) => {
+      if (it.embedded) {
+        it.vel.set(0, 0, 0);
+        return;
+      }
+      it.landedThisFrame = false;
       it.vel.y -= it.gravity * d;
       it.vel.multiplyScalar(Math.exp(-it.drag * d));
       it.pos.addScaledVector(it.vel, d);
@@ -192,14 +187,7 @@ function Achievements({ world, achievements }) {
       const floorY = moundSurfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
       if (it.pos.y < floorY) {
         it.pos.y = floorY;
-        if (it.vel.y < 0) it.vel.y *= -BOUNCE * 0.5;
-        it.vel.x *= 0.88;
-        it.vel.z *= 0.88;
-
-        // A gentle fan-out across the mound prevents every item from draining
-        // into the same central heap. Shakes still overpower this attraction.
-        it.vel.x += (it.restX - it.pos.x) * 1.8 * d;
-        it.vel.z += (it.restZ - it.pos.z) * 1.8 * d;
+        it.landedThisFrame = true;
       }
     });
 
@@ -228,37 +216,71 @@ function Achievements({ world, achievements }) {
         }
       }
       const correctedFloorY = moundSurfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
-      if (it.pos.y < correctedFloorY) it.pos.y = correctedFloorY;
+      if (it.landedThisFrame || it.pos.y < correctedFloorY) it.pos.y = correctedFloorY;
+
+      // Resolve the impact collision once, then let the snow hold the item in
+      // its final position permanently. Later shakes and inertia skip it.
+      if (it.landedThisFrame) {
+        it.embedded = true;
+        it.vel.set(0, 0, 0);
+      }
 
       const sprite = spritesRef.current[i];
       if (sprite) {
         sprite.position.copy(it.pos);
         sprite.material.rotation += it.spin * d * Math.min(it.vel.length(), 2.5);
       }
+
+      // A soft contact shadow anchors a badge only as it reaches the mound.
+      // Airborne pieces stay clean and weightless rather than carrying a dark
+      // disc around the globe with them.
+      const shadow = shadowsRef.current[i];
+      if (shadow) {
+        const surfaceY = moundSurfaceY(it.pos.x, it.pos.z);
+        const height = Math.max(0, it.pos.y - surfaceY - it.r * 0.45);
+        const contact = THREE.MathUtils.clamp(1 - height / Math.max(it.size * 0.7, 0.01), 0, 1);
+        shadow.position.set(it.pos.x, surfaceY + 0.018, it.pos.z);
+        shadow.scale.set(it.size * 0.72, it.size * 0.34, 1);
+        shadow.material.opacity = contact * 0.16;
+      }
     });
   });
 
   if (!items) return null;
   return items.map((it, i) => (
-    <sprite
-      key={i}
-      ref={(el) => (spritesRef.current[i] = el)}
-      position={it.pos.toArray()}
-      scale={[it.size * it.aspect, it.size, 1]}
-    >
-      <spriteMaterial map={it.tex} transparent depthWrite={false} />
-    </sprite>
+    <group key={i}>
+      <mesh
+        ref={(el) => (shadowsRef.current[i] = el)}
+        position={[it.pos.x, moundSurfaceY(it.pos.x, it.pos.z) + 0.018, it.pos.z]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[it.size * 0.72, it.size * 0.34, 1]}
+        renderOrder={1}
+      >
+        <circleGeometry args={[1, 24]} />
+        <meshBasicMaterial color='#71849e' transparent opacity={0} depthWrite={false} />
+      </mesh>
+      <sprite
+        ref={(el) => (spritesRef.current[i] = el)}
+        position={it.pos.toArray()}
+        scale={[it.size * it.aspect, it.size, 1]}
+      >
+        <spriteMaterial map={it.tex} transparent depthWrite={false} />
+      </sprite>
+    </group>
   ));
 }
 
-/* Snow particles with their own cheaper physics — one pool where every flake
-   gets an independent random size and weight (gravity/drag/shake response),
-   so dust that drifts and chunks that plummet are all mixed together.
-   Per-flake size needs a tiny shader: PointsMaterial only has a global size. */
+/* Snow particles with their own cheaper physics. Crisp flakes and soft powder
+   use separate pools, but share this simulation and the same total particle
+   budget. Per-particle size and settling opacity need a tiny shader because
+   PointsMaterial only exposes one global size and opacity. */
 const SNOW_VERTEX = /* glsl */ `
   attribute float size;
+  attribute float alpha;
   uniform float uScale;
+  varying float vAlpha;
   void main() {
+    vAlpha = alpha;
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_PointSize = size * (uScale / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
@@ -267,39 +289,81 @@ const SNOW_VERTEX = /* glsl */ `
 const SNOW_FRAGMENT = /* glsl */ `
   uniform sampler2D map;
   uniform vec3 color;
+  uniform float uOpacity;
+  varying float vAlpha;
   void main() {
-    gl_FragColor = vec4(color, 0.9) * texture2D(map, gl_PointCoord);
+    gl_FragColor = vec4(color, uOpacity * vAlpha) * texture2D(map, gl_PointCoord);
   }
 `;
 
-function SnowSystem({ world, count, makeTexture, color = '#dbe8fc' }) {
+function SnowSystem({
+  world,
+  count,
+  makeTexture,
+  color = '#dbe8fc',
+  minSize = 0.04,
+  maxSize = 0.2,
+  opacity = 0.9,
+  settledOpacity = 0.2,
+  gravityScale = 1,
+  kickScale = 1,
+}) {
   const pointsRef = useRef();
   const tex = useMemo(() => makeTexture(), [makeTexture]);
   const uniforms = useMemo(
-    () => ({ map: { value: tex }, color: { value: new THREE.Color(color) }, uScale: { value: 1000 } }),
-    [tex, color]
+    () => ({
+      map: { value: tex },
+      color: { value: new THREE.Color(color) },
+      uScale: { value: 1000 },
+      uOpacity: { value: opacity },
+    }),
+    [tex, color, opacity]
   );
   const data = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
     const sizes = new Float32Array(count);
+    const baseSizes = new Float32Array(count);
+    const alphas = new Float32Array(count).fill(1);
+    const settles = new Float32Array(count);
     const gravities = new Float32Array(count);
     const drags = new Float32Array(count);
     const kicks = new Float32Array(count);
+    const driftPhases = new Float32Array(count);
+    const driftRates = new Float32Array(count);
     for (let i = 0; i < count; i++) {
       const p = randomPointInGlobe(GLOBE_RADIUS * 0.92);
       positions.set([p.x, p.y, p.z], i * 3);
-      sizes[i] = 0.04 + Math.random() * 0.16;
+      const size = minSize + Math.random() * (maxSize - minSize);
+      sizes[i] = size;
+      baseSizes[i] = size;
       // weight drawn independently of size: gravity up, drag and shake
       // response down as a flake gets heavier. Gravity floor keeps even the
       // lightest dust falling visibly instead of hanging near-motionless.
       const weight = Math.random();
-      gravities[i] = 0.14 + weight * 0.45;
+      gravities[i] = (0.14 + weight * 0.45) * gravityScale;
       drags[i] = 1.1 - weight * 0.7;
-      kicks[i] = 1.35 - weight * 0.65;
+      kicks[i] = (1.35 - weight * 0.65) * kickScale;
+      driftPhases[i] = (i * GOLDEN_ANGLE) % (Math.PI * 2);
+      driftRates[i] = 0.65 + ((i * 37) % 101) / 160;
     }
-    return { positions, velocities, sizes, gravities, drags, kicks, count };
-  }, [count]);
+    return {
+      positions,
+      velocities,
+      sizes,
+      baseSizes,
+      alphas,
+      settles,
+      gravities,
+      drags,
+      kicks,
+      driftPhases,
+      driftRates,
+      count,
+    };
+  }, [count, minSize, maxSize, gravityScale, kickScale]);
+
+  useEffect(() => () => tex.dispose(), [tex]);
 
   useEffect(() => {
     world.current.snowSystems.push(data);
@@ -308,18 +372,21 @@ function SnowSystem({ world, count, makeTexture, color = '#dbe8fc' }) {
     };
   }, [world, data]);
 
-  useFrame(({ gl }, dt) => {
+  useFrame(({ gl, clock }, dt) => {
     const d = Math.min(dt, 0.05);
-    const { positions, velocities, gravities, drags } = data;
+    const { positions, velocities, sizes, baseSizes, alphas, settles, gravities, drags, driftPhases, driftRates } =
+      data;
+    const time = clock.elapsedTime;
     for (let i = 0; i < count; i++) {
       const ix = i * 3;
       const decay = Math.exp(-drags[i] * d);
       velocities[ix + 1] -= gravities[i] * d;
-      // faint turbulence: flakes flutter as they fall, and any flakes the
-      // dome funnels toward the top pole disperse instead of raining down
-      // the center axis as a visible column
-      velocities[ix] += (Math.random() - 0.5) * 0.5 * d;
-      velocities[ix + 2] += (Math.random() - 0.5) * 0.5 * d;
+      // Smooth, seeded currents give every mote a coherent path. Per-frame
+      // randomness made the old snow shimmer in place instead of drifting.
+      const phase = driftPhases[i];
+      const rate = driftRates[i];
+      velocities[ix] += (Math.sin(time * rate + phase) * 0.18 + Math.sin(time * 0.37 + phase * 1.7) * 0.06) * d;
+      velocities[ix + 2] += Math.cos(time * rate * 0.83 + phase * 1.3) * 0.16 * d;
       velocities[ix] *= decay;
       velocities[ix + 1] *= decay;
       velocities[ix + 2] *= decay;
@@ -329,6 +396,13 @@ function SnowSystem({ world, count, makeTexture, color = '#dbe8fc' }) {
 
       const surfY = moundSurfaceY(positions[ix], positions[ix + 2]) + 0.02;
       const airborne = positions[ix + 1] > surfY + 0.03;
+
+      // Once landed, flakes slowly compress into the mound instead of
+      // remaining as a permanent layer of bright dots. A new shake resets
+      // this progress and makes the full flake visible again.
+      settles[i] = airborne ? Math.max(0, settles[i] - d * 3.5) : Math.min(1, settles[i] + d * 0.7);
+      alphas[i] = 1 - settles[i] * (1 - settledOpacity);
+      sizes[i] = baseSizes[i] * (1 - settles[i] * 0.42);
 
       if (airborne) {
         // the glass bound is a sphere only in the upper flight region — lower
@@ -354,8 +428,8 @@ function SnowSystem({ world, count, makeTexture, color = '#dbe8fc' }) {
             // and later drain down the axis as a visible snow tornado —
             // scatter them sideways instead
             if (dy > maxR * 0.7) {
-              velocities[ix] += (Math.random() - 0.5) * 1.6;
-              velocities[ix + 2] += (Math.random() - 0.5) * 1.6;
+              velocities[ix] += Math.sin(phase) * 0.8;
+              velocities[ix + 2] += Math.cos(phase) * 0.8;
             }
           }
         } else {
@@ -384,8 +458,9 @@ function SnowSystem({ world, count, makeTexture, color = '#dbe8fc' }) {
           velocities[ix] *= 0.2;
           velocities[ix + 2] *= 0.2;
         }
-        if (positions[ix + 1] < surfY) {
-          positions[ix + 1] = surfY;
+        const settledY = surfY - settles[i] * 0.018;
+        if (positions[ix + 1] < settledY) {
+          positions[ix + 1] = settledY;
           velocities[ix] *= 0.1;
           velocities[ix + 1] = 0;
           velocities[ix + 2] *= 0.1;
@@ -394,6 +469,8 @@ function SnowSystem({ world, count, makeTexture, color = '#dbe8fc' }) {
     }
     if (pointsRef.current) {
       pointsRef.current.geometry.attributes.position.needsUpdate = true;
+      pointsRef.current.geometry.attributes.size.needsUpdate = true;
+      pointsRef.current.geometry.attributes.alpha.needsUpdate = true;
       // match PointsMaterial's size attenuation: scale = drawing buffer height / 2
       uniforms.uScale.value = gl.drawingBufferHeight / 2;
     }
@@ -404,6 +481,7 @@ function SnowSystem({ world, count, makeTexture, color = '#dbe8fc' }) {
       <bufferGeometry>
         <bufferAttribute attach='attributes-position' args={[data.positions, 3]} />
         <bufferAttribute attach='attributes-size' args={[data.sizes, 1]} />
+        <bufferAttribute attach='attributes-alpha' args={[data.alphas, 1]} />
       </bufferGeometry>
       <shaderMaterial
         uniforms={uniforms}
@@ -453,6 +531,14 @@ function WobbleGroup({ world, children }) {
     w.prevVelX = velNow;
     if (Math.abs(impulse) > 0.001) {
       w.items.forEach((it) => {
+        if (it.embedded) {
+          // Settled pieces stay locked during tiny spring corrections. A real
+          // drag or shake breaks them free so they can tumble and land again.
+          if (Math.abs(impulse) < 0.18) return;
+          it.embedded = false;
+          it.landedThisFrame = false;
+          it.vel.y += (0.45 + Math.abs(impulse) * 0.35) * (it.kick ?? 1);
+        }
         it.vel.x += impulse * (it.kick ?? 1);
         it.vel.y += Math.abs(impulse) * 0.3 * Math.random() * (it.kick ?? 1);
       });
