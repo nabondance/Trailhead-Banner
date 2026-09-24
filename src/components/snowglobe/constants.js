@@ -3,6 +3,7 @@ import * as THREE from 'three';
 /* Globe dimensions and the physics constants shared by every module */
 const GLOBE_RADIUS = 2;
 const CENTER_Y = 0.4;
+const DISPLAY_SCALE = 1.08;
 const GRAVITY = 0.9; // very slow sink — floaty, underwater feel
 const DRAG = 1.15;
 const BOUNCE = 0.35;
@@ -51,6 +52,7 @@ function randomPointInGlobe(maxRadius) {
 export {
   GLOBE_RADIUS,
   CENTER_Y,
+  DISPLAY_SCALE,
   GRAVITY,
   DRAG,
   BOUNCE,

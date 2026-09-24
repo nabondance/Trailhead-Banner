@@ -122,7 +122,7 @@ function Base({ username }) {
   }, [username]);
 
   return (
-    <group position={[0, BASE_TOP_Y, 0]}>
+    <group position={[0, BASE_TOP_Y, 0]} scale={[1, 0.95, 1]}>
       {/* gold trim, wider than the snow rim so the mound sits in it like a
           bezel — tall enough that its top edge overlaps the mound's curve,
           otherwise a sliver of background shows between snow and ring */}
