@@ -111,6 +111,9 @@ function Achievements({ world, achievements }) {
         const size = (a.type === 'rank' ? 0.72 : a.type === 'certification' ? 0.62 : 0.55) * sizeScale;
         const img = a.tex.image;
         const aspect = Math.min(2, Math.max(0.5, img ? img.width / img.height : 1));
+        const pos = randomPointInGlobe(GLOBE_RADIUS * 0.7);
+        const startFloorY = moundSurfaceY(pos.x, pos.z) + size * 0.28;
+        if (pos.y < startFloorY) pos.y = startFloorY + 0.12 + Math.random() * 0.42;
         // per-type weight + per-item jitter: the rank sinks and settles first,
         // certs follow, agentblazer and stamps flutter longest — different
         // fall rates keep the pile from stacking in one clump
@@ -119,7 +122,7 @@ function Achievements({ world, achievements }) {
         const weight = typeWeight * (0.8 + Math.random() * 0.4);
         return {
           tex: a.tex,
-          pos: randomPointInGlobe(GLOBE_RADIUS * 0.7),
+          pos,
           vel: new THREE.Vector3(0, 0, 0),
           spin: (Math.random() - 0.5) * 2,
           size,

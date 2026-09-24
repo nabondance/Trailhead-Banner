@@ -1,9 +1,13 @@
 import * as THREE from 'three';
 
 /* Globe dimensions and the physics constants shared by every module */
-const GLOBE_RADIUS = 2;
+// Keep the glass visually dominant over the 2.055-wide wooden foot. The
+// slight overhang matches traditional globes, where the orb meets or exceeds
+// the base silhouette instead of looking perched on an oversized pedestal.
+const GLOBE_RADIUS = 2.1;
 const CENTER_Y = 0.4;
 const DISPLAY_SCALE = 1.08;
+const GLOBE_SEAT_DEPTH = 0.4;
 const GRAVITY = 0.9; // very slow sink — floaty, underwater feel
 const DRAG = 1.15;
 const BOUNCE = 0.35;
@@ -11,12 +15,13 @@ const BOUNCE = 0.35;
 const CENTER = new THREE.Vector3(0, CENTER_Y, 0);
 
 // snow mound: squashed sphere at the globe floor
-const MOUND_CENTER_Y = CENTER_Y - GLOBE_RADIUS + 0.24;
+const MOUND_CENTER_Y = CENTER_Y - GLOBE_RADIUS + 0.24 + GLOBE_SEAT_DEPTH;
 const MOUND_RX = GLOBE_RADIUS * 0.96 * 0.94;
 const MOUND_RY = GLOBE_RADIUS * 0.96 * 0.18;
 
-// base group sits at BASE_TOP_Y; wood cylinder hangs below it
-const BASE_TOP_Y = CENTER_Y - GLOBE_RADIUS + 0.1;
+// The base and snow floor rise around the lower sphere so the glass is seated
+// in the wood instead of balancing on its narrow bottom pole.
+const BASE_TOP_Y = CENTER_Y - GLOBE_RADIUS + 0.1 + GLOBE_SEAT_DEPTH;
 const BASE_BOTTOM_Y = BASE_TOP_Y - 0.9;
 const SCENE_TOP_Y = CENTER_Y + GLOBE_RADIUS + 0.15; // glass shell + wobble headroom
 const SCENE_HALF_WIDTH = 2.5; // base radius + full shake sway

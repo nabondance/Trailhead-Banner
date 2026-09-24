@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { useEffect, useMemo, useState } from 'react';
-import { GLOBE_RADIUS, CENTER_Y, BASE_TOP_Y, snowBump } from './constants';
+import { GLOBE_RADIUS, CENTER_Y, MOUND_CENTER_Y, BASE_TOP_Y, snowBump } from './constants';
 import {
   makeEngravedNameTexture,
   makeHighlightTexture,
@@ -42,7 +42,7 @@ function SnowMound() {
   );
 
   return (
-    <mesh geometry={geometry} position={[0, -GLOBE_RADIUS + 0.24, 0]}>
+    <mesh geometry={geometry} position={[0, MOUND_CENTER_Y - CENTER_Y, 0]}>
       <meshPhysicalMaterial
         map={snowTex}
         color='#f7fbff'
