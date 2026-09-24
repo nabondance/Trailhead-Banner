@@ -3,7 +3,7 @@
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useMemo, useRef } from 'react';
-import { CENTER } from './snowglobe/constants';
+import { CENTER, DISPLAY_SCALE } from './snowglobe/constants';
 import { makeFlakeTexture } from './snowglobe/textures';
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
@@ -137,12 +137,14 @@ export default function SnowGlobeScene({ achievements, rank, year, username, sha
         <CameraFitter />
         <SnapshotHelper onReady={onReady} />
         <WobbleGroup world={world}>
-          <GlobeShell />
-          <Base username={username} />
-          <Achievements world={world} achievements={tumblingItems} />
-          {/* ✳ one flake pool — every particle gets its own random size and
-              weight (gravity/drag/kick), drawn independently */}
-          <SnowSystem world={world} count={680} makeTexture={makeFlakeTexture} />
+          <group scale={DISPLAY_SCALE}>
+            <GlobeShell />
+            <Base username={username} />
+            <Achievements world={world} achievements={tumblingItems} />
+            {/* ✳ one flake pool — every particle gets its own random size and
+                weight (gravity/drag/kick), drawn independently */}
+            <SnowSystem world={world} count={680} makeTexture={makeFlakeTexture} />
+          </group>
         </WobbleGroup>
       </Canvas>
     </div>

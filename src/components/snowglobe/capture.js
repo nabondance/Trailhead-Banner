@@ -3,7 +3,15 @@
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
-import { GLOBE_RADIUS, CENTER_Y, BASE_TOP_Y, BASE_BOTTOM_Y, SCENE_TOP_Y, SCENE_HALF_WIDTH } from './constants';
+import {
+  GLOBE_RADIUS,
+  CENTER_Y,
+  BASE_TOP_Y,
+  BASE_BOTTOM_Y,
+  SCENE_TOP_Y,
+  SCENE_HALF_WIDTH,
+  DISPLAY_SCALE,
+} from './constants';
 
 /* Exposes a high-resolution capture: temporarily bumps the renderer's pixel
    ratio, renders one frame, snapshots it, then restores the live settings.
@@ -51,13 +59,13 @@ function CameraFitter() {
 
     // crop check: every extreme point must land inside normalized device coords
     const extremes = [
-      [0, SCENE_TOP_Y, 0],
-      [0, BASE_BOTTOM_Y, 0],
-      [-SCENE_HALF_WIDTH, BASE_TOP_Y - 0.3, 0],
-      [SCENE_HALF_WIDTH, BASE_TOP_Y - 0.3, 0],
-      [-GLOBE_RADIUS - 0.07, CENTER_Y, 0],
-      [GLOBE_RADIUS + 0.07, CENTER_Y, 0],
-      [0, CENTER_Y, GLOBE_RADIUS + 0.07],
+      [0, SCENE_TOP_Y * DISPLAY_SCALE, 0],
+      [0, BASE_BOTTOM_Y * DISPLAY_SCALE, 0],
+      [-SCENE_HALF_WIDTH * DISPLAY_SCALE, (BASE_TOP_Y - 0.3) * DISPLAY_SCALE, 0],
+      [SCENE_HALF_WIDTH * DISPLAY_SCALE, (BASE_TOP_Y - 0.3) * DISPLAY_SCALE, 0],
+      [(-GLOBE_RADIUS - 0.07) * DISPLAY_SCALE, CENTER_Y * DISPLAY_SCALE, 0],
+      [(GLOBE_RADIUS + 0.07) * DISPLAY_SCALE, CENTER_Y * DISPLAY_SCALE, 0],
+      [0, CENTER_Y * DISPLAY_SCALE, (GLOBE_RADIUS + 0.07) * DISPLAY_SCALE],
     ];
     const cropped = extremes.filter(([x, y, z]) => {
       const p = new THREE.Vector3(x, y, z).project(camera);
