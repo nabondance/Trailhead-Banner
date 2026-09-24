@@ -20,6 +20,67 @@ function makeFlakeTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
+/* Soft powder motes fill the gaps between the crisp flakes. Keeping these
+   round and diffuse makes the flurry feel layered instead of like a field of
+   identical symbols. */
+function makePowderTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const powder = ctx.createRadialGradient(32, 32, 0, 32, 32, 30);
+  powder.addColorStop(0, 'rgba(255,255,255,0.92)');
+  powder.addColorStop(0.35, 'rgba(238,247,255,0.62)');
+  powder.addColorStop(1, 'rgba(210,230,255,0)');
+  ctx.fillStyle = powder;
+  ctx.fillRect(0, 0, 64, 64);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/* Pale blue-gray variation for the wind-sculpted mound. The geometry provides
+   the large drifts; this supplies just enough grain and fine streaking for the
+   light to read as snow rather than a flat white surface. */
+function makeSnowTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  const base = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  base.addColorStop(0, '#ffffff');
+  base.addColorStop(0.5, '#f0f6ff');
+  base.addColorStop(1, '#cfdeef');
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < 420; i++) {
+    const x = ((Math.sin(i * 91.73) + 1) / 2) * canvas.width;
+    const y = ((Math.sin(i * 47.19 + 1.8) + 1) / 2) * canvas.height;
+    const radius = 0.35 + ((Math.sin(i * 13.11) + 1) / 2) * 1.15;
+    ctx.fillStyle = i % 4 === 0 ? 'rgba(124,160,202,0.08)' : 'rgba(255,255,255,0.16)';
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  for (let line = 0; line < 7; line++) {
+    const baseY = 90 + line * 44;
+    ctx.beginPath();
+    for (let x = -20; x <= canvas.width + 20; x += 12) {
+      const y = baseY + Math.sin(x * 0.018 + line * 1.4) * (5 + line * 0.7);
+      if (x === -20) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = line % 2 ? 'rgba(119,154,196,0.055)' : 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  return tex;
+}
+
 /* Username engraved in gold on the wooden base: gold-leaf gradient letters
    set in a dark groove (shadow above = inset, lit from above). The @ is
    drawn smaller than the name, like a signature flourish. */
@@ -413,6 +474,8 @@ function makeBackdropTexture(username, rankTitle, year) {
 
 export {
   makeFlakeTexture,
+  makePowderTexture,
+  makeSnowTexture,
   makeEngravedNameTexture,
   makeHighlightTexture,
   makeInteriorGlowTexture,

@@ -7,6 +7,7 @@ import {
   makeEngravedNameTexture,
   makeHighlightTexture,
   makeInteriorGlowTexture,
+  makeSnowTexture,
   makeWoodTexture,
   loadFont,
 } from './textures';
@@ -15,6 +16,7 @@ import {
    into its vertices, so the snow reads as one wind-blown mound instead of
    separate blobs. Displacement uses the same snowBump() as the physics. */
 function SnowMound() {
+  const snowTex = useMemo(() => makeSnowTexture(), []);
   const geometry = useMemo(() => {
     const r = GLOBE_RADIUS * 0.96;
     const geo = new THREE.SphereGeometry(r, 64, 32);
@@ -31,9 +33,24 @@ function SnowMound() {
     return geo;
   }, []);
 
+  useEffect(
+    () => () => {
+      geometry.dispose();
+      snowTex.dispose();
+    },
+    [geometry, snowTex]
+  );
+
   return (
     <mesh geometry={geometry} position={[0, -GLOBE_RADIUS + 0.24, 0]}>
-      <meshStandardMaterial color='#f2f7ff' roughness={0.92} />
+      <meshPhysicalMaterial
+        map={snowTex}
+        color='#f7fbff'
+        roughness={0.88}
+        metalness={0}
+        clearcoat={0.04}
+        clearcoatRoughness={0.72}
+      />
     </mesh>
   );
 }
