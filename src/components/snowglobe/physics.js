@@ -15,6 +15,74 @@ import {
   randomPointInGlobe,
 } from './constants';
 
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+const ACHIEVEMENT_COLLISION_PASSES = 2;
+
+/* Give every badge a loose resting destination across the mound. The targets
+   do not lock items into a grid: they only add a gentle pull after landing,
+   while the collision solver below keeps the visible sprite faces apart. */
+function makeRestTarget(index, count) {
+  const progress = Math.sqrt((index + 0.7) / Math.max(count, 1));
+  const angle = index * GOLDEN_ANGLE;
+  const radius = MOUND_RX * 0.68 * progress;
+  return {
+    x: Math.cos(angle) * radius,
+    z: Math.sin(angle) * radius * 0.72,
+  };
+}
+
+/* Sprites always face the camera, so their meaningful overlap is in screen
+   space (world X/Y), even when their Z positions differ. Two relaxed passes
+   are enough for the small item cap and avoid the rigid, jittery look of a
+   full physics engine. */
+function spreadAchievementCollisions(items) {
+  for (let pass = 0; pass < ACHIEVEMENT_COLLISION_PASSES; pass++) {
+    for (let i = 0; i < items.length; i++) {
+      const a = items[i];
+      for (let j = i + 1; j < items.length; j++) {
+        const b = items[j];
+        let dx = b.pos.x - a.pos.x;
+        let dy = b.pos.y - a.pos.y;
+        let distSq = dx * dx + dy * dy;
+        const minDist = a.collisionRadius + b.collisionRadius;
+        if (distSq >= minDist * minDist) continue;
+
+        // Exact overlaps need a stable direction; using the pair indexes keeps
+        // the result deterministic instead of adding per-frame random jitter.
+        if (distSq < 0.000001) {
+          const angle = (i * 17 + j * 31) * GOLDEN_ANGLE;
+          dx = Math.cos(angle) * 0.001;
+          dy = Math.sin(angle) * 0.001;
+          distSq = 0.000001;
+        }
+
+        const dist = Math.sqrt(distSq);
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const overlap = minDist - dist;
+        const invMassSum = a.invMass + b.invMass;
+        const correction = overlap * 0.58;
+
+        a.pos.x -= nx * correction * (a.invMass / invMassSum);
+        a.pos.y -= ny * correction * (a.invMass / invMassSum);
+        b.pos.x += nx * correction * (b.invMass / invMassSum);
+        b.pos.y += ny * correction * (b.invMass / invMassSum);
+
+        // Remove closing velocity with very low restitution. This lets badges
+        // softly pile up instead of bouncing indefinitely after every shake.
+        const closingSpeed = (b.vel.x - a.vel.x) * nx + (b.vel.y - a.vel.y) * ny;
+        if (closingSpeed < 0) {
+          const impulse = (-closingSpeed * 1.08) / invMassSum;
+          a.vel.x -= nx * impulse * a.invMass;
+          a.vel.y -= ny * impulse * a.invMass;
+          b.vel.x += nx * impulse * b.invMass;
+          b.vel.y += ny * impulse * b.invMass;
+        }
+      }
+    }
+  }
+}
+
 /* Certs and stamps tumbling inside the globe */
 function Achievements({ world, achievements }) {
   const [items, setItems] = useState(null);
@@ -45,7 +113,10 @@ function Achievements({ world, achievements }) {
       if (cancelled) return;
       const ok = loaded.filter(Boolean);
       const sizeScale = Math.min(1, Math.sqrt(14 / Math.max(ok.length, 1)));
-      const built = ok.map((a) => {
+      const typePriority = { rank: 0, agentblazer: 1, certification: 2, stamp: 3 };
+      const spreadOrder = [...ok].sort((a, b) => (typePriority[a.type] ?? 99) - (typePriority[b.type] ?? 99));
+      const spreadIndex = new Map(spreadOrder.map((item, index) => [item, index]));
+      const built = ok.map((a, index) => {
         const size = (a.type === 'rank' ? 0.72 : a.type === 'certification' ? 0.62 : 0.55) * sizeScale;
         const img = a.tex.image;
         const aspect = Math.min(2, Math.max(0.5, img ? img.width / img.height : 1));
@@ -55,6 +126,7 @@ function Achievements({ world, achievements }) {
         const typeWeight =
           a.type === 'rank' ? 1.25 : a.type === 'certification' ? 1 : a.type === 'agentblazer' ? 0.85 : 0.7;
         const weight = typeWeight * (0.8 + Math.random() * 0.4);
+        const restTarget = makeRestTarget(spreadIndex.get(a) ?? index, ok.length);
         return {
           tex: a.tex,
           pos: randomPointInGlobe(GLOBE_RADIUS * 0.7),
@@ -66,6 +138,10 @@ function Achievements({ world, achievements }) {
           gravity: GRAVITY * weight,
           drag: DRAG / weight,
           kick: 1 / weight,
+          invMass: 1 / weight,
+          collisionRadius: Math.max(size, size * aspect) * 0.38,
+          restX: restTarget.x,
+          restZ: restTarget.z,
         };
       });
       world.current.items = built;
@@ -117,9 +193,42 @@ function Achievements({ world, achievements }) {
       if (it.pos.y < floorY) {
         it.pos.y = floorY;
         if (it.vel.y < 0) it.vel.y *= -BOUNCE * 0.5;
-        it.vel.x *= 0.9;
-        it.vel.z *= 0.9;
+        it.vel.x *= 0.88;
+        it.vel.z *= 0.88;
+
+        // A gentle fan-out across the mound prevents every item from draining
+        // into the same central heap. Shakes still overpower this attraction.
+        it.vel.x += (it.restX - it.pos.x) * 1.8 * d;
+        it.vel.z += (it.restZ - it.pos.z) * 1.8 * d;
       }
+    });
+
+    spreadAchievementCollisions(items);
+
+    items.forEach((it, i) => {
+      // Collision correction can nudge the lower badge into the snow or an
+      // outer badge past the glass. Re-apply the visible resting bounds once.
+      const floorY = moundSurfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
+      if (it.pos.y < floorY) it.pos.y = floorY;
+
+      tmp.copy(it.pos).sub(CENTER);
+      const maxR = GLOBE_RADIUS - it.r - 0.05;
+      if (tmp.y > -0.35) {
+        if (tmp.length() > maxR) {
+          tmp.normalize();
+          it.pos.copy(CENTER).addScaledVector(tmp, maxR);
+        }
+      } else {
+        const rhMax = Math.sqrt(Math.max(maxR * maxR - tmp.y * tmp.y, 0.04));
+        const rh = Math.sqrt(it.pos.x * it.pos.x + it.pos.z * it.pos.z);
+        if (rh > rhMax) {
+          const scale = rhMax / rh;
+          it.pos.x *= scale;
+          it.pos.z *= scale;
+        }
+      }
+      const correctedFloorY = moundSurfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
+      if (it.pos.y < correctedFloorY) it.pos.y = correctedFloorY;
 
       const sprite = spritesRef.current[i];
       if (sprite) {
