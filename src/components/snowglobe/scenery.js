@@ -12,6 +12,29 @@ import {
   loadFont,
 } from './textures';
 
+const GLASS_RIM_VERTEX = /* glsl */ `
+  varying vec3 vNormal;
+  varying vec3 vViewDirection;
+  void main() {
+    vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+    vNormal = normalize(normalMatrix * normal);
+    vViewDirection = normalize(-viewPosition.xyz);
+    gl_Position = projectionMatrix * viewPosition;
+  }
+`;
+
+const GLASS_RIM_FRAGMENT = /* glsl */ `
+  uniform vec3 uColor;
+  varying vec3 vNormal;
+  varying vec3 vViewDirection;
+  void main() {
+    float rim = pow(1.0 - clamp(dot(vNormal, vViewDirection), 0.0, 1.0), 2.35);
+    gl_FragColor = vec4(uColor, rim * 0.2);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+  }
+`;
+
 /* Single displaced surface: the squashed sphere gets smooth drift bumps baked
    into its vertices, so the snow reads as one wind-blown mound instead of
    separate blobs. Displacement uses the same snowBump() as the physics. */
@@ -59,6 +82,7 @@ function SnowMound() {
 function GlobeShell() {
   const highlightTex = useMemo(() => makeHighlightTexture(), []);
   const interiorGlowTex = useMemo(() => makeInteriorGlowTexture(), []);
+  const rimUniforms = useMemo(() => ({ uColor: { value: new THREE.Color('#d8efff') } }), []);
 
   useEffect(
     () => () => {
@@ -79,16 +103,22 @@ function GlobeShell() {
         <meshPhongMaterial
           color='#cfe8ff'
           transparent
-          opacity={0.08}
-          shininess={140}
+          opacity={0.035}
+          shininess={180}
           specular='#ffffff'
           depthWrite={false}
         />
       </mesh>
-      {/* bright rim */}
+      {/* Fresnel rim: clear through the center, reflective at glancing angles */}
       <mesh renderOrder={9}>
-        <sphereGeometry args={[GLOBE_RADIUS + 0.07, 64, 64]} />
-        <meshBasicMaterial color='#bfe0ff' transparent opacity={0.06} side={THREE.BackSide} depthWrite={false} />
+        <sphereGeometry args={[GLOBE_RADIUS + 0.055, 64, 64]} />
+        <shaderMaterial
+          uniforms={rimUniforms}
+          vertexShader={GLASS_RIM_VERTEX}
+          fragmentShader={GLASS_RIM_FRAGMENT}
+          transparent
+          depthWrite={false}
+        />
       </mesh>
       {/* elongated shine hugging the upper-left rim, tilted along the glass curve */}
       <sprite position={[-0.85, 1.05, 1.5]} scale={[1.0, 0.4, 1]} renderOrder={12}>
@@ -157,11 +187,11 @@ function Base({ username }) {
         <meshPhysicalMaterial
           map={woodTex}
           bumpMap={woodTex}
-          bumpScale={0.012}
-          roughness={0.48}
-          metalness={0.03}
-          clearcoat={0.1}
-          clearcoatRoughness={0.72}
+          bumpScale={0.018}
+          roughness={0.6}
+          metalness={0.015}
+          clearcoat={0.045}
+          clearcoatRoughness={0.82}
         />
       </mesh>
       {/* darker foot grounds the base and gives the tapered body more depth */}
