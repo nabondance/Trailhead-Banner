@@ -154,38 +154,68 @@ function makeInteriorGlowTexture() {
   return tex;
 }
 
-/* Subtle turned-walnut grain for the base. The low-contrast horizontal lines
-   follow the cylinder and add material richness without competing with the
-   engraved username. */
+/* Turned walnut for the base: broad ribbons establish the timber's figure,
+   fine growth lines follow the lathed cylinder, and a few quiet knots break
+   the procedural regularity without competing with the engraved username. */
 function makeWoodTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
   const base = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  base.addColorStop(0, '#75472f');
-  base.addColorStop(0.48, '#5b3424');
-  base.addColorStop(1, '#3b2018');
+  base.addColorStop(0, '#8b5433');
+  base.addColorStop(0.46, '#623721');
+  base.addColorStop(1, '#351b14');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let line = 0; line < 30; line++) {
-    const baseY = 6 + line * 8.5 + Math.sin(line * 2.17) * 2.5;
+  // Wide, low-contrast figure gives the wood depth from normal viewing size.
+  for (let band = 0; band < 8; band++) {
+    const baseY = 18 + band * 31 + Math.sin(band * 2.3) * 8;
+    ctx.beginPath();
+    for (let x = -20; x <= canvas.width + 20; x += 10) {
+      const y = baseY + Math.sin(x * 0.013 + band * 1.8) * 7 + Math.sin(x * 0.037 - band) * 2.2;
+      if (x === -20) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = band % 3 === 0 ? 'rgba(34,13,7,0.15)' : 'rgba(214,126,66,0.075)';
+    ctx.lineWidth = 7 + (band % 3) * 2;
+    ctx.stroke();
+  }
+
+  for (let line = 0; line < 42; line++) {
+    const baseY = 4 + line * 6.1 + Math.sin(line * 2.17) * 2.3;
     ctx.beginPath();
     for (let x = -10; x <= canvas.width + 10; x += 8) {
-      const y = baseY + Math.sin(x * 0.022 + line * 1.7) * 1.8 + Math.sin(x * 0.061 - line) * 0.7;
+      const y = baseY + Math.sin(x * 0.019 + line * 1.7) * 1.9 + Math.sin(x * 0.057 - line) * 0.65;
       if (x === -10) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = line % 3 === 0 ? 'rgba(25,10,5,0.18)' : 'rgba(240,173,99,0.065)';
-    ctx.lineWidth = line % 4 === 0 ? 1.6 : 0.8;
+    ctx.strokeStyle = line % 4 === 0 ? 'rgba(24,9,5,0.24)' : 'rgba(240,165,91,0.075)';
+    ctx.lineWidth = line % 5 === 0 ? 1.45 : 0.7;
     ctx.stroke();
   }
+
+  // Small elliptical knots with nested rings keep the surface recognizably
+  // organic while remaining subtle beneath the gold nameplate.
+  [
+    [92, 82, 17, 6],
+    [307, 173, 22, 7],
+    [454, 52, 13, 5],
+  ].forEach(([x, y, rx, ry], knot) => {
+    for (let ring = 3; ring >= 0; ring--) {
+      ctx.beginPath();
+      ctx.ellipse(x, y, rx + ring * 5, ry + ring * 1.8, Math.sin(knot * 1.7) * 0.12, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(29,10,5,${0.07 + (3 - ring) * 0.035})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  });
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.RepeatWrapping;
-  tex.repeat.set(1.35, 1);
+  tex.repeat.set(1.15, 1);
   return tex;
 }
 
