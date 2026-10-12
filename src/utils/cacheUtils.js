@@ -99,11 +99,12 @@ export const getImage = async (imageUrl, folder = 'images', options = {}) => {
       },
     });
     const imageBuffer = Buffer.from(response.data, 'binary');
-    const cacheWrite = uploadImage(imageBuffer, fileName, folder);
+    // Caching is best-effort: a failed write must not discard the downloaded image
+    const cacheWrite = uploadImage(imageBuffer, fileName, folder).catch((error) =>
+      console.error(`Failed to cache image ${imageUrl}:`, error.message)
+    );
     if (awaitCacheWrite) {
       await cacheWrite;
-    } else {
-      cacheWrite.catch((error) => console.error(`Failed to cache image ${imageUrl}:`, error.message));
     }
     cacheHit = false;
     return { buffer: imageBuffer, cacheHit };
