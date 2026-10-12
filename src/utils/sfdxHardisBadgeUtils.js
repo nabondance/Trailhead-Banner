@@ -2,8 +2,13 @@ import axios from 'axios';
 import { getImage } from './cacheUtils.js';
 import RedisCacheUtils from './redisCacheUtils.js';
 
-const SFDX_HARDIS_TRAINING_ORIGIN = 'https://sfdx-hardis-training.cloudity.com';
-const SFDX_HARDIS_BADGES_URL = `${SFDX_HARDIS_TRAINING_ORIGIN}/badges`;
+// The course is moving from its GitHub Pages host to its own domain. Both serve
+// the same records at the root of the host, and the first one that answers wins.
+const SFDX_HARDIS_TRAINING_ORIGINS = [
+  'https://sfdx-hardis-training.cloudity.com',
+  'https://sfdx-hardis-training.github.io',
+];
+const SFDX_HARDIS_BADGES_URL = `${SFDX_HARDIS_TRAINING_ORIGINS[0]}/badges`;
 const USERNAME_PATTERN = /^[a-z0-9._-]{1,60}$/i;
 const POSITIVE_CACHE_TTL_SECONDS = 600;
 const NEGATIVE_CACHE_TTL_SECONDS = 300;
@@ -16,7 +21,7 @@ function normalizeBannerImageUrl(value, level) {
     const url = new URL(value);
     const expectedPath = `/badges/img/banner-level-${level}.svg`;
     if (
-      url.origin !== SFDX_HARDIS_TRAINING_ORIGIN ||
+      !SFDX_HARDIS_TRAINING_ORIGINS.includes(url.origin) ||
       url.pathname !== expectedPath ||
       url.username ||
       url.password ||
@@ -36,13 +41,15 @@ function normalizeBannerImageUrl(value, level) {
  * Build the public badge-record URL for a Trailblazer username.
  *
  * @param {string} username
+ * @param {string} origin one of the trusted training origins
  * @returns {string|null}
  */
-function buildSfdxHardisBadgeUrl(username) {
+function buildSfdxHardisBadgeUrl(username, origin = SFDX_HARDIS_TRAINING_ORIGINS[0]) {
   const normalizedUsername = typeof username === 'string' ? username.trim().toLowerCase() : '';
   if (!USERNAME_PATTERN.test(normalizedUsername)) return null;
+  if (!SFDX_HARDIS_TRAINING_ORIGINS.includes(origin)) return null;
 
-  return `${SFDX_HARDIS_BADGES_URL}/${encodeURIComponent(normalizedUsername)}.json`;
+  return `${origin}/badges/${encodeURIComponent(normalizedUsername)}.json`;
 }
 
 /**
@@ -82,7 +89,7 @@ function normalizeSfdxHardisBadgeRecord(record, username) {
             checksTotal > 0 &&
             checksPassed === checksTotal &&
             badge?.issuer?.name === 'Cloudity' &&
-            badge?.issuer?.course === SFDX_HARDIS_TRAINING_ORIGIN &&
+            SFDX_HARDIS_TRAINING_ORIGINS.includes(badge?.issuer?.course) &&
             bannerImage !== null
           );
         })
@@ -132,8 +139,7 @@ function getHighestSfdxHardisBadge(record) {
 async function fetchSfdxHardisBadges(username, dependencies = {}) {
   const httpClient = dependencies.httpClient || axios;
   const cache = dependencies.cache || RedisCacheUtils;
-  const url = buildSfdxHardisBadgeUrl(username);
-  if (!url) return null;
+  if (!buildSfdxHardisBadgeUrl(username)) return null;
 
   const normalizedUsername = username.trim().toLowerCase();
   const cacheKey = `sfdx-hardis-badges:v2:${normalizedUsername}`;
@@ -147,12 +153,25 @@ async function fetchSfdxHardisBadges(username, dependencies = {}) {
   }
 
   try {
-    const response = await httpClient.get(url, {
-      timeout: 4000,
-      signal: dependencies.signal,
-      headers: { Accept: 'application/json' },
-      validateStatus: (status) => status === 200 || status === 404,
-    });
+    // A host that does not answer (no DNS record yet, outage) hands over to the
+    // next one. A 404 is an answer: the learner has no badge.
+    let response = null;
+    let lastError = null;
+    for (const origin of SFDX_HARDIS_TRAINING_ORIGINS) {
+      try {
+        response = await httpClient.get(buildSfdxHardisBadgeUrl(username, origin), {
+          timeout: 4000,
+          signal: dependencies.signal,
+          headers: { Accept: 'application/json' },
+          validateStatus: (status) => status === 200 || status === 404,
+        });
+        break;
+      } catch (error) {
+        lastError = error;
+        if (dependencies.signal?.aborted) break;
+      }
+    }
+    if (!response) throw lastError;
 
     if (response.status === 404) {
       cache

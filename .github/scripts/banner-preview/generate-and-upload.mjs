@@ -56,7 +56,7 @@ function assertSfdxHardisBadge(data, username, callLabel) {
   const highest = badges.reduce((current, badge) => (!current || badge.level > current.level ? badge : current), null);
   const trustedBannerImage =
     typeof highest?.bannerImage === 'string' &&
-    /^https:\/\/sfdx-hardis-training\.cloudity\.com\/badges\/img\/banner-level-\d+\.svg$/.test(
+    /^https:\/\/sfdx-hardis-training\.(cloudity\.com|github\.io)\/badges\/img\/banner-level-\d+\.svg$/.test(
       highest.bannerImage
     );
 
