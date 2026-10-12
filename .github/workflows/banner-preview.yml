@@ -17,9 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    # Read-only on purpose: pull requests from forks get no secrets and a
+    # read-only token. Blob upload and the PR comment are done by
+    # banner-preview-publish.yml from the artifact uploaded below.
     permissions:
       contents: read
-      pull-requests: write
 
     steps:
       - name: Checkout Code
@@ -70,20 +72,19 @@ jobs:
             sleep 2
           done
 
-      - name: Generate and upload banners
+      - name: Generate banners
         env:
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          RUN_ID: ${{ github.run_id }}
-        run: node .github/scripts/banner-preview/generate-and-upload.mjs
+          OUTPUT_DIR: /tmp/banner-preview
+        run: node .github/scripts/banner-preview/generate.mjs
 
-      - name: Post PR comment
+      - name: Upload banners artifact
         if: always()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          SHORT_SHA: ${{ github.event.pull_request.head.sha }}
-        run: node .github/scripts/banner-preview/post-comment.mjs
+        uses: actions/upload-artifact@v7
+        with:
+          name: banner-preview
+          path: /tmp/banner-preview
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Stop server
         if: always()

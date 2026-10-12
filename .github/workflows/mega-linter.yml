@@ -35,12 +35,11 @@ jobs:
     name: MegaLinter
     runs-on: ubuntu-latest
 
-    # Give the default GITHUB_TOKEN write permission to commit and push, comment
-    # issues, and post new Pull Requests; remove the ones you do not need
+    # Read-only on purpose: pull requests from forks only get a read-only
+    # token. APPLY_FIXES is off, and the PR comment is posted by
+    # mega-linter-comment.yml from the report artifact uploaded below.
     permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+      contents: read
 
     steps:
       # Git Checkout
@@ -91,6 +90,9 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # PR comment is posted by mega-linter-comment.yml instead
+          GITHUB_COMMENT_REPORTER: false
 
           # ApiReporter (Grafana)
           API_REPORTER: true

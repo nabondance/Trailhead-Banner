@@ -1,6 +1,5 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { put } from '@vercel/blob';
 
 let usernames, defaultOptions, configs;
 try {
@@ -12,17 +11,11 @@ try {
   process.exit(1);
 }
 
-const prNumber = process.env.PR_NUMBER;
-const runId = process.env.RUN_ID;
-
-if (!prNumber || !/^\d+$/.test(prNumber)) {
-  console.error(`ERROR: PR_NUMBER is missing or invalid: "${prNumber}"`);
-  process.exit(1);
-}
-if (!runId) {
-  console.error('ERROR: RUN_ID is missing');
-  process.exit(1);
-}
+// Banners and results are written here, then uploaded as a workflow artifact.
+// Publishing (blob upload + PR comment) happens in banner-preview-publish.yml,
+// which has access to secrets even for pull requests coming from forks.
+const outputDir = process.env.OUTPUT_DIR || '/tmp/banner-preview';
+mkdirSync(outputDir, { recursive: true });
 
 const results = [];
 let requiredCaseFailed = false;
@@ -120,22 +113,16 @@ for (const username of usernames) {
 
     const warnings = second.warnings || [];
 
-    // Upload the second (cached) banner image
+    // Save the second (cached) banner image
     if (typeof second.imageUrl !== 'string' || !second.imageUrl.startsWith('data:image/')) {
       throw new Error(`Unexpected imageUrl format: ${String(second.imageUrl).slice(0, 80)}`);
     }
     const base64 = second.imageUrl.replace(/^data:image\/[^;]+;base64,/, '');
     const pngBuffer = Buffer.from(base64, 'base64');
-    const blobPath = `pr-previews/${prNumber}/${runId}/${username}.png`;
+    const file = `${username}.png`;
+    writeFileSync(join(outputDir, file), pngBuffer);
 
-    console.log(`  Uploading to blob: ${blobPath}`);
-    const blob = await put(blobPath, pngBuffer, {
-      access: 'public',
-      addRandomSuffix: false,
-      contentType: 'image/png',
-    });
-
-    console.log(`  OK → ${blob.url}`);
+    console.log(`  OK → ${file}`);
     results.push({
       username,
       status: 200,
@@ -146,7 +133,7 @@ for (const username of usernames) {
       cached_graphql_ms: secondGraphqlMs,
       cache_hits: secondCacheHits,
       cache_total: secondTotalQueries,
-      blobUrl: blob.url,
+      file,
     });
   } catch (err) {
     console.log(`  EXCEPTION: ${err.message}`);
@@ -158,8 +145,9 @@ for (const username of usernames) {
   await new Promise((r) => setTimeout(r, 1000));
 }
 
-writeFileSync('/tmp/banner-results.json', JSON.stringify(results, null, 2));
-console.log('Results written to /tmp/banner-results.json');
+const resultsPath = join(outputDir, 'results.json');
+writeFileSync(resultsPath, JSON.stringify(results, null, 2));
+console.log(`Results written to ${resultsPath}`);
 
 if (requiredCaseFailed) {
   console.error('ERROR: A required banner-preview integration case failed');

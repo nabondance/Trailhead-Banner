@@ -1,7 +1,10 @@
 ---
 name: Labeler
+# pull_request_target so that pull requests from forks get a token allowed to
+# set labels. Safe here: the job never checks out or runs pull request code,
+# and labeler reads .github/labeler.yml from the base branch.
 on: # yamllint disable-line
-  - pull_request
+  - pull_request_target
 
 jobs:
   triage:
