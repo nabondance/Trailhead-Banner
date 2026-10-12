@@ -77,14 +77,16 @@ if (!Array.isArray(rawResults)) {
   process.exit(1);
 }
 
-// Keep artifact text from breaking out of the comment's table cells / quotes
+// Keep artifact text from breaking out of the comment's table cells / quotes,
+// and from adding links, images, HTML or @mentions to a comment posted by the bot
 const text = (value) =>
   String(value ?? '')
-    .replace(/[\r\n|`<>]/g, ' ')
+    .replace(/[\r\n|`<>[\]()!@]/g, ' ')
     .slice(0, 300);
 const num = (value) => (Number.isFinite(value) ? value : null);
 
 const results = [];
+let uploadFailed = false;
 for (const raw of rawResults) {
   const username = raw?.username;
   // Usernames come from the trusted config, so they are safe in paths and markdown
@@ -99,18 +101,27 @@ for (const raw of rawResults) {
     continue;
   }
 
+  let pngBuffer;
   try {
     const filePath = join(artifactDir, `${username}.png`);
     if (!existsSync(filePath) || !lstatSync(filePath).isFile()) throw new Error('banner image is missing');
     if (lstatSync(filePath).size > MAX_PNG_BYTES) throw new Error('banner image is too large');
-    const pngBuffer = readFileSync(filePath);
+    pngBuffer = readFileSync(filePath);
     if (!pngBuffer.subarray(0, PNG_MAGIC.length).equals(PNG_MAGIC)) throw new Error('banner image is not a PNG');
+  } catch (err) {
+    console.log(`  Invalid artifact for ${username}: ${err.message}`);
+    results.push({ username, status: null, error: text(err.message) });
+    continue;
+  }
 
+  try {
     const blobPath = `pr-previews/${prNumber}/${runId}/${username}.png`;
     console.log(`Uploading to blob: ${blobPath}`);
     const blob = await put(blobPath, pngBuffer, {
       access: 'public',
       addRandomSuffix: false,
+      // Same path when this workflow or the preview run is re-run
+      allowOverwrite: true,
       contentType: 'image/png',
     });
     console.log(`  OK → ${blob.url}`);
@@ -126,8 +137,10 @@ for (const raw of rawResults) {
       blobUrl: blob.url,
     });
   } catch (err) {
-    console.log(`  EXCEPTION for ${username}: ${err.message}`);
-    results.push({ username, status: null, error: text(err.message) });
+    // Details stay in the workflow log, not in the public comment
+    console.error(`  ERROR: Upload failed for ${username}: ${err.message}`);
+    results.push({ username, status: null, error: 'Upload to blob storage failed, see the publish workflow logs' });
+    uploadFailed = true;
   }
 }
 
@@ -183,4 +196,11 @@ try {
 } catch (err) {
   console.error(`ERROR: ${err.message}`);
   process.exit(1);
+}
+
+// Fail after posting the comment: this workflow is not a PR check, a green run
+// with no banner published would go unnoticed
+if (uploadFailed) {
+  console.error('ERROR: At least one banner could not be uploaded');
+  process.exitCode = 1;
 }

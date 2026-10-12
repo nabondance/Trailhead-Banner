@@ -1,6 +1,8 @@
 // GitHub pull request helpers for workflows triggered by `workflow_run`.
 
 const API = 'https://api.github.com';
+const BOT_LOGIN = 'github-actions[bot]';
+const MAX_COMMENT_PAGES = 10;
 
 function headers(token, extra = {}) {
   return { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', ...extra };
@@ -40,16 +42,24 @@ export async function findPullRequestNumber({ repo, token, headOwner, headBranch
 /**
  * Post `body` as a PR comment, or update the existing comment containing
  * `sentinel`. `body` must include `sentinel`.
+ *
+ * Only comments posted by the workflow bot are updated: anyone can write the
+ * sentinel in a comment of their own.
  */
 export async function upsertComment({ repo, token, prNumber, sentinel, body }) {
-  const comments = await request(
-    `${API}/repos/${repo}/issues/${prNumber}/comments?per_page=100`,
-    { headers: headers(token) },
-    'list comments'
-  );
-  if (!Array.isArray(comments)) throw new Error('Unexpected response shape when listing comments');
+  let existing;
+  for (let page = 1; page <= MAX_COMMENT_PAGES && !existing; page++) {
+    const comments = await request(
+      `${API}/repos/${repo}/issues/${prNumber}/comments?per_page=100&page=${page}`,
+      { headers: headers(token) },
+      'list comments'
+    );
+    if (!Array.isArray(comments)) throw new Error('Unexpected response shape when listing comments');
 
-  const existing = comments.find((c) => c.body?.includes(sentinel));
+    existing = comments.find((c) => c.user?.login === BOT_LOGIN && c.body?.includes(sentinel));
+    if (comments.length < 100) break;
+  }
+
   const options = {
     headers: headers(token, { 'Content-Type': 'application/json' }),
     body: JSON.stringify({ body }),

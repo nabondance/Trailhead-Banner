@@ -40,7 +40,13 @@ if (lstatSync(reportPath).size > MAX_REPORT_BYTES) {
   process.exit(1);
 }
 
-let report = readFileSync(reportPath, 'utf8').replaceAll(SENTINEL, '').trim();
+// Drop HTML comments (sentinels of this or other bot comments) and defuse
+// @mentions, so a hand-written report cannot hijack a comment or ping people
+let report = readFileSync(reportPath, 'utf8')
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replaceAll('<!--', '&lt;!--')
+  .replace(/@(?=\w)/g, '@\u200b')
+  .trim();
 if (report.length > MAX_REPORT_CHARS) {
   report = `${report.slice(0, MAX_REPORT_CHARS)}\n\n_Report truncated, see the workflow run for the full version._`;
 }

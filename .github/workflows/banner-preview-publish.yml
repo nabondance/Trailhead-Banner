@@ -49,9 +49,6 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install Dependencies
-        run: pnpm install
-
       # Missing when the preview run failed before generating banners
       - name: Download banners
         id: download
@@ -62,6 +59,10 @@ jobs:
           path: ${{ runner.temp }}/banner-preview
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Dependencies
+        if: steps.download.outcome == 'success'
+        run: pnpm install
 
       - name: Upload banners and post PR comment
         if: steps.download.outcome == 'success'
