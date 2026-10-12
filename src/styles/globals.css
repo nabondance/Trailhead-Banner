@@ -1219,6 +1219,12 @@ legend {
   transform: scale(3);
 }
 
+.theme-switch-container button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 .theme-icon-sun {
   color: #ffea00;
 }
