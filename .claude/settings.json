@@ -35,5 +35,16 @@
       "Bash(curl -s http://localhost:3000:*)",
       "Bash(curl -s -X POST http://localhost:3000:*)"
     ]
+  },
+  "extraKnownMarketplaces": {
+    "megalinter": {
+      "source": {
+        "source": "github",
+        "repo": "oxsecurity/megalinter"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "megalinter@megalinter": true
   }
 }
