@@ -2,9 +2,8 @@ import axios from 'axios';
 import { getImage } from './cacheUtils.js';
 import RedisCacheUtils from './redisCacheUtils.js';
 
-const SFDX_HARDIS_TRAINING_ORIGIN = 'https://hardisgroupcom.github.io';
-const SFDX_HARDIS_TRAINING_PATH = '/sfdx-hardis-training';
-const SFDX_HARDIS_BADGES_URL = `${SFDX_HARDIS_TRAINING_ORIGIN}${SFDX_HARDIS_TRAINING_PATH}/badges`;
+const SFDX_HARDIS_TRAINING_ORIGIN = 'https://sfdx-hardis-training.cloudity.com';
+const SFDX_HARDIS_BADGES_URL = `${SFDX_HARDIS_TRAINING_ORIGIN}/badges`;
 const USERNAME_PATTERN = /^[a-z0-9._-]{1,60}$/i;
 const POSITIVE_CACHE_TTL_SECONDS = 600;
 const NEGATIVE_CACHE_TTL_SECONDS = 300;
@@ -15,7 +14,7 @@ function normalizeBannerImageUrl(value, level) {
 
   try {
     const url = new URL(value);
-    const expectedPath = `${SFDX_HARDIS_TRAINING_PATH}/badges/img/banner-level-${level}.svg`;
+    const expectedPath = `/badges/img/banner-level-${level}.svg`;
     if (
       url.origin !== SFDX_HARDIS_TRAINING_ORIGIN ||
       url.pathname !== expectedPath ||
@@ -83,7 +82,7 @@ function normalizeSfdxHardisBadgeRecord(record, username) {
             checksTotal > 0 &&
             checksPassed === checksTotal &&
             badge?.issuer?.name === 'Cloudity' &&
-            badge?.issuer?.course === `${SFDX_HARDIS_TRAINING_ORIGIN}${SFDX_HARDIS_TRAINING_PATH}` &&
+            badge?.issuer?.course === SFDX_HARDIS_TRAINING_ORIGIN &&
             bannerImage !== null
           );
         })
