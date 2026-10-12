@@ -56,6 +56,9 @@ if (!prNumber) {
 }
 console.log(`Publishing banner preview for PR #${prNumber}`);
 
+// Fork runs get no secrets: the preview server had no Redis or Blob credentials
+const isFork = headOwner.toLowerCase() !== repo.split('/')[0].toLowerCase();
+
 let allowedUsernames;
 try {
   const { usernames } = JSON.parse(readFileSync(new URL('../../banner-preview.config.json', import.meta.url)));
@@ -146,7 +149,14 @@ for (const raw of rawResults) {
 
 const successCount = results.filter((r) => r.status === 200).length;
 const errorCount = results.length - successCount;
-const statusIcon = errorCount === 0 ? '✅' : errorCount === results.length ? '❌' : '⚠️';
+
+// The 2nd call repeats the 1st one, so every GraphQL query should be served from Redis
+const hasCacheMiss = (r) => r.cache_hits != null && r.cache_total != null && r.cache_hits < r.cache_total;
+const cacheMissCount = results.filter((r) => r.status === 200 && hasCacheMiss(r)).length;
+// Expected on forks, a real problem otherwise
+const cacheFailed = cacheMissCount > 0 && !isFork;
+
+const statusIcon = errorCount === results.length ? '❌' : errorCount > 0 || cacheFailed ? '⚠️' : '✅';
 
 // Summary table
 const tableRows = results.map((r) => {
@@ -154,7 +164,8 @@ const tableRows = results.map((r) => {
     const warnText = r.warnings.length > 0 ? `⚠️ ${r.warnings.length}` : '✅ 0';
     const t1 = r.timings_ms != null ? `${r.timings_ms}ms` : '-';
     const t2 = r.cached_timings_ms != null ? `${r.cached_timings_ms}ms` : '-';
-    const hits = r.cache_hits != null && r.cache_total != null ? `${r.cache_hits}/${r.cache_total}` : '-';
+    const hitsIcon = hasCacheMiss(r) ? (isFork ? 'ℹ️ ' : '⚠️ ') : '';
+    const hits = r.cache_hits != null && r.cache_total != null ? `${hitsIcon}${r.cache_hits}/${r.cache_total}` : '-';
     return `| \`${r.username}\` | ✅ OK | ${t1} | ${t2} | ${hits} | ${warnText} |`;
   }
   return `| \`${r.username}\` | ❌ ${r.status ?? 'ERR'} | - | - | - | - |`;
@@ -182,6 +193,12 @@ Commit \`${sha}\` · [Workflow run](${runUrl}) · ${successCount}/${results.leng
 |---|---|---|---|---|---|
 ${tableRows.join('\n')}
 `;
+
+if (cacheMissCount > 0) {
+  body += isFork
+    ? `\n> [!NOTE]\n> This pull request comes from a fork, so the preview ran without the Redis and Blob credentials. Missing cache hits and slower calls are expected here and are not caused by the changes.\n`
+    : `\n> [!WARNING]\n> ${cacheMissCount}/${successCount} banners were not fully served from the Redis cache on the 2nd call. Check the cache credentials and the changes touching the GraphQL cache.\n`;
+}
 
 if (imageSections.length > 0) {
   body += `\n---\n\n${imageSections.join('\n\n---\n\n')}\n`;
