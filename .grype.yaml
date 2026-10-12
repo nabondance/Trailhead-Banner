@@ -34,4 +34,6 @@ ignore:
   - package:
       name: brace-expansion # glob/minimatch in tooling
   - package:
+      name: braces # micromatch via eslint-config-next → fast-glob (lint only)
+  - package:
       name: '@babel/core' # build-time transpilation
