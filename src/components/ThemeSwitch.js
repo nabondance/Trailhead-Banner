@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import '@theme-toggles/react/css/Classic.css';
+import '@theme-toggles/react/styles/classic.css';
 import { Classic } from '@theme-toggles/react';
 
 const ThemeSwitch = () => {
@@ -26,7 +26,7 @@ const ThemeSwitch = () => {
       <Classic
         duration={750}
         toggled={theme === 'dark'}
-        onToggle={toggleTheme}
+        onClick={toggleTheme}
         className={theme === 'dark' ? 'theme-icon-moon' : 'theme-icon-sun'}
       />
     </div>
