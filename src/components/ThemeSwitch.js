@@ -7,7 +7,8 @@ import { Classic } from '@theme-toggles/react';
 
 const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   useEffect(() => {
     setMounted(true);
@@ -18,16 +19,16 @@ const ThemeSwitch = () => {
   }
 
   const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
+    setTheme(isDark ? 'light' : 'dark');
   };
 
   return (
     <div className='theme-switch-container'>
       <Classic
         duration={750}
-        toggled={theme === 'dark'}
+        toggled={isDark}
         onClick={toggleTheme}
-        className={theme === 'dark' ? 'theme-icon-moon' : 'theme-icon-sun'}
+        className={isDark ? 'theme-icon-moon' : 'theme-icon-sun'}
       />
     </div>
   );

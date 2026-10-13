@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes';
 
 const TrailheadBannerFooter = () => {
   const [buttonSize, setButtonSize] = useState('large');
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const handleResize = () => {
@@ -24,7 +24,7 @@ const TrailheadBannerFooter = () => {
       <div className='footer-buttons'>
         <GitHubButton
           href='https://github.com/nabondance/trailhead-banner'
-          data-color-scheme={theme === 'dark' ? 'dark_dimmed' : 'light'}
+          data-color-scheme={resolvedTheme === 'dark' ? 'dark_dimmed' : 'light'}
           data-icon='octicon-star'
           data-size={buttonSize}
           data-show-count='true'
@@ -35,7 +35,7 @@ const TrailheadBannerFooter = () => {
         </GitHubButton>{' '}
         <GitHubButton
           href='https://github.com/nabondance'
-          data-color-scheme={theme === 'dark' ? 'dark_dimmed' : 'light'}
+          data-color-scheme={resolvedTheme === 'dark' ? 'dark_dimmed' : 'light'}
           data-size={buttonSize}
           data-show-count='true'
           aria-label='Follow @nabondance on GitHub'
