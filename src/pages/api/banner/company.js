@@ -152,7 +152,8 @@ export default async function handler(req, res) {
 
     // Analytics (non-blocking). mvp_count is null when the MVP query was
     // skipped (see computeQueryNeeds) — 0 would mean "no MVPs", not "unknown".
-    const mvpFetched = computeQueryNeeds(options).mvp;
+    const queryNeeds = computeQueryNeeds(options);
+    const mvpFetched = queryNeeds.mvp;
     SupabaseUtils.updateCompanyBannerCounter({
       team_hash: teamHash,
       processing_time: allTimings.total_ms,
@@ -168,6 +169,8 @@ export default async function handler(req, res) {
       ranger_count: aggregated.counters.ranger,
       cta_count: aggregated.counters.cta,
       agentblazer: aggregated.agentblazer,
+      // null when the badges were not fetched (display off, no CSV)
+      sfdx_hardis: queryNeeds.sfdxHardis ? aggregated.sfdxHardis : null,
       options: sanitizeOptionsForLogging(options),
       csv_requested: !!options.generateCsv,
       timings: allTimings,

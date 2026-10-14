@@ -2,7 +2,7 @@
   "usernames": ["nabondance", "anna", "stevemo", "gauravkheterpal", "babup", "nvuillamy", "mrousseaux"],
 
   "companyBanner": {
-    "usernames": ["nabondance", "mrousseaux", "fparisi", "ajaouen"],
+    "usernames": ["nabondance", "mrousseaux", "fparisi", "ajaouen", "nvuillamy"],
     "options": {
       "_description": "Exact company page defaults — library background index 5, people+certification counters, CSV generation",
       "backgroundColor": "#5badd6",
@@ -16,6 +16,7 @@
       "badgeLabelColor": "#555555",
       "displayAgentblazerIcons": true,
       "agentblazerRankDisplay": "current",
+      "displaySfdxHardisBadges": true,
       "displaySalesforceCertifications": true,
       "displayAccreditedProfessionalCertifications": true,
       "includeExpiredCertifications": true,

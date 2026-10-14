@@ -3,13 +3,14 @@ import crypto from 'crypto';
 import { Background, Counters, Certifications, Superbadges, Watermark } from '../components/index.js';
 import * as CompanyLogo from '../components/companyLogo.js';
 import * as CompanyAgentblazer from '../components/companyAgentblazer.js';
+import * as CompanySfdxHardisBadge from '../components/companySfdxHardisBadge.js';
 
 /**
  * Company Banner Renderer
  * Generates the company Trailhead banner (1128 × 191px — LinkedIn company page header size)
  *
  * Top bar layout (left → right):
- *   [Company Logo] [Counters] [Agentblazer icons (dynamic)] [Superbadges]
+ *   [Company Logo] [Counters] [Agentblazer icons (dynamic)] [sfdx-hardis badges (dynamic)] [Superbadges]
  *
  * Bottom area: Certification grid with optional ×N count badges
  */
@@ -89,16 +90,19 @@ async function generateCompanyBanner(aggregated, options = {}) {
   const superbadgesData = buildSuperbadgeData(aggregated.superbadgesData, options);
 
   const certifYPosition = CERT_TOP_Y; // where the cert grid starts (= logo slot bottom)
-  const [backgroundPrep, companyLogoPrep, companyAgentblazerPrep, watermarkPrep] = await Promise.all([
-    Background.prepareBackground(options),
-    CompanyLogo.prepareCompanyLogo(options, certifYPosition, LOGO_SLOT_WIDTH),
-    CompanyAgentblazer.prepareCompanyAgentblazer(aggregated.agentblazer, options, AGENTBLAZER_LOGO_HEIGHT),
-    Watermark.prepareWatermark(),
-  ]);
+  const [backgroundPrep, companyLogoPrep, companyAgentblazerPrep, companySfdxHardisPrep, watermarkPrep] =
+    await Promise.all([
+      Background.prepareBackground(options),
+      CompanyLogo.prepareCompanyLogo(options, certifYPosition, LOGO_SLOT_WIDTH),
+      CompanyAgentblazer.prepareCompanyAgentblazer(aggregated.agentblazer, options, AGENTBLAZER_LOGO_HEIGHT),
+      CompanySfdxHardisBadge.prepareCompanySfdxHardisBadge(aggregated.sfdxHardis, options, AGENTBLAZER_LOGO_HEIGHT),
+      Watermark.prepareWatermark(),
+    ]);
 
   timings.background_load_ms = backgroundPrep.timings?.load_ms;
   timings.company_logo_load_ms = companyLogoPrep.timings?.load_ms;
   timings.agentblazer_load_ms = companyAgentblazerPrep.timings?.load_ms;
+  timings.sfdx_hardis_badge_load_ms = companySfdxHardisPrep.timings?.load_ms;
 
   // Counters stack vertically; cap at MAX_COUNTERS and size the stack so it spans the
   // same vertical extent as the superbadge row (opt-in override, standard banner unaffected).
@@ -130,9 +134,14 @@ async function generateCompanyBanner(aggregated, options = {}) {
   timings.certifications_prep_ms = certificationsPrep.timings?.prep_ms;
   timings.certifications_count = certificationsPrep.counts.displayed;
 
-  // Superbadge layout: width is from agentblazer end to canvas right edge
+  // Top band: sfdx-hardis badges follow the agentblazer icons, superbadges take
+  // the rest up to the canvas right edge
   const agentblazerWidth = CompanyAgentblazer.getCompanyAgentblazerWidth(companyAgentblazerPrep);
-  const superbadgeStartX = AGENTBLAZER_START_X + agentblazerWidth + AGENTBLAZER_SUPERBADGE_GAP;
+  const agentblazerEndX = AGENTBLAZER_START_X + agentblazerWidth;
+  const sfdxHardisStartX = agentblazerWidth > 0 ? agentblazerEndX + AGENTBLAZER_SUPERBADGE_GAP : agentblazerEndX;
+  const sfdxHardisWidth = CompanySfdxHardisBadge.getCompanySfdxHardisBadgeWidth(companySfdxHardisPrep);
+  const programBadgesEndX = sfdxHardisWidth > 0 ? sfdxHardisStartX + sfdxHardisWidth : agentblazerEndX;
+  const superbadgeStartX = programBadgesEndX + AGENTBLAZER_SUPERBADGE_GAP;
   const superbadgeAvailableWidth = CANVAS_WIDTH - superbadgeStartX;
 
   const superbadgeLayout = {
@@ -167,6 +176,9 @@ async function generateCompanyBanner(aggregated, options = {}) {
   // 4. Agentblazer icons (after counters zone)
   await CompanyAgentblazer.renderCompanyAgentblazer(ctx, companyAgentblazerPrep, AGENTBLAZER_START_X, 5);
 
+  // 4b. sfdx-hardis training badge icons (after agentblazer zone)
+  await CompanySfdxHardisBadge.renderCompanySfdxHardisBadge(ctx, companySfdxHardisPrep, sfdxHardisStartX, 5);
+
   // 5. Certifications (bottom area)
   const certificationsRenderTiming = await Certifications.renderCertifications(
     ctx,
@@ -194,6 +206,7 @@ async function generateCompanyBanner(aggregated, options = {}) {
   warnings.push(...Certifications.getCertificationsWarnings(certificationsPrep));
   warnings.push(...Superbadges.getSuperbadgesWarnings(superbadgesPrep));
   warnings.push(...CompanyAgentblazer.getCompanyAgentblazerWarnings(companyAgentblazerPrep));
+  warnings.push(...CompanySfdxHardisBadge.getCompanySfdxHardisBadgeWarnings(companySfdxHardisPrep));
   warnings.push(...Watermark.getWatermarkWarnings(watermarkPrep));
 
   const encodeStart = Date.now();

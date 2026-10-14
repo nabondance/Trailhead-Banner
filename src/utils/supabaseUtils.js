@@ -347,6 +347,7 @@ class SupabaseUtils {
             th_count_ranger: data.ranger_count,
             th_count_cta: data.cta_count,
             thb_agentblazer: data.agentblazer,
+            thb_sfdx_hardis: data.sfdx_hardis,
             thb_options: data.options,
             thb_csv_requested: data.csv_requested,
             thb_timings: data.timings,

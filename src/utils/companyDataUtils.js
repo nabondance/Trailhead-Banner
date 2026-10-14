@@ -6,6 +6,9 @@ const CTA_CERT_TITLE = 'Salesforce Certified Technical Architect';
 // API numbering: Legend=3, Innovator=2, Champion=1 — Champion is the ENTRY level.
 const AGENTBLAZER_LEVELS = ['Legend', 'Innovator', 'Champion'];
 
+// sfdx-hardis training badge levels display order (highest first)
+const SFDX_HARDIS_LEVELS = [3, 2, 1];
+
 /**
  * Determine the agentblazer level for a user given their raw agentblazer data and display mode.
  * @param {Object} agentblazerData - Raw agentblazer data from GraphQL
@@ -90,11 +93,14 @@ export function aggregateCompanyData(usersData, options = {}) {
   const agentblazerCurrentLevels = []; // for CSV: current level per user
   const agentblazerAllTimeLevels = []; // for CSV: all-time high per user
 
+  // --- sfdx-hardis training badges (highest level per user) ---
+  const sfdxHardisCounts = { 3: 0, 2: 0, 1: 0 };
+
   // --- Per-user data for CSV ---
   const perUserData = [];
 
   for (const user of usersData) {
-    const { username, rankData, certificationsData, superbadgesData, mvpData, agentblazerData } = user;
+    const { username, rankData, certificationsData, superbadgesData, mvpData, agentblazerData, sfdxHardisLevel } = user;
 
     // Badges
     totalBadges += rankData?.earnedBadgesCount || 0;
@@ -186,6 +192,11 @@ export function aggregateCompanyData(usersData, options = {}) {
       agentblazerCounts[levelForBanner]++;
     }
 
+    // sfdx-hardis — the chunked flow sends user data back from the client, so
+    // only trust a known level
+    const userSfdxHardisLevel = SFDX_HARDIS_LEVELS.includes(sfdxHardisLevel) ? sfdxHardisLevel : null;
+    if (userSfdxHardisLevel) sfdxHardisCounts[userSfdxHardisLevel]++;
+
     perUserData.push({
       username,
       rank: rankTitle,
@@ -198,6 +209,7 @@ export function aggregateCompanyData(usersData, options = {}) {
       mvp: isMvp,
       agentblazer_current: currentLevel || 'none',
       agentblazer_alltime_high: allTimeHighLevel || 'none',
+      sfdx_hardis_level: userSfdxHardisLevel || 'none',
       cta: hasCta,
       certs: certs.filter((c) => certPassesTypeFilter(c, options)),
     });
@@ -260,6 +272,9 @@ export function aggregateCompanyData(usersData, options = {}) {
     // For companyAgentblazer component
     agentblazer: agentblazerCounts,
 
+    // For companySfdxHardisBadge component: { 3: N, 2: N, 1: N }
+    sfdxHardis: sfdxHardisCounts,
+
     // For superbadges component
     superbadgesData: {
       all: allSuperbadges,
@@ -283,4 +298,4 @@ export function aggregateCompanyData(usersData, options = {}) {
   };
 }
 
-export { CTA_CERT_TITLE, AGENTBLAZER_LEVELS };
+export { CTA_CERT_TITLE, AGENTBLAZER_LEVELS, SFDX_HARDIS_LEVELS };

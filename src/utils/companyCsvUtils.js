@@ -78,7 +78,7 @@ function buildRow(values) {
  * Columns:
  *   username, status, rank, badges, superbadges,
  *   certifications_total, certifications_active, certifications_expired, certifications_retired,
- *   mvp, agentblazer_current, agentblazer_alltime_high, cta,
+ *   mvp, agentblazer_current, agentblazer_alltime_high, sfdx_hardis_level, cta,
  *   [one column per unique cert with [SF]/[AP] prefix; cells: active|expired|retired|none]
  *
  * The CSV always exports the full truth: banner display options (e.g.
@@ -116,6 +116,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
     'mvp',
     'agentblazer_current',
     'agentblazer_alltime_high',
+    'sfdx_hardis_level',
     'cta',
   ];
   const allHeaders = [...fixedHeaders, ...certHeaders];
@@ -178,6 +179,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
       user.mvp ? 'true' : 'false',
       agentblazerCurrent,
       agentblazerAllTime,
+      user.sfdx_hardis_level || 'none',
       hasCta ? 'true' : 'false',
     ];
 
@@ -205,6 +207,7 @@ export function generateCompanyCsv(aggregated, failedUsers = []) {
     totalNumeric.certifications_expired,
     totalNumeric.certifications_retired,
     totalNumeric.mvp,
+    '',
     '',
     '',
     '',

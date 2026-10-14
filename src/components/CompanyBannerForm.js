@@ -82,6 +82,8 @@ const CompanyBannerForm = () => {
     // Agentblazer
     displayAgentblazerIcons: true,
     agentblazerRankDisplay: 'current',
+    // sfdx-hardis training badges
+    displaySfdxHardisBadges: true,
     // Certifications
     displaySalesforceCertifications: true,
     displayAccreditedProfessionalCertifications: true,
@@ -230,6 +232,7 @@ const CompanyBannerForm = () => {
       const fetchOptions = {
         generateCsv: bannerOptions.generateCsv,
         counterOrder,
+        displaySfdxHardisBadges: bannerOptions.displaySfdxHardisBadges,
       };
 
       // Phase 1: fetch Trailhead data in chunks with progress
@@ -489,6 +492,26 @@ const CompanyBannerForm = () => {
               )}
               <Tooltip id='company-agentblazer-mode-tooltip' place='top' delayShow={200} className='react-tooltip'>
                 Current: Active rank for this year. All Time High: Highest level ever reached across all years.
+              </Tooltip>
+              <label>
+                <input
+                  type='checkbox'
+                  checked={options.displaySfdxHardisBadges}
+                  onChange={(e) => setOptions({ ...options, displaySfdxHardisBadges: e.target.checked })}
+                />
+                <span className='option-label-text'>Show sfdx-hardis Training Badges</span>
+                <span
+                  className='option-info'
+                  data-tooltip-id='company-sfdx-hardis-tooltip'
+                  tabIndex='0'
+                  aria-label='More information'
+                >
+                  <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
+                </span>
+              </label>
+              <Tooltip id='company-sfdx-hardis-tooltip' place='top' delayShow={200} className='react-tooltip'>
+                Shows the verified sfdx-hardis by Cloudity training badge levels with the number of team members at each
+                level
               </Tooltip>
             </fieldset>
 

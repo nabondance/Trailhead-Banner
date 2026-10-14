@@ -1,5 +1,6 @@
 import { fetchUserData } from '../banner/api/shared.js';
 import { QUERY_MAP } from '../banner/api/queryBuilder.js';
+import { fetchSfdxHardisBadges, getHighestSfdxHardisBadge } from './sfdxHardisBadgeUtils.js';
 
 // Trailhead's APIs rate-limit per IP by request count (~200/min observed).
 // With the combined profile query a user costs 1-2 requests, so 10 concurrent
@@ -53,15 +54,18 @@ async function waitForCooldown() {
  * always fetched — it's a single request and one cache entry per user, so
  * option changes never force a refetch. Only MVP is a separate request (it
  * lives on the community API), needed for the mvp counter or the CSV export.
+ * The sfdx-hardis training badges come from a separate public JSON document,
+ * needed for the badge icons or the CSV export.
  *
- * @param {Object} options - Banner options (generateCsv, counterOrder)
- * @returns {{mvp: boolean}}
+ * @param {Object} options - Banner options (generateCsv, counterOrder, displaySfdxHardisBadges)
+ * @returns {{mvp: boolean, sfdxHardis: boolean}}
  */
 export function computeQueryNeeds(options = {}) {
   const csv = !!options.generateCsv;
   const counters = Array.isArray(options.counterOrder) ? options.counterOrder : [];
   return {
     mvp: csv || counters.includes('mvp'),
+    sfdxHardis: csv || options.displaySfdxHardisBadges !== false,
   };
 }
 
@@ -109,7 +113,7 @@ async function fetchSingleUser(username, needs) {
   for (let attempt = 0; ; attempt++) {
     try {
       await waitForCooldown();
-      return await fetchSingleUserOnce(queries, username);
+      return await fetchSingleUserOnce(queries, username, needs);
     } catch (error) {
       if (isRateLimitError(error) && attempt < RATE_LIMIT_RETRIES) {
         extendCooldown(attempt);
@@ -124,8 +128,13 @@ async function fetchSingleUser(username, needs) {
   }
 }
 
-async function fetchSingleUserOnce(queries, username) {
-  const { responseMap } = await fetchUserData(queries, username, { ttlSeconds: COMPANY_CACHE_TTL_SECONDS });
+async function fetchSingleUserOnce(queries, username, needs) {
+  // The badge read is fail-open (null on any error) and Redis-cached, so it
+  // never fails the user and is cheap to repeat on rate-limit retries
+  const [{ responseMap }, sfdxHardisBadgesData] = await Promise.all([
+    fetchUserData(queries, username, { ttlSeconds: COMPANY_CACHE_TTL_SECONDS }),
+    needs.sfdxHardis ? fetchSfdxHardisBadges(username) : Promise.resolve(null),
+  ]);
 
   // Trailhead may rate-limit with a 200 + GraphQL error body; surface it as a
   // retryable rate-limit error instead of misreading the empty profile as not_found
@@ -167,6 +176,8 @@ async function fetchSingleUserOnce(queries, username) {
       mvpData: responseMap.GET_MVP_STATUS?.data?.data?.profileData || {},
       // aggregateCompanyData reads agentblazerData.learnerStatusLevels
       agentblazerData: rankData,
+      // Highest verified sfdx-hardis training badge level (1-3), null when none
+      sfdxHardisLevel: getHighestSfdxHardisBadge(sfdxHardisBadgesData)?.level ?? null,
     },
   };
 }
