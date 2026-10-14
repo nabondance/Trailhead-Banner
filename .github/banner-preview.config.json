@@ -2,7 +2,19 @@
   "usernames": ["nabondance", "anna", "stevemo", "gauravkheterpal", "babup", "nvuillamy", "mrousseaux"],
 
   "companyBanner": {
-    "usernames": ["nabondance", "mrousseaux", "fparisi", "ajaouen", "nvuillamy"],
+    "usernames": [
+      "nabondance",
+      "mrousseaux",
+      "fparisi",
+      "ajaouen",
+      "nvuillamy",
+      "omulot1",
+      "selmack",
+      "gbshahaq",
+      "aioana",
+      "asemery",
+      "athizy"
+    ],
     "options": {
       "_description": "Exact company page defaults — library background index 5, people+certification counters, CSV generation",
       "backgroundColor": "#5badd6",
