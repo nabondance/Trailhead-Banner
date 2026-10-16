@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Null when env vars are missing (e.g. CI builds): this module is also evaluated during server prerender
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -15,6 +16,7 @@ const AnnouncementBanner = () => {
   };
 
   const fetchAnnouncement = async () => {
+    if (!supabase) return;
     try {
       const currentEnv = getEnvironment();
 
@@ -39,6 +41,8 @@ const AnnouncementBanner = () => {
   };
 
   useEffect(() => {
+    if (!supabase) return;
+
     // Fetch initial announcements
     fetchAnnouncement();
 
