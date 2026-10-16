@@ -358,14 +358,14 @@ main {
   }
 }
 
-.trailhead-banner-header h1 {
+.trailhead-banner-header .site-title {
   margin: 0;
   font-size: 3em;
   font-weight: bold;
   color: var(--text-header);
 }
 
-.trailhead-banner-header h2 {
+.trailhead-banner-header .site-tagline {
   margin: 0;
   font-size: 1.5em;
   font-weight: 500;
@@ -387,6 +387,24 @@ main {
   display: flex;
   flex-flow: column wrap;
   align-items: center;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.footer-nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-nav a:hover {
+  color: var(--secondary);
 }
 
 .footer-link {
@@ -1122,7 +1140,7 @@ legend {
 }
 
 @media (width <= 1024px) {
-  .trailhead-banner-header h2 {
+  .trailhead-banner-header .site-tagline {
     font-size: 1.2em;
     margin-bottom: 20px;
   }
@@ -1142,7 +1160,7 @@ legend {
     align-items: center;
   }
 
-  .trailhead-banner-header h2 {
+  .trailhead-banner-header .site-tagline {
     font-size: 1.1em;
   }
 
@@ -2360,4 +2378,33 @@ select:focus {
   color: var(--text-faded);
   font-style: italic;
   padding: 1rem;
+}
+
+/* Home page explainer + FAQ (server-rendered, below the generator) */
+.home-about p {
+  color: var(--text-contrast);
+  line-height: 1.5;
+}
+
+.home-about .faq-item h3 {
+  font-size: 1.1em;
+  margin-bottom: 4px;
+  color: var(--text-contrast);
+}
+
+.home-about .faq-item p {
+  margin-top: 0;
+}
+
+.sponsors-page-title {
+  /* Page heading for crawlers and screen readers; the Sponsors block already shows a visible title */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }

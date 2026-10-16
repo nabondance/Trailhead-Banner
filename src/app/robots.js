@@ -13,23 +13,14 @@ export default function robots() {
   }
 
   return {
+    // A single group: some crawlers only read the first `User-Agent: *` group.
+    // Never disallow /_next/ — crawlers need its JS/CSS to render pages.
     rules: [
       {
         userAgent: '*',
-        disallow: '/api/', // Next.js API routes
+        allow: '/',
+        disallow: ['/api/', ...noIndexPaths],
       },
-      {
-        userAgent: '*',
-        disallow: '/_next/', // Next.js build output
-      },
-      {
-        userAgent: '*',
-        disallow: '/public/', // static files like css, images, fonts. This one's up to you!
-      },
-      ...noIndexPaths.map((path) => ({
-        userAgent: '*',
-        disallow: path,
-      })),
     ],
     sitemap: 'https://thb.nabondance.me/sitemap.xml',
   };

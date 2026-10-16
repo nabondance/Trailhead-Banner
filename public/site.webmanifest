@@ -1,7 +1,7 @@
 {
   "name": "Trailhead Banner",
   "short_name": "THB",
-  "description": "Generate your LinkedIn Banner with your Trailhead data",
+  "description": "Free LinkedIn banner generator for Salesforce Trailblazers, built from your Trailhead badges, certifications and rank",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

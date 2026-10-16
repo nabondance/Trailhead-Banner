@@ -1,0 +1,39 @@
+[
+  {
+    "question": "What is Trailhead Banner?",
+    "answer": "Trailhead Banner is a free, open-source tool that turns a public Salesforce Trailhead profile into a LinkedIn banner image. You enter your Trailhead username and it draws your rank, badge counts, certifications and superbadges onto a ready-to-upload banner.",
+    "link": { "href": "https://github.com/nabondance/trailhead-banner", "label": "View the source on GitHub" }
+  },
+  {
+    "question": "What size is the generated LinkedIn banner?",
+    "answer": "Banners are 1584 × 396 pixels PNG images, the background photo size LinkedIn recommends for personal profiles."
+  },
+  {
+    "question": "Which Trailhead data appears on the banner?",
+    "answer": "Your Trailblazer rank logo, counters (badges, superbadges and certifications by default; trails, points, stamps, Trailblazer Community activity and more are optional), the logos of your Salesforce and Accredited Professional certifications, your superbadges, your Agentblazer rank, an MVP ribbon for Salesforce MVPs, and your highest verified sfdx-hardis training badge."
+  },
+  {
+    "question": "Why are my certifications missing from the banner?",
+    "answer": "Certifications only appear when they are public. In your Trailhead Academy profile, set Certification Privacy to \"Make my certifications public to all\", then generate the banner again.",
+    "link": { "href": "/how-to#make-certifications-public", "label": "Make your certifications public" }
+  },
+  {
+    "question": "Why does Trailhead Banner say my profile is private?",
+    "answer": "Trailhead Banner can only read public profiles. In your Trailhead settings, set Your Profile Privacy to Public. Also check that you entered your username (the part after salesforce.com/trailblazer/), not your email address.",
+    "link": { "href": "/how-to#make-profile-public", "label": "Make your profile public" }
+  },
+  {
+    "question": "Can I use my own background image?",
+    "answer": "Yes. Pick one of the 33 backgrounds in the library, use a solid color, paste an image URL, or upload and crop your own image.",
+    "link": { "href": "/background-library", "label": "Browse the background library" }
+  },
+  {
+    "question": "How do I add the banner to my LinkedIn profile?",
+    "answer": "Download the generated PNG, open your LinkedIn profile, click the pencil icon on the background photo, choose Change photo, upload the banner and save.",
+    "link": { "href": "/how-to#modify-linkedin-banner", "label": "Step-by-step guide" }
+  },
+  {
+    "question": "Is Trailhead Banner free? Do I need an account?",
+    "answer": "It is completely free and needs no account or login: only your public Trailhead username. Trailhead Banner is an independent community project, not an official Salesforce product."
+  }
+]

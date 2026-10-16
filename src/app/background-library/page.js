@@ -1,4 +1,6 @@
 import BackgroundLibraryPage from '../../components/BackgroundLibraryPage';
+import JsonLd from '../../components/JsonLd';
+import { breadcrumbJsonLd } from '../../utils/seoUtils';
 
 export const metadata = {
   title: 'Background Library – Trailhead Banner',
@@ -28,5 +30,10 @@ export const metadata = {
 };
 
 export default function BackgroundLibrary() {
-  return <BackgroundLibraryPage />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd('Background Library', '/background-library')} />
+      <BackgroundLibraryPage />
+    </>
+  );
 }

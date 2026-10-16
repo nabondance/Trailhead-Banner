@@ -4,7 +4,7 @@ import '../styles/globals.css';
 
 import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
 import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
-import Sponsors from '../components/Sponsors';
+import JsonLd from '../components/JsonLd';
 
 import ThemeProvider from '../components/ThemeProvider';
 
@@ -33,6 +33,8 @@ const InterFont = Inter({
 });
 
 const siteUrl = 'https://thb.nabondance.me';
+const siteDescription =
+  'Free, open-source LinkedIn banner generator for Salesforce Trailblazers: turn your Trailhead badges, certifications and rank into a 1584×396 banner.';
 const ogImage = {
   url: '/og-image.png',
   width: 1200,
@@ -43,16 +45,13 @@ const ogImage = {
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Trailhead Banner',
-  description: 'Generate your LinkedIn Banner with your Trailhead data',
+  description: siteDescription,
   keywords: 'Trailhead, LinkedIn, Banner, Header, Generator, Salesforce, Trailblazer, open-source',
   authors: [{ name: 'nabondance', url: 'https://nabondance.me' }],
   publisher: 'nabondance',
-  alternates: {
-    canonical: siteUrl,
-  },
   openGraph: {
     title: 'Trailhead Banner',
-    description: 'Generate your LinkedIn Banner with your Trailhead data',
+    description: siteDescription,
     url: siteUrl,
     siteName: 'Trailhead Banner',
     type: 'website',
@@ -62,7 +61,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Trailhead Banner',
-    description: 'Generate your LinkedIn Banner with your Trailhead data',
+    description: siteDescription,
     images: ['/og-image.png'],
   },
   icons: {
@@ -79,31 +78,59 @@ export const metadata = {
   },
 };
 
+const author = {
+  '@type': 'Person',
+  '@id': 'https://nabondance.me/#person',
+  name: 'nabondance',
+  url: 'https://nabondance.me',
+  sameAs: ['https://github.com/nabondance'],
+};
+
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Trailhead Banner',
-  url: 'https://thb.nabondance.me',
-  description: 'Generate your LinkedIn Banner with your Trailhead data',
-  applicationCategory: 'UtilitiesApplication',
-  operatingSystem: 'Web',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
-  },
-  author: {
-    '@type': 'Person',
-    name: 'nabondance',
-    url: 'https://nabondance.me',
-  },
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      name: 'Trailhead Banner',
+      alternateName: 'THB',
+      url: siteUrl,
+      description: siteDescription,
+      inLanguage: 'en',
+      publisher: { '@id': author['@id'] },
+    },
+    {
+      '@type': 'WebApplication',
+      '@id': `${siteUrl}/#app`,
+      name: 'Trailhead Banner',
+      url: siteUrl,
+      description: siteDescription,
+      applicationCategory: 'DesignApplication',
+      operatingSystem: 'Web',
+      isAccessibleForFree: true,
+      image: `${siteUrl}/og-image.png`,
+      screenshot: `${siteUrl}/og-image.png`,
+      featureList: [
+        'Generate a 1584×396 LinkedIn banner from a Trailhead username',
+        'Trailblazer rank, badge, superbadge and certification counters',
+        'Salesforce and Accredited Professional certification logos',
+        'Superbadges, Agentblazer rank and Salesforce MVP ribbon',
+        '33 built-in backgrounds, custom image URL or upload',
+        'Trailhead Rewind year-in-review banner',
+      ],
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      author: { '@id': author['@id'] },
+      sameAs: ['https://github.com/nabondance/trailhead-banner'],
+    },
+    author,
+  ],
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang='en'>
+    <html lang='en' suppressHydrationWarning>
       <head>
-        <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <JsonLd data={jsonLd} />
         <link rel='icon' href='/favicon.ico' sizes='32x32' />
         <link rel='icon' href='/favicon-16x16.png' sizes='16x16' type='image/png' />
         <link rel='icon' href='/favicon-32x32.png' sizes='32x32' type='image/png' />

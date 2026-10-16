@@ -126,8 +126,8 @@ See any existing page (e.g. `src/app/examples/page.js`) as a reference.
 When **adding** a new page, also update:
 
 1. `src/app/sitemap.js` — add an entry with appropriate `priority` and `changeFrequency`
-2. `public/llms.txt` — add a line under `## Pages` with the URL and a one-line description
-3. `public/llms-full.txt` — add the page under `## Pages` and update any relevant sections (API, features, etc.)
+2. `src/content/llms.js` → `buildLlmsTxt` (serves `/llms.txt`) — add a line under `## Pages` with the URL and a one-line description
+3. `src/content/llms.js` → `buildLlmsFullTxt` (serves `/llms-full.txt`) — add the page under `## Pages` and update any relevant sections (API, features, etc.)
 
 When **removing** a page, remove it from both files as well.
 
@@ -221,7 +221,7 @@ Every component exports 4 functions: `prepare*` (async — load assets, compute 
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
