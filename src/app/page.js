@@ -1,5 +1,4 @@
 import MainPage from '../components/MainPage';
-import HomeAbout from '../components/HomeAbout';
 import JsonLd from '../components/JsonLd';
 import { getBannerCount, formatBannerCount } from '../utils/bannerCountUtils';
 import { SITE_URL } from '../utils/seoUtils';
@@ -59,7 +58,6 @@ export default async function Home() {
         />
       )}
       <MainPage />
-      <HomeAbout />
     </>
   );
 }

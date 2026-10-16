@@ -2380,20 +2380,17 @@ select:focus {
   padding: 1rem;
 }
 
-/* Home page explainer + FAQ (server-rendered, below the generator) */
-.home-about p {
-  color: var(--text-contrast);
-  line-height: 1.5;
-}
-
-.home-about .faq-item h3 {
+/* How-To page FAQ */
+.how-to-page .faq-item h3 {
   font-size: 1.1em;
   margin-bottom: 4px;
   color: var(--text-contrast);
 }
 
-.home-about .faq-item p {
+.how-to-page .faq-item p {
   margin-top: 0;
+  color: var(--text-contrast);
+  line-height: 1.5;
 }
 
 .sponsors-page-title {

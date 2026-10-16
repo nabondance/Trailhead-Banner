@@ -22,7 +22,7 @@ their Trailhead username and receive a downloadable PNG banner.
 ## Pages
 
 - https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
-- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn.
+- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
 - https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
 - https://thb.nabondance.me/background-library — Browse the 33 available background images for the banner.
 - https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
@@ -66,7 +66,7 @@ their rank, certifications, superbadges, badge counts, and more.
 ## Pages
 
 - https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
-- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn.
+- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
 - https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
 - https://thb.nabondance.me/background-library — Browse all 33 available background images for the banner.
 - https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
