@@ -148,13 +148,13 @@ main {
   z-index: 1002;
 }
 
-.header-nav a {
+.header-nav > a {
   text-decoration: none;
   color: var(--text-nav);
   font-weight: bold;
 }
 
-.header-nav a:hover {
+.header-nav > a:hover {
   text-decoration: underline;
 }
 
@@ -387,24 +387,6 @@ main {
   display: flex;
   flex-flow: column wrap;
   align-items: center;
-}
-
-.footer-nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 16px;
-  margin-bottom: 8px;
-  font-size: 0.9em;
-}
-
-.footer-nav a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.footer-nav a:hover {
-  color: var(--secondary);
 }
 
 .footer-link {

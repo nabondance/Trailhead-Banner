@@ -1,21 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import GitHubButton from 'react-github-btn';
 import { useTheme } from 'next-themes';
-
-// Plain links to every public page: the header dropdowns are buttons, which crawlers don't follow
-const footerLinks = [
-  { href: '/', label: 'Banner Generator' },
-  { href: '/how-to', label: 'How-To' },
-  { href: '/examples', label: 'Examples' },
-  { href: '/background-library', label: 'Background Library' },
-  { href: '/rewind', label: 'Trailhead Rewind' },
-  { href: '/releases', label: 'Releases' },
-  { href: '/sponsors', label: 'Sponsors' },
-  { href: '/legal', label: 'Terms & Privacy' },
-];
 
 const TrailheadBannerFooter = () => {
   const [buttonSize, setButtonSize] = useState('large');
@@ -38,13 +25,6 @@ const TrailheadBannerFooter = () => {
 
   return (
     <footer className='footer'>
-      <nav className='footer-nav' aria-label='Site pages'>
-        {footerLinks.map(({ href, label }) => (
-          <Link key={href} href={href}>
-            {label}
-          </Link>
-        ))}
-      </nav>
       <div className='footer-buttons'>
         <GitHubButton
           href='https://github.com/nabondance/trailhead-banner'
