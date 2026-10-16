@@ -5,6 +5,8 @@ import '../styles/globals.css';
 import TrailheadBannerHeader from '../components/TrailheadBannerHeader';
 import TrailheadBannerFooter from '../components/TrailheadBannerFooter';
 import JsonLd from '../components/JsonLd';
+import bannerBackgrounds from '../data/banners.json';
+import { getBannerCount } from '../utils/bannerCountUtils';
 
 import ThemeProvider from '../components/ThemeProvider';
 
@@ -86,7 +88,7 @@ const author = {
   sameAs: ['https://github.com/nabondance'],
 };
 
-const jsonLd = {
+const buildJsonLd = (bannerCount) => ({
   '@context': 'https://schema.org',
   '@graph': [
     {
@@ -115,18 +117,27 @@ const jsonLd = {
         'Trailblazer rank, badge, superbadge and certification counters',
         'Salesforce and Accredited Professional certification logos',
         'Superbadges, Agentblazer rank and Salesforce MVP ribbon',
-        '33 built-in backgrounds, custom image URL or upload',
+        `${bannerBackgrounds.length} built-in backgrounds, custom image URL or upload`,
         'Trailhead Rewind year-in-review banner',
       ],
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       author: { '@id': author['@id'] },
       sameAs: ['https://github.com/nabondance/trailhead-banner'],
+      ...(bannerCount > 0 && {
+        interactionStatistic: {
+          '@type': 'InteractionCounter',
+          interactionType: 'https://schema.org/CreateAction',
+          userInteractionCount: bannerCount,
+          description: 'LinkedIn banners generated',
+        },
+      }),
     },
     author,
   ],
-};
+});
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const jsonLd = buildJsonLd(await getBannerCount());
   return (
     <html lang='en' suppressHydrationWarning>
       <head>

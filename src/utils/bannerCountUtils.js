@@ -1,5 +1,7 @@
 import { cache } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from './supabaseUtils';
+
+const COUNT_TIMEOUT_MS = 5000;
 
 /**
  * Server-side total of generated banners (estimated), deduplicated per render with React cache.
@@ -7,12 +9,14 @@ import { createClient } from '@supabase/supabase-js';
  * @returns {Promise<number|null>} null when the count can't be fetched
  */
 export const getBannerCount = cache(async () => {
+  if (!supabase) return null;
   try {
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    // Called during static builds: a hung request must not stall the deploy
     const { count, error } = await supabase
       .from('banners')
       .select('id', { count: 'estimated', head: true })
-      .eq('source_env', process.env.NEXT_PUBLIC_VERCEL_ENV || 'development');
+      .eq('source_env', process.env.NEXT_PUBLIC_VERCEL_ENV || 'development')
+      .abortSignal(AbortSignal.timeout(COUNT_TIMEOUT_MS));
     if (error) throw error;
     return count ?? null;
   } catch (error) {

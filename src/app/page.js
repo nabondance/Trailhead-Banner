@@ -1,5 +1,4 @@
 import MainPage from '../components/MainPage';
-import JsonLd from '../components/JsonLd';
 import { getBannerCount, formatBannerCount } from '../utils/bannerCountUtils';
 import { SITE_URL } from '../utils/seoUtils';
 
@@ -37,27 +36,6 @@ export async function generateMetadata() {
   };
 }
 
-export default async function Home() {
-  const bannerCount = await getBannerCount();
-  return (
-    <>
-      {bannerCount && (
-        // Merges into the site-wide WebApplication node (same @id) defined in the root layout
-        <JsonLd
-          data={{
-            '@context': 'https://schema.org',
-            '@type': 'WebApplication',
-            '@id': `${SITE_URL}/#app`,
-            interactionStatistic: {
-              '@type': 'InteractionCounter',
-              interactionType: 'https://schema.org/CreateAction',
-              userInteractionCount: bannerCount,
-              description: 'LinkedIn banners generated',
-            },
-          }}
-        />
-      )}
-      <MainPage />
-    </>
-  );
+export default function Home() {
+  return <MainPage />;
 }

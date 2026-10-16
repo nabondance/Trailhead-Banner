@@ -10,6 +10,8 @@ const TrailheadBannerFooter = () => {
   const { resolvedTheme } = useTheme();
   // resolvedTheme is unknown during server render; use light until mounted to avoid a hydration mismatch
   const colorScheme = mounted && resolvedTheme === 'dark' ? 'dark_dimmed' : 'light';
+  // The static HTML is built at deploy time; use the visitor's year only once mounted
+  const year = mounted ? new Date().getFullYear() : 2025;
 
   useEffect(() => {
     const handleResize = () => {
@@ -49,8 +51,7 @@ const TrailheadBannerFooter = () => {
         </GitHubButton>
       </div>
       <a href='https://nabondance.me' target='_blank' rel='noopener noreferrer' className='footer-link'>
-        &copy; {new Date().getFullYear() === 2025 ? '2025' : `2025-${new Date().getFullYear()}`} Trailhead Banner by
-        /nabondance.me powered by Think2
+        &copy; {year === 2025 ? '2025' : `2025-${year}`} Trailhead Banner by /nabondance.me powered by Think2
       </a>
     </footer>
   );

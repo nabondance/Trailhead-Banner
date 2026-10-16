@@ -353,4 +353,5 @@ class SupabaseUtils {
   }
 }
 
+export { supabase };
 export default SupabaseUtils;

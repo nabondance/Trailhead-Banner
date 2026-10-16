@@ -1,6 +1,10 @@
 // Source of /llms.txt and /llms-full.txt (served by route handlers in src/app/llms*.txt/).
 // Edit the text here; `usageLine` injects the live banner count when available.
 
+import bannerBackgrounds from '../data/banners.json';
+
+const backgroundCount = bannerBackgrounds.length;
+
 const getUsageLine = (formattedCount, prefix) =>
   formattedCount ? `${prefix}${formattedCount} banners generated so far\n` : '';
 
@@ -24,7 +28,7 @@ their Trailhead username and receive a downloadable PNG banner.
 - https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
 - https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
 - https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
-- https://thb.nabondance.me/background-library — Browse the 33 available background images for the banner.
+- https://thb.nabondance.me/background-library — Browse the ${backgroundCount} available background images for the banner.
 - https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
 - https://thb.nabondance.me/releases — Changelog and release history.
 - https://thb.nabondance.me/sponsors — Sponsors and supporters who help keep the project running.
@@ -68,7 +72,7 @@ their rank, certifications, superbadges, badge counts, and more.
 - https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
 - https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
 - https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
-- https://thb.nabondance.me/background-library — Browse all 33 available background images for the banner.
+- https://thb.nabondance.me/background-library — Browse all ${backgroundCount} available background images for the banner.
 - https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
 - https://thb.nabondance.me/releases — Changelog and release history.
 - https://thb.nabondance.me/sponsors — Sponsors and supporters who help keep the project running.
@@ -85,7 +89,7 @@ A generated banner (1584×396px) includes the following elements:
 - **Superbadges** — Logos for earned superbadges
 - **sfdx-hardis training badge** — Highest verified Cloudity course badge, when earned (not a certification)
 - **MVP ribbon** — Top-right corner ribbon for Salesforce MVP/All-Star MVP holders
-- **Background** — Chosen from a library of 33 Salesforce/Trailblazer themed backgrounds
+- **Background** — Chosen from a library of ${backgroundCount} Salesforce/Trailblazer themed backgrounds
 - **Watermark** — Trailhead Banner branding (bottom-right corner)
 
 ## How To Use
@@ -104,7 +108,7 @@ A generated banner (1584×396px) includes the following elements:
 
 ## Background Library
 
-33 backgrounds are available, themed around Salesforce events, locations, and Trailblazer.me imagery.
+${backgroundCount} backgrounds are available, themed around Salesforce events, locations, and Trailblazer.me imagery.
 Examples: Australia, Japan, France, Highland Waterfalls, Tropical Beach, and more.
 Full list visible at https://thb.nabondance.me/background-library.
 
