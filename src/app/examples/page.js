@@ -1,12 +1,14 @@
 import ExamplesPage from '../../components/ExamplesPage';
+import JsonLd from '../../components/JsonLd';
+import { breadcrumbJsonLd } from '../../utils/seoUtils';
 
 export const metadata = {
-  title: 'Trailhead Banner Examples',
+  title: 'Trailhead LinkedIn Banner Examples – Trailhead Banner',
   description:
     'Browse example LinkedIn banners generated from real Trailhead profiles — badges, certifications, MVP ribbon, and more.',
   alternates: { canonical: 'https://thb.nabondance.me/examples' },
   openGraph: {
-    title: 'Trailhead Banner Examples',
+    title: 'Trailhead LinkedIn Banner Examples – Trailhead Banner',
     description:
       'Browse example LinkedIn banners generated from real Trailhead profiles — badges, certifications, MVP ribbon, and more.',
     url: 'https://thb.nabondance.me/examples',
@@ -23,7 +25,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Trailhead Banner Examples',
+    title: 'Trailhead LinkedIn Banner Examples – Trailhead Banner',
     description:
       'Browse example LinkedIn banners generated from real Trailhead profiles — badges, certifications, MVP ribbon, and more.',
     images: ['/og-image.png'],
@@ -31,5 +33,10 @@ export const metadata = {
 };
 
 export default function Examples() {
-  return <ExamplesPage />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd('Examples', '/examples')} />
+      <ExamplesPage />
+    </>
+  );
 }

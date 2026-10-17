@@ -1,4 +1,6 @@
 import LegalPage from '../../components/LegalPage';
+import JsonLd from '../../components/JsonLd';
+import { breadcrumbJsonLd } from '../../utils/seoUtils';
 
 export const metadata = {
   title: 'Legal – Trailhead Banner',
@@ -28,5 +30,10 @@ export const metadata = {
 };
 
 export default function Legal() {
-  return <LegalPage />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd('Terms & Privacy', '/legal')} />
+      <LegalPage />
+    </>
+  );
 }

@@ -93,7 +93,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
     badgeLabelColor: '#555555',
     badgeMessageColor: '#1F80C0',
     backgroundKind: 'library', // Default to library
-    backgroundLibraryUrl: `${window.location.origin}${bannerBackground[5].src}`, // Set default background library URL
+    backgroundLibraryUrl: bannerBackground[5].src, // Default library background; made absolute on mount (window is unavailable during SSR)
     customBackgroundImageUrl: '',
     displayLastXCertifications: false,
     lastXCertifications: '',
@@ -123,6 +123,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
   const usernameInputRef = useRef(null);
+
+  React.useEffect(() => {
+    setOptions((prev) =>
+      prev.backgroundLibraryUrl.startsWith('/')
+        ? { ...prev, backgroundLibraryUrl: `${window.location.origin}${prev.backgroundLibraryUrl}` }
+        : prev
+    );
+  }, []);
 
   const handleUsernameBlur = async () => {
     if (!options.username) {
@@ -409,7 +417,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
                     alt={image.description}
                     width={200}
                     height={50}
-                    className={`thumbnail ${options.backgroundLibraryUrl === `${window.location.origin}${image.src}` ? 'selected' : ''}`}
+                    className={`thumbnail ${options.backgroundLibraryUrl.endsWith(image.src) ? 'selected' : ''}`}
                     onClick={() => handlePredefinedImage(image.src)}
                   />
                 ))}

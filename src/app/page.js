@@ -1,34 +1,40 @@
 import MainPage from '../components/MainPage';
+import { getBannerCount, formatBannerCount } from '../utils/bannerCountUtils';
+import { SITE_URL } from '../utils/seoUtils';
 
-export const metadata = {
-  title: 'Trailhead Banner – LinkedIn Banner for Trailblazers',
-  description:
-    'Instantly generate a professional LinkedIn banner showcasing your Salesforce Trailhead badges, certifications, and rank.',
-  alternates: { canonical: 'https://thb.nabondance.me' },
-  openGraph: {
-    title: 'Trailhead Banner – LinkedIn Banner for Trailblazers',
-    description:
-      'Instantly generate a professional LinkedIn banner showcasing your Salesforce Trailhead badges, certifications, and rank.',
-    url: 'https://thb.nabondance.me',
-    siteName: 'Trailhead Banner',
-    type: 'website',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Trailhead Banner – LinkedIn Banner for Trailblazers',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Trailhead Banner – LinkedIn Banner for Trailblazers',
-    description:
-      'Instantly generate a professional LinkedIn banner showcasing your Salesforce Trailhead badges, certifications, and rank.',
-    images: ['/og-image.png'],
-  },
-};
+const title = 'Trailhead Banner – LinkedIn Banner for Trailblazers';
+const description =
+  'Instantly generate a professional LinkedIn banner showcasing your Salesforce Trailhead badges, certifications, and rank.';
+
+export async function generateMetadata() {
+  const formattedCount = formatBannerCount(await getBannerCount());
+  return {
+    title,
+    description: formattedCount ? `${description} ${formattedCount} banners generated.` : description,
+    alternates: { canonical: SITE_URL },
+    openGraph: {
+      title,
+      description,
+      url: SITE_URL,
+      siteName: 'Trailhead Banner',
+      type: 'website',
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'Trailhead Banner – LinkedIn Banner for Trailblazers',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/og-image.png'],
+    },
+  };
+}
 
 export default function Home() {
   return <MainPage />;

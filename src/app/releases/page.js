@@ -1,4 +1,6 @@
 import { extractDisplayContent, filterReleases } from '../../utils/releasesUtils';
+import JsonLd from '../../components/JsonLd';
+import { breadcrumbJsonLd } from '../../utils/seoUtils';
 
 export const metadata = {
   title: 'Releases – Trailhead Banner',
@@ -31,7 +33,7 @@ export default async function ReleasesPage() {
   try {
     const res = await fetch('https://api.github.com/repos/nabondance/trailhead-banner/releases', {
       headers: {
-        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        ...(process.env.GITHUB_TOKEN && { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }),
         Accept: 'application/vnd.github.v3+json',
       },
       next: { revalidate: 3600 }, // Cache API response for 1 hour
@@ -46,6 +48,7 @@ export default async function ReleasesPage() {
 
     return (
       <div className='releases-container'>
+        <JsonLd data={breadcrumbJsonLd('Releases', '/releases')} />
         <h1>Trailhead Banner Releases</h1>
         <ul className='releases-list'>
           {releases.length > 0 ? (

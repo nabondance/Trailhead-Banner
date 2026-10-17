@@ -1,12 +1,14 @@
 import Sponsors from '../../components/Sponsors';
+import JsonLd from '../../components/JsonLd';
+import { breadcrumbJsonLd } from '../../utils/seoUtils';
 
 export const metadata = {
-  title: 'Sponsors',
+  title: 'Sponsors – Trailhead Banner',
   description:
     'Trailhead Banner is free and open source. Meet the sponsors and supporters who help keep the project running.',
   alternates: { canonical: 'https://thb.nabondance.me/sponsors' },
   openGraph: {
-    title: 'Sponsors',
+    title: 'Sponsors – Trailhead Banner',
     description:
       'Trailhead Banner is free and open source. Meet the sponsors and supporters who help keep the project running.',
     url: 'https://thb.nabondance.me/sponsors',
@@ -23,7 +25,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Sponsors',
+    title: 'Sponsors – Trailhead Banner',
     description:
       'Trailhead Banner is free and open source. Meet the sponsors and supporters who help keep the project running.',
     images: ['/og-image.png'],
@@ -33,6 +35,8 @@ export const metadata = {
 export default function SponsorsPage() {
   return (
     <div className='container'>
+      <JsonLd data={breadcrumbJsonLd('Sponsors', '/sponsors')} />
+      <h1 className='sponsors-page-title'>Trailhead Banner Sponsors</h1>
       <Sponsors />
       <div className='sponsors-cta'>
         <p>Love Trailhead Banner? Put your name on it.</p>

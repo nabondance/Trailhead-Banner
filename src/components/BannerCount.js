@@ -4,7 +4,8 @@ import { CountUp } from 'countup.js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Null when env vars are missing (e.g. CI builds): this module is also evaluated during server prerender
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 const BannerCount = forwardRef((props, ref) => {
   const [count, setCount] = useState(0);
@@ -27,6 +28,7 @@ const BannerCount = forwardRef((props, ref) => {
   };
 
   const fetchCount = async () => {
+    if (!supabase) return;
     const { count: newCount, error } = await supabase
       .from('banners')
       .select('id', { count: 'estimated', head: true })
@@ -46,6 +48,8 @@ const BannerCount = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
+    if (!supabase) return;
+
     // Fetch initial count
     fetchCount();
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import HowToFaq from './HowToFaq';
 
 const HowToPage = () => {
   return (
@@ -108,6 +109,7 @@ const HowToPage = () => {
           <li>If the problem persists, consider writing an issue on the GitHub repository.</li>
         </ul>
       </section>
+      <HowToFaq />
       <section id='further-assistance' className='how-to-section'>
         <h2>Need Further Assistance?</h2>
         <ul>
