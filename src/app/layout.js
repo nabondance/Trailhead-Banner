@@ -1,4 +1,5 @@
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import Script from 'next/script';
 
 import '../styles/globals.css';
 
@@ -150,11 +151,11 @@ export default async function RootLayout({ children }) {
         <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
         <link rel='apple-touch-icon' href='/apple-touch-icon.png' />
         <link rel='manifest' href='/site.webmanifest' />
-        <script
-          defer
+        <Script
           src='https://cloud.umami.is/script.js'
           data-website-id='b540d5cc-247f-426e-87ec-0c1258767c22'
-        ></script>
+          strategy='afterInteractive'
+        />
         <SpeedInsights />
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
         <link

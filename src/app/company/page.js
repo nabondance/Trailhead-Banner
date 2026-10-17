@@ -41,7 +41,7 @@ export default function CompanyPage() {
           table='company_banners'
           envColumn='thb_source_env'
           elementId='company-countup-element'
-          after=' amazing company banners generated and still counting !'
+          after=' amazing company banners generated and still counting!'
         />
         <CompanyBannerForm />
       </div>

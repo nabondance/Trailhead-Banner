@@ -775,7 +775,8 @@ main {
 }
 
 .option-label-text {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 @media (width <= 425px) {
@@ -1346,6 +1347,16 @@ legend {
   fieldset {
     padding: 8px;
     margin-bottom: 10px;
+  }
+}
+
+/* Two thumbnails per row on phones instead of one half-width column */
+@media (width <= 480px) {
+  .thumbnail {
+    width: calc(50% - 5px);
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 4 / 1;
   }
 }
 
