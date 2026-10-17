@@ -95,6 +95,16 @@ const sortCertifications = (certifications, sortOption, sortOrder) => {
     });
   } else if (sortOption === 'difficulty') {
     certifications.sort((a, b) => a.difficulty - b.difficulty);
+  } else if (sortOption === 'count') {
+    // Company banner: sort ascending; descendant reversal below will flip to most-held-first
+    certifications.sort((a, b) => (a.count ?? 1) - (b.count ?? 1));
+  } else if (sortOption === 'first-won') {
+    // Company banner: sort by earliest dateCompleted across the team
+    certifications.sort((a, b) => {
+      const dateA = a.dateCompleted ? new Date(normalizeDate(a.dateCompleted)) : new Date(0);
+      const dateB = b.dateCompleted ? new Date(normalizeDate(b.dateCompleted)) : new Date(0);
+      return dateA - dateB;
+    });
   }
 
   if (sortOrder === 'descendant') {
@@ -124,11 +134,20 @@ const getCountersConfig = (options = {}) => {
       break;
   }
 
+  // Opt-in override for compact banners (e.g. the company LinkedIn-header banner).
+  // Standard banners never set this, so their sizing is unchanged.
+  if (typeof options.badgeCounterScaleOverride === 'number') {
+    badgeCounterScale = options.badgeCounterScaleOverride;
+  }
+
   const badgeCounterYDelta = 35 * badgeCounterScale;
 
   return { counter, badgeCounterScale, badgeCounterYDelta };
 };
 
+// Counter values are shown exactly up to 9,999, then abbreviated (13627 → 13k)
+// so they always fit the counter pill. Shared by all banner counters and the
+// +N overflow badges.
 const formatCounterValue = (value) => {
   if (value < 10_000) return value.toString();
   if (value < 1_000_000) return `${Math.floor(value / 1000)}k`;

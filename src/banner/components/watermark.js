@@ -49,7 +49,7 @@ async function prepareWatermark(options = {}) {
  * @param {number} canvasWidth - Canvas width for positioning
  * @param {number} canvasHeight - Canvas height for positioning
  */
-async function renderWatermark(ctx, prepared, canvasWidth, canvasHeight) {
+async function renderWatermark(ctx, prepared, canvasWidth, canvasHeight, scale = 1) {
   if (!prepared.image) {
     console.debug('Skipping watermark render - image not loaded');
     return;
@@ -58,11 +58,15 @@ async function renderWatermark(ctx, prepared, canvasWidth, canvasHeight) {
   // Reset transparency
   ctx.globalAlpha = 1.0;
 
-  // Position in bottom right corner
-  const x = canvasWidth - prepared.width;
-  const y = canvasHeight - prepared.height - 2;
+  // Optional scaling (compact banners pass a smaller scale); default keeps standard size
+  const width = prepared.width * scale;
+  const height = prepared.height * scale;
 
-  ctx.drawImage(prepared.image, x, y, prepared.width, prepared.height);
+  // Position in bottom right corner
+  const x = canvasWidth - width;
+  const y = canvasHeight - height - 2;
+
+  ctx.drawImage(prepared.image, x, y, width, height);
 }
 
 /**
