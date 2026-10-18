@@ -52,36 +52,6 @@ class SupabaseUtils {
     throw lastError;
   }
 
-  static async updateBannerCounterViaAPI(thb_data, protocol, host) {
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}` // Use Vercel's domain in production
-      : `${protocol}://${host}`; // Fallback for local development
-
-    const addBannerUrl = `${baseUrl}/api/add-banner`;
-    const cleanedData = SupabaseUtils.cleanData(thb_data);
-    try {
-      await SupabaseUtils.retryWithBackoff(async () => {
-        const response = await fetch(addBannerUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            thb_data: cleanedData,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to save banner hash');
-        }
-        return response;
-      });
-    } catch (error) {
-      console.error('Error updating banner counter via API (after retries):', error);
-    }
-  }
-
   static async updateBannerCounter(thb_data) {
     if (!supabase) {
       console.log('[Supabase] Credentials not configured, skipping banner counter update.');
