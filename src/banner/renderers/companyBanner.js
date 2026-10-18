@@ -174,7 +174,7 @@ async function generateCompanyBanner(aggregated, options = {}) {
   // ============================================================
 
   // 1. Background
-  await Background.renderBackground(ctx, backgroundPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
+  await Background.renderBackground(ctx, backgroundPrep, CANVAS_WIDTH, CANVAS_HEIGHT, { fit: 'cover' });
 
   // 2. Company Logo (top-left, same slot as rank logo)
   await CompanyLogo.renderCompanyLogo(ctx, companyLogoPrep, 0, 0);

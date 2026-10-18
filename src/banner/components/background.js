@@ -212,8 +212,11 @@ async function prepareBackground(options) {
  * @param {Object} prepared - Prepared background data from prepareBackground()
  * @param {number} canvasWidth - Canvas width
  * @param {number} canvasHeight - Canvas height
+ * @param {Object} [options]
+ * @param {'stretch'|'cover'} [options.fit='stretch'] - 'cover' keeps the image aspect ratio and crops the overflow (centered)
  */
-async function renderBackground(ctx, prepared, canvasWidth, canvasHeight) {
+async function renderBackground(ctx, prepared, canvasWidth, canvasHeight, options = {}) {
+  const { fit = 'stretch' } = options;
   const { data } = prepared;
 
   if (!data) {
@@ -224,7 +227,19 @@ async function renderBackground(ctx, prepared, canvasWidth, canvasHeight) {
   switch (data.type) {
     case 'image':
       if (data.image) {
-        ctx.drawImage(data.image, 0, 0, canvasWidth, canvasHeight);
+        const imgWidth = data.image.width || 0;
+        const imgHeight = data.image.height || 0;
+        if (fit === 'cover' && imgWidth > 0 && imgHeight > 0) {
+          // Scale to fill the canvas, then crop the overflow from the center of the source
+          const scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
+          const srcWidth = canvasWidth / scale;
+          const srcHeight = canvasHeight / scale;
+          const srcX = (imgWidth - srcWidth) / 2;
+          const srcY = (imgHeight - srcHeight) / 2;
+          ctx.drawImage(data.image, srcX, srcY, srcWidth, srcHeight, 0, 0, canvasWidth, canvasHeight);
+        } else {
+          ctx.drawImage(data.image, 0, 0, canvasWidth, canvasHeight);
+        }
       }
       break;
 
