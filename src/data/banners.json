@@ -2,22 +2,26 @@
   {
     "src": "/assets/background-library/sf_australia.png",
     "alt": "Australia Background",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.4
   },
   {
     "src": "/assets/background-library/sf_japan.png",
     "alt": "Japan Background",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.7
   },
   {
     "src": "/assets/background-library/sf_france.png",
     "alt": "France Background",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.45
   },
   {
     "src": "/assets/background-library/highland-waterfalls.png",
     "alt": "Highland Waterfalls",
-    "credit": "Trailblazer.me"
+    "credit": "Trailblazer.me",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/tropical-beach.png",
@@ -27,97 +31,116 @@
   {
     "src": "/assets/background-library/NYC_dreamforce_1.png",
     "alt": "Dreamforce Background 1",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/NYC_dreamforce_2.png",
     "alt": "Dreamforce Background 2",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.3
   },
   {
     "src": "/assets/background-library/NYC_dreamforce_3.png",
     "alt": "Dreamforce Background 3",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.75
   },
   {
     "src": "/assets/background-library/NYC_dreamforce_4.png",
     "alt": "Dreamforce Background 4",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.25
   },
   {
     "src": "/assets/background-library/NYC_KOA_2.png",
     "alt": "KOA Background 2",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.95
   },
   {
     "src": "/assets/background-library/NYC_KOA_3.png",
     "alt": "KOA Background 3",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.8
   },
   {
     "src": "/assets/background-library/energy-central-background.png",
     "alt": "Energy Central Background",
-    "credit": "energycentral.com"
+    "credit": "energycentral.com",
+    "focusY": 0.7
   },
   {
     "src": "/assets/background-library/clouds_mongo.jpg",
     "alt": "Clouds",
-    "credit": "Trailblazer.me"
+    "credit": "Trailblazer.me",
+    "focusY": 0
   },
   {
     "src": "/assets/background-library/salesforce_canyon_1.png",
     "alt": "Canyon Background 1",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.1
   },
   {
     "src": "/assets/background-library/salesforce_canyon_2.png",
     "alt": "Canyon Background 2",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0
   },
   {
     "src": "/assets/background-library/NYC_desert_1.png",
     "alt": "Desert Background 1",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0
   },
   {
     "src": "/assets/background-library/NYC_desert_3.png",
     "alt": "Desert Background 3",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0
   },
   {
     "src": "/assets/background-library/NYC_desert_4.png",
     "alt": "Desert Background 4",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.6
   },
   {
     "src": "/assets/background-library/sf_event.png",
     "alt": "Salesforce Event Background",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.9
   },
   {
     "src": "/assets/background-library/sf_meetup.png",
     "alt": "Meetup Background",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/robot_codey.png",
     "alt": "Robot Codey",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 0.15
   },
   {
     "src": "/assets/background-library/SF_Desk-Backdrop.png",
     "alt": "Salesforce Desk Backdrop",
-    "credit": "salesforce.com"
+    "credit": "salesforce.com",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/vass-company.png",
     "alt": "Vass Company Background",
-    "credit": "vasscompany.com"
+    "credit": "vasscompany.com",
+    "focusY": 0.65
   },
   {
     "src": "/assets/background-library/golden-sun.png",
     "alt": "Golden sun",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/trailhead-mfe-background.png",
@@ -127,12 +150,14 @@
   {
     "src": "/assets/background-library/marquee-our-story-bg.png",
     "alt": "Our Story Background 1",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/our-story-marquee.png",
     "alt": "Our Story Background 2",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/service_background-1.png",
@@ -142,26 +167,31 @@
   {
     "src": "/assets/background-library/salescloud_faq-1.png",
     "alt": "Sales Cloud Background 1",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 1
   },
   {
     "src": "/assets/background-library/hero-block__variation-1.png",
     "alt": "Hero Block Variation 1",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 0.45
   },
   {
     "src": "/assets/background-library/hero-block__variation-2.png",
     "alt": "Hero Block Variation 2",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 0.7
   },
   {
     "src": "/assets/background-library/hero-block__variation-3.png",
     "alt": "Hero Block Variation 3",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 0.45
   },
   {
     "src": "/assets/background-library/hero-block__variation-4.png",
     "alt": "Hero Block Variation 4",
-    "credit": "Salesforce.com"
+    "credit": "Salesforce.com",
+    "focusY": 0.35
   }
 ]

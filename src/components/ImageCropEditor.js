@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
+import { BANNER_SIZES } from '../banner/bannerSizes';
 
-const ASPECT_RATIO = 1584 / 396;
 const ZOOM_HEADROOM = 3;
 
 const ImageCropEditor = ({
@@ -16,7 +16,11 @@ const ImageCropEditor = ({
   onCropPositionChange,
   cropZoom,
   onCropZoomChange,
+  size = BANNER_SIZES.standard,
 }) => {
+  const aspectRatio = size.width / size.height;
+  // Without a crop, the server draws the original image with the banner's fit (see BANNER_SIZES)
+  const skipCover = size.fit === 'cover';
   const containerRef = useRef(null);
   const cropZoomRef = useRef(cropZoom);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -32,11 +36,11 @@ const ImageCropEditor = ({
     if (!el) return;
     const observer = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
-      setContainerSize({ width: Math.round(w), height: Math.round(w / ASPECT_RATIO) });
+      setContainerSize({ width: Math.round(w), height: Math.round(w / aspectRatio) });
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [aspectRatio]);
 
   // Compute min zoom so the image always covers the crop area (no grey bars).
   // Only overrides the current zoom if it is below the cover minimum (e.g. fresh upload).
@@ -47,7 +51,7 @@ const ImageCropEditor = ({
     img.onload = () => {
       if (cancelled) return;
       const imageAspect = img.naturalWidth / img.naturalHeight;
-      const coverZoom = imageAspect < ASPECT_RATIO ? ASPECT_RATIO / imageAspect : 1;
+      const coverZoom = imageAspect < aspectRatio ? aspectRatio / imageAspect : 1;
       setMinZoom(coverZoom);
       setMaxZoom(coverZoom * ZOOM_HEADROOM);
       if (cropZoomRef.current < coverZoom) {
@@ -63,7 +67,7 @@ const ImageCropEditor = ({
     return () => {
       cancelled = true;
     };
-  }, [imageSrc, onCropZoomChange]);
+  }, [imageSrc, onCropZoomChange, aspectRatio]);
 
   const handleCropComplete = useCallback(
     (_, croppedAreaPixels) => {
@@ -85,13 +89,18 @@ const ImageCropEditor = ({
         <div ref={containerRef} className='crop-container' style={{ height: containerSize.height || undefined }}>
           {containerSize.width > 0 &&
             (isCropSkipped ? (
-              <img src={imageSrc} alt='Preview (distorted)' className='crop-skip-preview' />
+              <img
+                src={imageSrc}
+                alt={skipCover ? 'Preview (center-cropped)' : 'Preview (distorted)'}
+                className='crop-skip-preview'
+                style={{ objectFit: skipCover ? 'cover' : 'fill' }}
+              />
             ) : (
               <Cropper
                 image={imageSrc}
                 crop={cropPosition}
                 zoom={Math.max(cropZoom, minZoom)}
-                aspect={ASPECT_RATIO}
+                aspect={aspectRatio}
                 minZoom={minZoom}
                 maxZoom={maxZoom}
                 cropSize={containerSize}
@@ -103,7 +112,11 @@ const ImageCropEditor = ({
         </div>
       </div>
       {isCropSkipped && (
-        <p className='crop-skip-message'>Crop disabled — original image will be used (may be distorted)</p>
+        <p className='crop-skip-message'>
+          {skipCover
+            ? 'Crop disabled — original image will be center-cropped to fit'
+            : 'Crop disabled — original image will be used (may be distorted)'}
+        </p>
       )}
       <div className='crop-controls'>
         <div className='zoom-slider-row'>

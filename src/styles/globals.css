@@ -1675,7 +1675,7 @@ select:focus {
 .background-preview .canvas-container {
   position: relative;
   width: 100%;
-  padding-top: calc(396 / 1584 * 100%); /* Maintain exact 1584:396 aspect ratio */
+  aspect-ratio: 1584 / 396; /* Default; BackgroundPreview sets the banner's own ratio inline */
   margin: 0 auto;
   max-width: min(100%, calc(100vw - 60px)); /* Account for padding and prevent overflow */
   box-sizing: border-box;
@@ -1730,7 +1730,6 @@ select:focus {
 .crop-container {
   position: relative;
   width: 100%;
-  min-height: 60px;
 }
 
 .crop-skip-preview {

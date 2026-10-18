@@ -4,6 +4,8 @@ import fs from 'fs';
 import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
+import { getLibraryFocusY } from '../../utils/libraryBackgrounds.js';
+import { drawImageWithFit } from '../bannerSizes.js';
 
 /**
  * Background Component
@@ -134,7 +136,7 @@ async function prepareBackground(options) {
           const filePath = path.join(process.cwd(), 'public', 'assets', 'background-library', filename);
           const bgImageBuffer = await fs.promises.readFile(filePath);
           const bgImage = await loadImage(bgImageBuffer);
-          backgroundData = { type: 'image', image: bgImage };
+          backgroundData = { type: 'image', image: bgImage, focusY: getLibraryFocusY(filename) };
         }
         break;
 
@@ -212,8 +214,12 @@ async function prepareBackground(options) {
  * @param {Object} prepared - Prepared background data from prepareBackground()
  * @param {number} canvasWidth - Canvas width
  * @param {number} canvasHeight - Canvas height
+ * @param {Object} [options]
+ * @param {'stretch'|'cover'} [options.fit='stretch'] - 'cover' keeps the image aspect ratio and crops the overflow
+ *   (horizontally centered; vertically at the background's focusY, default center)
  */
-async function renderBackground(ctx, prepared, canvasWidth, canvasHeight) {
+async function renderBackground(ctx, prepared, canvasWidth, canvasHeight, options = {}) {
+  const { fit = 'stretch' } = options;
   const { data } = prepared;
 
   if (!data) {
@@ -224,7 +230,8 @@ async function renderBackground(ctx, prepared, canvasWidth, canvasHeight) {
   switch (data.type) {
     case 'image':
       if (data.image) {
-        ctx.drawImage(data.image, 0, 0, canvasWidth, canvasHeight);
+        const { width: imgWidth = 0, height: imgHeight = 0 } = data.image;
+        drawImageWithFit(ctx, data.image, imgWidth, imgHeight, canvasWidth, canvasHeight, fit, data.focusY);
       }
       break;
 

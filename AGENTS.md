@@ -134,8 +134,9 @@ When **removing** a page, remove it from both files as well.
 ### Add New Background Image
 
 1. Add to `public/assets/background-library/`
-2. Update `src/data/banners.json` with metadata
-3. Verify in background library page
+2. Update `src/data/banners.json` with metadata (`src`, `alt`, `credit`), plus `focusY` when the subject isn't centered
+   - `focusY` sets the vertical crop on the company banner (0 = keep top, 0.5 = center (default), 1 = keep bottom)
+3. Verify in background library page, and in the company form's Background Preview
 
 ### Modify Banner Layout
 
@@ -154,7 +155,10 @@ When **removing** a page, remove it from both files as well.
 - **@napi-rs/canvas**: Server-side canvas rendering
 - **Upstash Redis**: Query result caching
 - **Vercel Blob**: Server-side asset cache for certification logo images (not used for generated banners)
-- **Supabase**: Analytics database — tracks every banner/rewind generation (`banners`, `rewinds` tables) and errors (`errors` table); implemented in `src/utils/supabaseUtils.js`. The server writes with `SUPABASE_SERVICE_ROLE_KEY` (server-only, never `NEXT_PUBLIC_`); the browser uses `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` only for the `announcement` table and the `generation_count` database function behind the generation counters. The anon key cannot read or write the analytics tables
+- **Supabase**: Analytics database — tracks every banner/rewind generation (`banners`, `rewinds` tables) and errors (`errors` table); implemented in `src/utils/supabaseUtils.js`.
+  The server writes with `SUPABASE_SERVICE_ROLE_KEY` (server-only, never `NEXT_PUBLIC_`);
+  the browser uses `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` only for the `announcement` table and the `generation_count` database function behind the generation counters.
+  The anon key cannot read or write the analytics tables
 
 ## Debugging Quick Tips
 

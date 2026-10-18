@@ -26,56 +26,9 @@ import {
 } from '../utils/backgroundUtils';
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
+import BackgroundPreview from './BackgroundPreview';
+import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
-
-const BackgroundPreview = ({ src, backgroundColor }) => {
-  const canvasRef = React.useRef(null);
-
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-
-    // Set canvas dimensions based on LinkedIn banner aspect ratio
-    canvas.width = 1584;
-    canvas.height = 396;
-
-    // Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (src) {
-      // Load and draw image background exactly like in generateImage.js
-      const img = new Image();
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      };
-      img.onerror = () => {
-        console.error('Failed to load image:', src);
-        // On error, show background color
-        ctx.fillStyle = backgroundColor || '#5badd6';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      };
-      // For library backgrounds, use the raw path without window.location.origin
-      const imagePath = src.includes(window.location.origin) ? src.replace(window.location.origin, '') : src;
-      img.src = imagePath;
-    } else {
-      // Draw solid background color
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-  }, [src, backgroundColor]);
-
-  return (
-    <div className='background-preview'>
-      <h3>Background Preview</h3>
-      <div className='canvas-container'>
-        <canvas ref={canvasRef} />
-      </div>
-    </div>
-  );
-};
 
 // Counters without allowedIn are standard-only (stamp variants); company-only ones are excluded
 const STANDARD_COUNTERS = COUNTERS_CONFIG.filter((c) => !c.allowedIn || c.allowedIn.includes('standard'));
@@ -441,7 +394,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
             ) : (
               options.backgroundKind !== 'procedural' &&
               options.backgroundKind !== 'upload' && (
-                <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+                <BackgroundPreview options={options} size={BANNER_SIZES.standard} />
               )
             )}
           </fieldset>
