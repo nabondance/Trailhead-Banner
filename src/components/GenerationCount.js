@@ -1,26 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { CountUp } from 'countup.js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-// Null when env vars are missing (e.g. CI builds): this module is also evaluated during server prerender
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
-
-// How often to re-check the count while the tab is visible
-const POLL_INTERVAL_MS = 30000;
+import { supabaseBrowser as supabase } from '../utils/supabaseBrowserClient';
 
 /**
- * Reusable generation counter backed by a Supabase table.
+ * Reusable live generation counter backed by a Supabase table.
  *
- * Renders an animated count that refreshes every POLL_INTERVAL_MS while the tab is visible.
- * Used by the standard banner, rewind, and company banner pages — each just passes the
- * table it tracks and the wording to display.
+ * Renders an animated count that ticks up in real time as new rows are inserted
+ * into the given table. Used by the standard banner, rewind, and company banner
+ * pages — each just passes the table it tracks and the wording to display.
  *
- * The count comes from the `generation_count` database function, so the browser never
- * reads the analytics tables directly.
+ * The browser never reads the analytics tables: the initial count comes from the
+ * `generation_count` database function, and live updates arrive on the private
+ * `generation-count:<table>:<env>` broadcast channel, which a database trigger
+ * publishes to on each insert. Browsers can listen on that channel but not send.
  *
  * @param {string} table - Table to count rows from ('banners', 'rewinds' or 'company_banners')
  * @param {string} elementId - Unique DOM id for the CountUp target span (must be unique per mounted instance)
@@ -32,17 +26,20 @@ const GenerationCount = forwardRef(
   ({ table, elementId, className = 'banner-count', before = 'Already ', after }, ref) => {
     const [count, setCount] = useState(0);
     const countUpRef = useRef(null);
-    const initialLoad = useRef(true);
-    const latestRequest = useRef(0);
+    const latestUpdate = useRef(0);
 
     const sourceEnv = process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development';
 
-    const animateCount = (start, end) => {
+    const applyCount = (newCount) => {
+      if (!Number.isFinite(newCount)) {
+        console.error(`Unexpected ${table} count:`, newCount);
+        return;
+      }
       if (countUpRef.current) {
-        countUpRef.current.update(end);
+        countUpRef.current.update(newCount);
       } else {
-        countUpRef.current = new CountUp(elementId, end, {
-          startVal: start,
+        countUpRef.current = new CountUp(elementId, newCount, {
+          startVal: 0,
           duration: 4,
           useEasing: true,
           useGrouping: true,
@@ -50,31 +47,23 @@ const GenerationCount = forwardRef(
         });
         countUpRef.current.start();
       }
+      setCount(newCount);
     };
 
     const fetchCount = async () => {
       if (!supabase) return;
-      // Poll, tab focus and post-generation refreshes can overlap: only the latest request may update the count
-      const requestId = ++latestRequest.current;
+      // Fetches and broadcasts can overlap: a response is dropped if a newer update arrived meanwhile
+      const updateId = ++latestUpdate.current;
       const { data, error } = await supabase.rpc('generation_count', {
         p_table: table,
         p_env: sourceEnv,
       });
-      if (requestId !== latestRequest.current) return;
+      if (updateId !== latestUpdate.current) return;
 
       if (error) {
         console.error(`Error fetching ${table} count:`, error);
-      } else if (!Number.isFinite(data)) {
-        console.error(`Unexpected ${table} count:`, data);
       } else {
-        const newCount = data;
-        if (initialLoad.current) {
-          animateCount(0, newCount);
-          initialLoad.current = false;
-        } else {
-          animateCount(count, newCount);
-        }
-        setCount(newCount);
+        applyCount(data);
       }
     };
 
@@ -83,17 +72,22 @@ const GenerationCount = forwardRef(
 
       fetchCount();
 
-      // Poll while the tab is visible, and refresh as soon as it becomes visible again
-      const interval = setInterval(() => {
-        if (!document.hidden) fetchCount();
-      }, POLL_INTERVAL_MS);
+      const channel = supabase
+        .channel(`generation-count:${table}:${sourceEnv}`, { config: { private: true } })
+        .on('broadcast', { event: 'count' }, ({ payload }) => {
+          latestUpdate.current++;
+          applyCount(payload?.count);
+        })
+        .subscribe();
+
+      // Catch up on anything missed while the tab was in the background
       const onVisibilityChange = () => {
         if (!document.hidden) fetchCount();
       };
       document.addEventListener('visibilitychange', onVisibilityChange);
 
       return () => {
-        clearInterval(interval);
+        supabase.removeChannel(channel);
         document.removeEventListener('visibilitychange', onVisibilityChange);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps

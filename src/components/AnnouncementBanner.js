@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-// Null when env vars are missing (e.g. CI builds): this module is also evaluated during server prerender
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+import { supabaseBrowser as supabase } from '../utils/supabaseBrowserClient';
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
