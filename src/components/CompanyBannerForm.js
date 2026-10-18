@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
+import { zipSync, strToU8 } from 'fflate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from 'react-tooltip';
@@ -21,7 +22,8 @@ import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 import { extractUsernameFromUrl } from '../utils/usernameValidation';
 
-const EMPTY_USERNAMES_ERROR = 'Please enter at least one username.';
+// Excel only reads a CSV as UTF-8 (accents, non-Latin names) when it starts with a byte order mark
+const UTF8_BOM = '\uFEFF';
 
 // The compact company banner only renders the first N counters (see companyBanner.js),
 // so the UI selection is capped to the same number to stay in sync.
@@ -205,8 +207,7 @@ const CompanyBannerForm = () => {
   const [warnings, setWarnings] = useState([]);
   const [failedUsers, setFailedUsers] = useState([]);
   const [mainError, setMainError] = useState(null);
-  const [isPreparingCsv, setIsPreparingCsv] = useState(false);
-  const preparingCsvRef = useRef(false); // Sync guard: state updates don't land between rapid clicks
+  const [usernamesError, setUsernamesError] = useState(null); // Client-side check of the usernames list
   const [csvDownloadError, setCsvDownloadError] = useState(null);
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
@@ -255,10 +256,8 @@ const CompanyBannerForm = () => {
   };
 
   // All team CSVs in one zip: browsers often block or prompt for several downloads from one click
-  const handleDownloadCsv = async () => {
-    if (!resultCsvData || preparingCsvRef.current) return;
-    preparingCsvRef.current = true;
-    setIsPreparingCsv(true);
+  const handleDownloadCsv = () => {
+    if (!resultCsvData) return;
     setCsvDownloadError(null);
     const files = [
       [`company-banner-${teamHash}.csv`, resultCsvData],
@@ -267,24 +266,21 @@ const CompanyBannerForm = () => {
     ].filter(([, content]) => content);
 
     try {
-      const { zipSync, strToU8 } = await import('fflate'); // Loaded only when needed
       // level 0: store without compressing, a few KB of CSV aren't worth the CPU
-      const zipped = zipSync(Object.fromEntries(files.map(([name, content]) => [name, strToU8(content)])), {
+      const zipped = zipSync(Object.fromEntries(files.map(([name, content]) => [name, strToU8(UTF8_BOM + content)])), {
         level: 0,
       });
       downloadBlob(new Blob([zipped], { type: 'application/zip' }), `company-csv-${teamHash}.zip`);
     } catch (err) {
       console.error('Failed to build CSV zip:', err);
       setCsvDownloadError('Failed to prepare the CSV download. Please try again.');
-    } finally {
-      preparingCsvRef.current = false;
-      setIsPreparingCsv(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMainError(null);
+    setUsernamesError(null);
     setCsvDownloadError(null);
     setResultImageUrl(null);
     setResultCsvData(null);
@@ -297,14 +293,12 @@ const CompanyBannerForm = () => {
     const usernames = parseUsernameInput(usernamesRaw);
 
     if (usernames.length === 0) {
-      setMainError(new Error(EMPTY_USERNAMES_ERROR));
+      setUsernamesError('Please enter at least one username.');
       return;
     }
     if (usernames.length > MAX_COMPANY_USERS) {
-      setMainError(
-        new Error(
-          `A company banner supports up to ${MAX_COMPANY_USERS} Trailblazers (you entered ${usernames.length}). Please shorten the list.`
-        )
+      setUsernamesError(
+        `A company banner supports up to ${MAX_COMPANY_USERS} Trailblazers (you entered ${usernames.length}). Please shorten the list.`
       );
       return;
     }
@@ -426,8 +420,8 @@ const CompanyBannerForm = () => {
             value={usernamesRaw}
             onChange={(e) => {
               setUsernamesRaw(e.target.value);
-              // Typing fixes the "no usernames" error; other errors stay until the next submit
-              if (mainError?.message === EMPTY_USERNAMES_ERROR) setMainError(null);
+              // Editing the list resolves its own errors; server errors stay until the next submit
+              if (usernamesError) setUsernamesError(null);
             }}
             placeholder={'Enter Trailhead usernames (one per line, comma, pipe or space separated)'}
             required
@@ -864,6 +858,7 @@ const CompanyBannerForm = () => {
         )}
 
         {/* Error */}
+        {usernamesError && <p className='error-message'>{usernamesError}</p>}
         {mainError && <p className='error-message'>{mainError.message}</p>}
 
         {/* Failed users */}
@@ -951,11 +946,10 @@ const CompanyBannerForm = () => {
               <button
                 type='button'
                 className='download-link'
-                style={{ marginTop: 0, cursor: isPreparingCsv ? 'wait' : 'pointer' }}
+                style={{ marginTop: 0, cursor: 'pointer' }}
                 onClick={handleDownloadCsv}
-                disabled={isPreparingCsv}
               >
-                {isPreparingCsv ? 'Preparing CSVs…' : 'Download CSVs (zip)'}
+                Download CSVs (zip)
               </button>
             )}
           </div>
