@@ -19,7 +19,7 @@ const LEVEL_ORDER = [3, 2, 1];
 const DEFAULT_LOGO_HEIGHT = 100;
 const ICON_SPACING = 8;
 const BADGE_RADIUS_RATIO = 0.18; // Badge circle size relative to icon height
-const BADGE_BG_COLOR = '#032D60';
+const BADGE_BG_COLOR = '#8a00c4'; // THB purple, same as the agentblazer and superbadge ×N badges
 
 /**
  * Prepare company sfdx-hardis badge icons for rendering.
