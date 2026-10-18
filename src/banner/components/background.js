@@ -3,7 +3,12 @@ import path from 'path';
 import fs from 'fs';
 import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
-import { validateImageBuffer, MAX_PHOTO_DIMENSION, MAX_PHOTO_PIXELS } from '../../utils/imageSafety.js';
+import {
+  decodeImageDataUrl,
+  validateImageBuffer,
+  MAX_PHOTO_DIMENSION,
+  MAX_PHOTO_PIXELS,
+} from '../../utils/imageSafety.js';
 import { Timer } from '../../utils/timerUtils.js';
 import { getLibraryFocusY } from '../../utils/libraryBackgrounds.js';
 import { drawImageWithFit } from '../bannerSizes.js';
@@ -16,22 +21,14 @@ import { drawImageWithFit } from '../bannerSizes.js';
 // Uploads arrive as base64 data URLs inside the JSON body (capped by the
 // platform at 4.5 MB); the decoded image gets the same limits as downloads
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-const DATA_URL_PATTERN = /^data:image\/[a-z0-9.+-]+;base64,/i;
 
 /**
- * Decode an uploaded background. Only base64 image data URLs are accepted:
- * loadImage() given a string would also fetch http(s) URLs (no SSRF checks)
- * and read local file paths.
+ * Decode and check an uploaded background.
  * @param {unknown} dataUrl
  * @returns {Buffer} validated image bytes
  */
 function decodeUploadedImage(dataUrl) {
-  const match = typeof dataUrl === 'string' ? dataUrl.match(DATA_URL_PATTERN) : null;
-  if (!match) throw new Error('Uploaded background must be a base64 image');
-  if ((dataUrl.length - match[0].length) * 0.75 > MAX_UPLOAD_BYTES) {
-    throw new Error('Uploaded background is too large');
-  }
-  const buffer = Buffer.from(dataUrl.slice(match[0].length), 'base64');
+  const buffer = decodeImageDataUrl(dataUrl, MAX_UPLOAD_BYTES);
   const validation = validateImageBuffer(buffer, {
     maxDimension: MAX_PHOTO_DIMENSION,
     maxPixels: MAX_PHOTO_PIXELS,
@@ -78,12 +75,7 @@ async function prepareBackground(options) {
             bgImage = await loadImage(decodeUploadedImage(options.backgroundImageUrl));
           } else {
             // getImage fetches through the SSRF-safe client and validates the image
-            let bgImageResult;
-            try {
-              bgImageResult = await getImage(String(options.backgroundImageUrl), 'background');
-            } catch {
-              throw new Error('Unsupported image type');
-            }
+            const bgImageResult = await getImage(String(options.backgroundImageUrl), 'background');
             bgImage = await loadImage(bgImageResult.buffer || bgImageResult);
           }
 
@@ -116,19 +108,13 @@ async function prepareBackground(options) {
     }
   } catch (error) {
     console.error('Error loading background:', error);
-    // Generic text: raw errors can reveal server paths or network details
+    // Generic text: raw errors can reveal server paths or network details.
+    // The banner still renders, on a black background.
     warnings.push('Could not load the background image, a black background was used instead.');
-
-    // Fallback to black background
     backgroundData = {
       type: 'color',
       color: '#000000',
     };
-
-    // Re-throw for certain error types
-    if (error.message === 'Unsupported image type') {
-      throw error;
-    }
   }
 
   return {

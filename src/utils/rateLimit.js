@@ -1,3 +1,4 @@
+import net from 'net';
 import { Ratelimit } from '@upstash/ratelimit';
 import RedisCacheUtils from './redisCacheUtils.js';
 
@@ -16,8 +17,10 @@ const LIMITS = {
   standard: { tokens: 30, window: '1 m' },
   rewind: { tokens: 30, window: '1 m' },
   validateUsername: { tokens: 60, window: '1 m' },
-  // Counted per username, not per request: a fetch chunk holds up to 25
-  companyFetchUsers: { tokens: 1500, window: '10 m' },
+  // Counted per username, not per request (a fetch chunk holds up to 25, the
+  // direct company flow up to 50). Room for a few full 500-user runs with
+  // retries, and for colleagues sharing an office IP.
+  companyFetchUsers: { tokens: 3000, window: '10 m' },
   company: { tokens: 30, window: '10 m' },
 };
 
@@ -31,7 +34,8 @@ function getLimiter(name) {
     redis && config
       ? new Ratelimit({
           redis,
-          limiter: Ratelimit.slidingWindow(config.tokens, config.window),
+          // Fixed window: its reset time is exact, so Retry-After is true
+          limiter: Ratelimit.fixedWindow(config.tokens, config.window),
           prefix: `thb:ratelimit:${process.env.VERCEL_ENV || 'development'}:${name}`,
           // Never let the limiter slow a request down much
           timeout: 1000,
@@ -57,6 +61,27 @@ export function getClientIp(req) {
 }
 
 /**
+ * Rate-limit key for an IP. An IPv6 client usually owns a whole /64, so
+ * limiting single addresses would let it rotate through endless fresh buckets.
+ * @param {string} ip
+ * @returns {string}
+ */
+export function getRateLimitKey(ip) {
+  if (net.isIPv4(ip) || !net.isIPv6(ip)) return ip;
+  if (/^::ffff:\d+\.\d+\.\d+\.\d+$/i.test(ip)) return ip.slice(7); // IPv4-mapped
+  const [head, tail = ''] = ip.split('%')[0].toLowerCase().split('::');
+  const headParts = head ? head.split(':') : [];
+  const tailParts = tail ? tail.split(':') : [];
+  const parts = ip.includes('::')
+    ? [...headParts, ...new Array(8 - headParts.length - tailParts.length).fill('0'), ...tailParts]
+    : headParts;
+  return `${parts
+    .slice(0, 4)
+    .map((part) => parseInt(part || '0', 16).toString(16))
+    .join(':')}::/64`;
+}
+
+/**
  * Consume tokens from a named limit for the request's IP.
  * @param {import('http').IncomingMessage} req
  * @param {keyof LIMITS} name
@@ -67,10 +92,11 @@ export async function checkRateLimit(req, name, tokens = 1) {
   const limiter = getLimiter(name);
   if (!limiter) return { allowed: true, retryAfterSeconds: 0 };
   try {
-    const result = await limiter.limit(getClientIp(req), { rate: tokens });
+    const key = getRateLimitKey(getClientIp(req));
+    const result = await limiter.limit(key, { rate: tokens });
     const retryAfterSeconds = Math.max(1, Math.ceil((result.reset - Date.now()) / 1000));
     if (!result.success) {
-      console.warn(`[Rate Limit] ${name} blocked for ${getClientIp(req)} (retry in ${retryAfterSeconds}s)`);
+      console.warn(`[Rate Limit] ${name} blocked for ${key} (retry in ${retryAfterSeconds}s)`);
     }
     return { allowed: result.success, retryAfterSeconds };
   } catch (error) {

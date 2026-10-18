@@ -164,6 +164,9 @@ export default async function handler(req, res) {
         });
       }
 
+      // Same per-username Trailhead budget as the chunked flow
+      if (!(await enforceRateLimit(req, res, 'companyFetchUsers', usernames.length))) return;
+
       timings.start('fetch');
       console.log(`[Company Banner] Fetching data for ${usernames.length} usernames`);
       ({ resolved, failed } = await fetchCompanyData(usernames, { queryOptions: options }));

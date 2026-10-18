@@ -2,6 +2,7 @@ import { downloadImage, uploadImage } from './blobUtils.js';
 import { safeFetchBuffer } from './urlSafety.js';
 import { validateImageBuffer, MAX_PHOTO_DIMENSION, MAX_PHOTO_PIXELS } from './imageSafety.js';
 import { getStampFileName } from './stampUtils.js';
+import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
@@ -30,6 +31,11 @@ export const getImage = async (imageUrl, folder = 'images', options = {}) => {
   }
   if (folder === 'stamps' || folder === 'stamps_keyed') {
     fileName = getStampFileName(imageUrl);
+  }
+  if (folder === 'background') {
+    // User-supplied URLs: key by the full URL, or two sites' "banner.jpg"
+    // would share one cache entry and users would see each other's images
+    fileName = crypto.createHash('sha256').update(imageUrl).digest('hex').slice(0, 32);
   }
   let imageDownloaded = null;
   let cacheHit = false;
