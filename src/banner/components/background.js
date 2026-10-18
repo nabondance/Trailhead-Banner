@@ -4,6 +4,10 @@ import fs from 'fs';
 import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
+import libraryBackgrounds from '../../data/banners.json';
+
+// Vertical crop focus per library background (0 = top, 0.5 = center, 1 = bottom), used by 'cover' fit
+const LIBRARY_FOCUS_Y = new Map(libraryBackgrounds.map((b) => [b.src.split('/').pop(), b.focusY]));
 
 /**
  * Background Component
@@ -134,7 +138,7 @@ async function prepareBackground(options) {
           const filePath = path.join(process.cwd(), 'public', 'assets', 'background-library', filename);
           const bgImageBuffer = await fs.promises.readFile(filePath);
           const bgImage = await loadImage(bgImageBuffer);
-          backgroundData = { type: 'image', image: bgImage };
+          backgroundData = { type: 'image', image: bgImage, focusY: LIBRARY_FOCUS_Y.get(filename) };
         }
         break;
 
@@ -213,7 +217,8 @@ async function prepareBackground(options) {
  * @param {number} canvasWidth - Canvas width
  * @param {number} canvasHeight - Canvas height
  * @param {Object} [options]
- * @param {'stretch'|'cover'} [options.fit='stretch'] - 'cover' keeps the image aspect ratio and crops the overflow (centered)
+ * @param {'stretch'|'cover'} [options.fit='stretch'] - 'cover' keeps the image aspect ratio and crops the overflow
+ *   (horizontally centered; vertically at the background's focusY, default center)
  */
 async function renderBackground(ctx, prepared, canvasWidth, canvasHeight, options = {}) {
   const { fit = 'stretch' } = options;
@@ -230,12 +235,13 @@ async function renderBackground(ctx, prepared, canvasWidth, canvasHeight, option
         const imgWidth = data.image.width || 0;
         const imgHeight = data.image.height || 0;
         if (fit === 'cover' && imgWidth > 0 && imgHeight > 0) {
-          // Scale to fill the canvas, then crop the overflow from the center of the source
+          // Scale to fill the canvas, then crop the overflow around the focus point
+          const focusY = Math.min(Math.max(data.focusY ?? 0.5, 0), 1);
           const scale = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
           const srcWidth = canvasWidth / scale;
           const srcHeight = canvasHeight / scale;
           const srcX = (imgWidth - srcWidth) / 2;
-          const srcY = (imgHeight - srcHeight) / 2;
+          const srcY = (imgHeight - srcHeight) * focusY;
           ctx.drawImage(data.image, srcX, srcY, srcWidth, srcHeight, 0, 0, canvasWidth, canvasHeight);
         } else {
           ctx.drawImage(data.image, 0, 0, canvasWidth, canvasHeight);
