@@ -4,21 +4,20 @@ import { supabase } from './supabaseUtils';
 const COUNT_TIMEOUT_MS = 5000;
 
 /**
- * Server-side total of generated banners (estimated), deduplicated per render with React cache.
- * Used for crawler-facing surfaces only (metadata, JSON-LD, llms.txt); the visible counter stays live client-side.
+ * Server-side total of generated banners, deduplicated per render with React cache.
+ * Used for crawler-facing surfaces only (metadata, JSON-LD, llms.txt); the visible counter is GenerationCount.
+ * Both read the same `generation_count` database function.
  * @returns {Promise<number|null>} null when the count can't be fetched
  */
 export const getBannerCount = cache(async () => {
   if (!supabase) return null;
   try {
     // Called during static builds: a hung request must not stall the deploy
-    const { count, error } = await supabase
-      .from('banners')
-      .select('id', { count: 'estimated', head: true })
-      .eq('source_env', process.env.NEXT_PUBLIC_VERCEL_ENV || 'development')
+    const { data, error } = await supabase
+      .rpc('generation_count', { p_table: 'banners', p_env: process.env.NEXT_PUBLIC_VERCEL_ENV || 'development' })
       .abortSignal(AbortSignal.timeout(COUNT_TIMEOUT_MS));
     if (error) throw error;
-    return count ?? null;
+    return Number.isFinite(data) ? data : null;
   } catch (error) {
     console.error('Error fetching banner count:', error);
     return null;
