@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from 'react-tooltip';
@@ -20,6 +20,8 @@ import BackgroundPreview from './BackgroundPreview';
 import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 import { extractUsernameFromUrl } from '../utils/usernameValidation';
+
+const EMPTY_USERNAMES_ERROR = 'Please enter at least one username.';
 
 // The compact company banner only renders the first N counters (see companyBanner.js),
 // so the UI selection is capped to the same number to stay in sync.
@@ -203,6 +205,9 @@ const CompanyBannerForm = () => {
   const [warnings, setWarnings] = useState([]);
   const [failedUsers, setFailedUsers] = useState([]);
   const [mainError, setMainError] = useState(null);
+  const [isPreparingCsv, setIsPreparingCsv] = useState(false);
+  const preparingCsvRef = useRef(false); // Sync guard: state updates don't land between rapid clicks
+  const [csvDownloadError, setCsvDownloadError] = useState(null);
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const handleBackgroundChange = (e) => handleBackgroundKindChange(e.target.value, setOptions);
@@ -241,41 +246,46 @@ const CompanyBannerForm = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
+    // Some browsers ignore clicks on links that aren't in the page
+    document.body.appendChild(a);
     a.click();
+    a.remove();
     // Revoking right away can cancel the download in some browsers (Safari, Firefox)
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  // A single download: one CSV as-is, several CSVs bundled in one zip
-  // (browsers often block or prompt for several downloads from one click)
+  // All team CSVs in one zip: browsers often block or prompt for several downloads from one click
   const handleDownloadCsv = async () => {
-    if (!resultCsvData) return;
+    if (!resultCsvData || preparingCsvRef.current) return;
+    preparingCsvRef.current = true;
+    setIsPreparingCsv(true);
+    setCsvDownloadError(null);
     const files = [
       [`company-banner-${teamHash}.csv`, resultCsvData],
       [`company-products-${teamHash}.csv`, resultProductCsvData],
       [`company-maintenance-${teamHash}.csv`, resultMaintenanceCsvData],
     ].filter(([, content]) => content);
 
-    if (files.length === 1) {
-      downloadBlob(new Blob([files[0][1]], { type: 'text/csv' }), files[0][0]);
-      return;
-    }
-
     try {
       const { zipSync, strToU8 } = await import('fflate'); // Loaded only when needed
-      const zipped = zipSync(Object.fromEntries(files.map(([name, content]) => [name, strToU8(content)])));
+      // level 0: store without compressing, a few KB of CSV aren't worth the CPU
+      const zipped = zipSync(Object.fromEntries(files.map(([name, content]) => [name, strToU8(content)])), {
+        level: 0,
+      });
       downloadBlob(new Blob([zipped], { type: 'application/zip' }), `company-csv-${teamHash}.zip`);
     } catch (err) {
       console.error('Failed to build CSV zip:', err);
-      setMainError(new Error('Failed to prepare the CSV download. Please try again.'));
+      setCsvDownloadError('Failed to prepare the CSV download. Please try again.');
+    } finally {
+      preparingCsvRef.current = false;
+      setIsPreparingCsv(false);
     }
   };
-
-  const hasMultipleCsv = Boolean(resultProductCsvData || resultMaintenanceCsvData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMainError(null);
+    setCsvDownloadError(null);
     setResultImageUrl(null);
     setResultCsvData(null);
     setResultProductCsvData(null);
@@ -287,7 +297,7 @@ const CompanyBannerForm = () => {
     const usernames = parseUsernameInput(usernamesRaw);
 
     if (usernames.length === 0) {
-      setMainError(new Error('Please enter at least one username.'));
+      setMainError(new Error(EMPTY_USERNAMES_ERROR));
       return;
     }
     if (usernames.length > MAX_COMPANY_USERS) {
@@ -416,7 +426,8 @@ const CompanyBannerForm = () => {
             value={usernamesRaw}
             onChange={(e) => {
               setUsernamesRaw(e.target.value);
-              if (mainError) setMainError(null); // Clear a stale error (e.g. "enter at least one username") while typing
+              // Typing fixes the "no usernames" error; other errors stay until the next submit
+              if (mainError?.message === EMPTY_USERNAMES_ERROR) setMainError(null);
             }}
             placeholder={'Enter Trailhead usernames (one per line, comma, pipe or space separated)'}
             required
@@ -940,13 +951,15 @@ const CompanyBannerForm = () => {
               <button
                 type='button'
                 className='download-link'
-                style={{ marginTop: 0, cursor: 'pointer' }}
+                style={{ marginTop: 0, cursor: isPreparingCsv ? 'wait' : 'pointer' }}
                 onClick={handleDownloadCsv}
+                disabled={isPreparingCsv}
               >
-                {hasMultipleCsv ? 'Download CSVs (zip)' : 'Download CSV'}
+                {isPreparingCsv ? 'Preparing CSVs…' : 'Download CSVs (zip)'}
               </button>
             )}
           </div>
+          {csvDownloadError && <p className='error-message'>{csvDownloadError}</p>}
         </div>
       )}
 
