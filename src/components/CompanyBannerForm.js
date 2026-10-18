@@ -839,13 +839,14 @@ const CompanyBannerForm = () => {
                   checked={options.generateCsv}
                   onChange={(e) => setOptions({ ...options, generateCsv: e.target.checked })}
                 />
-                <span className='option-label-text'>Also Generate CSV Skills Matrix</span>
+                <span className='option-label-text'>Also export team data (CSV)</span>
                 <span className='option-info' data-tooltip-id='csv-tooltip' tabIndex='0' aria-label='More information'>
                   <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
                 </span>
               </label>
               <Tooltip id='csv-tooltip' place='top' delayShow={200} className='react-tooltip'>
-                Exports a spreadsheet with per-user certification details, totals, and coverage percentages
+                Downloads a zip with up to 3 spreadsheets: a skills matrix per teammate (with totals and coverage %),
+                certifications per product, and upcoming certification maintenance
               </Tooltip>
             </fieldset>
           </div>
