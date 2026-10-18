@@ -36,7 +36,10 @@ export default function CompanyPage() {
     <div className='container'>
       <div className='main-content'>
         <h2>Company Banner Generator</h2>
-        <p>For teams and companies : combine multiple Trailhead profiles into a single banner.</p>
+        <p>
+          Showcase your team&apos;s Salesforce expertise in one LinkedIn banner. Add your teammates&apos; Trailhead
+          usernames to combine their certifications, superbadges and Agentblazer levels.
+        </p>
         <GenerationCount
           table='company_banners'
           envColumn='thb_source_env'
