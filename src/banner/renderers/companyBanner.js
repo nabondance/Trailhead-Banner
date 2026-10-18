@@ -38,7 +38,8 @@ const WATERMARK_SCALE = 0.65; // Smaller watermark for this compact banner
 
 /**
  * Build superbadge data in the format expected by the Superbadges component.
- * Respects the superbadgeDeduplicate option.
+ * Respects the superbadgeDeduplicate option. Unique superbadges are sorted by
+ * how many team members earned them (most-held first), so a limit keeps the top ones.
  *
  * @param {Object} companySuperbadges - { all, unique } from companyDataUtils
  * @param {Object} options
@@ -46,7 +47,9 @@ const WATERMARK_SCALE = 0.65; // Smaller watermark for this compact banner
  */
 function buildSuperbadgeData(companySuperbadges, options) {
   const deduplicate = options.superbadgeDeduplicate ?? false;
-  const source = deduplicate ? companySuperbadges?.unique || [] : companySuperbadges?.all || [];
+  const source = deduplicate
+    ? [...(companySuperbadges?.unique || [])].sort((a, b) => (b.count || 1) - (a.count || 1))
+    : companySuperbadges?.all || [];
 
   return {
     earnedAwards: {
@@ -124,6 +127,10 @@ async function generateCompanyBanner(aggregated, options = {}) {
     ...options,
     showCertCount: true,
     certificationSort: options.certificationSort ?? 'count',
+    // Match aggregation: retired certs are counted, so draw them (faded, per
+    // convention), and expired ones are included unless the option is off
+    includeRetiredCertifications: true,
+    includeExpiredCertifications: options.includeExpiredCertifications ?? true,
   };
   const certificationsPrep = await Certifications.prepareCertifications(
     aggregated.certificationsData,
@@ -148,7 +155,12 @@ async function generateCompanyBanner(aggregated, options = {}) {
     availableWidth: superbadgeAvailableWidth,
     logoHeight: SUPERBADGE_LOGO_HEIGHT,
   };
-  const superbadgesPrep = await Superbadges.prepareSuperbadges(superbadgesData, options, superbadgeLayout);
+  const superbadgesPrep = await Superbadges.prepareSuperbadges(
+    superbadgesData,
+    // Deduplicated superbadges are sorted most-held first: a limit keeps the top ones
+    { ...options, superbadgeLimitKeep: options.superbadgeDeduplicate ? 'first' : 'last' },
+    superbadgeLayout
+  );
   timings.superbadges_download_ms = superbadgesPrep.timings?.download_ms;
 
   timings.preparation_total_ms = Date.now() - prepareStartTime;

@@ -50,14 +50,23 @@ function formatCertColumnHeader(title) {
 }
 
 /**
- * Escape a CSV cell value (wrap in quotes if it contains comma, quote, or newline).
+ * Escape a CSV cell value: neutralise spreadsheet formulas, and wrap in quotes
+ * if it contains a comma, quote or line break.
+ *
+ * Text cells starting with = + - @ (or tab/CR) are run as formulas by Excel
+ * and Sheets — e.g. a username typed as =HYPERLINK(...) — so they get a
+ * leading apostrophe, which spreadsheets treat as "this is text". Numbers are
+ * left alone so negative values stay numeric.
  * @param {*} value
  * @returns {string}
  */
 function escapeCell(value) {
   if (value === null || value === undefined) return '';
-  const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+  let str = String(value);
+  if (typeof value === 'string' && /^[=+\-@\t\r]/.test(str)) {
+    str = `'${str}`;
+  }
+  if (/[",\n\r]/.test(str)) {
     return `"${str.replace(/"/g, '""')}"`;
   }
   return str;

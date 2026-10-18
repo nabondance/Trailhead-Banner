@@ -1,6 +1,7 @@
 import { fetchUserData } from '../banner/api/shared.js';
 import { QUERY_MAP } from '../banner/api/queryBuilder.js';
 import { fetchSfdxHardisBadges, getHighestSfdxHardisBadge } from './sfdxHardisBadgeUtils.js';
+import { extractUsernameFromUrl } from './usernameValidation.js';
 
 // Trailhead's APIs rate-limit per IP by request count (~200/min observed).
 // With the combined profile query a user costs 1-2 requests, so 10 concurrent
@@ -17,6 +18,13 @@ const COMPANY_CACHE_TTL_SECONDS = 1800;
 // Max usernames accepted per /api/banner/company-fetch call. The client chunks
 // its list to this size; keep the two in sync via this export.
 export const FETCH_CHUNK_SIZE = 25;
+// Max team size for a company banner (chunked flow). Keep in sync with the form.
+export const MAX_COMPANY_USERS = 500;
+// The direct flow fetches everything inside one /api/banner/company call
+// (60s limit), so it only suits small teams — CI and API callers.
+export const MAX_DIRECT_USERS = 50;
+// Usernames are slugs; anything longer is not a real Trailhead username
+const MAX_USERNAME_LENGTH = 80;
 
 function isRateLimitError(error) {
   return (
@@ -107,7 +115,7 @@ function buildCompanyQueries(username, needs) {
  * @param {Object} needs - Output of computeQueryNeeds()
  * @returns {Promise<{success: boolean, username: string, data?: Object, status?: string, error?: string}>}
  */
-async function fetchSingleUser(username, needs) {
+async function fetchSingleUser(username, needs, deadline = Infinity) {
   const queries = buildCompanyQueries(username, needs);
 
   for (let attempt = 0; ; attempt++) {
@@ -117,6 +125,11 @@ async function fetchSingleUser(username, needs) {
     } catch (error) {
       if (isRateLimitError(error) && attempt < RATE_LIMIT_RETRIES) {
         extendCooldown(attempt);
+        // Backing off past the time budget would overrun the function limit;
+        // hand the user back so the caller can retry it in a later request
+        if (rateLimitCooldownUntil > deadline) {
+          return { success: false, username, status: 'deferred' };
+        }
         continue;
       }
 
@@ -183,22 +196,47 @@ async function fetchSingleUserOnce(queries, username, needs) {
 }
 
 /**
+ * Clean a username list: turn profile URLs into usernames, keep non-empty
+ * strings of a sane length, trimmed, and drop case-insensitive duplicates (Trailhead usernames are
+ * case-insensitive, so "Jane" and "jane" are one person counted once).
+ *
+ * @param {Array} list
+ * @returns {string[]} Unique usernames, first spelling kept
+ */
+export function normalizeUsernames(list) {
+  if (!Array.isArray(list)) return [];
+  const seen = new Set();
+  const result = [];
+  for (const item of list) {
+    if (typeof item !== 'string') continue;
+    const username = extractUsernameFromUrl(item);
+    const key = username.toLowerCase();
+    if (!username || username.length > MAX_USERNAME_LENGTH || seen.has(key)) continue;
+    seen.add(key);
+    result.push(username);
+  }
+  return result;
+}
+
+/**
  * Parse and deduplicate a username list from a textarea string.
- * Supports newline and comma separators.
+ * Supports newline, comma, pipe and space separators.
  *
  * @param {string} raw - Raw textarea content
  * @returns {string[]} Cleaned, unique usernames
  */
 export function parseUsernames(raw) {
   if (!raw || typeof raw !== 'string') return [];
-  return [
-    ...new Set(
-      raw
-        .split(/[\n, ]+/)
-        .map((u) => u.trim())
-        .filter(Boolean)
-    ),
-  ];
+  return normalizeUsernames(raw.split(/[\n,| ]+/));
+}
+
+/**
+ * Accept a username list as an array or a separator-delimited string.
+ * @param {Array|string} input
+ * @returns {string[]}
+ */
+export function parseUsernameInput(input) {
+  return Array.isArray(input) ? normalizeUsernames(input) : parseUsernames(typeof input === 'string' ? input : '');
 }
 
 /**
@@ -210,11 +248,16 @@ export function parseUsernames(raw) {
  * @param {Object} [options]
  * @param {number} [options.concurrency] - Max users fetched at once
  * @param {Object} [options.queryOptions] - Banner options used to trim the query set (see computeQueryNeeds)
- * @returns {Promise<{resolved: Array, failed: Array}>}
+ * @param {number} [options.deadline] - Epoch ms after which no new user is started and
+ *   rate-limit back-offs are not waited out; those users are returned in `deferred`
+ * @returns {Promise<{resolved: Array, failed: Array, deferred: string[]}>}
  */
-export async function fetchCompanyData(usernames, { concurrency = USER_CONCURRENCY, queryOptions = {} } = {}) {
+export async function fetchCompanyData(
+  usernames,
+  { concurrency = USER_CONCURRENCY, queryOptions = {}, deadline = Infinity } = {}
+) {
   if (!usernames || usernames.length === 0) {
-    return { resolved: [], failed: [] };
+    return { resolved: [], failed: [], deferred: [] };
   }
 
   const needs = computeQueryNeeds(queryOptions);
@@ -225,8 +268,12 @@ export async function fetchCompanyData(usernames, { concurrency = USER_CONCURREN
     while (nextIndex < usernames.length) {
       const index = nextIndex++;
       const username = usernames[index];
+      if (Date.now() > deadline) {
+        results[index] = { success: false, username, status: 'deferred' };
+        continue;
+      }
       try {
-        results[index] = await fetchSingleUser(username, needs);
+        results[index] = await fetchSingleUser(username, needs, deadline);
       } catch (error) {
         // fetchSingleUser handles its own errors; this is a safety net
         results[index] = { success: false, username, status: 'error', error: error?.message };
@@ -238,14 +285,17 @@ export async function fetchCompanyData(usernames, { concurrency = USER_CONCURREN
 
   const resolved = [];
   const failed = [];
+  const deferred = [];
 
   for (const result of results) {
     if (result.success) {
       resolved.push(result.data);
+    } else if (result.status === 'deferred') {
+      deferred.push(result.username);
     } else {
       failed.push({ username: result.username, status: result.status || 'not_found' });
     }
   }
 
-  return { resolved, failed };
+  return { resolved, failed, deferred };
 }

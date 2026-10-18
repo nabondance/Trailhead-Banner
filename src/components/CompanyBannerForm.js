@@ -17,6 +17,7 @@ import {
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
+import { extractUsernameFromUrl } from '../utils/usernameValidation';
 
 // The compact company banner only renders the first N counters (see companyBanner.js),
 // so the UI selection is capped to the same number to stay in sync.
@@ -24,6 +25,14 @@ const MAX_COMPANY_COUNTERS = 2;
 // Usernames are fetched in chunks so Trailhead's rate limit is respected and
 // progress can be shown. Must not exceed FETCH_CHUNK_SIZE in companyFetchUtils.js.
 const FETCH_CHUNK_SIZE = 25;
+// Keep in sync with MAX_COMPANY_USERS in companyFetchUtils.js
+const MAX_COMPANY_USERS = 500;
+// Users deferred by the server (rate limit or time budget) or in a failed
+// chunk request are re-queued, up to this many attempts each
+const MAX_FETCH_ATTEMPTS = 3;
+const RETRY_PAUSE_MS = 2000;
+// The logo slot is small; raster uploads are downscaled before sending
+const MAX_LOGO_UPLOAD_PX = 600;
 const COMPANY_COUNTERS = COUNTERS_CONFIG.filter((c) => c.allowedIn?.includes('company'));
 // Default pair: team size (Trailblazers) for context + certifications as the headline metric.
 // Superbadges/certs are already shown as graphics, so counting Trailblazers adds non-redundant info.
@@ -32,36 +41,103 @@ const DEFAULT_COMPANY_COUNTERS = DEFAULT_COMPANY_COUNTER_IDS.map((id) =>
   COMPANY_COUNTERS.find((c) => c.id === id)
 ).filter(Boolean);
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Split the textarea into usernames (profile URLs are reduced to their username),
+ * dropping case-insensitive duplicates
+ * (Trailhead usernames are case-insensitive, so "Jane" and "jane" are one person).
+ */
+function parseUsernameInput(raw) {
+  const seen = new Set();
+  return raw
+    .split(/[\n,| ]+/)
+    .map((u) => (u.trim() ? extractUsernameFromUrl(u) : ''))
+    .filter((u) => {
+      const key = u.toLowerCase();
+      if (!u || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+/** Downscale a raster logo data URL so its longest side is at most MAX_LOGO_UPLOAD_PX (PNG keeps transparency). */
+function downscaleLogo(dataUrl) {
+  return new Promise((resolve) => {
+    if (dataUrl.startsWith('data:image/svg')) return resolve(dataUrl);
+    const image = new Image();
+    image.onload = () => {
+      const scale = Math.min(1, MAX_LOGO_UPLOAD_PX / Math.max(image.naturalWidth, image.naturalHeight));
+      if (scale === 1) return resolve(dataUrl);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(image.naturalWidth * scale);
+      canvas.height = Math.round(image.naturalHeight * scale);
+      canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    image.onerror = () => resolve(dataUrl);
+    image.src = dataUrl;
+  });
+}
+
 /**
  * Fetch Trailhead data for usernames chunk by chunk via /api/banner/company-fetch.
  * Sequential chunks keep the request rate under Trailhead's per-IP limit and
- * let the UI show real progress. onProgress receives the number of usernames done.
+ * let the UI show real progress. The server keeps each chunk's data and returns
+ * a token; only the tokens are sent to the render endpoint.
+ *
+ * Users the server deferred (rate limit or its time budget) and chunks whose
+ * request failed outright (e.g. a gateway timeout) are re-queued, up to
+ * MAX_FETCH_ATTEMPTS each. onProgress receives (usernames done, isRetrying).
+ *
+ * @returns {Promise<{tokens: string[], failed: Array, resolvedCount: number}>}
+ *   failed only lists users the server never reported on (exhausted retries)
  */
 async function fetchUsersInChunks(usernames, onProgress, fetchOptions = {}) {
-  const resolved = [];
+  const tokens = [];
   const failed = [];
+  const attempts = new Map();
+  let queue = [...usernames];
   let done = 0;
+  let resolvedCount = 0;
 
-  for (let i = 0; i < usernames.length; i += FETCH_CHUNK_SIZE) {
-    const chunk = usernames.slice(i, i + FETCH_CHUNK_SIZE);
+  while (queue.length > 0) {
+    const chunk = queue.slice(0, FETCH_CHUNK_SIZE);
+    queue = queue.slice(FETCH_CHUNK_SIZE);
+    const isRetrying = chunk.some((u) => attempts.has(u));
+    chunk.forEach((u) => attempts.set(u, (attempts.get(u) || 0) + 1));
+
+    let retry;
+    let retryStatus;
     try {
       const response = await fetch('/api/banner/company-fetch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usernames: chunk, options: fetchOptions }),
       });
+      // A platform error (504/413) returns HTML, so .json() throws here too
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Fetch failed');
-      resolved.push(...(data.resolved || []));
-      failed.push(...(data.failed || []));
+      tokens.push(data.token);
+      resolvedCount += data.resolvedCount || 0;
+      retry = Array.isArray(data.deferred) ? data.deferred : [];
+      retryStatus = 'rate_limited';
     } catch {
-      failed.push(...chunk.map((username) => ({ username, status: 'error' })));
+      retry = chunk;
+      retryStatus = 'error';
     }
-    done += chunk.length;
-    onProgress(done);
+
+    const exhausted = retry.filter((u) => attempts.get(u) >= MAX_FETCH_ATTEMPTS);
+    failed.push(...exhausted.map((username) => ({ username, status: retryStatus })));
+    queue.push(...retry.filter((u) => attempts.get(u) < MAX_FETCH_ATTEMPTS));
+    done += chunk.length - retry.length + exhausted.length;
+    onProgress(done, isRetrying);
+
+    // Give Trailhead's rate limit a moment before hammering it again
+    if (retry.length > exhausted.length) await sleep(RETRY_PAUSE_MS);
   }
 
-  return { resolved, failed };
+  return { tokens, failed, resolvedCount };
 }
 
 const CompanyBannerForm = () => {
@@ -95,10 +171,12 @@ const CompanyBannerForm = () => {
     lastXCertifications: '',
     // Superbadges
     displaySuperbadges: true,
-    displayLastXSuperbadges: false,
-    lastXSuperbadges: '',
-    superbadgeDeduplicate: false,
-    superbadgeShowCount: false,
+    // Unique + top 12 keeps the row readable for big teams and avoids loading
+    // every team member's superbadge images
+    displayLastXSuperbadges: true,
+    lastXSuperbadges: '12',
+    superbadgeDeduplicate: true,
+    superbadgeShowCount: true,
     superbadgeAlignment: 'left',
     // CSV
     generateCsv: false,
@@ -142,9 +220,10 @@ const CompanyBannerForm = () => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
+      const logo = await downscaleLogo(ev.target.result);
       setUploadedLogoFile(file);
-      setOptions((prev) => ({ ...prev, companyLogoUrl: ev.target.result }));
+      setOptions((prev) => ({ ...prev, companyLogoUrl: logo }));
     };
     reader.readAsDataURL(file);
   };
@@ -187,13 +266,18 @@ const CompanyBannerForm = () => {
     setWarnings([]);
     setFailedUsers([]);
 
-    const usernames = usernamesRaw
-      .split(/[\n,| ]+/)
-      .map((u) => u.trim())
-      .filter(Boolean);
+    const usernames = parseUsernameInput(usernamesRaw);
 
     if (usernames.length === 0) {
       setMainError(new Error('Please enter at least one username.'));
+      return;
+    }
+    if (usernames.length > MAX_COMPANY_USERS) {
+      setMainError(
+        new Error(
+          `A company banner supports up to ${MAX_COMPANY_USERS} Trailblazers (you entered ${usernames.length}). Please shorten the list.`
+        )
+      );
       return;
     }
 
@@ -235,50 +319,44 @@ const CompanyBannerForm = () => {
         displaySfdxHardisBadges: bannerOptions.displaySfdxHardisBadges,
       };
 
-      // Phase 1: fetch Trailhead data in chunks with progress
+      // Phase 1: fetch Trailhead data in chunks with progress (rate-limited
+      // users are retried inside fetchUsersInChunks)
       const fetchStartTime = Date.now();
       setFetchProgress({ phase: 'fetch', done: 0, total: usernames.length });
-      const { resolved, failed } = await fetchUsersInChunks(
+      const { tokens, failed, resolvedCount } = await fetchUsersInChunks(
         usernames,
-        (done) => setFetchProgress({ phase: 'fetch', done, total: usernames.length }),
+        (done, isRetrying) =>
+          setFetchProgress({ phase: isRetrying ? 'retry' : 'fetch', done, total: usernames.length }),
         fetchOptions
       );
-
-      // Retry rate-limited users once — Trailhead's limit usually clears quickly
-      let finalFailed = failed.filter((f) => f.status !== 'rate_limited');
-      const toRetry = failed.filter((f) => f.status === 'rate_limited').map((f) => f.username);
-      if (toRetry.length > 0) {
-        setFetchProgress({ phase: 'retry', done: 0, total: toRetry.length });
-        const retryResult = await fetchUsersInChunks(
-          toRetry,
-          (done) => setFetchProgress({ phase: 'retry', done, total: toRetry.length }),
-          fetchOptions
-        );
-        resolved.push(...retryResult.resolved);
-        finalFailed = [...finalFailed, ...retryResult.failed];
-      }
       const clientFetchMs = Date.now() - fetchStartTime;
 
-      if (resolved.length === 0) {
-        setMainError(new Error('None of the provided usernames could be resolved. Check usernames and try again.'));
-        setFailedUsers(finalFailed);
+      if (resolvedCount === 0 && tokens.length === 0) {
+        setMainError(new Error('Could not reach Trailhead. Please try again in a moment.'));
+        setFailedUsers(failed);
         return;
       }
 
-      // Phase 2: aggregate and render the banner from the fetched data
+      // Phase 2: aggregate and render the banner from the data kept server-side
       setFetchProgress({ phase: 'render' });
       const response = await fetch('/api/banner/company', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          resolvedData: resolved,
-          failedUsers: finalFailed,
+          chunkTokens: tokens,
+          failedUsers: failed,
           clientFetchMs,
           options: bannerOptions,
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        // Platform errors (413 body too large, 504 timeout) are not JSON
+        throw new Error(`The server could not generate the banner (HTTP ${response.status}). Please try again.`);
+      }
 
       if (!response.ok) {
         setMainError(new Error(data.error || 'Failed to generate company banner.'));
@@ -295,7 +373,11 @@ const CompanyBannerForm = () => {
       setWarnings(data.warnings || []);
       setFailedUsers(data.failedUsers || []);
     } catch (err) {
-      setMainError(new Error('An unexpected error occurred. Please try again.'));
+      setMainError(
+        new Error(
+          err?.message?.startsWith('The server') ? err.message : 'An unexpected error occurred. Please try again.'
+        )
+      );
     } finally {
       setIsGenerating(false);
       setFetchProgress(null);

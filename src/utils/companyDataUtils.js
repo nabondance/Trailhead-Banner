@@ -10,6 +10,19 @@ const AGENTBLAZER_LEVELS = ['Legend', 'Innovator', 'Champion'];
 const SFDX_HARDIS_LEVELS = [3, 2, 1];
 
 /**
+ * Zero-pad a Trailhead date ("2025-2-5" → "2025-02-05") so string order is
+ * chronological. Anything after the date part (time) is kept as-is.
+ * @param {string} value
+ * @returns {string}
+ */
+function toSortableDate(value) {
+  return String(value).replace(
+    /^(\d{4})-(\d{1,2})-(\d{1,2})/,
+    (_, y, m, d) => `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+  );
+}
+
+/**
  * Determine the agentblazer level for a user given their raw agentblazer data and display mode.
  * @param {Object} agentblazerData - Raw agentblazer data from GraphQL
  * @param {string} displayMode - 'current' or 'allTimeHigh'
@@ -223,12 +236,13 @@ export function aggregateCompanyData(usersData, options = {}) {
     const activeHolders = holders.filter((h) => !h.expired);
     const allExpired = activeHolders.length === 0;
 
-    // firstTimeWon: earliest dateCompleted across all holders
+    // firstTimeWon: earliest dateCompleted across all holders. Trailhead dates
+    // are not zero-padded ("2025-2-5"), so compare padded keys, not raw strings.
     const firstTimeWon =
       holders
         .map((h) => h.dateCompleted)
         .filter(Boolean)
-        .sort()[0] || null;
+        .sort((a, b) => toSortableDate(a).localeCompare(toSortableDate(b)))[0] || null;
 
     // For the banner: show as active unless everyone has it expired
     const displayExpired = allExpired && !isRetired;

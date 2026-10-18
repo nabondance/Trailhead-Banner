@@ -1,12 +1,20 @@
-import { fetchCompanyData, parseUsernames, FETCH_CHUNK_SIZE } from '../../../utils/companyFetchUtils';
+import { fetchCompanyData, parseUsernameInput, FETCH_CHUNK_SIZE } from '../../../utils/companyFetchUtils';
+import { saveCompanyChunk } from '../../../utils/companyChunkStore';
+
+// Stop starting new users after this long so the response (and the chunk
+// save) lands well inside the function's maxDuration (20s, see vercel.json)
+const FETCH_TIME_BUDGET_MS = 10000;
 
 /**
  * Fetch Trailhead data for a small chunk of usernames.
  * The company banner form splits its username list into chunks and calls this
- * endpoint sequentially so it can show fetch progress, then sends the collected
- * data to /api/banner/company for aggregation and rendering. Keeping each call
- * small also stays under Trailhead's per-IP rate limit and Vercel's function
- * duration limit.
+ * endpoint sequentially so it can show fetch progress. The fetched data stays
+ * server-side: it is stored under an opaque token, and the form later sends
+ * only the tokens to /api/banner/company — so the render endpoint never trusts
+ * user data (image URLs, counts) coming from the browser.
+ *
+ * Users that could not be fetched within the time budget or were still
+ * rate-limited are returned in `deferred` for the client to retry.
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,10 +22,7 @@ export default async function handler(req, res) {
   }
 
   const body = req.body || {};
-  const rawUsernames = body.usernames;
-  const usernames = Array.isArray(rawUsernames)
-    ? rawUsernames.filter((u) => typeof u === 'string' && u.trim()).map((u) => u.trim())
-    : parseUsernames(typeof rawUsernames === 'string' ? rawUsernames : '');
+  const usernames = parseUsernameInput(body.usernames);
 
   if (usernames.length === 0) {
     return res.status(400).json({ error: 'At least one username is required', validationError: true });
@@ -34,11 +39,25 @@ export default async function handler(req, res) {
     const startTime = Date.now();
     // Options trim the per-user query set (e.g. skip MVP when neither the
     // counters nor the CSV need it) — see computeQueryNeeds
-    const { resolved, failed } = await fetchCompanyData(usernames, { queryOptions: body.options || {} });
+    const { resolved, failed, deferred } = await fetchCompanyData(usernames, {
+      queryOptions: body.options || {},
+      deadline: startTime + FETCH_TIME_BUDGET_MS,
+    });
+
+    // Still rate-limited after the server-side retries: let the client retry later
+    const retryable = [...deferred, ...failed.filter((f) => f.status === 'rate_limited').map((f) => f.username)];
+    const finalFailed = failed.filter((f) => f.status !== 'rate_limited');
+
+    const token = await saveCompanyChunk({ resolved, failed: finalFailed });
     console.log(
-      `[Company Fetch] ${usernames.length} usernames | resolved: ${resolved.length} | failed: ${failed.length} | ${Date.now() - startTime}ms`
+      `[Company Fetch] ${usernames.length} usernames | resolved: ${resolved.length} | failed: ${finalFailed.length} | deferred: ${retryable.length} | ${Date.now() - startTime}ms`
     );
-    return res.status(200).json({ resolved, failed });
+    return res.status(200).json({
+      token,
+      resolvedCount: resolved.length,
+      failed: finalFailed,
+      deferred: retryable,
+    });
   } catch (error) {
     console.error('Error fetching company data chunk:', error?.message);
     return res.status(500).json({ error: 'Failed to fetch Trailhead data. Please try again.' });

@@ -1,5 +1,6 @@
-import axios from 'axios';
 import { downloadImage, uploadImage } from './blobUtils.js';
+import { safeFetchBuffer } from './urlSafety.js';
+import { validateImageBuffer } from './imageSafety.js';
 import { getStampFileName } from './stampUtils.js';
 import fs from 'fs';
 import path from 'path';
@@ -16,6 +17,12 @@ export const getCertificationFileName = (imageUrl) => {
   const lastMod = url.searchParams.get('lastMod');
   return `${id}_${oid}_${lastMod}.png`;
 };
+
+// Downloaded images (Trailhead assets, custom background URLs) — generous
+// limits, as photos used as backgrounds can be large
+const MAX_DOWNLOAD_BYTES = 15 * 1024 * 1024;
+const MAX_DOWNLOAD_DIMENSION = 12000;
+const MAX_DOWNLOAD_PIXELS = 60 * 1000 * 1000;
 
 export const getImage = async (imageUrl, folder = 'images', options = {}) => {
   const { signal, timeoutMs = 10000, awaitCacheWrite = true } = options;
@@ -45,60 +52,26 @@ export const getImage = async (imageUrl, folder = 'images', options = {}) => {
     throw new Error('Keyed version not found in cache');
   }
 
-  // Validate URL protocol (only allow http/https)
   try {
-    const parsedUrl = new URL(imageUrl);
-    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-      throw new Error(`Invalid protocol: ${parsedUrl.protocol}`);
-    }
-
-    // Check for localhost and private IP ranges to prevent SSRF
-    const hostname = parsedUrl.hostname.toLowerCase();
-    const privateRanges = [
-      'localhost',
-      '127.',
-      '10.',
-      '172.16.',
-      '172.17.',
-      '172.18.',
-      '172.19.',
-      '172.20.',
-      '172.21.',
-      '172.22.',
-      '172.23.',
-      '172.24.',
-      '172.25.',
-      '172.26.',
-      '172.27.',
-      '172.28.',
-      '172.29.',
-      '172.30.',
-      '172.31.',
-      '192.168.',
-      '169.254.', // Link-local
-      '::1', // IPv6 localhost (URL.hostname returns without brackets)
-      'fe80:', // IPv6 link-local
-    ];
-
-    if (privateRanges.some((range) => hostname.startsWith(range))) {
-      throw new Error(`Private/internal address blocked: ${hostname}`);
-    }
-  } catch (error) {
-    console.error(`URL validation failed for ${imageUrl}:`, error);
-    throw new Error(`Invalid or blocked URL: ${error.message}`);
-  }
-
-  try {
-    const response = await axios.get(imageUrl, {
-      responseType: 'arraybuffer',
-      timeout: timeoutMs,
+    // SSRF-safe: private/reserved addresses are refused at connect time and
+    // on every redirect hop (see urlSafety.js)
+    const imageBuffer = await safeFetchBuffer(imageUrl, {
+      timeoutMs,
       signal,
+      maxBytes: MAX_DOWNLOAD_BYTES,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
       },
     });
-    const imageBuffer = Buffer.from(response.data, 'binary');
+    // Never store something that is not an image in the public Blob cache
+    const validation = validateImageBuffer(imageBuffer, {
+      maxDimension: MAX_DOWNLOAD_DIMENSION,
+      maxPixels: MAX_DOWNLOAD_PIXELS,
+    });
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
     // Caching is best-effort: a failed write must not discard the downloaded image
     const cacheWrite = uploadImage(imageBuffer, fileName, folder).catch((error) =>
       console.error(`Failed to cache image ${imageUrl}:`, error.message)

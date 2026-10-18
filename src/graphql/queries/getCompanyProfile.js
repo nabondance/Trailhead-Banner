@@ -7,8 +7,7 @@
  */
 // Field selection is intentionally minimal: only what aggregateCompanyData,
 // the banner components, and the CSV export actually read. Slimmer responses
-// mean smaller Redis entries and a smaller resolvedData payload the browser
-// re-uploads for the render call.
+// mean smaller Redis entries (GraphQL cache and stored fetch chunks).
 const GET_COMPANY_PROFILE = `
   query GetCompanyProfile($slug: String, $hasSlug: Boolean!, $count: Int = 100, $filter: AwardTypeFilter = SUPERBADGE) {
     profile(slug: $slug) @include(if: $hasSlug) {

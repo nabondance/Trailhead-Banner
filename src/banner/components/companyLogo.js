@@ -1,5 +1,6 @@
 import { loadImage } from '@napi-rs/canvas';
-import { getImage } from '../../utils/cacheUtils.js';
+import { safeFetchBuffer } from '../../utils/urlSafety.js';
+import { validateImageBuffer } from '../../utils/imageSafety.js';
 import { Timer } from '../../utils/timerUtils.js';
 
 /**
@@ -8,46 +9,27 @@ import { Timer } from '../../utils/timerUtils.js';
  * Accepts a URL or base64 data URL. Auto-resizes to fit the available slot.
  */
 
-/**
- * Validate that a URL is a safe external image URL (SSRF protection).
- * @param {string} url
- * @returns {boolean}
- */
-function isValidExternalUrl(url) {
-  try {
-    const parsed = new URL(url);
-    if (!['http:', 'https:'].includes(parsed.protocol)) return false;
+// Logos come from the user, so they are fetched fresh (never Blob-cached:
+// the cache is keyed by file name, and different companies' "logo.png" would
+// collide) and checked before decoding.
+const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+const DATA_URL_PATTERN = /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,/i;
 
-    const hostname = parsed.hostname.toLowerCase();
-    const blocked = [
-      'localhost',
-      '127.',
-      '10.',
-      '169.254.',
-      '::1',
-      'fe80:',
-      '172.16.',
-      '172.17.',
-      '172.18.',
-      '172.19.',
-      '172.20.',
-      '172.21.',
-      '172.22.',
-      '172.23.',
-      '172.24.',
-      '172.25.',
-      '172.26.',
-      '172.27.',
-      '172.28.',
-      '172.29.',
-      '172.30.',
-      '172.31.',
-      '192.168.',
-    ];
-    return !blocked.some((range) => hostname.startsWith(range));
-  } catch {
-    return false;
+/**
+ * Load the logo bytes from a data URL or a public http(s) URL.
+ * @param {string} logoInput
+ * @returns {Promise<Buffer>}
+ */
+async function loadLogoBuffer(logoInput) {
+  if (logoInput.startsWith('data:')) {
+    const match = logoInput.match(DATA_URL_PATTERN);
+    if (!match) throw new Error('Unsupported logo format');
+    // base64 is ~4/3 the decoded size: reject before decoding a huge string
+    if ((logoInput.length - match[0].length) * 0.75 > MAX_LOGO_BYTES)
+      throw new Error('Logo file is too large (max 2 MB)');
+    return Buffer.from(logoInput.slice(match[0].length), 'base64');
   }
+  return safeFetchBuffer(logoInput, { maxBytes: MAX_LOGO_BYTES });
 }
 
 /**
@@ -70,20 +52,10 @@ async function prepareCompanyLogo(options = {}, slotHeight, slotWidth) {
 
   timer.start('load');
   try {
-    let image;
-    const isBase64 = logoInput.startsWith('data:');
-
-    if (isBase64) {
-      image = await loadImage(logoInput);
-    } else {
-      if (!isValidExternalUrl(logoInput)) {
-        warnings.push('Company logo URL is invalid or points to a private/internal address.');
-        return { shouldRender: false, image: null, width: 0, height: 0, warnings, timings: timer.end('load').get() };
-      }
-      const result = await getImage(logoInput, 'company-logos');
-      const buffer = result.buffer || result;
-      image = await loadImage(buffer);
-    }
+    const buffer = await loadLogoBuffer(String(logoInput));
+    const validation = validateImageBuffer(buffer);
+    if (!validation.valid) throw new Error(validation.error);
+    const image = await loadImage(buffer);
 
     // Scale to fill slot (with 2% padding) while maintaining aspect ratio
     const maxWidth = slotWidth * 0.9;

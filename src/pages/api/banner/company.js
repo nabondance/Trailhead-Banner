@@ -1,6 +1,14 @@
 import crypto from 'crypto';
 import { generateCompanyBanner } from '../../../banner/renderers/companyBanner';
-import { fetchCompanyData, parseUsernames, computeQueryNeeds } from '../../../utils/companyFetchUtils';
+import {
+  fetchCompanyData,
+  parseUsernameInput,
+  computeQueryNeeds,
+  FETCH_CHUNK_SIZE,
+  MAX_COMPANY_USERS,
+  MAX_DIRECT_USERS,
+} from '../../../utils/companyFetchUtils';
+import { isValidChunkToken, loadCompanyChunks } from '../../../utils/companyChunkStore';
 import { aggregateCompanyData } from '../../../utils/companyDataUtils';
 import { generateCompanyCsv, generateProductCsv, generateMaintenanceCsv } from '../../../utils/companyCsvUtils';
 import { getTeamMaintenanceSummary } from '../../../utils/certificationMaintenanceUtils';
@@ -30,6 +38,55 @@ function sanitizeOptionsForLogging(options) {
   return sanitized;
 }
 
+// Retries add chunks, so allow a few more tokens than a full team needs
+const MAX_CHUNK_TOKENS = Math.ceil(MAX_COMPANY_USERS / FETCH_CHUNK_SIZE) * 3;
+const FAILED_STATUSES = new Set(['not_found', 'private', 'rate_limited', 'timeout', 'error']);
+
+/**
+ * Merge stored fetch chunks into one resolved/failed list. A user can appear in
+ * several chunks (retries) and under different casing: a successful fetch
+ * wins over a failure, and the latest failure status wins otherwise.
+ *
+ * @param {Array} chunks - Chunks from loadCompanyChunks
+ * @param {Array} clientFailed - Users the client gave up on (no chunk reports them)
+ * @returns {{resolved: Array, failed: Array}}
+ */
+function mergeChunks(chunks, clientFailed) {
+  const resolvedByKey = new Map();
+  const failedByKey = new Map();
+  for (const chunk of chunks) {
+    for (const user of chunk.resolved || []) {
+      const key = user.username.toLowerCase();
+      if (!resolvedByKey.has(key)) resolvedByKey.set(key, user);
+    }
+    for (const failure of chunk.failed || []) {
+      failedByKey.set(failure.username.toLowerCase(), failure);
+    }
+  }
+  for (const failure of clientFailed) {
+    const key = failure.username.toLowerCase();
+    if (!failedByKey.has(key)) failedByKey.set(key, failure);
+  }
+  const failed = [...failedByKey].filter(([key]) => !resolvedByKey.has(key)).map(([, failure]) => failure);
+  return { resolved: [...resolvedByKey.values()], failed };
+}
+
+/**
+ * Client-reported failures are display/analytics only: keep a clean username
+ * and a known status, nothing else.
+ */
+function sanitizeClientFailed(list) {
+  if (!Array.isArray(list)) return [];
+  const usernames = parseUsernameInput(list.map((f) => f?.username));
+  const statusByName = new Map(
+    list.filter((f) => typeof f?.username === 'string').map((f) => [f.username.trim(), f.status])
+  );
+  return usernames.slice(0, MAX_COMPANY_USERS).map((username) => {
+    const status = statusByName.get(username);
+    return { username, status: FAILED_STATUSES.has(status) ? status : 'error' };
+  });
+}
+
 export const config = {
   api: {
     bodyParser: {
@@ -53,36 +110,52 @@ export default async function handler(req, res) {
   const timings = createTimingTracker();
   const body = req.body || {};
   const options = body.options || {};
-  const rawUsernames = body.usernames;
-  // Pre-fetched data from the chunked /api/banner/company-fetch flow
-  const preFetched = Array.isArray(body.resolvedData) ? body.resolvedData : null;
+  // Tokens from the chunked /api/banner/company-fetch flow (data kept server-side)
+  const isChunked = Array.isArray(body.chunkTokens);
 
   try {
     let usernames;
     let resolved;
     let failed;
 
-    if (preFetched) {
-      // Chunked flow: the client already fetched user data chunk by chunk.
+    if (isChunked) {
+      const tokens = [...new Set(body.chunkTokens)];
+      if (tokens.length > MAX_CHUNK_TOKENS || !tokens.every(isValidChunkToken)) {
+        return res.status(400).json({ error: 'Invalid fetch session. Please generate again.', validationError: true });
+      }
+      const { chunks, missing } = await loadCompanyChunks(tokens);
+      if (missing > 0) {
+        return res.status(410).json({
+          error: 'The fetched Trailhead data has expired. Please generate the banner again.',
+          validationError: true,
+        });
+      }
+      ({ resolved, failed } = mergeChunks(chunks, sanitizeClientFailed(body.failedUsers)));
+      usernames = [...resolved.map((u) => u.username), ...failed.map((f) => f.username)];
+      if (usernames.length > MAX_COMPANY_USERS) {
+        return res.status(400).json({
+          error: `A company banner supports up to ${MAX_COMPANY_USERS} Trailblazers.`,
+          validationError: true,
+        });
+      }
       // The fetch time was spent in /api/banner/company-fetch invocations, so
       // the client reports its fetch wall-time for accurate processing_time
       // analytics (clamped to 30min to keep garbage values out of the stats).
       const clientFetchMs = Math.min(Math.max(0, Math.round(Number(body.clientFetchMs) || 0)), 30 * 60 * 1000);
-      resolved = preFetched.filter((u) => u && typeof u.username === 'string');
-      failed = Array.isArray(body.failedUsers)
-        ? body.failedUsers.filter((f) => f && typeof f.username === 'string')
-        : [];
-      usernames = [...resolved.map((u) => u.username), ...failed.map((f) => f.username)];
       timings.add('fetch_ms', clientFetchMs);
     } else {
       // Direct flow: fetch everything server-side (throttled)
-      usernames = Array.isArray(rawUsernames)
-        ? rawUsernames
-        : parseUsernames(typeof rawUsernames === 'string' ? rawUsernames : '');
+      usernames = parseUsernameInput(body.usernames);
 
       if (usernames.length === 0) {
         return res.status(400).json({
           error: 'At least one username is required',
+          validationError: true,
+        });
+      }
+      if (usernames.length > MAX_DIRECT_USERS) {
+        return res.status(400).json({
+          error: `Maximum ${MAX_DIRECT_USERS} usernames per request; use /api/banner/company-fetch for larger teams`,
           validationError: true,
         });
       }
@@ -144,7 +217,7 @@ export default async function handler(req, res) {
     const allTimings = timings.getAll();
     // For the chunked flow the fetch happened client-side, so include its
     // reported duration in the total processing time
-    allTimings.total_ms = Date.now() - startTime + (preFetched ? allTimings.fetch_ms : 0);
+    allTimings.total_ms = Date.now() - startTime + (isChunked ? allTimings.fetch_ms : 0);
 
     console.log(
       `[Company Banner] Total: ${allTimings.total_ms}ms | Fetch: ${allTimings.fetch_ms}ms | Agg: ${allTimings.aggregation_ms}ms | Image: ${allTimings.image_generation_ms}ms`

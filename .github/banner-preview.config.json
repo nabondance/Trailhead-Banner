@@ -38,10 +38,10 @@
       "displayLastXCertifications": false,
       "lastXCertifications": "",
       "displaySuperbadges": true,
-      "displayLastXSuperbadges": false,
-      "lastXSuperbadges": "",
-      "superbadgeDeduplicate": false,
-      "superbadgeShowCount": false,
+      "displayLastXSuperbadges": true,
+      "lastXSuperbadges": 12,
+      "superbadgeDeduplicate": true,
+      "superbadgeShowCount": true,
       "superbadgeAlignment": "left",
       "generateCsv": true
     }

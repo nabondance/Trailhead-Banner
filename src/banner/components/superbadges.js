@@ -44,20 +44,34 @@ async function prepareSuperbadges(superbadgesData, options, layout) {
       .map((edge) => ({ icon: edge.node.award.icon, count: edge.node.award.count ?? 1 })) || [];
 
   if (options.displayLastXSuperbadges && options.lastXSuperbadges) {
-    superbadgeEntries = superbadgeEntries.slice(-options.lastXSuperbadges);
+    // Standard banner keeps the most recent (end of list); the company banner
+    // passes 'first' to keep its most-held superbadges (sorted first)
+    superbadgeEntries =
+      options.superbadgeLimitKeep === 'first'
+        ? superbadgeEntries.slice(0, options.lastXSuperbadges)
+        : superbadgeEntries.slice(-options.lastXSuperbadges);
   }
 
   const displayedSuperbadges = superbadgeEntries.length;
   const hiddenSuperbadges = totalSuperbadges - displayedSuperbadges;
 
-  // Download all superbadge logos in parallel
+  // Download all superbadge logos in parallel. Each distinct icon is loaded
+  // once: a company team repeats the same superbadges thousands of times.
   timer.start('total');
   timer.start('download');
+  const logoByIcon = new Map();
+  const loadLogo = (icon) => {
+    if (!logoByIcon.has(icon)) {
+      logoByIcon.set(
+        icon,
+        getImage(icon, 'superbadges').then((result) => loadImage(result.buffer || result))
+      );
+    }
+    return logoByIcon.get(icon);
+  };
   const superbadgeLogoPromises = superbadgeEntries.map(async (entry) => {
     try {
-      const logoResult = await getImage(entry.icon, 'superbadges');
-      const logoBuffer = logoResult.buffer || logoResult;
-      const logo = await loadImage(logoBuffer);
+      const logo = await loadLogo(entry.icon);
       return { logo, count: entry.count };
     } catch (error) {
       console.error(`Error loading superbadge logo from URL: ${entry.icon}`, error);
