@@ -291,9 +291,13 @@ const CompanyBannerForm = () => {
     if (options.backgroundKind === 'upload' && options.backgroundImageUrl) {
       try {
         if (!isCropSkipped && croppedAreaPixels) {
-          backgroundImageUrl = await getCroppedImage(options.backgroundImageUrl, croppedAreaPixels);
+          backgroundImageUrl = await getCroppedImage(
+            options.backgroundImageUrl,
+            croppedAreaPixels,
+            BANNER_SIZES.company
+          );
         } else {
-          backgroundImageUrl = await resizeImageForPayload(options.backgroundImageUrl);
+          backgroundImageUrl = await resizeImageForPayload(options.backgroundImageUrl, BANNER_SIZES.company);
         }
       } catch (err) {
         setMainError(new Error('Failed to process image. Please try again.'));
@@ -435,7 +439,9 @@ const CompanyBannerForm = () => {
                 <label>
                   Upload Background Image:
                   <input type='file' accept='image/*' onChange={handleImageChange} className='input-file' />
-                  <p className='helper-text'>Recommended image size: 1128 x 191 pixels</p>
+                  <p className='helper-text'>
+                    Recommended image size: {BANNER_SIZES.company.width} x {BANNER_SIZES.company.height} pixels
+                  </p>
                   {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
                 </label>
               )}
@@ -450,7 +456,7 @@ const CompanyBannerForm = () => {
                   onCropPositionChange={setCropPosition}
                   cropZoom={cropZoom}
                   onCropZoomChange={setCropZoom}
-                  aspectRatio={BANNER_SIZES.company.width / BANNER_SIZES.company.height}
+                  size={BANNER_SIZES.company}
                 />
               )}
               {options.backgroundKind === 'customUrl' && (
@@ -466,7 +472,9 @@ const CompanyBannerForm = () => {
                     data-lpignore='true'
                     data-form-type='other'
                   />
-                  <p className='helper-text'>Recommended image size: 1128 x 191 pixels</p>
+                  <p className='helper-text'>
+                    Recommended image size: {BANNER_SIZES.company.width} x {BANNER_SIZES.company.height} pixels
+                  </p>
                   {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
                 </label>
               )}

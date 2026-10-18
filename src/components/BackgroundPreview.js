@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { BANNER_SIZES } from '../banner/bannerSizes';
+import { BANNER_SIZES, getCoverSourceRect } from '../banner/bannerSizes';
 import { getBackgroundPreviewSrc } from '../utils/backgroundUtils';
 import { getLibraryFocusY } from '../utils/libraryBackgrounds';
 
@@ -13,12 +13,8 @@ function drawBackground(ctx, img, width, height, fit, focusY) {
   const imgWidth = img.naturalWidth;
   const imgHeight = img.naturalHeight;
   if (fit === 'cover' && imgWidth > 0 && imgHeight > 0) {
-    const scale = Math.max(width / imgWidth, height / imgHeight);
-    const srcWidth = width / scale;
-    const srcHeight = height / scale;
-    const srcX = (imgWidth - srcWidth) / 2;
-    const srcY = (imgHeight - srcHeight) * Math.min(Math.max(focusY, 0), 1);
-    ctx.drawImage(img, srcX, srcY, srcWidth, srcHeight, 0, 0, width, height);
+    const src = getCoverSourceRect(imgWidth, imgHeight, width, height, focusY);
+    ctx.drawImage(img, src.x, src.y, src.width, src.height, 0, 0, width, height);
   } else {
     ctx.drawImage(img, 0, 0, width, height);
   }

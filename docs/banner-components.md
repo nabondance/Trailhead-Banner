@@ -59,8 +59,11 @@ import { createCanvas } from '@napi-rs/canvas';
 import * as Background from '../components/background.js';
 import * as Certifications from '../components/certifications.js';
 
-const CANVAS_WIDTH = 1584;
-const CANVAS_HEIGHT = 396;
+import { BANNER_SIZES } from '../bannerSizes.js';
+
+// Add an entry to BANNER_SIZES (src/banner/bannerSizes.js) for a new banner type: { width, height, fit }.
+// The client forms, crop editor and BackgroundPreview read the same entry, so they stay in sync.
+const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT, fit: BACKGROUND_FIT } = BANNER_SIZES.standard;
 
 async function generateMyBanner(data, options = {}) {
   const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -77,7 +80,8 @@ async function generateMyBanner(data, options = {}) {
   ]);
 
   // PHASE 2: RENDER (sequential for correct layering)
-  await Background.renderBackground(ctx, bgPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
+  // fit: 'stretch' fills the canvas; 'cover' keeps the aspect ratio and crops at the background's focusY
+  await Background.renderBackground(ctx, bgPrep, CANVAS_WIDTH, CANVAS_HEIGHT, { fit: BACKGROUND_FIT });
   await Certifications.renderCertifications(ctx, certsPrep, 0, 100);
 
   // PHASE 3: COLLECT warnings and encode

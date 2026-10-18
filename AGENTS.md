@@ -134,8 +134,9 @@ When **removing** a page, remove it from both files as well.
 ### Add New Background Image
 
 1. Add to `public/assets/background-library/`
-2. Update `src/data/banners.json` with metadata
-3. Verify in background library page
+2. Update `src/data/banners.json` with metadata (`src`, `alt`, `credit`), plus `focusY` when the subject isn't centered
+   - `focusY` sets the vertical crop on the company banner (0 = keep top, 0.5 = center (default), 1 = keep bottom)
+3. Verify in background library page, and in the company form's Background Preview
 
 ### Modify Banner Layout
 

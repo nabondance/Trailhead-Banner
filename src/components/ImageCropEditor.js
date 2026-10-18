@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { BANNER_SIZES } from '../banner/bannerSizes';
 
-const DEFAULT_ASPECT_RATIO = BANNER_SIZES.standard.width / BANNER_SIZES.standard.height;
 const ZOOM_HEADROOM = 3;
 
 const ImageCropEditor = ({
@@ -17,8 +16,11 @@ const ImageCropEditor = ({
   onCropPositionChange,
   cropZoom,
   onCropZoomChange,
-  aspectRatio = DEFAULT_ASPECT_RATIO,
+  size = BANNER_SIZES.standard,
 }) => {
+  const aspectRatio = size.width / size.height;
+  // Without a crop, the server draws the original image with the banner's fit (see BANNER_SIZES)
+  const skipCover = size.fit === 'cover';
   const containerRef = useRef(null);
   const cropZoomRef = useRef(cropZoom);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -87,7 +89,12 @@ const ImageCropEditor = ({
         <div ref={containerRef} className='crop-container' style={{ height: containerSize.height || undefined }}>
           {containerSize.width > 0 &&
             (isCropSkipped ? (
-              <img src={imageSrc} alt='Preview (distorted)' className='crop-skip-preview' />
+              <img
+                src={imageSrc}
+                alt={skipCover ? 'Preview (center-cropped)' : 'Preview (distorted)'}
+                className='crop-skip-preview'
+                style={{ objectFit: skipCover ? 'cover' : 'fill' }}
+              />
             ) : (
               <Cropper
                 image={imageSrc}
@@ -105,7 +112,11 @@ const ImageCropEditor = ({
         </div>
       </div>
       {isCropSkipped && (
-        <p className='crop-skip-message'>Crop disabled — original image will be used (may be distorted)</p>
+        <p className='crop-skip-message'>
+          {skipCover
+            ? 'Crop disabled — original image will be center-cropped to fit'
+            : 'Crop disabled — original image will be used (may be distorted)'}
+        </p>
       )}
       <div className='crop-controls'>
         <div className='zoom-slider-row'>
