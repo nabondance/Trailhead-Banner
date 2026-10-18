@@ -1,24 +1,9 @@
 'use client';
 
 import React from 'react';
-import { BANNER_SIZES, getCoverSourceRect } from '../banner/bannerSizes';
+import { BANNER_SIZES, drawImageWithFit } from '../banner/bannerSizes';
 import { getBackgroundPreviewSrc } from '../utils/backgroundUtils';
 import { getLibraryFocusY } from '../utils/libraryBackgrounds';
-
-/**
- * Draw a background on a canvas the same way the server does (see renderBackground in
- * src/banner/components/background.js).
- */
-function drawBackground(ctx, img, width, height, fit, focusY) {
-  const imgWidth = img.naturalWidth;
-  const imgHeight = img.naturalHeight;
-  if (fit === 'cover' && imgWidth > 0 && imgHeight > 0) {
-    const src = getCoverSourceRect(imgWidth, imgHeight, width, height, focusY);
-    ctx.drawImage(img, src.x, src.y, src.width, src.height, 0, 0, width, height);
-  } else {
-    ctx.drawImage(img, 0, 0, width, height);
-  }
-}
 
 /**
  * Preview of a banner background, at the banner's real size and shape.
@@ -59,7 +44,8 @@ const BackgroundPreview = ({ options = {}, size = BANNER_SIZES.standard, title =
     img.onload = () => {
       if (cancelled) return;
       ctx.clearRect(0, 0, width, height);
-      drawBackground(ctx, img, width, height, fit, focusY);
+      // Same drawing as the server render (renderBackground in src/banner/components/background.js)
+      drawImageWithFit(ctx, img, img.naturalWidth, img.naturalHeight, width, height, fit, focusY);
     };
     img.onerror = () => {
       if (cancelled) return;

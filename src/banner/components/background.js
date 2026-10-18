@@ -5,7 +5,7 @@ import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
 import { getLibraryFocusY } from '../../utils/libraryBackgrounds.js';
-import { getCoverSourceRect } from '../bannerSizes.js';
+import { drawImageWithFit } from '../bannerSizes.js';
 
 /**
  * Background Component
@@ -230,15 +230,8 @@ async function renderBackground(ctx, prepared, canvasWidth, canvasHeight, option
   switch (data.type) {
     case 'image':
       if (data.image) {
-        const imgWidth = data.image.width || 0;
-        const imgHeight = data.image.height || 0;
-        if (fit === 'cover' && imgWidth > 0 && imgHeight > 0) {
-          // Scale to fill the canvas, then crop the overflow around the focus point
-          const src = getCoverSourceRect(imgWidth, imgHeight, canvasWidth, canvasHeight, data.focusY);
-          ctx.drawImage(data.image, src.x, src.y, src.width, src.height, 0, 0, canvasWidth, canvasHeight);
-        } else {
-          ctx.drawImage(data.image, 0, 0, canvasWidth, canvasHeight);
-        }
+        const { width: imgWidth = 0, height: imgHeight = 0 } = data.image;
+        drawImageWithFit(ctx, data.image, imgWidth, imgHeight, canvasWidth, canvasHeight, fit, data.focusY);
       }
       break;
 

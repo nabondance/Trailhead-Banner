@@ -61,9 +61,10 @@ import * as Certifications from '../components/certifications.js';
 
 import { BANNER_SIZES } from '../bannerSizes.js';
 
-// Add an entry to BANNER_SIZES (src/banner/bannerSizes.js) for a new banner type: { width, height, fit }.
+// Add an entry to BANNER_SIZES (src/banner/bannerSizes.js) for the new banner type, e.g.
+//   myBanner: { width: 1584, height: 396, fit: 'cover' },
 // The client forms, crop editor and BackgroundPreview read the same entry, so they stay in sync.
-const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT, fit: BACKGROUND_FIT } = BANNER_SIZES.standard;
+const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT, fit: BACKGROUND_FIT } = BANNER_SIZES.myBanner;
 
 async function generateMyBanner(data, options = {}) {
   const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
