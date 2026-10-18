@@ -1033,9 +1033,15 @@ function drawStylizedText(ctx, text, fontSize, x, y, style) {
 }
 
 const generateCountBadgeSvg = (count, color = '#009edb') => {
+  // Same convention as the +N badges: counter abbreviation (exact < 10k, then
+  // k / M / B) and a font that shrinks past 3 characters (font-size 110 fits "×99")
+  const text = `×${formatCounterValue(count)}`;
+  const fontSize = Math.min(110, Math.floor(330 / text.length));
+  // Circle center is y=100; at font-size 110 the baseline sits at 138
+  const baselineY = 100 + fontSize * 0.345;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
     <circle cx="100" cy="100" r="100" fill="${color}" fill-opacity="0.7"/>
-    <text x="100" y="138" fill="#ffffff" font-family="Anta, Arial, sans-serif" font-weight="bold" font-size="110" text-anchor="middle">×${count}</text>
+    <text x="100" y="${baselineY}" fill="#ffffff" font-family="Anta, Arial, sans-serif" font-weight="bold" font-size="${fontSize}" text-anchor="middle">${text}</text>
   </svg>`;
 };
 

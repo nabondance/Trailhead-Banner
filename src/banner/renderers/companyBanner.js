@@ -127,6 +127,8 @@ async function generateCompanyBanner(aggregated, options = {}) {
     ...options,
     showCertCount: true,
     certificationSort: options.certificationSort ?? 'count',
+    // Most-held / most recent first unless the caller asks otherwise
+    certificationSortOrder: options.certificationSortOrder ?? 'descendant',
     // Match aggregation: retired certs are counted, so draw them (faded, per
     // convention), and expired ones are included unless the option is off
     includeRetiredCertifications: true,

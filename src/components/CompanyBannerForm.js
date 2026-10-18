@@ -118,7 +118,7 @@ async function fetchUsersInChunks(usernames, onProgress, fetchOptions = {}) {
       // A platform error (504/413) returns HTML, so .json() throws here too
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Fetch failed');
-      tokens.push(data.token);
+      if (data.token) tokens.push(data.token);
       resolvedCount += data.resolvedCount || 0;
       retry = Array.isArray(data.deferred) ? data.deferred : [];
       retryStatus = 'rate_limited';

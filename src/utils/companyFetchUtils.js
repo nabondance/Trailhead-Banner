@@ -119,17 +119,19 @@ async function fetchSingleUser(username, needs, deadline = Infinity) {
   const queries = buildCompanyQueries(username, needs);
 
   for (let attempt = 0; ; attempt++) {
+    // Waiting out a cooldown (possibly set by another worker) or retrying past
+    // the time budget would overrun the function limit: hand the user back
+    if (attempt > 0 || rateLimitCooldownUntil > Date.now()) {
+      if (rateLimitCooldownUntil > deadline || Date.now() > deadline) {
+        return { success: false, username, status: 'deferred' };
+      }
+    }
     try {
       await waitForCooldown();
       return await fetchSingleUserOnce(queries, username, needs);
     } catch (error) {
       if (isRateLimitError(error) && attempt < RATE_LIMIT_RETRIES) {
         extendCooldown(attempt);
-        // Backing off past the time budget would overrun the function limit;
-        // hand the user back so the caller can retry it in a later request
-        if (rateLimitCooldownUntil > deadline) {
-          return { success: false, username, status: 'deferred' };
-        }
         continue;
       }
 

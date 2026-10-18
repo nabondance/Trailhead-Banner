@@ -38,8 +38,9 @@ function sanitizeOptionsForLogging(options) {
   return sanitized;
 }
 
-// Retries add chunks, so allow a few more tokens than a full team needs
-const MAX_CHUNK_TOKENS = Math.ceil(MAX_COMPANY_USERS / FETCH_CHUNK_SIZE) * 3;
+// Retries add chunks (up to 3 attempts per user, and the last retry chunks
+// can be small), so allow well over a full team's worth. Tokens are tiny.
+const MAX_CHUNK_TOKENS = Math.ceil(MAX_COMPANY_USERS / FETCH_CHUNK_SIZE) * 10;
 const FAILED_STATUSES = new Set(['not_found', 'private', 'rate_limited', 'timeout', 'error']);
 
 /**

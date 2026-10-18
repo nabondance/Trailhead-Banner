@@ -18,7 +18,7 @@
       "memory": 1024
     },
     "src/pages/api/banner/company-fetch.js": {
-      "maxDuration": 20,
+      "maxDuration": 30,
       "memory": 512
     },
     "src/pages/api/graphql-query.js": {

@@ -1,8 +1,9 @@
 import { fetchCompanyData, parseUsernameInput, FETCH_CHUNK_SIZE } from '../../../utils/companyFetchUtils';
 import { saveCompanyChunk } from '../../../utils/companyChunkStore';
 
-// Stop starting new users after this long so the response (and the chunk
-// save) lands well inside the function's maxDuration (20s, see vercel.json)
+// Stop starting new users after this long. A request already in flight can
+// still take up to the 15s GraphQL timeout, so the function's maxDuration
+// (30s, see vercel.json) leaves room for it and the chunk save
 const FETCH_TIME_BUDGET_MS = 10000;
 
 /**
@@ -48,7 +49,9 @@ export default async function handler(req, res) {
     const retryable = [...deferred, ...failed.filter((f) => f.status === 'rate_limited').map((f) => f.username)];
     const finalFailed = failed.filter((f) => f.status !== 'rate_limited');
 
-    const token = await saveCompanyChunk({ resolved, failed: finalFailed });
+    // A chunk where every user was deferred has nothing to keep: no token
+    const token =
+      resolved.length > 0 || finalFailed.length > 0 ? await saveCompanyChunk({ resolved, failed: finalFailed }) : null;
     console.log(
       `[Company Fetch] ${usernames.length} usernames | resolved: ${resolved.length} | failed: ${finalFailed.length} | deferred: ${retryable.length} | ${Date.now() - startTime}ms`
     );
