@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
+import { BANNER_SIZES } from '../banner/bannerSizes';
 
-const DEFAULT_ASPECT_RATIO = 1584 / 396; // Standard LinkedIn banner
+const DEFAULT_ASPECT_RATIO = BANNER_SIZES.standard.width / BANNER_SIZES.standard.height;
 const ZOOM_HEADROOM = 3;
 
 const ImageCropEditor = ({

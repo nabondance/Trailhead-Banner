@@ -12,14 +12,14 @@ import {
   Stamps,
   SfdxHardisBadge,
 } from '../components/index.js';
+import { BANNER_SIZES } from '../bannerSizes.js';
 
 /**
  * Standard Banner Renderer
  * Generates the standard Trailhead banner (1584 × 396px)
  */
 
-const CANVAS_WIDTH = 1584;
-const CANVAS_HEIGHT = 396;
+const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT, fit: BACKGROUND_FIT } = BANNER_SIZES.standard;
 const TOP_PART_RATIO = 1 / 4;
 const BOTTOM_PART_RATIO = 3 / 4;
 const RIGHT_PART_RATIO = 7 / 10;
@@ -138,7 +138,7 @@ async function generateStandardBanner(data, options = {}) {
   // ============================================================
 
   // 1. Background (always first)
-  await Background.renderBackground(ctx, backgroundPrep, CANVAS_WIDTH, CANVAS_HEIGHT);
+  await Background.renderBackground(ctx, backgroundPrep, CANVAS_WIDTH, CANVAS_HEIGHT, { fit: BACKGROUND_FIT });
 
   // 2. Rank Logo (top-left)
   await RankLogo.renderRankLogo(ctx, rankLogoPrep, 0, 0);

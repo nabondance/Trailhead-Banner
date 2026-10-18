@@ -17,18 +17,9 @@ import {
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
 import BackgroundPreview from './BackgroundPreview';
+import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 import { extractUsernameFromUrl } from '../utils/usernameValidation';
-
-// Company banner canvas size (matches src/banner/renderers/companyBanner.js)
-const COMPANY_BANNER_WIDTH = 1128;
-const COMPANY_BANNER_HEIGHT = 191;
-
-// Vertical crop focus of a library background, as used by the server's cover fit
-const getLibraryFocusY = (url) => {
-  const filename = url?.split('/').pop();
-  return bannerBackground.find((b) => b.src.split('/').pop() === filename)?.focusY ?? 0.5;
-};
 
 // The compact company banner only renders the first N counters (see companyBanner.js),
 // so the UI selection is capped to the same number to stay in sync.
@@ -459,7 +450,7 @@ const CompanyBannerForm = () => {
                   onCropPositionChange={setCropPosition}
                   cropZoom={cropZoom}
                   onCropZoomChange={setCropZoom}
-                  aspectRatio={COMPANY_BANNER_WIDTH / COMPANY_BANNER_HEIGHT}
+                  aspectRatio={BANNER_SIZES.company.width / BANNER_SIZES.company.height}
                 />
               )}
               {options.backgroundKind === 'customUrl' && (
@@ -495,14 +486,7 @@ const CompanyBannerForm = () => {
                 </div>
               )}
               {options.backgroundKind !== 'upload' && (
-                <BackgroundPreview
-                  src={getBackgroundPreviewSrc(options)}
-                  backgroundColor={options.backgroundColor}
-                  width={COMPANY_BANNER_WIDTH}
-                  height={COMPANY_BANNER_HEIGHT}
-                  fit='cover'
-                  focusY={options.backgroundKind === 'library' ? getLibraryFocusY(options.backgroundLibraryUrl) : 0.5}
-                />
+                <BackgroundPreview options={options} size={BANNER_SIZES.company} />
               )}
             </fieldset>
 

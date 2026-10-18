@@ -4,10 +4,7 @@ import fs from 'fs';
 import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
 import { Timer } from '../../utils/timerUtils.js';
-import libraryBackgrounds from '../../data/banners.json';
-
-// Vertical crop focus per library background (0 = top, 0.5 = center, 1 = bottom), used by 'cover' fit
-const LIBRARY_FOCUS_Y = new Map(libraryBackgrounds.map((b) => [b.src.split('/').pop(), b.focusY]));
+import { getLibraryFocusY } from '../../utils/libraryBackgrounds.js';
 
 /**
  * Background Component
@@ -138,7 +135,7 @@ async function prepareBackground(options) {
           const filePath = path.join(process.cwd(), 'public', 'assets', 'background-library', filename);
           const bgImageBuffer = await fs.promises.readFile(filePath);
           const bgImage = await loadImage(bgImageBuffer);
-          backgroundData = { type: 'image', image: bgImage, focusY: LIBRARY_FOCUS_Y.get(filename) };
+          backgroundData = { type: 'image', image: bgImage, focusY: getLibraryFocusY(filename) };
         }
         break;
 

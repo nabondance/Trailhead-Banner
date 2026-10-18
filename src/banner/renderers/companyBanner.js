@@ -4,6 +4,7 @@ import { Background, Counters, Certifications, Superbadges, Watermark } from '..
 import * as CompanyLogo from '../components/companyLogo.js';
 import * as CompanyAgentblazer from '../components/companyAgentblazer.js';
 import * as CompanySfdxHardisBadge from '../components/companySfdxHardisBadge.js';
+import { BANNER_SIZES } from '../bannerSizes.js';
 
 /**
  * Company Banner Renderer
@@ -15,8 +16,7 @@ import * as CompanySfdxHardisBadge from '../components/companySfdxHardisBadge.js
  * Bottom area: Certification grid with optional ×N count badges
  */
 
-const CANVAS_WIDTH = 1128; // LinkedIn company page header width
-const CANVAS_HEIGHT = 191; // LinkedIn company page header height
+const { width: CANVAS_WIDTH, height: CANVAS_HEIGHT, fit: BACKGROUND_FIT } = BANNER_SIZES.company;
 const TOP_PART_RATIO = 1 / 4; // top bar used for agentblazer/superbadge sizing
 const BOTTOM_PART_RATIO = 3 / 4; // cert area
 
@@ -174,7 +174,7 @@ async function generateCompanyBanner(aggregated, options = {}) {
   // ============================================================
 
   // 1. Background
-  await Background.renderBackground(ctx, backgroundPrep, CANVAS_WIDTH, CANVAS_HEIGHT, { fit: 'cover' });
+  await Background.renderBackground(ctx, backgroundPrep, CANVAS_WIDTH, CANVAS_HEIGHT, { fit: BACKGROUND_FIT });
 
   // 2. Company Logo (top-left, same slot as rank logo)
   await CompanyLogo.renderCompanyLogo(ctx, companyLogoPrep, 0, 0);

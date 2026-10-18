@@ -27,6 +27,7 @@ import {
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
 import BackgroundPreview from './BackgroundPreview';
+import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 
 // Counters without allowedIn are standard-only (stamp variants); company-only ones are excluded
@@ -393,7 +394,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
             ) : (
               options.backgroundKind !== 'procedural' &&
               options.backgroundKind !== 'upload' && (
-                <BackgroundPreview src={getBackgroundPreviewSrc(options)} backgroundColor={options.backgroundColor} />
+                <BackgroundPreview options={options} size={BANNER_SIZES.standard} />
               )
             )}
           </fieldset>
