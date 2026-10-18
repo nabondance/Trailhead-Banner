@@ -1,6 +1,6 @@
 import { downloadImage, uploadImage } from './blobUtils.js';
 import { safeFetchBuffer } from './urlSafety.js';
-import { validateImageBuffer } from './imageSafety.js';
+import { validateImageBuffer, MAX_PHOTO_DIMENSION, MAX_PHOTO_PIXELS } from './imageSafety.js';
 import { getStampFileName } from './stampUtils.js';
 import fs from 'fs';
 import path from 'path';
@@ -21,8 +21,6 @@ export const getCertificationFileName = (imageUrl) => {
 // Downloaded images (Trailhead assets, custom background URLs) — generous
 // limits, as photos used as backgrounds can be large
 const MAX_DOWNLOAD_BYTES = 15 * 1024 * 1024;
-const MAX_DOWNLOAD_DIMENSION = 12000;
-const MAX_DOWNLOAD_PIXELS = 60 * 1000 * 1000;
 
 export const getImage = async (imageUrl, folder = 'images', options = {}) => {
   const { signal, timeoutMs = 10000, awaitCacheWrite = true } = options;
@@ -66,8 +64,8 @@ export const getImage = async (imageUrl, folder = 'images', options = {}) => {
     });
     // Never store something that is not an image in the public Blob cache
     const validation = validateImageBuffer(imageBuffer, {
-      maxDimension: MAX_DOWNLOAD_DIMENSION,
-      maxPixels: MAX_DOWNLOAD_PIXELS,
+      maxDimension: MAX_PHOTO_DIMENSION,
+      maxPixels: MAX_PHOTO_PIXELS,
     });
     if (!validation.valid) {
       throw new Error(validation.error);

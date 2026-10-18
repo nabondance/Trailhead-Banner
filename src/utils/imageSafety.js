@@ -7,15 +7,29 @@
 export const MAX_IMAGE_DIMENSION = 4096;
 export const MAX_IMAGE_PIXELS = 16 * 1024 * 1024;
 
+// Photos used as backgrounds (downloaded or uploaded) can be large
+export const MAX_PHOTO_DIMENSION = 12000;
+export const MAX_PHOTO_PIXELS = 60 * 1000 * 1000;
+
+// CSS units in px; em/ex assume the default 16px font size
+const SVG_UNIT_PX = { '': 1, px: 1, pt: 4 / 3, pc: 16, in: 96, cm: 96 / 2.54, mm: 96 / 25.4, em: 16, ex: 8 };
+
 /**
- * Parse a CSS-like length from an SVG attribute (px or unitless only).
+ * Parse an SVG width/height attribute into px. The rasterizer understands
+ * exponents ("1e4") and units ("20000mm"), so a size this parser can't read
+ * must be refused, not treated as "no size".
  * @param {string|undefined} value
- * @returns {number|null}
+ * @returns {number|null|undefined} px; null when absent or relative (%); undefined when unreadable
  */
 function parseSvgLength(value) {
-  if (!value) return null;
-  const match = value.trim().match(/^([\d.]+)(px)?$/);
-  return match ? Number(match[1]) : null;
+  if (value === undefined || value.trim() === '') return null;
+  const match = value.trim().match(/^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)\s*([a-z%]*)$/i);
+  if (!match) return undefined;
+  const unit = match[2].toLowerCase();
+  if (unit === '%') return null; // relative to the viewport: falls back to the viewBox
+  const number = Number(match[1]);
+  if (!(unit in SVG_UNIT_PX) || !Number.isFinite(number) || number < 0) return undefined;
+  return number * SVG_UNIT_PX[unit];
 }
 
 function getSvgInfo(buffer) {
@@ -25,11 +39,14 @@ function getSvgInfo(buffer) {
   const attr = (name) => tag.match(new RegExp(`\\s${name}\\s*=\\s*["']([^"']*)["']`, 'i'))?.[1];
   let width = parseSvgLength(attr('width'));
   let height = parseSvgLength(attr('height'));
-  const viewBox = attr('viewBox')
-    ?.trim()
-    .split(/[\s,]+/)
-    .map(Number);
-  if ((width === null || height === null) && viewBox?.length === 4) {
+  if (width === undefined || height === undefined) return null;
+  const viewBoxAttr = attr('viewBox');
+  if ((width === null || height === null) && viewBoxAttr !== undefined) {
+    const viewBox = viewBoxAttr
+      .trim()
+      .split(/[\s,]+/)
+      .map(Number);
+    if (viewBox.length !== 4 || viewBox.some((n) => !Number.isFinite(n))) return null;
     width = width ?? viewBox[2];
     height = height ?? viewBox[3];
   }
@@ -117,7 +134,7 @@ export function validateImageBuffer(buffer, { maxDimension = MAX_IMAGE_DIMENSION
   if (width > maxDimension || height > maxDimension || width * height > maxPixels) {
     return {
       valid: false,
-      error: `Image is too large (${width}×${height}); max ${maxDimension}×${maxDimension}`,
+      error: `Image is too large (${Math.round(width)}×${Math.round(height)}); max ${maxDimension}×${maxDimension}`,
     };
   }
   return { valid: true, info };

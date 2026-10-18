@@ -15,6 +15,7 @@ import { getTeamMaintenanceSummary } from '../../../utils/certificationMaintenan
 import SupabaseUtils from '../../../utils/supabaseUtils';
 import { validateContentLength } from '../../../banner/api/validators';
 import { createTimingTracker, handleBannerError } from '../../../banner/api/shared';
+import { enforceRateLimit } from '../../../utils/rateLimit';
 import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 function buildTeamHash(usernames) {
@@ -100,6 +101,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  if (!(await enforceRateLimit(req, res, 'company'))) return;
 
   const contentLength = parseInt(req.headers['content-length'] || '0');
   const contentValidation = validateContentLength(contentLength, 10 * 1024 * 1024);

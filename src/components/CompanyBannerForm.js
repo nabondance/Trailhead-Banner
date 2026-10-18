@@ -49,6 +49,9 @@ const DEFAULT_COMPANY_COUNTERS = DEFAULT_COMPANY_COUNTER_IDS.map((id) =>
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** An error whose message is written for the user and can be shown as-is. */
+class UserFacingError extends Error {}
+
 /**
  * Split the textarea into usernames (profile URLs are reduced to their username),
  * dropping case-insensitive duplicates
@@ -115,6 +118,7 @@ async function fetchUsersInChunks(usernames, onProgress, fetchOptions = {}) {
 
     let retry;
     let retryStatus;
+    let rateLimitMessage = null;
     try {
       const response = await fetch('/api/banner/company-fetch', {
         method: 'POST',
@@ -123,6 +127,7 @@ async function fetchUsersInChunks(usernames, onProgress, fetchOptions = {}) {
       });
       // A platform error (504/413) returns HTML, so .json() throws here too
       const data = await response.json();
+      if (response.status === 429 && data.rateLimited) rateLimitMessage = data.message;
       if (!response.ok) throw new Error(data.error || 'Fetch failed');
       if (data.token) tokens.push(data.token);
       resolvedCount += data.resolvedCount || 0;
@@ -132,6 +137,9 @@ async function fetchUsersInChunks(usernames, onProgress, fetchOptions = {}) {
       retry = chunk;
       retryStatus = 'error';
     }
+
+    // Our own per-IP limit: retrying would only extend the wait, so stop here
+    if (rateLimitMessage) throw new UserFacingError(rateLimitMessage);
 
     const exhausted = retry.filter((u) => attempts.get(u) >= MAX_FETCH_ATTEMPTS);
     failed.push(...exhausted.map((username) => ({ username, status: retryStatus })));
@@ -381,11 +389,14 @@ const CompanyBannerForm = () => {
         data = await response.json();
       } catch {
         // Platform errors (413 body too large, 504 timeout) are not JSON
-        throw new Error(`The server could not generate the banner (HTTP ${response.status}). Please try again.`);
+        throw new UserFacingError(
+          `The server could not generate the banner (HTTP ${response.status}). Please try again.`
+        );
       }
 
       if (!response.ok) {
-        setMainError(new Error(data.error || 'Failed to generate company banner.'));
+        // handleBannerError puts a short label in `error` and the sentence for the user in `message`
+        setMainError(new Error(data.message || data.error || 'Failed to generate company banner.'));
         if (data.failedUsers) setFailedUsers(data.failedUsers);
         return;
       }
@@ -400,9 +411,7 @@ const CompanyBannerForm = () => {
       setFailedUsers(data.failedUsers || []);
     } catch (err) {
       setMainError(
-        new Error(
-          err?.message?.startsWith('The server') ? err.message : 'An unexpected error occurred. Please try again.'
-        )
+        new Error(err instanceof UserFacingError ? err.message : 'An unexpected error occurred. Please try again.')
       );
     } finally {
       setIsGenerating(false);

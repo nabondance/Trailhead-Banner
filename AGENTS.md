@@ -153,7 +153,7 @@ When **removing** a page, remove it from both files as well.
 
 - **Trailhead GraphQL API**: Source of user data (cached)
 - **@napi-rs/canvas**: Server-side canvas rendering
-- **Upstash Redis**: Query result caching
+- **Upstash Redis**: Query result caching, and per-IP rate limits on the API routes (`src/utils/rateLimit.js`, fails open if Redis is down)
 - **Vercel Blob**: Server-side asset cache for certification logo images (not used for generated banners)
 - **Supabase**: Analytics database — tracks every banner/rewind generation (`banners`, `rewinds` tables) and errors (`errors` table); implemented in `src/utils/supabaseUtils.js`.
   The server writes with `SUPABASE_SERVICE_ROLE_KEY` (server-only, never `NEXT_PUBLIC_`);

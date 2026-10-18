@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
 import { getImage } from '../../utils/cacheUtils.js';
+import { validateImageBuffer, MAX_PHOTO_DIMENSION, MAX_PHOTO_PIXELS } from '../../utils/imageSafety.js';
 import { Timer } from '../../utils/timerUtils.js';
 import { getLibraryFocusY } from '../../utils/libraryBackgrounds.js';
 import { drawImageWithFit } from '../bannerSizes.js';
@@ -12,103 +13,31 @@ import { drawImageWithFit } from '../bannerSizes.js';
  * Handles 5 background types: library, customUrl, upload, monochromatic, procedural
  */
 
+// Uploads arrive as base64 data URLs inside the JSON body (capped by the
+// platform at 4.5 MB); the decoded image gets the same limits as downloads
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const DATA_URL_PATTERN = /^data:image\/[a-z0-9.+-]+;base64,/i;
+
 /**
- * Validate if URL points to a valid image
- * @param {string} url - URL to validate
- * @returns {Promise<boolean>} True if valid image URL
+ * Decode an uploaded background. Only base64 image data URLs are accepted:
+ * loadImage() given a string would also fetch http(s) URLs (no SSRF checks)
+ * and read local file paths.
+ * @param {unknown} dataUrl
+ * @returns {Buffer} validated image bytes
  */
-async function isValidImageType(url) {
-  try {
-    // Validate URL protocol (only allow http/https)
-    const parsedUrl = new URL(url);
-    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-      console.error('Invalid protocol:', parsedUrl.protocol);
-      return false;
-    }
-
-    // Check for localhost and private IP ranges to prevent SSRF
-    const hostname = parsedUrl.hostname.toLowerCase();
-    const privateRanges = [
-      'localhost',
-      '127.',
-      '10.',
-      '172.16.',
-      '172.17.',
-      '172.18.',
-      '172.19.',
-      '172.20.',
-      '172.21.',
-      '172.22.',
-      '172.23.',
-      '172.24.',
-      '172.25.',
-      '172.26.',
-      '172.27.',
-      '172.28.',
-      '172.29.',
-      '172.30.',
-      '172.31.',
-      '192.168.',
-      '169.254.', // Link-local
-      '::1', // IPv6 localhost (URL.hostname returns without brackets)
-      'fe80:', // IPv6 link-local
-    ];
-
-    if (privateRanges.some((range) => hostname.startsWith(range))) {
-      console.error('Private/internal address blocked:', hostname);
-      return false;
-    }
-
-    // Use AbortController with timeout to prevent hanging requests
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-    try {
-      const response = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        console.error('Non-OK response:', response.status);
-        return false;
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.startsWith('image/')) {
-        return true;
-      }
-
-      // Fallback to checking URL patterns if content-type is not reliable
-      const urlWithoutParams = url.split('?')[0];
-      const extension = path.extname(urlWithoutParams).toLowerCase();
-
-      if (extension) {
-        switch (extension) {
-          case '.jpg':
-          case '.jpeg':
-          case '.png':
-          case '.webp':
-          case '.gif':
-            return true;
-          default:
-            break;
-        }
-      }
-
-      // Check common image patterns in URL
-      const imagePatterns = ['/image/', 'profile-displaybackgroundimage', '/img/', '/photo/', 'media.licdn.com'];
-
-      return imagePatterns.some((pattern) => url.toLowerCase().includes(pattern));
-    } catch (fetchError) {
-      clearTimeout(timeoutId);
-      if (fetchError.name === 'AbortError') {
-        console.error('Request timeout for URL:', url);
-      }
-      throw fetchError;
-    }
-  } catch (error) {
-    console.error('Error validating image URL:', error);
-    return false;
+function decodeUploadedImage(dataUrl) {
+  const match = typeof dataUrl === 'string' ? dataUrl.match(DATA_URL_PATTERN) : null;
+  if (!match) throw new Error('Uploaded background must be a base64 image');
+  if ((dataUrl.length - match[0].length) * 0.75 > MAX_UPLOAD_BYTES) {
+    throw new Error('Uploaded background is too large');
   }
+  const buffer = Buffer.from(dataUrl.slice(match[0].length), 'base64');
+  const validation = validateImageBuffer(buffer, {
+    maxDimension: MAX_PHOTO_DIMENSION,
+    maxPixels: MAX_PHOTO_PIXELS,
+  });
+  if (!validation.valid) throw new Error(validation.error);
+  return buffer;
 }
 
 /**
@@ -146,16 +75,16 @@ async function prepareBackground(options) {
           let bgImage;
 
           if (options.backgroundKind === 'upload') {
-            // For upload, backgroundImageUrl is a data URL - load directly
-            bgImage = await loadImage(options.backgroundImageUrl);
+            bgImage = await loadImage(decodeUploadedImage(options.backgroundImageUrl));
           } else {
-            // For custom URLs, validate first then use getImage
-            if (!(await isValidImageType(options.backgroundImageUrl))) {
+            // getImage fetches through the SSRF-safe client and validates the image
+            let bgImageResult;
+            try {
+              bgImageResult = await getImage(String(options.backgroundImageUrl), 'background');
+            } catch {
               throw new Error('Unsupported image type');
             }
-            const bgImageResult = await getImage(options.backgroundImageUrl, 'background');
-            const bgImageBuffer = bgImageResult.buffer || bgImageResult;
-            bgImage = await loadImage(bgImageBuffer);
+            bgImage = await loadImage(bgImageResult.buffer || bgImageResult);
           }
 
           backgroundData = { type: 'image', image: bgImage };
@@ -187,7 +116,8 @@ async function prepareBackground(options) {
     }
   } catch (error) {
     console.error('Error loading background:', error);
-    warnings.push(`Error loading background: ${error.message}`);
+    // Generic text: raw errors can reveal server paths or network details
+    warnings.push('Could not load the background image, a black background was used instead.');
 
     // Fallback to black background
     backgroundData = {

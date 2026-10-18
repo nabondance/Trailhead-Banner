@@ -42,7 +42,8 @@ const MainPage = () => {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate image');
+        // `message` holds the readable sentence when the API sends both (see handleBannerError)
+        throw new Error(errorData.message || errorData.error || 'Failed to generate image');
       }
       const data = await response.json();
       console.debug('Data:', data);

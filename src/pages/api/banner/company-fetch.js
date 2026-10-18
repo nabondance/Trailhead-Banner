@@ -1,5 +1,6 @@
 import { fetchCompanyData, parseUsernameInput, FETCH_CHUNK_SIZE } from '../../../utils/companyFetchUtils';
 import { saveCompanyChunk } from '../../../utils/companyChunkStore';
+import { enforceRateLimit } from '../../../utils/rateLimit';
 
 // Stop starting new users after this long. A request already in flight can
 // still take up to the 15s GraphQL timeout, so the function's maxDuration
@@ -35,6 +36,8 @@ export default async function handler(req, res) {
       validationError: true,
     });
   }
+
+  if (!(await enforceRateLimit(req, res, 'companyFetchUsers', usernames.length))) return;
 
   try {
     const startTime = Date.now();
