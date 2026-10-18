@@ -9,22 +9,27 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 // Null when env vars are missing (e.g. CI builds): this module is also evaluated during server prerender
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
+// How often to re-check the count while the tab is visible
+const POLL_INTERVAL_MS = 30000;
+
 /**
- * Reusable live generation counter backed by a Supabase table.
+ * Reusable generation counter backed by a Supabase table.
  *
- * Renders an animated count that ticks up in real time as new rows are inserted
- * into the given table. Used by the standard banner, rewind, and company banner
- * pages — each just passes the table it tracks and the wording to display.
+ * Renders an animated count that refreshes every POLL_INTERVAL_MS while the tab is visible.
+ * Used by the standard banner, rewind, and company banner pages — each just passes the
+ * table it tracks and the wording to display.
  *
- * @param {string} table - Supabase table to count rows from (e.g. 'banners', 'rewinds', 'company_banners')
- * @param {string} [envColumn='source_env'] - Column holding the source environment to filter on
+ * The count comes from the `generation_count` database function, so the browser never
+ * reads the analytics tables directly.
+ *
+ * @param {string} table - Table to count rows from ('banners', 'rewinds' or 'company_banners')
  * @param {string} elementId - Unique DOM id for the CountUp target span (must be unique per mounted instance)
  * @param {string} [className='banner-count'] - Wrapper class name
  * @param {string} [before='Already '] - Text rendered before the count
  * @param {string} after - Text rendered after the count
  */
 const GenerationCount = forwardRef(
-  ({ table, envColumn = 'source_env', elementId, className = 'banner-count', before = 'Already ', after }, ref) => {
+  ({ table, elementId, className = 'banner-count', before = 'Already ', after }, ref) => {
     const [count, setCount] = useState(0);
     const countUpRef = useRef(null);
     const initialLoad = useRef(true);
@@ -48,10 +53,11 @@ const GenerationCount = forwardRef(
 
     const fetchCount = async () => {
       if (!supabase) return;
-      const { count: newCount, error } = await supabase
-        .from(table)
-        .select('id', { count: 'estimated', head: true })
-        .eq(envColumn, sourceEnv);
+      const { data, error } = await supabase.rpc('generation_count', {
+        p_table: table,
+        p_env: sourceEnv,
+      });
+      const newCount = Number(data) || 0;
 
       if (error) {
         console.error(`Error fetching ${table} count:`, error);
@@ -69,29 +75,20 @@ const GenerationCount = forwardRef(
     useEffect(() => {
       if (!supabase) return;
 
-      // Fetch initial count
       fetchCount();
 
-      // Subscribe to changes in the table so the count updates live
-      const subscription = supabase
-        .channel(`realtime:${table}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table,
-            filter: `${envColumn}=eq.${sourceEnv}`,
-          },
-          () => {
-            fetchCount(); // Update the count when a change is detected
-          }
-        )
-        .subscribe();
+      // Poll while the tab is visible, and refresh as soon as it becomes visible again
+      const interval = setInterval(() => {
+        if (!document.hidden) fetchCount();
+      }, POLL_INTERVAL_MS);
+      const onVisibilityChange = () => {
+        if (!document.hidden) fetchCount();
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
 
-      // Cleanup subscription on component unmount
       return () => {
-        supabase.removeChannel(subscription);
+        clearInterval(interval);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

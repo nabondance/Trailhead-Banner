@@ -2,9 +2,16 @@ import packageJson from '../../package.json';
 import { createClient } from '@supabase/supabase-js';
 import { getHighestAgentblazerRankPerYear } from './dataUtils';
 
+// Server-only client: the service role key bypasses RLS, so the analytics tables can stay closed to the public anon key.
+// Never prefix this key with NEXT_PUBLIC_ or import this module from client components.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase =
+  supabaseUrl && supabaseServiceRoleKey
+    ? createClient(supabaseUrl, supabaseServiceRoleKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      })
+    : null;
 
 /**
  * Detects whether a value is a Data URL (e.g. "data:image/png;base64,...").

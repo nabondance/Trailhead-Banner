@@ -42,7 +42,6 @@ export default function CompanyPage() {
         </p>
         <GenerationCount
           table='company_banners'
-          envColumn='thb_source_env'
           elementId='company-countup-element'
           after=' amazing company banners generated and still counting!'
         />
