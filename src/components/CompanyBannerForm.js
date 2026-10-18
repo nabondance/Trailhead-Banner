@@ -16,8 +16,19 @@ import {
 } from '../utils/backgroundUtils';
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
+import BackgroundPreview from './BackgroundPreview';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 import { extractUsernameFromUrl } from '../utils/usernameValidation';
+
+// Company banner canvas size (matches src/banner/renderers/companyBanner.js)
+const COMPANY_BANNER_WIDTH = 1128;
+const COMPANY_BANNER_HEIGHT = 191;
+
+// Vertical crop focus of a library background, as used by the server's cover fit
+const getLibraryFocusY = (url) => {
+  const filename = url?.split('/').pop();
+  return bannerBackground.find((b) => b.src.split('/').pop() === filename)?.focusY ?? 0.5;
+};
 
 // The compact company banner only renders the first N counters (see companyBanner.js),
 // so the UI selection is capped to the same number to stay in sync.
@@ -433,7 +444,7 @@ const CompanyBannerForm = () => {
                 <label>
                   Upload Background Image:
                   <input type='file' accept='image/*' onChange={handleImageChange} className='input-file' />
-                  <p className='helper-text'>Recommended image size: 1584 x 396 pixels</p>
+                  <p className='helper-text'>Recommended image size: 1128 x 191 pixels</p>
                   {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
                 </label>
               )}
@@ -448,6 +459,7 @@ const CompanyBannerForm = () => {
                   onCropPositionChange={setCropPosition}
                   cropZoom={cropZoom}
                   onCropZoomChange={setCropZoom}
+                  aspectRatio={COMPANY_BANNER_WIDTH / COMPANY_BANNER_HEIGHT}
                 />
               )}
               {options.backgroundKind === 'customUrl' && (
@@ -463,7 +475,7 @@ const CompanyBannerForm = () => {
                     data-lpignore='true'
                     data-form-type='other'
                   />
-                  <p className='helper-text'>Recommended image size: 1584 x 396 pixels</p>
+                  <p className='helper-text'>Recommended image size: 1128 x 191 pixels</p>
                   {backgroundImageUrlError && <p className='error-message'>{backgroundImageUrlError}</p>}
                 </label>
               )}
@@ -481,6 +493,16 @@ const CompanyBannerForm = () => {
                     />
                   ))}
                 </div>
+              )}
+              {options.backgroundKind !== 'upload' && (
+                <BackgroundPreview
+                  src={getBackgroundPreviewSrc(options)}
+                  backgroundColor={options.backgroundColor}
+                  width={COMPANY_BANNER_WIDTH}
+                  height={COMPANY_BANNER_HEIGHT}
+                  fit='cover'
+                  focusY={options.backgroundKind === 'library' ? getLibraryFocusY(options.backgroundLibraryUrl) : 0.5}
+                />
               )}
             </fieldset>
 

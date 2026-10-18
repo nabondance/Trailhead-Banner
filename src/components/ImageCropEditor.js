@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 
-const ASPECT_RATIO = 1584 / 396;
+const DEFAULT_ASPECT_RATIO = 1584 / 396; // Standard LinkedIn banner
 const ZOOM_HEADROOM = 3;
 
 const ImageCropEditor = ({
@@ -16,6 +16,7 @@ const ImageCropEditor = ({
   onCropPositionChange,
   cropZoom,
   onCropZoomChange,
+  aspectRatio = DEFAULT_ASPECT_RATIO,
 }) => {
   const containerRef = useRef(null);
   const cropZoomRef = useRef(cropZoom);
@@ -32,11 +33,11 @@ const ImageCropEditor = ({
     if (!el) return;
     const observer = new ResizeObserver(([entry]) => {
       const w = entry.contentRect.width;
-      setContainerSize({ width: Math.round(w), height: Math.round(w / ASPECT_RATIO) });
+      setContainerSize({ width: Math.round(w), height: Math.round(w / aspectRatio) });
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [aspectRatio]);
 
   // Compute min zoom so the image always covers the crop area (no grey bars).
   // Only overrides the current zoom if it is below the cover minimum (e.g. fresh upload).
@@ -47,7 +48,7 @@ const ImageCropEditor = ({
     img.onload = () => {
       if (cancelled) return;
       const imageAspect = img.naturalWidth / img.naturalHeight;
-      const coverZoom = imageAspect < ASPECT_RATIO ? ASPECT_RATIO / imageAspect : 1;
+      const coverZoom = imageAspect < aspectRatio ? aspectRatio / imageAspect : 1;
       setMinZoom(coverZoom);
       setMaxZoom(coverZoom * ZOOM_HEADROOM);
       if (cropZoomRef.current < coverZoom) {
@@ -63,7 +64,7 @@ const ImageCropEditor = ({
     return () => {
       cancelled = true;
     };
-  }, [imageSrc, onCropZoomChange]);
+  }, [imageSrc, onCropZoomChange, aspectRatio]);
 
   const handleCropComplete = useCallback(
     (_, croppedAreaPixels) => {
@@ -91,7 +92,7 @@ const ImageCropEditor = ({
                 image={imageSrc}
                 crop={cropPosition}
                 zoom={Math.max(cropZoom, minZoom)}
-                aspect={ASPECT_RATIO}
+                aspect={aspectRatio}
                 minZoom={minZoom}
                 maxZoom={maxZoom}
                 cropSize={containerSize}

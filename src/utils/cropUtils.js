@@ -44,6 +44,7 @@ export async function getCroppedImage(imageSrc, pixelCrop) {
     return dataUrl;
   }
 
-  // Too large for API payload — fall back to 2× banner dimensions
-  return drawCrop(image, pixelCrop, FALLBACK_WIDTH, FALLBACK_HEIGHT);
+  // Too large for API payload — fall back to 2× banner width, keeping the crop's aspect ratio
+  const fallbackHeight = Math.round((FALLBACK_WIDTH * pixelCrop.height) / pixelCrop.width);
+  return drawCrop(image, pixelCrop, FALLBACK_WIDTH, fallbackHeight);
 }
