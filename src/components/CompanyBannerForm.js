@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { zipSync, strToU8 } from 'fflate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from 'react-tooltip';
@@ -20,6 +21,9 @@ import BackgroundPreview from './BackgroundPreview';
 import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 import { extractUsernameFromUrl } from '../utils/usernameValidation';
+
+// Excel only reads a CSV as UTF-8 (accents, non-Latin names) when it starts with a byte order mark
+const UTF8_BOM = '\uFEFF';
 
 // The compact company banner only renders the first N counters (see companyBanner.js),
 // so the UI selection is capped to the same number to stay in sync.
@@ -203,6 +207,8 @@ const CompanyBannerForm = () => {
   const [warnings, setWarnings] = useState([]);
   const [failedUsers, setFailedUsers] = useState([]);
   const [mainError, setMainError] = useState(null);
+  const [usernamesError, setUsernamesError] = useState(null); // Client-side check of the usernames list
+  const [csvDownloadError, setCsvDownloadError] = useState(null);
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const handleBackgroundChange = (e) => handleBackgroundKindChange(e.target.value, setOptions);
@@ -236,30 +242,46 @@ const CompanyBannerForm = () => {
     setUploadedLogoFile(null);
   };
 
-  const downloadCsvFile = (content, filename) => {
-    const blob = new Blob([content], { type: 'text/csv' });
+  const downloadBlob = (blob, filename) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
+    // Some browsers ignore clicks on links that aren't in the page
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    // Revoking right away can cancel the download in some browsers (Safari, Firefox)
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
+  // All team CSVs in one zip: browsers often block or prompt for several downloads from one click
   const handleDownloadCsv = () => {
     if (!resultCsvData) return;
-    downloadCsvFile(resultCsvData, `company-banner-${teamHash}.csv`);
-    if (resultProductCsvData) {
-      downloadCsvFile(resultProductCsvData, `company-products-${teamHash}.csv`);
-    }
-    if (resultMaintenanceCsvData) {
-      downloadCsvFile(resultMaintenanceCsvData, `company-maintenance-${teamHash}.csv`);
+    setCsvDownloadError(null);
+    const files = [
+      [`company-banner-${teamHash}.csv`, resultCsvData],
+      [`company-products-${teamHash}.csv`, resultProductCsvData],
+      [`company-maintenance-${teamHash}.csv`, resultMaintenanceCsvData],
+    ].filter(([, content]) => content);
+
+    try {
+      // level 0: store without compressing, a few KB of CSV aren't worth the CPU
+      const zipped = zipSync(Object.fromEntries(files.map(([name, content]) => [name, strToU8(UTF8_BOM + content)])), {
+        level: 0,
+      });
+      downloadBlob(new Blob([zipped], { type: 'application/zip' }), `company-csv-${teamHash}.zip`);
+    } catch (err) {
+      console.error('Failed to build CSV zip:', err);
+      setCsvDownloadError('Failed to prepare the CSV download. Please try again.');
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMainError(null);
+    setUsernamesError(null);
+    setCsvDownloadError(null);
     setResultImageUrl(null);
     setResultCsvData(null);
     setResultProductCsvData(null);
@@ -271,14 +293,12 @@ const CompanyBannerForm = () => {
     const usernames = parseUsernameInput(usernamesRaw);
 
     if (usernames.length === 0) {
-      setMainError(new Error('Please enter at least one username.'));
+      setUsernamesError('Please enter at least one username.');
       return;
     }
     if (usernames.length > MAX_COMPANY_USERS) {
-      setMainError(
-        new Error(
-          `A company banner supports up to ${MAX_COMPANY_USERS} Trailblazers (you entered ${usernames.length}). Please shorten the list.`
-        )
+      setUsernamesError(
+        `A company banner supports up to ${MAX_COMPANY_USERS} Trailblazers (you entered ${usernames.length}). Please shorten the list.`
       );
       return;
     }
@@ -398,7 +418,11 @@ const CompanyBannerForm = () => {
           <textarea
             rows={4}
             value={usernamesRaw}
-            onChange={(e) => setUsernamesRaw(e.target.value)}
+            onChange={(e) => {
+              setUsernamesRaw(e.target.value);
+              // Editing the list resolves its own errors; server errors stay until the next submit
+              if (usernamesError) setUsernamesError(null);
+            }}
             placeholder={'Enter Trailhead usernames (one per line, comma, pipe or space separated)'}
             required
             className='input'
@@ -820,19 +844,21 @@ const CompanyBannerForm = () => {
                   checked={options.generateCsv}
                   onChange={(e) => setOptions({ ...options, generateCsv: e.target.checked })}
                 />
-                <span className='option-label-text'>Also Generate CSV Skills Matrix</span>
+                <span className='option-label-text'>Also export team data (CSV)</span>
                 <span className='option-info' data-tooltip-id='csv-tooltip' tabIndex='0' aria-label='More information'>
                   <FontAwesomeIcon icon={faCircleInfo} className='icon-info' />
                 </span>
               </label>
               <Tooltip id='csv-tooltip' place='top' delayShow={200} className='react-tooltip'>
-                Exports a spreadsheet with per-user certification details, totals, and coverage percentages
+                Downloads a zip with up to 3 spreadsheets: a skills matrix per teammate (with totals and coverage %),
+                certifications per product, and upcoming certification maintenance
               </Tooltip>
             </fieldset>
           </div>
         )}
 
         {/* Error */}
+        {usernamesError && <p className='error-message'>{usernamesError}</p>}
         {mainError && <p className='error-message'>{mainError.message}</p>}
 
         {/* Failed users */}
@@ -923,10 +949,11 @@ const CompanyBannerForm = () => {
                 style={{ marginTop: 0, cursor: 'pointer' }}
                 onClick={handleDownloadCsv}
               >
-                {resultProductCsvData ? 'Download CSVs' : 'Download CSV'}
+                Download CSVs (zip)
               </button>
             )}
           </div>
+          {csvDownloadError && <p className='error-message'>{csvDownloadError}</p>}
         </div>
       )}
 
