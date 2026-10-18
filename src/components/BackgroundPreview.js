@@ -28,7 +28,7 @@ function drawBackground(ctx, img, width, height, fit, focusY) {
  * Preview of a banner background, at the banner's real size and shape.
  *
  * @param {Object} props.options - Form options: backgroundKind, backgroundLibraryUrl, customBackgroundImageUrl,
- *   backgroundImageUrl, backgroundColor, and optional focusY (overrides the library background's focusY)
+ *   backgroundImageUrl, backgroundColor. Library backgrounds crop at their focusY from banners.json
  * @param {Object} [props.size=BANNER_SIZES.standard] - { width, height, fit } — use an entry of BANNER_SIZES
  * @param {string} [props.title='Background Preview'] - Heading shown above the preview (falsy to hide)
  */
@@ -37,8 +37,7 @@ const BackgroundPreview = ({ options = {}, size = BANNER_SIZES.standard, title =
   const { width, height, fit = 'stretch' } = size;
   const src = getBackgroundPreviewSrc(options);
   const backgroundColor = options.backgroundColor || '#5badd6';
-  const focusY =
-    options.focusY ?? (options.backgroundKind === 'library' ? getLibraryFocusY(options.backgroundLibraryUrl) : 0.5);
+  const focusY = options.backgroundKind === 'library' ? getLibraryFocusY(options.backgroundLibraryUrl) : 0.5;
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
