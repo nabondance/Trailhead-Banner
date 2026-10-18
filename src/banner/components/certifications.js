@@ -66,9 +66,13 @@ async function prepareCertifications(certificationsData, options = {}, layout) {
   // Sort certifications
   certifications = sortCertifications(certifications, options.certificationSort, options.certificationSortOrder);
 
-  // Limit to first X after sorting
+  // Limit to X after sorting: the standard banner keeps the last X; the company
+  // banner passes 'first' to keep the top of its sort (e.g. most-held)
   if (options.displayLastXCertifications && options.lastXCertifications) {
-    certifications = certifications.slice(0, options.lastXCertifications);
+    certifications =
+      options.certificationLimitKeep === 'first'
+        ? certifications.slice(0, options.lastXCertifications)
+        : certifications.slice(-options.lastXCertifications);
   }
 
   const displayedCertifications = certifications.length;

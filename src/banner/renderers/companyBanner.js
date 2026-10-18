@@ -129,6 +129,8 @@ async function generateCompanyBanner(aggregated, options = {}) {
     certificationSort: options.certificationSort ?? 'count',
     // Most-held / most recent first unless the caller asks otherwise
     certificationSortOrder: options.certificationSortOrder ?? 'descendant',
+    // A limit keeps the top of the sort (most-held first by default)
+    certificationLimitKeep: 'first',
     // Match aggregation: retired certs are counted, so draw them (faded, per
     // convention), and expired ones are included unless the option is off
     includeRetiredCertifications: true,
