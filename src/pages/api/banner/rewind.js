@@ -3,6 +3,7 @@ import { generateRewind } from '../../../utils/generateRewind';
 import { buildRewindQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, createTimingTracker, handleBannerError } from '../../../banner/api/shared';
 import { validateUsername } from '../../../banner/api/validators';
+import { enforceRateLimit } from '../../../utils/rateLimit';
 import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 export const config = {
@@ -30,6 +31,8 @@ export default async function handler(req, res) {
       message: 'Only POST requests are supported',
     });
   }
+
+  if (!(await enforceRateLimit(req, res, 'rewind'))) return;
 
   const startTime = Date.now();
   const timings = createTimingTracker();

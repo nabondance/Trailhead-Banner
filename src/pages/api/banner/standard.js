@@ -5,6 +5,7 @@ import { validateUsername, validateContentLength } from '../../../banner/api/val
 import { buildStandardQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, createTimingTracker, handleBannerError } from '../../../banner/api/shared';
 import { fetchSfdxHardisBadgeBundle } from '../../../utils/sfdxHardisBadgeUtils';
+import { enforceRateLimit } from '../../../utils/rateLimit';
 import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 export const config = {
@@ -19,6 +20,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  if (!(await enforceRateLimit(req, res, 'standard'))) return;
 
   // Validate content length
   const contentLength = parseInt(req.headers['content-length'] || '0');

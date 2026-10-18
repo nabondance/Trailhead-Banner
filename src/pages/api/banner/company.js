@@ -15,6 +15,7 @@ import { getTeamMaintenanceSummary } from '../../../utils/certificationMaintenan
 import SupabaseUtils from '../../../utils/supabaseUtils';
 import { validateContentLength } from '../../../banner/api/validators';
 import { createTimingTracker, handleBannerError } from '../../../banner/api/shared';
+import { enforceRateLimit } from '../../../utils/rateLimit';
 import '../../../utils/fonts.js'; // Register fonts with @napi-rs/canvas
 
 function buildTeamHash(usernames) {
@@ -101,6 +102,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  if (!(await enforceRateLimit(req, res, 'company'))) return;
+
   const contentLength = parseInt(req.headers['content-length'] || '0');
   const contentValidation = validateContentLength(contentLength, 10 * 1024 * 1024);
   if (!contentValidation.valid) {
@@ -160,6 +163,9 @@ export default async function handler(req, res) {
           validationError: true,
         });
       }
+
+      // Same per-username Trailhead budget as the chunked flow
+      if (!(await enforceRateLimit(req, res, 'companyFetchUsers', usernames.length))) return;
 
       timings.start('fetch');
       console.log(`[Company Banner] Fetching data for ${usernames.length} usernames`);

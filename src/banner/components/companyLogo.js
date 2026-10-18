@@ -1,6 +1,6 @@
 import { loadImage } from '@napi-rs/canvas';
 import { safeFetchBuffer } from '../../utils/urlSafety.js';
-import { validateImageBuffer } from '../../utils/imageSafety.js';
+import { decodeImageDataUrl, validateImageBuffer } from '../../utils/imageSafety.js';
 import { Timer } from '../../utils/timerUtils.js';
 
 /**
@@ -13,7 +13,6 @@ import { Timer } from '../../utils/timerUtils.js';
 // the cache is keyed by file name, and different companies' "logo.png" would
 // collide) and checked before decoding.
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
-const DATA_URL_PATTERN = /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,/i;
 
 /**
  * Load the logo bytes from a data URL or a public http(s) URL.
@@ -22,12 +21,7 @@ const DATA_URL_PATTERN = /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,/
  */
 async function loadLogoBuffer(logoInput) {
   if (logoInput.startsWith('data:')) {
-    const match = logoInput.match(DATA_URL_PATTERN);
-    if (!match) throw new Error('Unsupported logo format');
-    // base64 is ~4/3 the decoded size: reject before decoding a huge string
-    if ((logoInput.length - match[0].length) * 0.75 > MAX_LOGO_BYTES)
-      throw new Error('Logo file is too large (max 2 MB)');
-    return Buffer.from(logoInput.slice(match[0].length), 'base64');
+    return decodeImageDataUrl(logoInput, MAX_LOGO_BYTES);
   }
   return safeFetchBuffer(logoInput, { maxBytes: MAX_LOGO_BYTES });
 }
