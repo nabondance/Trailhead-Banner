@@ -33,6 +33,17 @@ function normalizeBannerImageUrl(value, level) {
 }
 
 /**
+ * Build the trusted banner image URL of a training badge level.
+ *
+ * @param {number} level
+ * @returns {string|null}
+ */
+function buildSfdxHardisBannerImageUrl(level) {
+  if (!Number.isInteger(level) || level < 1 || level > 3) return null;
+  return `${SFDX_HARDIS_TRAINING_ORIGIN}/badges/img/banner-level-${level}.svg`;
+}
+
+/**
  * Build the public badge-record URL for a Trailblazer username.
  *
  * @param {string} username
@@ -249,6 +260,7 @@ export {
   SFDX_HARDIS_BADGES_URL,
   SFDX_HARDIS_TIME_BUDGET_MS,
   buildSfdxHardisBadgeUrl,
+  buildSfdxHardisBannerImageUrl,
   normalizeSfdxHardisBadgeRecord,
   getHighestSfdxHardisBadge,
   fetchSfdxHardisBadges,

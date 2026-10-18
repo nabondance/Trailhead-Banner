@@ -1,0 +1,315 @@
+import { getHighestAgentblazerRankPerYear } from './dataUtils.js';
+
+const CTA_CERT_TITLE = 'Salesforce Certified Technical Architect';
+
+// Agentblazer level display order (highest prestige first).
+// API numbering: Legend=3, Innovator=2, Champion=1 — Champion is the ENTRY level.
+const AGENTBLAZER_LEVELS = ['Legend', 'Innovator', 'Champion'];
+
+// sfdx-hardis training badge levels display order (highest first)
+const SFDX_HARDIS_LEVELS = [3, 2, 1];
+
+/**
+ * Zero-pad a Trailhead date ("2025-2-5" → "2025-02-05") so string order is
+ * chronological. Anything after the date part (time) is kept as-is.
+ * @param {string} value
+ * @returns {string}
+ */
+function toSortableDate(value) {
+  return String(value).replace(
+    /^(\d{4})-(\d{1,2})-(\d{1,2})/,
+    (_, y, m, d) => `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+  );
+}
+
+/**
+ * Determine the agentblazer level for a user given their raw agentblazer data and display mode.
+ * @param {Object} agentblazerData - Raw agentblazer data from GraphQL
+ * @param {string} displayMode - 'current' or 'allTimeHigh'
+ * @returns {string|null} Level title or null
+ */
+function getUserAgentblazerLevel(agentblazerData, displayMode) {
+  const levels = agentblazerData?.learnerStatusLevels;
+  if (!levels) return null;
+
+  const ranksPerYear = getHighestAgentblazerRankPerYear(levels);
+  if (!ranksPerYear || ranksPerYear.length === 0) return null;
+
+  let selectedRank = null;
+  if (displayMode === 'allTimeHigh') {
+    selectedRank = ranksPerYear.reduce((highest, current) => {
+      if (!highest || current.level > highest.level) return current;
+      return highest;
+    }, null);
+  } else {
+    // current: strictly the active rank — a lapsed past-year rank is not
+    // "current" (users who want lapsed ranks counted can pick All Time High)
+    selectedRank = ranksPerYear.find((r) => r.active === true) || null;
+  }
+
+  return selectedRank?.title || null;
+}
+
+/**
+ * Determine if a cert is an Accredited Professional cert.
+ * @param {Object} cert
+ * @returns {boolean}
+ */
+function isAccreditedProfessional(cert) {
+  return cert.title.includes('Accredited Professional');
+}
+
+/**
+ * Filter a cert based on cert type options.
+ * @param {Object} cert
+ * @param {Object} options
+ * @returns {boolean}
+ */
+function certPassesTypeFilter(cert, options) {
+  const displaySalesforce = options.displaySalesforceCertifications ?? true;
+  const displayAccredited = options.displayAccreditedProfessionalCertifications ?? true;
+  const isAP = isAccreditedProfessional(cert);
+  return (displaySalesforce || isAP) && (displayAccredited || !isAP);
+}
+
+/**
+ * Aggregate data from multiple users into a company data object.
+ *
+ * @param {Array} usersData - Array of { username, rankData, certificationsData, superbadgesData, mvpData, agentblazerData }
+ * @param {Object} options - Banner options
+ * @returns {Object} Aggregated company data
+ */
+export function aggregateCompanyData(usersData, options = {}) {
+  const includeExpired = options.includeExpiredCertifications ?? true;
+  const agentblazerDisplayMode = options.agentblazerRankDisplay ?? 'current';
+
+  // --- Cert aggregation ---
+  // Map: cert title → { cert object, holders: [{ username, dateCompleted, expired }] }
+  const certMap = new Map();
+  // All cert titles for the CSV columns: unlike certMap, never filtered by the
+  // includeExpiredCertifications display option — the CSV exports full truth
+  const csvCertTitleSet = new Set();
+
+  // --- Superbadge aggregation ---
+  const allSuperbadges = [];
+  const uniqueSuperbadgeMap = new Map(); // title → first superbadge node
+  const superbadgeCountMap = new Map(); // title → number of times earned across the team
+
+  // --- Counters ---
+  let totalBadges = 0;
+  let mvpCount = 0;
+  let rangerCount = 0;
+  let ctaCount = 0;
+
+  // --- Agentblazer ---
+  const agentblazerCounts = { Innovator: 0, Champion: 0, Legend: 0 };
+  const agentblazerCurrentLevels = []; // for CSV: current level per user
+  const agentblazerAllTimeLevels = []; // for CSV: all-time high per user
+
+  // --- sfdx-hardis training badges (highest level per user) ---
+  const sfdxHardisCounts = { 3: 0, 2: 0, 1: 0 };
+
+  // --- Per-user data for CSV ---
+  const perUserData = [];
+
+  for (const user of usersData) {
+    const { username, rankData, certificationsData, superbadgesData, mvpData, agentblazerData, sfdxHardisLevel } = user;
+
+    // Badges
+    totalBadges += rankData?.earnedBadgesCount || 0;
+
+    // Rank check for Ranger+ (Ranger and above)
+    const rankTitle = rankData?.rank?.title || '';
+    if (rankTitle.toLowerCase().includes('ranger')) {
+      rangerCount++;
+    }
+
+    // MVP
+    const isMvp = mvpData?.isMvp || false;
+    if (isMvp) mvpCount++;
+
+    // Certifications
+    const certs = certificationsData?.certifications || [];
+    let userActiveCerts = 0;
+    let userExpiredCerts = 0;
+    let userRetiredCerts = 0;
+    let userTotalCerts = 0;
+    let hasCta = false;
+
+    for (const cert of certs) {
+      if (!certPassesTypeFilter(cert, options)) continue;
+
+      const isExpired = cert.status?.expired === true;
+      const isRetired = cert.status?.title === 'Retired';
+
+      // Per-user truth (feeds the CSV): count every cert regardless of the
+      // includeExpiredCertifications display option — the CSV is an audit
+      // artifact, banner options are cosmetic. Active excludes retired.
+      userTotalCerts++;
+      if (isExpired) {
+        userExpiredCerts++;
+      } else if (isRetired) {
+        userRetiredCerts++;
+      } else {
+        userActiveCerts++;
+      }
+      csvCertTitleSet.add(cert.title);
+
+      if (cert.title === CTA_CERT_TITLE && !isExpired && !isRetired) hasCta = true;
+
+      // Banner display: skip expired if option says active only
+      if (!includeExpired && isExpired) continue;
+
+      // Add to cert map
+      if (!certMap.has(cert.title)) {
+        certMap.set(cert.title, {
+          title: cert.title,
+          logoUrl: cert.logoUrl,
+          product: cert.product,
+          dateExpired: cert.dateExpired,
+          isRetired,
+          holders: [],
+        });
+      }
+      certMap.get(cert.title).holders.push({
+        username,
+        dateCompleted: cert.dateCompleted,
+        expired: isExpired,
+      });
+    }
+
+    if (hasCta) ctaCount++;
+
+    // Superbadges
+    const sbEdges = superbadgesData?.earnedAwards?.edges || [];
+    for (const edge of sbEdges) {
+      const award = edge?.node?.award;
+      if (!award) continue;
+      allSuperbadges.push(award);
+      superbadgeCountMap.set(award.title, (superbadgeCountMap.get(award.title) || 0) + 1);
+      if (!uniqueSuperbadgeMap.has(award.title)) {
+        uniqueSuperbadgeMap.set(award.title, award);
+      }
+    }
+
+    // Agentblazer
+    const currentLevel = getUserAgentblazerLevel(agentblazerData, 'current');
+    const allTimeHighLevel = getUserAgentblazerLevel(agentblazerData, 'allTimeHigh');
+
+    agentblazerCurrentLevels.push({ username, level: currentLevel });
+    agentblazerAllTimeLevels.push({ username, level: allTimeHighLevel });
+
+    // Count for banner using selected display mode
+    const levelForBanner = agentblazerDisplayMode === 'allTimeHigh' ? allTimeHighLevel : currentLevel;
+    if (levelForBanner && agentblazerCounts.hasOwnProperty(levelForBanner)) {
+      agentblazerCounts[levelForBanner]++;
+    }
+
+    // sfdx-hardis — the chunked flow sends user data back from the client, so
+    // only trust a known level
+    const userSfdxHardisLevel = SFDX_HARDIS_LEVELS.includes(sfdxHardisLevel) ? sfdxHardisLevel : null;
+    if (userSfdxHardisLevel) sfdxHardisCounts[userSfdxHardisLevel]++;
+
+    perUserData.push({
+      username,
+      rank: rankTitle,
+      badges: rankData?.earnedBadgesCount || 0,
+      superbadges: sbEdges.length,
+      certifications_total: userTotalCerts,
+      certifications_active: userActiveCerts,
+      certifications_expired: userExpiredCerts,
+      certifications_retired: userRetiredCerts,
+      mvp: isMvp,
+      agentblazer_current: currentLevel || 'none',
+      agentblazer_alltime_high: allTimeHighLevel || 'none',
+      sfdx_hardis_level: userSfdxHardisLevel || 'none',
+      cta: hasCta,
+      certs: certs.filter((c) => certPassesTypeFilter(c, options)),
+    });
+  }
+
+  // --- Build aggregated cert list ---
+  const aggregatedCerts = [];
+  for (const [, certData] of certMap) {
+    const { holders, isRetired, ...certBase } = certData;
+    const count = holders.length;
+    const activeHolders = holders.filter((h) => !h.expired);
+    const allExpired = activeHolders.length === 0;
+
+    // firstTimeWon: earliest dateCompleted across all holders. Trailhead dates
+    // are not zero-padded ("2025-2-5"), so compare padded keys, not raw strings.
+    const firstTimeWon =
+      holders
+        .map((h) => h.dateCompleted)
+        .filter(Boolean)
+        .sort((a, b) => toSortableDate(a).localeCompare(toSortableDate(b)))[0] || null;
+
+    // For the banner: show as active unless everyone has it expired
+    const displayExpired = allExpired && !isRetired;
+
+    aggregatedCerts.push({
+      ...certBase,
+      dateCompleted: firstTimeWon,
+      status: {
+        expired: displayExpired,
+        title: isRetired ? 'Retired' : displayExpired ? 'Expired' : 'Active',
+      },
+      count,
+      activeHolderCount: activeHolders.length,
+      isRetired,
+    });
+  }
+
+  const totalCerts = aggregatedCerts.reduce((sum, c) => sum + c.count, 0);
+  // Per-holder active count (matches the CSV's ACTIVE_TOTAL): a teammate's
+  // expired copy doesn't count as active just because someone else's is live,
+  // and retired certs are never "active"
+  const activeCerts = aggregatedCerts.filter((c) => !c.isRetired).reduce((sum, c) => sum + c.activeHolderCount, 0);
+  return {
+    // For cert grid rendering (passed as certificationsData to certifications component)
+    certificationsData: {
+      certifications: aggregatedCerts,
+    },
+
+    // For counters component
+    counters: {
+      people: usersData.length,
+      badge: totalBadges,
+      certification: totalCerts,
+      superbadge: allSuperbadges.length,
+      mvp: mvpCount,
+      ranger: rangerCount,
+      'active-certs': activeCerts,
+      cta: ctaCount,
+    },
+
+    // For companyAgentblazer component
+    agentblazer: agentblazerCounts,
+
+    // For companySfdxHardisBadge component: { 3: N, 2: N, 1: N }
+    sfdxHardis: sfdxHardisCounts,
+
+    // For superbadges component
+    superbadgesData: {
+      all: allSuperbadges,
+      // Each unique superbadge carries a `count` = how many team members earned it,
+      // used to render a ×N badge when deduplicating.
+      unique: Array.from(uniqueSuperbadgeMap.values()).map((award) => ({
+        ...award,
+        count: superbadgeCountMap.get(award.title) || 1,
+      })),
+    },
+
+    // For CSV — cert columns come from the unfiltered title set so the export
+    // is complete even when display options hide certs from the banner
+    perUserData,
+    agentblazerCurrentLevels,
+    agentblazerAllTimeLevels,
+    allCertTitles: [...csvCertTitleSet],
+
+    // Metadata
+    agentblazerLevels: AGENTBLAZER_LEVELS,
+  };
+}
+
+export { CTA_CERT_TITLE, AGENTBLAZER_LEVELS, SFDX_HARDIS_LEVELS };

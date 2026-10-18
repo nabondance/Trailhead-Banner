@@ -1,5 +1,52 @@
 {
   "usernames": ["nabondance", "anna", "stevemo", "gauravkheterpal", "babup", "nvuillamy", "mrousseaux"],
+
+  "companyBanner": {
+    "usernames": [
+      "nabondance",
+      "mrousseaux",
+      "fparisi",
+      "ajaouen",
+      "nvuillamy",
+      "omulot1",
+      "selmack",
+      "gbshahaq",
+      "aioana",
+      "asemery",
+      "athizy"
+    ],
+    "options": {
+      "_description": "Exact company page defaults — library background index 5, people+certification counters, CSV generation",
+      "backgroundColor": "#5badd6",
+      "backgroundImageUrl": "",
+      "backgroundKind": "library",
+      "backgroundLibraryUrl": "/assets/background-library/NYC_dreamforce_1.png",
+      "customBackgroundImageUrl": "",
+      "companyLogoKind": "none",
+      "companyLogoUrl": "",
+      "counterOrder": ["people", "certification"],
+      "badgeLabelColor": "#555555",
+      "displayAgentblazerIcons": true,
+      "agentblazerRankDisplay": "current",
+      "displaySfdxHardisBadges": true,
+      "displaySalesforceCertifications": true,
+      "displayAccreditedProfessionalCertifications": true,
+      "includeExpiredCertifications": true,
+      "certificationSort": "count",
+      "certificationSortOrder": "descendant",
+      "certificationAlignment": "center",
+      "displayLastXCertifications": false,
+      "lastXCertifications": "",
+      "displaySuperbadges": true,
+      "displayLastXSuperbadges": true,
+      "lastXSuperbadges": 12,
+      "superbadgeDeduplicate": true,
+      "superbadgeShowCount": true,
+      "superbadgeAlignment": "left",
+      "generateCsv": true
+    }
+  },
+
   "defaultOptions": {
     "_description": "Exact website defaults — library background index 5, default counters",
     "backgroundKind": "library",

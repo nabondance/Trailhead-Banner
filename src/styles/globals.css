@@ -775,7 +775,8 @@ main {
 }
 
 .option-label-text {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 @media (width <= 425px) {
@@ -845,6 +846,23 @@ legend {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 10px;
+  background-color: var(--primary);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--secondary);
+  border-radius: 5px;
+  transition: width 0.3s ease;
 }
 
 .image-container {
@@ -1111,6 +1129,40 @@ legend {
   text-align: left;
 }
 
+.maintenance-people {
+  text-align: left;
+  margin-top: 12px;
+}
+
+.maintenance-person {
+  margin-top: 12px;
+}
+
+.maintenance-person:first-child {
+  margin-top: 0;
+}
+
+.maintenance-username {
+  font-weight: bold;
+}
+
+.maintenance-cert-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 4px 0 0;
+}
+
+.maintenance-cert-list li {
+  margin: 2px 0;
+  font-weight: normal;
+}
+
+.maintenance-due {
+  opacity: 0.7;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
 .info-message a {
   color: var(--primary);
   text-decoration: underline;
@@ -1295,6 +1347,16 @@ legend {
   fieldset {
     padding: 8px;
     margin-bottom: 10px;
+  }
+}
+
+/* Two thumbnails per row on phones instead of one half-width column */
+@media (width <= 480px) {
+  .thumbnail {
+    width: calc(50% - 5px);
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 4 / 1;
   }
 }
 

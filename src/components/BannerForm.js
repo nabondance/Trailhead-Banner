@@ -77,6 +77,9 @@ const BackgroundPreview = ({ src, backgroundColor }) => {
   );
 };
 
+// Counters without allowedIn are standard-only (stamp variants); company-only ones are excluded
+const STANDARD_COUNTERS = COUNTERS_CONFIG.filter((c) => !c.allowedIn || c.allowedIn.includes('standard'));
+
 const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart }) => {
   const router = useRouter();
 
@@ -84,7 +87,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
     username: '',
     backgroundColor: '#5badd6',
     backgroundImageUrl: '',
-    selectedCounters: COUNTERS_CONFIG.filter((c) => c.defaultSelected),
+    selectedCounters: STANDARD_COUNTERS.filter((c) => c.defaultSelected),
     displayRankLogo: true,
     displaySuperbadges: true,
     includeExpiredCertifications: false,
@@ -448,6 +451,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
               selectedCounters={options.selectedCounters}
               onCountersChange={(newCounters) => setOptions({ ...options, selectedCounters: newCounters })}
               maxCounters={5}
+              config={STANDARD_COUNTERS}
             />
           </fieldset>
           <fieldset>

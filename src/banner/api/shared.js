@@ -10,11 +10,13 @@ import GraphQLUtils from '../../utils/graphqlUtils';
  *
  * @param {Array} queries - Array of GraphQL query configurations
  * @param {string} username - Trailhead username (for cache key)
+ * @param {Object} [options]
+ * @param {number} [options.ttlSeconds] - Cache TTL override for these queries
  * @returns {Promise<{responseMap: Object, cacheSummary: Object, timingBreakdown: Object, totalTime: number}>}
  */
-export async function fetchUserData(queries, username) {
+export async function fetchUserData(queries, username, options = {}) {
   const startTime = Date.now();
-  const result = await GraphQLUtils.performQueriesWithCache(queries, username);
+  const result = await GraphQLUtils.performQueriesWithCache(queries, username, options);
 
   // Build response map for easy access by query name
   const responseMap = {};
