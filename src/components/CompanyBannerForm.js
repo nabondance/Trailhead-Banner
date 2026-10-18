@@ -236,26 +236,42 @@ const CompanyBannerForm = () => {
     setUploadedLogoFile(null);
   };
 
-  const downloadCsvFile = (content, filename) => {
-    const blob = new Blob([content], { type: 'text/csv' });
+  const downloadBlob = (blob, filename) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
-    URL.revokeObjectURL(url);
+    // Revoking right away can cancel the download in some browsers (Safari, Firefox)
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  const handleDownloadCsv = () => {
+  // A single download: one CSV as-is, several CSVs bundled in one zip
+  // (browsers often block or prompt for several downloads from one click)
+  const handleDownloadCsv = async () => {
     if (!resultCsvData) return;
-    downloadCsvFile(resultCsvData, `company-banner-${teamHash}.csv`);
-    if (resultProductCsvData) {
-      downloadCsvFile(resultProductCsvData, `company-products-${teamHash}.csv`);
+    const files = [
+      [`company-banner-${teamHash}.csv`, resultCsvData],
+      [`company-products-${teamHash}.csv`, resultProductCsvData],
+      [`company-maintenance-${teamHash}.csv`, resultMaintenanceCsvData],
+    ].filter(([, content]) => content);
+
+    if (files.length === 1) {
+      downloadBlob(new Blob([files[0][1]], { type: 'text/csv' }), files[0][0]);
+      return;
     }
-    if (resultMaintenanceCsvData) {
-      downloadCsvFile(resultMaintenanceCsvData, `company-maintenance-${teamHash}.csv`);
+
+    try {
+      const { zipSync, strToU8 } = await import('fflate'); // Loaded only when needed
+      const zipped = zipSync(Object.fromEntries(files.map(([name, content]) => [name, strToU8(content)])));
+      downloadBlob(new Blob([zipped], { type: 'application/zip' }), `company-csv-${teamHash}.zip`);
+    } catch (err) {
+      console.error('Failed to build CSV zip:', err);
+      setMainError(new Error('Failed to prepare the CSV download. Please try again.'));
     }
   };
+
+  const hasMultipleCsv = Boolean(resultProductCsvData || resultMaintenanceCsvData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -398,7 +414,10 @@ const CompanyBannerForm = () => {
           <textarea
             rows={4}
             value={usernamesRaw}
-            onChange={(e) => setUsernamesRaw(e.target.value)}
+            onChange={(e) => {
+              setUsernamesRaw(e.target.value);
+              if (mainError) setMainError(null); // Clear a stale error (e.g. "enter at least one username") while typing
+            }}
             placeholder={'Enter Trailhead usernames (one per line, comma, pipe or space separated)'}
             required
             className='input'
@@ -923,7 +942,7 @@ const CompanyBannerForm = () => {
                 style={{ marginTop: 0, cursor: 'pointer' }}
                 onClick={handleDownloadCsv}
               >
-                {resultProductCsvData ? 'Download CSVs' : 'Download CSV'}
+                {hasMultipleCsv ? 'Download CSVs (zip)' : 'Download CSV'}
               </button>
             )}
           </div>

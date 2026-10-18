@@ -50,6 +50,9 @@ importers:
       countup.js:
         specifier: ^2.10.1
         version: 2.10.1
+      fflate:
+        specifier: ^0.8.3
+        version: 0.8.3
       next:
         specifier: 16.4.0
         version: 16.4.0(@babel/core@7.29.6)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1475,6 +1478,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   file-entry-cache@11.1.5:
     resolution: {integrity: sha512-+PFTHITI08JIGhnNpGNI8T8inUpgZfk3GNEqfT9R2zZV2iFXg3CvqzSl/uEhs7TSGujYRELEANyDvS8Fj7+S7Q==}
@@ -4081,6 +4087,8 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.4):
     optionalDependencies:
       picomatch: 4.0.4
+
+  fflate@0.8.3: {}
 
   file-entry-cache@11.1.5:
     dependencies:
