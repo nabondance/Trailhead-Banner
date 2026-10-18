@@ -33,6 +33,7 @@ const GenerationCount = forwardRef(
     const [count, setCount] = useState(0);
     const countUpRef = useRef(null);
     const initialLoad = useRef(true);
+    const latestRequest = useRef(0);
 
     const sourceEnv = process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development';
 
@@ -53,15 +54,20 @@ const GenerationCount = forwardRef(
 
     const fetchCount = async () => {
       if (!supabase) return;
+      // Poll, tab focus and post-generation refreshes can overlap: only the latest request may update the count
+      const requestId = ++latestRequest.current;
       const { data, error } = await supabase.rpc('generation_count', {
         p_table: table,
         p_env: sourceEnv,
       });
-      const newCount = Number(data) || 0;
+      if (requestId !== latestRequest.current) return;
 
       if (error) {
         console.error(`Error fetching ${table} count:`, error);
+      } else if (!Number.isFinite(data)) {
+        console.error(`Unexpected ${table} count:`, data);
       } else {
+        const newCount = data;
         if (initialLoad.current) {
           animateCount(0, newCount);
           initialLoad.current = false;

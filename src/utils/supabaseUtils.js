@@ -13,6 +13,12 @@ const supabase =
       })
     : null;
 
+if (!supabase && process.env.VERCEL_ENV) {
+  console.error(
+    '[Supabase] NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing: analytics will not be saved.'
+  );
+}
+
 /**
  * Detects whether a value is a Data URL (e.g. "data:image/png;base64,...").
  * @param {unknown} value - Value to test.
