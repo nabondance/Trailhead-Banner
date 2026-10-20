@@ -107,6 +107,10 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Agentforce Field Service and Operations Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
   "Salesforce Certified Force.com Advanced Developer": {
     "category": "developer",
     "difficulty": 7
@@ -179,11 +183,19 @@
     "category": "marketer",
     "difficulty": 3
   },
+  "Salesforce Certified Marketing Cloud Engagement Specialist": {
+    "category": "marketer",
+    "difficulty": 3
+  },
   "Salesforce Certified Marketing Cloud Engagement Administrator": {
     "category": "admin",
     "difficulty": 4
   },
   "Salesforce Certified Marketing Cloud Engagement Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
+  "Salesforce Certified Marketing Cloud Next Consultant": {
     "category": "consultant",
     "difficulty": 6
   },
@@ -263,6 +275,10 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Agentforce Nonprofit Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
   "Salesforce Certified Omnistudio Consultant": {
     "category": "consultant",
     "difficulty": 6
@@ -319,11 +335,23 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Agentforce Sales Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
   "Salesforce Certified Revenue Cloud Consultant": {
     "category": "consultant",
     "difficulty": 6
   },
+  "Salesforce Certified Revenue Management Consultant": {
+    "category": "consultant",
+    "difficulty": 6
+  },
   "Salesforce Certified Sales Foundations": {
+    "category": "associate",
+    "difficulty": 1
+  },
+  "Salesforce Certified Agentforce Sales Foundations": {
     "category": "associate",
     "difficulty": 1
   },
@@ -332,6 +360,10 @@
     "difficulty": 2
   },
   "Salesforce Certified Service Cloud Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
+  "Salesforce Certified Agentforce Service Consultant": {
     "category": "consultant",
     "difficulty": 5
   },
@@ -383,6 +415,10 @@
     "category": "consultant",
     "difficulty": 5
   },
+  "Salesforce Certified Tableau Next Consultant": {
+    "category": "consultant",
+    "difficulty": 5
+  },
   "Tableau Desktop Specialist": {
     "category": "admin",
     "difficulty": 2
@@ -411,7 +447,23 @@
     "category": "accredited-commerce",
     "difficulty": 4
   },
+  "Salesforce Accredited B2B Commerce Administrator": {
+    "category": "accredited-commerce",
+    "difficulty": 4
+  },
+  "Salesforce Accredited B2B Commerce Administrator Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 4
+  },
   "B2B Commerce for Developers Accredited Professional": {
+    "category": "accredited-commerce",
+    "difficulty": 6
+  },
+  "Salesforce Accredited B2B Commerce Developer": {
+    "category": "accredited-commerce",
+    "difficulty": 6
+  },
+  "Salesforce Accredited B2B Commerce Developer Professional": {
     "category": "accredited-commerce",
     "difficulty": 6
   },
@@ -423,7 +475,15 @@
     "category": "accredited-industry",
     "difficulty": 5
   },
+  "Salesforce Accredited Agentforce Communications Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
   "Consumer Goods Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 4
+  },
+  "Salesforce Accredited Agentforce Consumer Goods Professional": {
     "category": "accredited-industry",
     "difficulty": 4
   },
@@ -451,11 +511,19 @@
     "category": "accredited-service",
     "difficulty": 5
   },
+  "Salesforce Accredited Agentforce Financial Services Professional": {
+    "category": "accredited-service",
+    "difficulty": 5
+  },
   "Headless | API First Accredited Professional": {
     "category": "accredited-commerce",
     "difficulty": 6
   },
   "Health Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Salesforce Accredited Agentforce Health Professional": {
     "category": "accredited-industry",
     "difficulty": 5
   },
@@ -472,6 +540,10 @@
     "difficulty": 5
   },
   "Manufacturing Cloud Accredited Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
+  "Salesforce Accredited Agentforce Manufacturing Professional": {
     "category": "accredited-industry",
     "difficulty": 5
   },
@@ -519,6 +591,10 @@
     "category": "accredited-industry",
     "difficulty": 5
   },
+  "Salesforce Accredited Agentforce 360 for Public Sector Professional": {
+    "category": "accredited-industry",
+    "difficulty": 5
+  },
   "Revenue Cloud Consultant Accredited Professional": {
     "category": "accredited-sales",
     "difficulty": 5
@@ -528,6 +604,10 @@
     "difficulty": 5
   },
   "Sales Business Excellence Accredited Professional": {
+    "category": "accredited-sales",
+    "difficulty": 4
+  },
+  "Salesforce Accredited Sales Professional": {
     "category": "accredited-sales",
     "difficulty": 4
   },
