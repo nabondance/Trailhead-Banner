@@ -236,28 +236,29 @@ export default async function handler(req, res) {
     // skipped (see computeQueryNeeds) — 0 would mean "no MVPs", not "unknown".
     const queryNeeds = computeQueryNeeds(options);
     const mvpFetched = queryNeeds.mvp;
+    const company_data = {
+      team_hash: teamHash,
+      processing_time: allTimings.total_ms,
+      team_size: usernames.length,
+      resolved_count: resolved.length,
+      failed_count: failed.length,
+      failed_users: failed,
+      cert_count: aggregated.counters.certification,
+      active_cert_count: aggregated.counters['active-certs'],
+      badge_count: aggregated.counters.badge,
+      sb_count: aggregated.counters.superbadge,
+      mvp_count: mvpFetched ? aggregated.counters.mvp : null,
+      ranger_count: aggregated.counters.ranger,
+      cta_count: aggregated.counters.cta,
+      agentblazer: aggregated.agentblazer,
+      // null when the badges were not fetched (display off, no CSV)
+      sfdx_hardis: queryNeeds.sfdxHardis ? aggregated.sfdxHardis : null,
+      options: sanitizeOptionsForLogging(options),
+      csv_requested: !!options.generateCsv,
+      timings: allTimings,
+    };
     waitUntil(
-      SupabaseUtils.updateCompanyBannerCounter({
-        team_hash: teamHash,
-        processing_time: allTimings.total_ms,
-        team_size: usernames.length,
-        resolved_count: resolved.length,
-        failed_count: failed.length,
-        failed_users: failed,
-        cert_count: aggregated.counters.certification,
-        active_cert_count: aggregated.counters['active-certs'],
-        badge_count: aggregated.counters.badge,
-        sb_count: aggregated.counters.superbadge,
-        mvp_count: mvpFetched ? aggregated.counters.mvp : null,
-        ranger_count: aggregated.counters.ranger,
-        cta_count: aggregated.counters.cta,
-        agentblazer: aggregated.agentblazer,
-        // null when the badges were not fetched (display off, no CSV)
-        sfdx_hardis: queryNeeds.sfdxHardis ? aggregated.sfdxHardis : null,
-        options: sanitizeOptionsForLogging(options),
-        csv_requested: !!options.generateCsv,
-        timings: allTimings,
-      }).catch((error) => {
+      SupabaseUtils.updateCompanyBannerCounter(company_data).catch((error) => {
         console.error('Error updating company banner counter:', error.message);
       })
     );

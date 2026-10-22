@@ -305,7 +305,7 @@ class SupabaseUtils {
     }
   }
 
-  static async updateCompanyBannerCounter(data) {
+  static async updateCompanyBannerCounter(company_data) {
     if (!supabase) {
       console.log('[Supabase] Credentials not configured, skipping company banner counter update.');
       return;
@@ -316,24 +316,24 @@ class SupabaseUtils {
           {
             thb_source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
             thb_version: packageJson.version,
-            thb_processing_time: data.processing_time,
-            thb_banner_hash: data.team_hash,
-            thb_team_size: data.team_size,
-            thb_count_resolved: data.resolved_count,
-            thb_count_failed: data.failed_count,
-            thb_failed_users: data.failed_users,
-            th_count_cert: data.cert_count,
-            th_count_active_cert: data.active_cert_count,
-            th_count_badge: data.badge_count,
-            th_count_sb: data.sb_count,
-            th_count_mvp: data.mvp_count,
-            th_count_ranger: data.ranger_count,
-            th_count_cta: data.cta_count,
-            thb_agentblazer: data.agentblazer,
-            thb_sfdx_hardis: data.sfdx_hardis,
-            thb_options: data.options,
-            thb_csv_requested: data.csv_requested,
-            thb_timings: data.timings,
+            thb_processing_time: company_data.processing_time,
+            thb_banner_hash: company_data.team_hash,
+            thb_team_size: company_data.team_size,
+            thb_count_resolved: company_data.resolved_count,
+            thb_count_failed: company_data.failed_count,
+            thb_failed_users: company_data.failed_users,
+            th_count_cert: company_data.cert_count,
+            th_count_active_cert: company_data.active_cert_count,
+            th_count_badge: company_data.badge_count,
+            th_count_sb: company_data.sb_count,
+            th_count_mvp: company_data.mvp_count,
+            th_count_ranger: company_data.ranger_count,
+            th_count_cta: company_data.cta_count,
+            thb_agentblazer: company_data.agentblazer,
+            thb_sfdx_hardis: company_data.sfdx_hardis,
+            thb_options: company_data.options,
+            thb_csv_requested: company_data.csv_requested,
+            thb_timings: company_data.timings,
           },
         ]);
 
