@@ -1,4 +1,5 @@
 import { generateStandardBanner } from '../../../banner/renderers/standardBanner';
+import { waitUntil } from '@vercel/functions';
 import SupabaseUtils from '../../../utils/supabaseUtils';
 import { getMaintenanceInfoMessages } from '../../../utils/certificationMaintenanceUtils';
 import { validateUsername, validateContentLength } from '../../../banner/api/validators';
@@ -141,9 +142,12 @@ export default async function handler(req, res) {
       communityData,
       timings: allTimings,
     };
-    SupabaseUtils.updateBannerCounter(thb_data).catch((error) => {
-      console.error('Error updating banner counter:', error.message);
-    });
+    // waitUntil keeps the function alive after the response so the insert can finish
+    waitUntil(
+      SupabaseUtils.updateBannerCounter(thb_data).catch((error) => {
+        console.error('Error updating banner counter:', error.message);
+      })
+    );
 
     // Send response
     return res.status(200).json({

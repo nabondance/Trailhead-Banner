@@ -12,6 +12,7 @@ import { isValidChunkToken, loadCompanyChunks } from '../../../utils/companyChun
 import { aggregateCompanyData } from '../../../utils/companyDataUtils';
 import { generateCompanyCsv, generateProductCsv, generateMaintenanceCsv } from '../../../utils/companyCsvUtils';
 import { getTeamMaintenanceSummary } from '../../../utils/certificationMaintenanceUtils';
+import { waitUntil } from '@vercel/functions';
 import SupabaseUtils from '../../../utils/supabaseUtils';
 import { validateContentLength } from '../../../banner/api/validators';
 import { createTimingTracker, handleBannerError } from '../../../banner/api/shared';
@@ -230,11 +231,12 @@ export default async function handler(req, res) {
       `[Company Banner] Total: ${allTimings.total_ms}ms | Fetch: ${allTimings.fetch_ms}ms | Agg: ${allTimings.aggregation_ms}ms | Image: ${allTimings.image_generation_ms}ms`
     );
 
-    // Analytics (non-blocking). mvp_count is null when the MVP query was
+    // Analytics (non-blocking). waitUntil keeps the function alive after the
+    // response so the insert can finish. mvp_count is null when the MVP query was
     // skipped (see computeQueryNeeds) — 0 would mean "no MVPs", not "unknown".
     const queryNeeds = computeQueryNeeds(options);
     const mvpFetched = queryNeeds.mvp;
-    SupabaseUtils.updateCompanyBannerCounter({
+    const company_data = {
       team_hash: teamHash,
       processing_time: allTimings.total_ms,
       team_size: usernames.length,
@@ -254,9 +256,12 @@ export default async function handler(req, res) {
       options: sanitizeOptionsForLogging(options),
       csv_requested: !!options.generateCsv,
       timings: allTimings,
-    }).catch((error) => {
-      console.error('Error updating company banner counter:', error.message);
-    });
+    };
+    waitUntil(
+      SupabaseUtils.updateCompanyBannerCounter(company_data).catch((error) => {
+        console.error('Error updating company banner counter:', error.message);
+      })
+    );
 
     return res.status(200).json({
       imageUrl: result.bannerUrl,
