@@ -1,3 +1,4 @@
+import { waitUntil } from '@vercel/functions';
 import SupabaseUtils from '../../../utils/supabaseUtils';
 import { generateRewind } from '../../../utils/generateRewind';
 import { buildRewindQueries } from '../../../banner/api/queryBuilder';
@@ -147,9 +148,12 @@ export default async function handler(req, res) {
       rewindSummary,
       timings: allTimings,
     };
-    SupabaseUtils.updateRewindCounter(rewind_data).catch((error) => {
-      console.error('Error updating rewind counter:', error.message);
-    });
+    // waitUntil keeps the function alive after the response so the insert can finish
+    waitUntil(
+      SupabaseUtils.updateRewindCounter(rewind_data).catch((error) => {
+        console.error('Error updating rewind counter:', error.message);
+      })
+    );
 
     // Send response
     return res.status(200).json({
