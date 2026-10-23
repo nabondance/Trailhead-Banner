@@ -2,13 +2,33 @@ import axios from 'axios';
 import RedisCacheUtils from './redisCacheUtils.js';
 
 // Optional queries (the Trailblazer Community API, see queryBuilder) get a
-// shorter timeout, and after a network/HTTP failure their endpoint is skipped
-// for a minute, so a dead or hanging API doesn't slow down every banner.
-// The skip state is per warm serverless instance.
+// shorter timeout. After several network/HTTP failures in a row their endpoint
+// is skipped for a minute, so a dead or hanging API doesn't slow down every
+// banner. One slow user (community stats take ~6s for very active members)
+// must not trip it, hence the threshold. State is per warm serverless instance.
 const REQUIRED_QUERY_TIMEOUT_MS = 15000;
-const OPTIONAL_QUERY_TIMEOUT_MS = 5000;
+const OPTIONAL_QUERY_TIMEOUT_MS = 10000;
+const OPTIONAL_OUTAGE_THRESHOLD = 3;
 const OPTIONAL_OUTAGE_SKIP_MS = 60000;
-const optionalOutageUntil = new Map(); // url -> epoch ms
+const optionalEndpointState = new Map(); // url -> { failures, skipUntil }
+
+function isOptionalEndpointSkipped(url) {
+  return (optionalEndpointState.get(url)?.skipUntil || 0) > Date.now();
+}
+
+function recordOptionalEndpointResult(url, ok) {
+  if (ok) {
+    optionalEndpointState.delete(url);
+    return;
+  }
+  const state = optionalEndpointState.get(url) || { failures: 0, skipUntil: 0 };
+  state.failures++;
+  if (state.failures >= OPTIONAL_OUTAGE_THRESHOLD) {
+    state.failures = 0;
+    state.skipUntil = Date.now() + OPTIONAL_OUTAGE_SKIP_MS;
+  }
+  optionalEndpointState.set(url, state);
+}
 
 // GraphQL error codes that mean "this user has no data here", not "the API is unavailable"
 const USER_LEVEL_ERROR_CODES = new Set(['USER_NOT_FOUND', 'NOT_FOUND']);
@@ -93,7 +113,7 @@ class GraphQLUtils {
       const label = query.name || queryName;
 
       // Optional endpoint failed recently: skip it instead of waiting on it again
-      if (!result && query.optional && (optionalOutageUntil.get(query.url) || 0) > Date.now()) {
+      if (!result && query.optional && isOptionalEndpointSkipped(query.url)) {
         failedQueries.push(label);
         source = 'skipped';
       } else if (!result) {
@@ -126,6 +146,7 @@ class GraphQLUtils {
 
           result = graphqlResponse;
           cacheMisses++;
+          if (query.optional) recordOptionalEndpointResult(query.url, true);
 
           // Store in cache asynchronously (non-blocking)
           // Only cache the serializable parts (avoid circular references)
@@ -153,9 +174,8 @@ class GraphQLUtils {
             `[GraphQL] Optional query ${label} failed, continuing without it:`,
             error?.response?.status || error?.code || error?.message
           );
-          if (!error.isGraphQLErrorBody) {
-            optionalOutageUntil.set(query.url, Date.now() + OPTIONAL_OUTAGE_SKIP_MS);
-          }
+          // An error body means the API answered, so it isn't down
+          recordOptionalEndpointResult(query.url, !!error.isGraphQLErrorBody);
           failedQueries.push(label);
           source = 'error';
         }
