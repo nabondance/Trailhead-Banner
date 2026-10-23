@@ -1,6 +1,28 @@
 import axios from 'axios';
 import RedisCacheUtils from './redisCacheUtils.js';
 
+// Optional queries (the Trailblazer Community API, see queryBuilder) get a
+// shorter timeout, and after a network/HTTP failure their endpoint is skipped
+// for a minute, so a dead or hanging API doesn't slow down every banner.
+// The skip state is per warm serverless instance.
+const REQUIRED_QUERY_TIMEOUT_MS = 15000;
+const OPTIONAL_QUERY_TIMEOUT_MS = 5000;
+const OPTIONAL_OUTAGE_SKIP_MS = 60000;
+const optionalOutageUntil = new Map(); // url -> epoch ms
+
+// GraphQL error codes that mean "this user has no data here", not "the API is unavailable"
+const USER_LEVEL_ERROR_CODES = new Set(['USER_NOT_FOUND', 'NOT_FOUND']);
+
+/**
+ * True when a GraphQL body carries errors and no usable data
+ * (e.g. `{ errors: [{ message: 'Service unavailable' }], data: null }`).
+ */
+function isUnusableErrorBody(body) {
+  if (!body?.errors?.length) return false;
+  if (body.errors.every((e) => USER_LEVEL_ERROR_CODES.has(e?.extensions?.code))) return false;
+  return !body.data || Object.values(body.data).every((value) => value == null);
+}
+
 class GraphQLUtils {
   static async performQueries(queries) {
     return await Promise.all(
@@ -23,15 +45,19 @@ class GraphQLUtils {
    * Perform GraphQL queries with Redis caching
    * Returns cached results when available, falls back to GraphQL API otherwise
    *
-   * @param {Array} queries - Array of query objects with { query, variables, url }
+   * @param {Array} queries - Array of query objects with { name, query, variables, url, optional }.
+   *   An `optional` query that fails (network/HTTP error including 429, non-JSON body, or a GraphQL
+   *   error body without data) resolves to null instead of rejecting the whole batch, and its name
+   *   is listed in `failedQueries`
    * @param {string} username - Username for cache key generation
    * @param {Object} [options]
    * @param {number} [options.ttlSeconds] - Cache TTL override (defaults to RedisCacheUtils.CACHE_TTL_SECONDS)
-   * @returns {Object} { responses, timingBreakdown, cacheSummary }
+   * @returns {Object} { responses, failedQueries, timingBreakdown, cacheSummary }
    */
   static async performQueriesWithCache(queries, username, { ttlSeconds } = {}) {
     const timingBreakdown = [];
     const cacheErrors = [];
+    const failedQueries = [];
     let cacheHits = 0;
     let cacheMisses = 0;
 
@@ -64,8 +90,14 @@ class GraphQLUtils {
         }
       }
 
-      // Fetch from GraphQL if not cached
-      if (!result) {
+      const label = query.name || queryName;
+
+      // Optional endpoint failed recently: skip it instead of waiting on it again
+      if (!result && query.optional && (optionalOutageUntil.get(query.url) || 0) > Date.now()) {
+        failedQueries.push(label);
+        source = 'skipped';
+      } else if (!result) {
+        // Fetch from GraphQL if not cached
         try {
           const graphqlResponse = await axios.post(
             query.url,
@@ -74,9 +106,23 @@ class GraphQLUtils {
               headers: {
                 'Content-Type': 'application/json',
               },
-              timeout: 15000,
+              timeout: query.optional ? OPTIONAL_QUERY_TIMEOUT_MS : REQUIRED_QUERY_TIMEOUT_MS,
             }
           );
+
+          if (query.optional) {
+            // A non-GraphQL body (e.g. an HTML page after a redirect) means the API is gone
+            if (typeof graphqlResponse.data !== 'object' || graphqlResponse.data === null) {
+              throw new Error(`Unexpected non-JSON response from ${query.url}`);
+            }
+            // A 200 with only errors (rate limit, service unavailable...): no data, but
+            // possibly user-specific, so don't skip the endpoint for everyone
+            if (isUnusableErrorBody(graphqlResponse.data)) {
+              const bodyError = new Error(graphqlResponse.data.errors[0]?.message || 'GraphQL error');
+              bodyError.isGraphQLErrorBody = true;
+              throw bodyError;
+            }
+          }
 
           result = graphqlResponse;
           cacheMisses++;
@@ -101,8 +147,17 @@ class GraphQLUtils {
             });
           }
         } catch (error) {
-          // Re-throw GraphQL errors - these should be handled by caller
-          throw error;
+          // Required query errors are handled by the caller
+          if (!query.optional) throw error;
+          console.warn(
+            `[GraphQL] Optional query ${label} failed, continuing without it:`,
+            error?.response?.status || error?.code || error?.message
+          );
+          if (!error.isGraphQLErrorBody) {
+            optionalOutageUntil.set(query.url, Date.now() + OPTIONAL_OUTAGE_SKIP_MS);
+          }
+          failedQueries.push(label);
+          source = 'error';
         }
       }
 
@@ -130,7 +185,8 @@ class GraphQLUtils {
 
     // Calculate actual average times from this request
     const hitTimes = timingBreakdown.filter((t) => t.cache_hit).map((t) => t.time_ms);
-    const missTimes = timingBreakdown.filter((t) => !t.cache_hit).map((t) => t.time_ms);
+    // Failed/skipped optional queries are neither hits nor misses
+    const missTimes = timingBreakdown.filter((t) => t.source === 'graphql').map((t) => t.time_ms);
 
     const avgCacheHitTime = hitTimes.length > 0 ? hitTimes.reduce((a, b) => a + b, 0) / hitTimes.length : 0;
     const avgCacheMissTime = missTimes.length > 0 ? missTimes.reduce((a, b) => a + b, 0) / missTimes.length : 0;
@@ -143,6 +199,7 @@ class GraphQLUtils {
       avg_cache_hit_time_ms: Math.round(avgCacheHitTime),
       avg_cache_miss_time_ms: Math.round(avgCacheMissTime),
       redis_available: redisAvailable,
+      failed_queries: failedQueries.length,
       errors: cacheErrors,
     };
 
@@ -162,6 +219,7 @@ class GraphQLUtils {
 
     return {
       responses,
+      failedQueries,
       timingBreakdown,
       cacheSummary,
     };

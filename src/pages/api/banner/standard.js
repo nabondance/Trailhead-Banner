@@ -17,6 +17,23 @@ export const config = {
   },
 };
 
+/**
+ * Warn when the Trailblazer Community API failed: the banner was still
+ * generated, but without the MVP ribbon and with community counters at 0.
+ *
+ * @param {string[]} failedQueries - Optional queries that failed (see graphqlUtils)
+ * @returns {string[]} Warning messages
+ */
+function getCommunityWarnings(failedQueries = []) {
+  const missing = [];
+  if (failedQueries.includes('GET_MVP_STATUS')) missing.push('the MVP ribbon');
+  if (failedQueries.includes('GET_COMMUNITY_STATS')) missing.push('community counters (answers, followers, groups...)');
+  if (missing.length === 0) return [];
+  return [
+    `Trailblazer Community data is unavailable right now, so ${missing.join(' and ')} could not be loaded. Try again later.`,
+  ];
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -64,7 +81,7 @@ export default async function handler(req, res) {
       fetchUserData(queries, options.username),
       options.displaySfdxHardisBadge === false ? Promise.resolve(null) : fetchSfdxHardisBadgeBundle(options.username),
     ]);
-    const { responseMap, cacheSummary, timingBreakdown, totalTime } = userData;
+    const { responseMap, failedQueries, cacheSummary, timingBreakdown, totalTime } = userData;
     const sfdxHardisBadgesData = sfdxHardisBadgeBundle?.badgesData || null;
     timings.add('graphql_queries_ms', totalTime);
     timings.add('graphql_breakdown', timingBreakdown);
@@ -104,7 +121,7 @@ export default async function handler(req, res) {
     timings.add('image_generation_breakdown', result.timings);
 
     const imageUrl = result.bannerUrl;
-    const warnings = result.warnings || [];
+    const warnings = [...(result.warnings || []), ...getCommunityWarnings(failedQueries)];
     const imageHash = result.hash;
 
     // Collect info messages
@@ -137,6 +154,7 @@ export default async function handler(req, res) {
       rankData,
       profileData,
       mvpData,
+      mvpUnavailable: failedQueries.includes('GET_MVP_STATUS'),
       stampsData,
       agentblazerData,
       communityData,

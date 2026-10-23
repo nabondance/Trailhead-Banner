@@ -12,7 +12,8 @@ import GraphQLUtils from '../../utils/graphqlUtils';
  * @param {string} username - Trailhead username (for cache key)
  * @param {Object} [options]
  * @param {number} [options.ttlSeconds] - Cache TTL override for these queries
- * @returns {Promise<{responseMap: Object, cacheSummary: Object, timingBreakdown: Object, totalTime: number}>}
+ * @returns {Promise<{responseMap: Object, failedQueries: string[], cacheSummary: Object, timingBreakdown: Object, totalTime: number}>}
+ *   `failedQueries` lists optional queries that failed; their responseMap entry is null
  */
 export async function fetchUserData(queries, username, options = {}) {
   const startTime = Date.now();
@@ -26,6 +27,7 @@ export async function fetchUserData(queries, username, options = {}) {
 
   return {
     responseMap,
+    failedQueries: result.failedQueries,
     cacheSummary: result.cacheSummary,
     timingBreakdown: result.timingBreakdown,
     totalTime: Date.now() - startTime,

@@ -166,7 +166,8 @@ class SupabaseUtils {
       thb_options: SupabaseUtils.sanitizeThbOptions(data.options),
       thb_version: packageJson.version,
       bannerHash: data.bannerHash,
-      mvp: data.mvpData?.isMvp || false,
+      // null = MVP status unknown (community API failed), not "not an MVP"
+      mvp: data.mvpUnavailable ? null : data.mvpData?.isMvp || false,
       learnerStatusLevels: (() => {
         // Find the active status level from agentblazerData
         const activeStatus = data.agentblazerData?.learnerStatusLevels?.find((level) => level.active === true);

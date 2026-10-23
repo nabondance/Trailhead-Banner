@@ -231,11 +231,21 @@ export default async function handler(req, res) {
       `[Company Banner] Total: ${allTimings.total_ms}ms | Fetch: ${allTimings.fetch_ms}ms | Agg: ${allTimings.aggregation_ms}ms | Image: ${allTimings.image_generation_ms}ms`
     );
 
+    // MVP status comes from the Trailblazer Community API, which may be down
+    // (see queryBuilder): those users count as non-MVPs, so say so
+    const queryNeeds = computeQueryNeeds(options);
+    const mvpUnavailableCount = queryNeeds.mvp ? resolved.filter((u) => u.mvpUnavailable).length : 0;
+    const warnings = [...(result.warnings || [])];
+    if (mvpUnavailableCount > 0) {
+      warnings.push(
+        `Trailblazer Community data is unavailable right now, so MVP status could not be checked for ${mvpUnavailableCount} Trailblazer${mvpUnavailableCount > 1 ? 's' : ''}. The MVP count may be too low. Try again later.`
+      );
+    }
+
     // Analytics (non-blocking). waitUntil keeps the function alive after the
     // response so the insert can finish. mvp_count is null when the MVP query was
-    // skipped (see computeQueryNeeds) — 0 would mean "no MVPs", not "unknown".
-    const queryNeeds = computeQueryNeeds(options);
-    const mvpFetched = queryNeeds.mvp;
+    // skipped (see computeQueryNeeds) or failed — 0 would mean "no MVPs", not "unknown".
+    const mvpFetched = queryNeeds.mvp && mvpUnavailableCount === 0;
     const company_data = {
       team_hash: teamHash,
       processing_time: allTimings.total_ms,
@@ -270,7 +280,7 @@ export default async function handler(req, res) {
       maintenanceCsvData,
       maintenanceInfo,
       teamHash,
-      warnings: result.warnings || [],
+      warnings,
       failedUsers: failed,
       timings: allTimings,
     });
