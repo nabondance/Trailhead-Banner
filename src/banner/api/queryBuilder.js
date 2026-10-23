@@ -13,9 +13,15 @@ import GET_COMMUNITY_STATS from '../../graphql/queries/getCommunityStats';
 import GET_COMPANY_PROFILE from '../../graphql/queries/getCompanyProfile';
 import { calculateRequiredQueries } from '../../utils/queryDependencyCalculator';
 
+// The Trailblazer Community goes read-only on Oct 30, 2026 and its API may
+// degrade or disappear. Queries against it are `optional`: if the request
+// fails, the banner is still generated without that data (see graphqlUtils).
+const COMMUNITY_API_URL = 'https://community.api.trailhead.com/graphql';
+
 /**
  * Query configuration map
- * Maps query names to their GraphQL query objects, endpoints, and variable builders
+ * Maps query names to their GraphQL query objects, endpoints, and variable builders.
+ * `optional: true` means a failed request returns no data instead of failing the whole banner.
  */
 export const QUERY_MAP = {
   GET_TRAILBLAZER_RANK: {
@@ -60,7 +66,8 @@ export const QUERY_MAP = {
   },
   GET_MVP_STATUS: {
     query: GET_MVP_STATUS,
-    url: 'https://community.api.trailhead.com/graphql',
+    url: COMMUNITY_API_URL,
+    optional: true,
     buildVariables: (username, params) => ({
       userSlug: username,
       queryMvp: true,
@@ -86,7 +93,8 @@ export const QUERY_MAP = {
   },
   GET_COMMUNITY_STATS: {
     query: GET_COMMUNITY_STATS,
-    url: 'https://community.api.trailhead.com/graphql',
+    url: COMMUNITY_API_URL,
+    optional: true,
     buildVariables: (username) => ({
       userSlug: username,
     }),
@@ -109,7 +117,7 @@ export const QUERY_MAP = {
  *
  * @param {string} username - Trailhead username
  * @param {Object} options - Banner generation options
- * @returns {Array<{name: string, query: string, variables: Object, url: string}>} Array of GraphQL queries
+ * @returns {Array<{name: string, query: string, variables: Object, url: string, optional: boolean}>} Array of GraphQL queries
  */
 export function buildStandardQueries(username, options) {
   const requiredQueries = calculateRequiredQueries(options);
@@ -124,6 +132,7 @@ export function buildStandardQueries(username, options) {
       query: config.query,
       variables: config.buildVariables(username, params),
       url: config.url,
+      optional: config.optional === true,
     };
   });
 }

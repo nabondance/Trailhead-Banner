@@ -100,6 +100,7 @@ function buildCompanyQueries(username, needs) {
       query: QUERY_MAP.GET_MVP_STATUS.query,
       variables: QUERY_MAP.GET_MVP_STATUS.buildVariables(username, {}),
       url: QUERY_MAP.GET_MVP_STATUS.url,
+      optional: QUERY_MAP.GET_MVP_STATUS.optional,
     });
   }
   return queries;
@@ -146,7 +147,7 @@ async function fetchSingleUser(username, needs, deadline = Infinity) {
 async function fetchSingleUserOnce(queries, username, needs) {
   // The badge read is fail-open (null on any error) and Redis-cached, so it
   // never fails the user and is cheap to repeat on rate-limit retries
-  const [{ responseMap }, sfdxHardisBadgesData] = await Promise.all([
+  const [{ responseMap, failedQueries }, sfdxHardisBadgesData] = await Promise.all([
     fetchUserData(queries, username, { ttlSeconds: COMPANY_CACHE_TTL_SECONDS }),
     needs.sfdxHardis ? fetchSfdxHardisBadges(username) : Promise.resolve(null),
   ]);
@@ -189,6 +190,8 @@ async function fetchSingleUserOnce(queries, username, needs) {
       // aggregateCompanyData reads superbadgesData.earnedAwards.edges
       superbadgesData: profile,
       mvpData: responseMap.GET_MVP_STATUS?.data?.data?.profileData || {},
+      // The community API failed, so MVP status is unknown (not "not an MVP")
+      mvpUnavailable: failedQueries.includes('GET_MVP_STATUS'),
       // aggregateCompanyData reads agentblazerData.learnerStatusLevels
       agentblazerData: rankData,
       // Highest verified sfdx-hardis training badge level (1-3), null when none
