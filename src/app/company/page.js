@@ -1,5 +1,6 @@
 import CompanyBannerForm from '../../components/CompanyBannerForm';
 import GenerationCount from '../../components/GenerationCount';
+import { getGenerationCount } from '../../utils/bannerCountUtils';
 
 export const metadata = {
   title: 'Company Banner Generator – Trailhead Banner',
@@ -31,7 +32,7 @@ export const metadata = {
   },
 };
 
-export default function CompanyPage() {
+export default async function CompanyPage() {
   return (
     <div className='container'>
       <div className='main-content'>
@@ -43,6 +44,7 @@ export default function CompanyPage() {
         <GenerationCount
           table='company_banners'
           elementId='company-countup-element'
+          fallbackCount={await getGenerationCount('company_banners')}
           after=' amazing company banners generated and still counting!'
         />
         <CompanyBannerForm />

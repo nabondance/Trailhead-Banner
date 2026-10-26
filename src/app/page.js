@@ -36,6 +36,6 @@ export async function generateMetadata() {
   };
 }
 
-export default function Home() {
-  return <MainPage />;
+export default async function Home() {
+  return <MainPage bannerCountFallback={await getBannerCount()} />;
 }

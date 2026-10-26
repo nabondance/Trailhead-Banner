@@ -4,25 +4,32 @@ import { supabase } from './supabaseUtils';
 const COUNT_TIMEOUT_MS = 5000;
 
 /**
- * Server-side total of generated banners, deduplicated per render with React cache.
- * Used for crawler-facing surfaces only (metadata, JSON-LD, llms.txt); the visible counter is GenerationCount.
- * Both read the same `generation_count` database function.
+ * Server-side generation total for a table, deduplicated per render with React cache.
+ * Used for crawler-facing surfaces (metadata, JSON-LD, llms.txt) and as the deploy-time
+ * fallback of the visible GenerationCount counter. Both read the same `generation_count` database function.
+ * @param {string} table - 'banners', 'rewinds' or 'company_banners'
  * @returns {Promise<number|null>} null when the count can't be fetched
  */
-export const getBannerCount = cache(async () => {
+export const getGenerationCount = cache(async (table) => {
   if (!supabase) return null;
   try {
     // Called during static builds: a hung request must not stall the deploy
     const { data, error } = await supabase
-      .rpc('generation_count', { p_table: 'banners', p_env: process.env.NEXT_PUBLIC_VERCEL_ENV || 'development' })
+      .rpc('generation_count', { p_table: table, p_env: process.env.NEXT_PUBLIC_VERCEL_ENV || 'development' })
       .abortSignal(AbortSignal.timeout(COUNT_TIMEOUT_MS));
     if (error) throw error;
     return Number.isFinite(data) ? data : null;
   } catch (error) {
-    console.error('Error fetching banner count:', error);
+    console.error(`Error fetching ${table} count:`, error);
     return null;
   }
 });
+
+/**
+ * Server-side total of generated banners.
+ * @returns {Promise<number|null>} null when the count can't be fetched
+ */
+export const getBannerCount = () => getGenerationCount('banners');
 
 /**
  * Rounds down to a stable, citable figure ("43,000+") so it doesn't churn on every regeneration.

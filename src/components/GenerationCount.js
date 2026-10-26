@@ -4,8 +4,8 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } f
 import { CountUp } from 'countup.js';
 import { supabaseBrowser as supabase } from '../utils/supabaseBrowserClient';
 
-// Backoff between retries when a count request fails
-const RETRY_DELAYS_MS = [1000, 3000, 10000];
+// Backoff between retries when a count request fails; after the last one, the fallback count is shown
+const RETRY_DELAYS_MS = [1000, 3000];
 
 // Worth retrying: network failure (status 0), timeout, rate limit, server error.
 // Other errors (permission denied, missing function, bad params) won't fix themselves.
@@ -28,13 +28,16 @@ const isTransient = (status) => status === 0 || status === 408 || status === 429
  * @param {string} [className='banner-count'] - Wrapper class name
  * @param {string} [before='Already '] - Text rendered before the count
  * @param {string} after - Text rendered after the count
+ * @param {number|null} [fallbackCount=null] - Count fetched at deploy time, shown if the live fetch keeps failing.
+ *   The next broadcast replaces it with the live count.
  */
 const GenerationCount = forwardRef(
-  ({ table, elementId, className = 'banner-count', before = 'Already ', after }, ref) => {
+  ({ table, elementId, className = 'banner-count', before = 'Already ', after, fallbackCount = null }, ref) => {
     const [count, setCount] = useState(0);
     const countUpRef = useRef(null);
     const latestUpdate = useRef(0);
     const retryTimer = useRef(null);
+    const hasCount = useRef(false);
 
     const sourceEnv = process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development';
 
@@ -59,6 +62,7 @@ const GenerationCount = forwardRef(
         countUpRef.current.start();
       }
       setCount(newCount);
+      hasCount.current = true;
       return true;
     };
 
@@ -73,17 +77,19 @@ const GenerationCount = forwardRef(
       });
       if (updateId !== latestUpdate.current) return;
 
-      let retryable;
+      let retryable = true;
       if (error) {
         console.error(`Error fetching ${table} count (attempt ${attempt + 1}, status ${status}):`, error);
         retryable = isTransient(status);
-      } else {
-        retryable = !applyCount(data);
+      } else if (applyCount(data)) {
+        return;
       }
 
-      // Without a retry, one failed request leaves the counter at 0 until the next visibility change
       if (retryable && attempt < RETRY_DELAYS_MS.length) {
         retryTimer.current = setTimeout(() => fetchCount(attempt + 1), RETRY_DELAYS_MS[attempt]);
+      } else if (!hasCount.current && Number.isFinite(fallbackCount)) {
+        // Better than sticking at 0; the next broadcast brings the live count
+        applyCount(fallbackCount);
       }
     };
 

@@ -9,7 +9,7 @@ import { generateIssueTitle, generateIssueBody } from '../utils/issueUtils';
 import GenerationCount from './GenerationCount';
 import packageJson from '../../package.json';
 
-const RewindPage = () => {
+const RewindPage = ({ rewindCountFallback = null }) => {
   const [username, setUsername] = useState('');
   const [flippedLetters, setFlippedLetters] = useState(new Set());
   const [loading, setLoading] = useState(false);
@@ -262,6 +262,7 @@ const RewindPage = () => {
         ref={rewindCountRef}
         table='rewinds'
         elementId='rewind-countup-element'
+        fallbackCount={rewindCountFallback}
         className='rewind-count'
         after=' rewinds generated, create yours now !'
       />
