@@ -1,6 +1,7 @@
 import net from 'net';
 import { Ratelimit } from '@upstash/ratelimit';
 import RedisCacheUtils from './redisCacheUtils.js';
+import { SERVER_ENV } from './envUtils.js';
 
 /**
  * Per-IP rate limiting for the API routes that call Trailhead.
@@ -36,7 +37,7 @@ function getLimiter(name) {
           redis,
           // Fixed window: its reset time is exact, so Retry-After is true
           limiter: Ratelimit.fixedWindow(config.tokens, config.window),
-          prefix: `thb:ratelimit:${process.env.VERCEL_ENV || 'development'}:${name}`,
+          prefix: `thb:ratelimit:${SERVER_ENV}:${name}`,
           // Never let the limiter slow a request down much
           timeout: 1000,
           analytics: false,
