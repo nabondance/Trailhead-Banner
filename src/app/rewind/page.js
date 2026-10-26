@@ -38,11 +38,7 @@ export default async function Rewind() {
   return (
     <>
       <JsonLd data={breadcrumbJsonLd('Trailhead Rewind', '/rewind')} />
-      {isRewindActive ? (
-        <RewindPage rewindCountFallback={await getGenerationCount('rewinds')} />
-      ) : (
-        <RewindWaitingPage />
-      )}
+      {isRewindActive ? <RewindPage fallbackCount={await getGenerationCount('rewinds')} /> : <RewindWaitingPage />}
     </>
   );
 }
