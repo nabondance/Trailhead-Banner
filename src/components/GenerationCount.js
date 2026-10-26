@@ -4,8 +4,12 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } f
 import { CountUp } from 'countup.js';
 import { supabaseBrowser as supabase } from '../utils/supabaseBrowserClient';
 
-// Backoff between retries when the initial count request fails
+// Backoff between retries when a count request fails
 const RETRY_DELAYS_MS = [1000, 3000, 10000];
+
+// Worth retrying: network failure (status 0), timeout, rate limit, server error.
+// Other errors (permission denied, missing function, bad params) won't fix themselves.
+const isTransient = (status) => status === 0 || status === 408 || status === 429 || status >= 500;
 
 /**
  * Reusable live generation counter backed by a Supabase table.
@@ -31,15 +35,17 @@ const GenerationCount = forwardRef(
     const countUpRef = useRef(null);
     const latestUpdate = useRef(0);
     const retryTimer = useRef(null);
-    const unmounted = useRef(false);
 
     const sourceEnv = process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development';
 
+    // Returns false when the value isn't a usable count
     const applyCount = (newCount) => {
       if (!Number.isFinite(newCount)) {
         console.error(`Unexpected ${table} count:`, newCount);
-        return;
+        return false;
       }
+      // A valid count makes any pending retry unnecessary
+      clearTimeout(retryTimer.current);
       if (countUpRef.current) {
         countUpRef.current.update(newCount);
       } else {
@@ -53,6 +59,7 @@ const GenerationCount = forwardRef(
         countUpRef.current.start();
       }
       setCount(newCount);
+      return true;
     };
 
     const fetchCount = async (attempt = 0) => {
@@ -60,37 +67,41 @@ const GenerationCount = forwardRef(
       clearTimeout(retryTimer.current);
       // Fetches and broadcasts can overlap: a response is dropped if a newer update arrived meanwhile
       const updateId = ++latestUpdate.current;
-      const { data, error } = await supabase.rpc('generation_count', {
+      const { data, error, status } = await supabase.rpc('generation_count', {
         p_table: table,
         p_env: sourceEnv,
       });
-      if (updateId !== latestUpdate.current || unmounted.current) return;
+      if (updateId !== latestUpdate.current) return;
 
+      let retryable;
       if (error) {
-        console.error(
-          `Error fetching ${table} count (attempt ${attempt + 1}): ${error.message || error.code || error}`
-        );
-        // A single failed request would otherwise leave the counter at 0 until the next visibility change
-        if (attempt < RETRY_DELAYS_MS.length) {
-          retryTimer.current = setTimeout(() => fetchCount(attempt + 1), RETRY_DELAYS_MS[attempt]);
-        }
+        console.error(`Error fetching ${table} count (attempt ${attempt + 1}, status ${status}):`, error);
+        retryable = isTransient(status);
       } else {
-        applyCount(data);
+        retryable = !applyCount(data);
+      }
+
+      // Without a retry, one failed request leaves the counter at 0 until the next visibility change
+      if (retryable && attempt < RETRY_DELAYS_MS.length) {
+        retryTimer.current = setTimeout(() => fetchCount(attempt + 1), RETRY_DELAYS_MS[attempt]);
       }
     };
 
     useEffect(() => {
       if (!supabase) return;
-      // Reset for Strict Mode, which runs cleanup then the effect again on the same instance
-      unmounted.current = false;
 
       fetchCount();
 
       const channel = supabase
         .channel(`generation-count:${table}:${sourceEnv}`, { config: { private: true } })
         .on('broadcast', { event: 'count' }, ({ payload }) => {
-          latestUpdate.current++;
-          applyCount(payload?.count);
+          // Only a valid count supersedes in-flight fetches; a malformed payload must not cancel them
+          if (Number.isFinite(payload?.count)) {
+            latestUpdate.current++;
+            applyCount(payload.count);
+          } else {
+            console.error(`Unexpected ${table} count broadcast:`, payload);
+          }
         })
         .subscribe();
 
@@ -99,12 +110,17 @@ const GenerationCount = forwardRef(
         if (!document.hidden) fetchCount();
       };
       document.addEventListener('visibilitychange', onVisibilityChange);
+      // Retries give up after ~14s: refetch when the connection comes back after a longer outage
+      const onOnline = () => fetchCount();
+      window.addEventListener('online', onOnline);
 
       return () => {
-        unmounted.current = true;
+        // Marks in-flight responses as stale so they're dropped after unmount
+        latestUpdate.current++;
         clearTimeout(retryTimer.current);
         supabase.removeChannel(channel);
         document.removeEventListener('visibilitychange', onVisibilityChange);
+        window.removeEventListener('online', onOnline);
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
