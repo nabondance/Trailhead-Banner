@@ -4,8 +4,7 @@
  * Client-safe: takes the Supabase client as a parameter and imports no server-only module.
  */
 
-// Inlined at build time, so server and browser read the same environment's rows
-export const GENERATION_COUNT_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV || 'development';
+import { APP_ENV } from './envUtils';
 
 // Worth retrying: network failure (status 0), timeout, rate limit, server error.
 // Other errors (permission denied, missing function, bad params) won't fix themselves.
@@ -20,7 +19,7 @@ const isTransientStatus = (status) => status === 0 || status === 408 || status =
  * @returns {Promise<{ count: number|null, error: object|null, status: number, retryable: boolean }>}
  */
 export const fetchGenerationCount = async (client, table, { signal } = {}) => {
-  let query = client.rpc('generation_count', { p_table: table, p_env: GENERATION_COUNT_ENV });
+  let query = client.rpc('generation_count', { p_table: table, p_env: APP_ENV });
   if (signal) query = query.abortSignal(signal);
   const { data, error, status } = await query;
 

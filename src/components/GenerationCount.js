@@ -3,7 +3,8 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import { CountUp } from 'countup.js';
 import { supabaseBrowser as supabase } from '../utils/supabaseBrowserClient';
-import { fetchGenerationCount, GENERATION_COUNT_ENV } from '../utils/generationCountUtils';
+import { fetchGenerationCount } from '../utils/generationCountUtils';
+import { APP_ENV } from '../utils/envUtils';
 
 // Backoff between retries when a count request fails; after the last one, the fallback count is shown
 const RETRY_DELAYS_MS = [1000, 3000];
@@ -84,7 +85,7 @@ const GenerationCount = forwardRef(
       fetchCount();
 
       const channel = supabase
-        .channel(`generation-count:${table}:${GENERATION_COUNT_ENV}`, { config: { private: true } })
+        .channel(`generation-count:${table}:${APP_ENV}`, { config: { private: true } })
         .on('broadcast', { event: 'count' }, ({ payload }) => {
           // Only a valid count supersedes in-flight fetches; a malformed payload must not cancel them
           if (applyCount(payload?.count)) {

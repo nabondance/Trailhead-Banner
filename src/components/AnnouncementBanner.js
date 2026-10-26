@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { supabaseBrowser as supabase } from '../utils/supabaseBrowserClient';
+import { APP_ENV } from '../utils/envUtils';
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [dismissedIds, setDismissedIds] = useState(new Set());
 
-  const getEnvironment = () => {
-    return process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development';
-  };
-
   const fetchAnnouncement = async () => {
     if (!supabase) return;
     try {
-      const currentEnv = getEnvironment();
-
       // Fetch all active announcements for the current environment
       const { data, error } = await supabase
         .from('announcement')
         .select('*')
         .eq('is_active', true)
-        .eq('environment', currentEnv)
+        .eq('environment', APP_ENV)
         .order('created_at', { ascending: false });
 
       if (error) {
