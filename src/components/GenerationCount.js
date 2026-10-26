@@ -4,6 +4,9 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } f
 import { CountUp } from 'countup.js';
 import { supabaseBrowser as supabase } from '../utils/supabaseBrowserClient';
 
+// Backoff between retries when the initial count request fails
+const RETRY_DELAYS_MS = [1000, 3000, 10000];
+
 /**
  * Reusable live generation counter backed by a Supabase table.
  *
@@ -27,6 +30,8 @@ const GenerationCount = forwardRef(
     const [count, setCount] = useState(0);
     const countUpRef = useRef(null);
     const latestUpdate = useRef(0);
+    const retryTimer = useRef(null);
+    const unmounted = useRef(false);
 
     const sourceEnv = process.env.NEXT_PUBLIC_VERCEL_ENV ? process.env.NEXT_PUBLIC_VERCEL_ENV : 'development';
 
@@ -50,18 +55,25 @@ const GenerationCount = forwardRef(
       setCount(newCount);
     };
 
-    const fetchCount = async () => {
+    const fetchCount = async (attempt = 0) => {
       if (!supabase) return;
+      clearTimeout(retryTimer.current);
       // Fetches and broadcasts can overlap: a response is dropped if a newer update arrived meanwhile
       const updateId = ++latestUpdate.current;
       const { data, error } = await supabase.rpc('generation_count', {
         p_table: table,
         p_env: sourceEnv,
       });
-      if (updateId !== latestUpdate.current) return;
+      if (updateId !== latestUpdate.current || unmounted.current) return;
 
       if (error) {
-        console.error(`Error fetching ${table} count:`, error);
+        console.error(
+          `Error fetching ${table} count (attempt ${attempt + 1}): ${error.message || error.code || error}`
+        );
+        // A single failed request would otherwise leave the counter at 0 until the next visibility change
+        if (attempt < RETRY_DELAYS_MS.length) {
+          retryTimer.current = setTimeout(() => fetchCount(attempt + 1), RETRY_DELAYS_MS[attempt]);
+        }
       } else {
         applyCount(data);
       }
@@ -69,6 +81,8 @@ const GenerationCount = forwardRef(
 
     useEffect(() => {
       if (!supabase) return;
+      // Reset for Strict Mode, which runs cleanup then the effect again on the same instance
+      unmounted.current = false;
 
       fetchCount();
 
@@ -87,6 +101,8 @@ const GenerationCount = forwardRef(
       document.addEventListener('visibilitychange', onVisibilityChange);
 
       return () => {
+        unmounted.current = true;
+        clearTimeout(retryTimer.current);
         supabase.removeChannel(channel);
         document.removeEventListener('visibilitychange', onVisibilityChange);
       };
