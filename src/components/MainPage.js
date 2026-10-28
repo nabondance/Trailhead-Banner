@@ -11,7 +11,7 @@ import AnnouncementBanner from './AnnouncementBanner';
 import Sponsors from './Sponsors';
 import packageJson from '../../package.json';
 
-const MainPage = () => {
+const MainPage = ({ fallbackCount = null }) => {
   const [imageUrl, setImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [mainError, setMainError] = useState(null);
@@ -91,6 +91,7 @@ const MainPage = () => {
         ref={bannerCountRef}
         table='banners'
         elementId='countup-element'
+        fallbackCount={fallbackCount}
         after=' amazing banners generated and still counting!'
       />
       <BannerForm

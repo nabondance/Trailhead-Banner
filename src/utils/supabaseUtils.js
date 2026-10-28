@@ -1,6 +1,7 @@
 import packageJson from '../../package.json';
 import { createClient } from '@supabase/supabase-js';
 import { getHighestAgentblazerRankPerYear } from './dataUtils';
+import { SERVER_ENV } from './envUtils';
 
 // Server-only client: the service role key bypasses RLS, so the analytics tables can stay closed to the public anon key.
 // Never prefix this key with NEXT_PUBLIC_ or import this module from client components.
@@ -78,7 +79,7 @@ class SupabaseUtils {
           {
             th_username: thb_data.th_username,
             thb_processing_time: thb_data.thb_processing_time,
-            source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+            source_env: SERVER_ENV,
             thb_options: thb_data.thb_options,
             thb_version: thb_data.thb_version,
             thb_banner_hash: thb_data.bannerHash,
@@ -267,7 +268,7 @@ class SupabaseUtils {
           {
             th_username: rewind_data.th_username,
             rewind_processing_time: rewind_data.rewind_processing_time,
-            source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+            source_env: SERVER_ENV,
             year: rewind_data.year,
             thb_version: packageJson.version,
             th_current_rank: rewind_data.rankData.rank?.title,
@@ -315,7 +316,7 @@ class SupabaseUtils {
       const result = await SupabaseUtils.retryWithBackoff(async () => {
         const { error } = await supabase.from('company_banners').insert([
           {
-            thb_source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+            thb_source_env: SERVER_ENV,
             thb_version: packageJson.version,
             thb_processing_time: company_data.processing_time,
             thb_banner_hash: company_data.team_hash,
@@ -357,7 +358,7 @@ class SupabaseUtils {
       const result = await SupabaseUtils.retryWithBackoff(async () => {
         const { data, error } = await supabase.from('errors').insert([
           {
-            source_env: process.env.VERCEL_ENV ? process.env.VERCEL_ENV : 'development',
+            source_env: SERVER_ENV,
             type: errors_data.type,
             error: errors_data.error,
             error_data: errors_data.error_data,

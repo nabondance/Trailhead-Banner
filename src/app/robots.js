@@ -1,7 +1,9 @@
+import { SERVER_ENV } from '../utils/envUtils';
+
 const noIndexPaths = [];
 
 export default function robots() {
-  if (process.env.VERCEL_ENV !== 'production') {
+  if (SERVER_ENV !== 'production') {
     return {
       rules: [
         {

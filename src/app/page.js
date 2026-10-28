@@ -1,5 +1,5 @@
 import MainPage from '../components/MainPage';
-import { getBannerCount, formatBannerCount } from '../utils/bannerCountUtils';
+import { getBannerCount, getGenerationCount, formatBannerCount } from '../utils/bannerCountUtils';
 import { SITE_URL } from '../utils/seoUtils';
 
 const title = 'Trailhead Banner – LinkedIn Banner for Trailblazers';
@@ -36,6 +36,6 @@ export async function generateMetadata() {
   };
 }
 
-export default function Home() {
-  return <MainPage />;
+export default async function Home() {
+  return <MainPage fallbackCount={await getGenerationCount('banners')} />;
 }
