@@ -2,7 +2,10 @@ import { buildRewindQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, handleBannerError } from '../../../banner/api/shared';
 import { validateUsername } from '../../../banner/api/validators';
 import { filterDataByYear, getCombinedAchievements, getAgentblazerRankForYear } from '../../../utils/rewindUtils';
+import { enforceRateLimit } from '../../../utils/rateLimit';
 
+// The snow globe is a 2026-only experience
+const YEAR = 2026;
 const MAX_ITEMS = 24;
 const RANK_NAME_PATTERN = /^[a-z0-9-]+\.png$/;
 
@@ -15,7 +18,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed', message: 'Only POST requests are supported' });
   }
 
-  const { username, year = 2026 } = req.body || {};
+  if (!(await enforceRateLimit(req, res, 'snowglobe'))) return;
+
+  const { username } = req.body || {};
+  const year = YEAR;
 
   if (!username || typeof username !== 'string' || username.length > 100) {
     return res.status(400).json({ error: 'Username is required', validationError: true });
@@ -24,10 +30,6 @@ export default async function handler(req, res) {
   const usernameValidation = await validateUsername(username);
   if (!usernameValidation.valid) {
     return res.status(400).json({ error: usernameValidation.message, validationError: true });
-  }
-
-  if (typeof year !== 'number' || year < 2020 || year > new Date().getFullYear() + 1) {
-    return res.status(400).json({ error: 'Invalid year provided', validationError: true });
   }
 
   try {
@@ -47,6 +49,17 @@ export default async function handler(req, res) {
     const stampsData = responseMap.GET_STAMPS?.data?.data?.earnedStamps || {};
 
     const yearlyData = filterDataByYear({ certificationsData, stampsData }, year);
+
+    // Years on Trailhead set how many growth rings the wooden base shows.
+    // Public profiles expose no join date, so use the earliest dated
+    // achievement: any certification (expired ones included) or stamp.
+    const achievementYears = [
+      ...(certificationsData.certifications || []).map((cert) => cert.dateCompleted),
+      ...(stampsData.edges || []).map((edge) => edge.node?.eventDate),
+    ]
+      .map((date) => new Date(date).getUTCFullYear())
+      .filter((y) => Number.isFinite(y) && y >= 2010 && y <= year);
+    const firstAchievementYear = achievementYears.length ? Math.min(...achievementYears) : null;
     const achievements = getCombinedAchievements(yearlyData)
       .slice(0, MAX_ITEMS)
       .map((a) => ({
@@ -85,6 +98,7 @@ export default async function handler(req, res) {
         logoUrl: rankLogoUrl,
       },
       achievements,
+      firstAchievementYear,
       totals: {
         certifications: yearlyData.certifications.length,
         stamps: yearlyData.stamps.length,
@@ -93,7 +107,7 @@ export default async function handler(req, res) {
   } catch (error) {
     return handleBannerError(error, res, 'snowglobe-data', {
       username: username ?? 'unknown',
-      year: year ?? 'unknown',
+      year,
     });
   }
 }

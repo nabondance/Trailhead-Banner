@@ -154,69 +154,215 @@ function makeInteriorGlowTexture() {
   return tex;
 }
 
-/* Turned walnut for the base: broad ribbons establish the timber's figure,
-   fine growth lines follow the lathed cylinder, and a few quiet knots break
-   the procedural regularity without competing with the engraved username. */
-function makeWoodTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  const base = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  base.addColorStop(0, '#8b5433');
-  base.addColorStop(0.46, '#623721');
-  base.addColorStop(1, '#351b14');
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+/* Value noise that repeats every `period` cells along x, so a texture built
+   from it wraps around the cylindrical base without a seam. */
+function wrappedNoise(x, y, period, seed) {
+  const hash = (ix, iy) => {
+    const wx = ((ix % period) + period) % period;
+    let h = Math.imul(wx, 374761393) ^ Math.imul(iy, 668265263) ^ Math.imul(seed, 0x9e3779b1);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+  };
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  const fx = x - ix;
+  const fy = y - iy;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sy = fy * fy * (3 - 2 * fy);
+  const a = hash(ix, iy);
+  const b = hash(ix + 1, iy);
+  const c = hash(ix, iy + 1);
+  const d = hash(ix + 1, iy + 1);
+  return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy;
+}
 
-  // Wide, low-contrast figure gives the wood depth from normal viewing size.
-  for (let band = 0; band < 8; band++) {
-    const baseY = 18 + band * 31 + Math.sin(band * 2.3) * 8;
-    ctx.beginPath();
-    for (let x = -20; x <= canvas.width + 20; x += 10) {
-      const y = baseY + Math.sin(x * 0.013 + band * 1.8) * 7 + Math.sin(x * 0.037 - band) * 2.2;
-      if (x === -20) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+/* Fractal noise (0..1) over the unit texture square: `cellsX` lattice cells
+   around the base, doubled per octave so every octave still wraps. */
+function wrappedFbm(u, v, cellsX, cellsY, octaves, seed) {
+  let sum = 0;
+  let amp = 0.5;
+  let norm = 0;
+  for (let o = 0; o < octaves; o++) {
+    const f = 2 ** o;
+    sum += wrappedNoise(u * cellsX * f, v * cellsY * f, cellsX * f, seed + o) * amp;
+    norm += amp;
+    amp *= 0.5;
+  }
+  return sum / norm;
+}
+
+const mix = (a, b, t) => a + (b - a) * t;
+const smoothstep = (e0, e1, x) => {
+  const t = Math.min(Math.max((x - e0) / (e1 - e0), 0), 1);
+  return t * t * (3 - 2 * t);
+};
+
+/* FNV-1a string hash → uint32 seed (a char-code sum would give "ab" and
+   "ba" the same wood) */
+function hashString(text) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h = Math.imul(h ^ text.charCodeAt(i), 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/* Small seeded PRNG (mulberry32) returning floats in [0, 1) */
+function seededRandom(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* Growth rings across the base's height for a given number of years on
+   Trailhead: young accounts get a few wide rings, veterans dense old growth */
+function woodRingCount(years) {
+  const y = Number.isFinite(years) && years > 0 ? years : 1;
+  return Math.min(Math.max(4 + y * 2, 6), 26);
+}
+
+/* Turned walnut for the base, generated per pixel: growth rings bent by
+   low-frequency noise (the arches and flames of real figure), uneven ring
+   spacing and strength, broad heartwood color streaks, and fine pores
+   stretched along the grain. Returns a color map plus a matching bump map
+   so latewood lines and pores sit slightly recessed under the varnish.
+   u runs around the base (wraps), v runs bottom (0) to top (1).
+
+   Each Trailblazer gets their own piece of wood: the username seeds the
+   grain and the knots, and their years on Trailhead set the ring count. */
+function makeWoodTexture({ username = '', years = 1 } = {}) {
+  const seed = hashString(username.toLowerCase() || 'trailhead');
+  const random = seededRandom(seed);
+  const rings = woodRingCount(years);
+  // warp strengths scale with ring density, so the figure keeps its shape
+  // and the rings never fold over each other at low counts
+  const warpScale = rings / 15;
+  const W = 2048;
+  const H = 256;
+  const color = new Uint8Array(W * H * 4);
+  const bump = new Uint8Array(W * H * 4);
+
+  const light = [146, 94, 58];
+  const mid = [104, 63, 38];
+  const dark = [70, 41, 25];
+  const late = [40, 22, 13];
+  const knotDark = [46, 24, 14];
+  const knotLight = [92, 52, 29];
+
+  // Wood eyes (knots). u = 0.5 faces the camera (the base cylinder starts
+  // at the back) and the engraved username sits around it, so visible knots
+  // go in the low and high bands beside the name, mirrored at random; one
+  // more sits at the back. Sizes are in base units (~12 around, 0.8 tall).
+  const CIRCUMFERENCE = 12;
+  const HEIGHT = 0.8;
+  const between = (min, max) => min + random() * (max - min);
+  const makeKnot = (u, v, rx) => ({ u, v, rx, ry: rx * between(0.27, 0.36), seed: seed + Math.floor(random() * 1000) });
+  const side = random() < 0.5 ? 1 : -1;
+  const knots = [
+    makeKnot(0.5 - side * between(0.06, 0.1), between(0.13, 0.25), between(0.15, 0.24)),
+    makeKnot(0.5 + side * between(0.07, 0.11), between(0.76, 0.87), between(0.11, 0.18)),
+    makeKnot(between(0.0, 0.1), between(0.3, 0.7), between(0.15, 0.22)),
+  ];
+  // about one in three pieces shows a single front knot
+  if (random() < 0.35) knots.splice(1, 1);
+
+  for (let j = 0; j < H; j++) {
+    const v = (j + 0.5) / H;
+    for (let i = 0; i < W; i++) {
+      const u = (i + 0.5) / W;
+
+      // ring coordinate: `rings` rings up the base, bent by two scales of warp so
+      // the lines sweep into broad waves and the odd cathedral arch
+      // (warp strengths are kept low enough vertically that rings never
+      // fold back on themselves — folds smear into dark blotches)
+      const sweep = wrappedFbm(u, v, 2, 0.7, 3, seed + 11) - 0.5;
+      const warp = wrappedFbm(u, v, 6, 2, 3, seed + 17) - 0.5;
+      // growth rate drifts with height, so ring spacing is uneven
+      const growth = wrappedFbm(0.5, v, 1, 2, 3, seed + 29) - 0.5;
+      let r = v * rings + (growth * 3.5 + sweep * 6 + warp * 2.2) * warpScale;
+
+      // knots: rings part around each eye (pushed up above it, down below
+      // it, fading with distance), and inside it its own rings take over
+      let knotMask = 0;
+      let knotShade = 0;
+      let knotRim = 0;
+      for (const knot of knots) {
+        const dx = ((((u - knot.u) % 1) + 1.5) % 1) - 0.5; // wrapped around the base
+        const nx = (dx * CIRCUMFERENCE) / knot.rx;
+        const ny = ((v - knot.v) * HEIGHT) / knot.ry;
+        const e = Math.sqrt(nx * nx + ny * ny);
+        if (e > 9) continue;
+        r -= 1.3 * Math.max(warpScale, 0.6) * Math.tanh(ny * 0.9) * Math.exp(-(nx * nx) / 10 - (ny * ny) / 14);
+        if (e < 1.15) {
+          // slightly irregular outline so the eye isn't a perfect ellipse
+          const edge = e * (1 + (wrappedNoise(Math.atan2(ny, nx) * 2 + 10, 0.5, 1e6, knot.seed + 91) - 0.5) * 0.18);
+          const inside = 1 - smoothstep(0.92, 1.0, edge);
+          const knotRings = (edge * 4.5 + wrappedNoise(nx * 2 + 20, ny * 2, 1e6, knot.seed) * 0.6) % 1;
+          knotMask = Math.max(knotMask, inside);
+          knotShade = 0.35 + 0.4 * smoothstep(0.4, 1, knotRings) + 0.25 * (1 - smoothstep(0, 0.35, edge));
+          knotRim = Math.max(knotRim, smoothstep(0.75, 0.97, edge) * (1 - smoothstep(0.97, 1.12, edge)));
+        }
+      }
+      const ring = Math.floor(r);
+      const p = r - ring;
+      // per-ring character: some growth years are wider, darker or bolder
+      const ringRand = wrappedNoise(ring * 7.31, 0.5, 1e6, seed + 37);
+      const ringTone = wrappedNoise(ring * 3.17, 4.5, 1e6, seed + 41);
+      // earlywood darkens gradually into a narrow latewood line with soft edges
+      const peak = 0.86 + ringRand * 0.06;
+      const lateWood = smoothstep(0.5 + ringRand * 0.2, peak, p) * (1 - smoothstep(peak, 1, p)) ** 0.7;
+      // a faint secondary line inside some rings (false rings) breaks the rhythm
+      const falseRing = ringRand > 0.6 ? smoothstep(0.08, 0, Math.abs(p - 0.42)) * 0.35 : 0;
+
+      // broad color streaks across the timber
+      const streak = wrappedFbm(u, v, 3, 0.8, 3, seed + 51);
+      // pores: tiny dark dashes along the grain
+      const pore = smoothstep(0.8, 0.97, wrappedNoise(u * 700, (r * 14) / warpScale, 700, seed + 67));
+      // fibers: faint long strands that keep flat areas from looking painted
+      const fiber = wrappedNoise(u * 260, (r * 9) / warpScale, 260, seed + 79) - 0.5;
+
+      const k = (j * W + i) * 4;
+      const tone = 0.88 + 0.12 * v; // slightly darker toward the foot
+      for (let c = 0; c < 3; c++) {
+        let value = mix(light[c], mid[c], smoothstep(0.3, 0.7, streak * 0.7 + ringTone * 0.3));
+        value = mix(value, dark[c], smoothstep(0.6, 0.85, streak) * 0.5);
+        value = mix(value, late[c], lateWood * (0.35 + ringRand * 0.35) + falseRing * 0.25);
+        value *= 1 - pore * 0.16;
+        value *= 1 + fiber * 0.07;
+        // knot: darker heartwood with its own rings, a near-black rim
+        const knotColor = mix(knotLight[c], knotDark[c], knotShade);
+        value = mix(value, knotColor, knotMask);
+        value = mix(value, late[c] * 0.7, knotRim * 0.85);
+        color[k + c] = Math.max(0, Math.min(255, Math.round(value * tone)));
+      }
+      color[k + 3] = 255;
+
+      const height = 1 - lateWood * 0.35 - pore * 0.3 + fiber * 0.05 - knotRim * 0.5 - knotMask * knotShade * 0.15;
+      const h = Math.max(0, Math.min(255, Math.round(height * 220)));
+      bump[k] = h;
+      bump[k + 1] = h;
+      bump[k + 2] = h;
+      bump[k + 3] = 255;
     }
-    ctx.strokeStyle = band % 3 === 0 ? 'rgba(34,13,7,0.15)' : 'rgba(214,126,66,0.075)';
-    ctx.lineWidth = 7 + (band % 3) * 2;
-    ctx.stroke();
   }
 
-  for (let line = 0; line < 42; line++) {
-    const baseY = 4 + line * 6.1 + Math.sin(line * 2.17) * 2.3;
-    ctx.beginPath();
-    for (let x = -10; x <= canvas.width + 10; x += 8) {
-      const y = baseY + Math.sin(x * 0.019 + line * 1.7) * 1.9 + Math.sin(x * 0.057 - line) * 0.65;
-      if (x === -10) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = line % 4 === 0 ? 'rgba(24,9,5,0.24)' : 'rgba(240,165,91,0.075)';
-    ctx.lineWidth = line % 5 === 0 ? 1.45 : 0.7;
-    ctx.stroke();
-  }
-
-  // Small elliptical knots with nested rings keep the surface recognizably
-  // organic while remaining subtle beneath the gold nameplate.
-  [
-    [92, 82, 17, 6],
-    [307, 173, 22, 7],
-    [454, 52, 13, 5],
-  ].forEach(([x, y, rx, ry], knot) => {
-    for (let ring = 3; ring >= 0; ring--) {
-      ctx.beginPath();
-      ctx.ellipse(x, y, rx + ring * 5, ry + ring * 1.8, Math.sin(knot * 1.7) * 0.12, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(29,10,5,${0.07 + (3 - ring) * 0.035})`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-  });
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.repeat.set(1.15, 1);
-  return tex;
+  const finish = (tex) => {
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.magFilter = THREE.LinearFilter;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+    tex.generateMipmaps = true;
+    tex.anisotropy = 8;
+    tex.needsUpdate = true;
+    return tex;
+  };
+  const map = finish(new THREE.DataTexture(color, W, H, THREE.RGBAFormat));
+  map.colorSpace = THREE.SRGBColorSpace;
+  const bumpMap = finish(new THREE.DataTexture(bump, W, H, THREE.RGBAFormat));
+  return { map, bumpMap };
 }
 
 /* Rank accent palette, mirrored from drawUtils.getRankAccentColor (drawUtils

@@ -10,7 +10,7 @@ import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
 import { Achievements, SnowSystem, WobbleGroup } from './snowglobe/physics';
 
-export default function SnowGlobeScene({ achievements, rank, year, username, shakeNonce, onReady }) {
+export default function SnowGlobeScene({ achievements, rank, year, username, woodYears, shakeNonce, onReady }) {
   // supersample 1.5× beyond the display's pixel ratio (capped) for a crisper globe
   const dpr = Math.min(window.devicePixelRatio * 1.5, 3);
   // the rank emblem tumbles with the achievements (the base now carries the username)
@@ -105,11 +105,14 @@ export default function SnowGlobeScene({ achievements, rank, year, username, sha
 
   return (
     <div
-      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'none' }}
+      // pan-y: vertical swipes still scroll the page on phones (the globe fills
+      // most of the screen there), horizontal drags shake the globe
+      style={{ width: '100%', height: '100%', cursor: 'grab', touchAction: 'pan-y' }}
       onPointerDown={startDrag}
       onPointerMove={moveDrag}
       onPointerUp={endDrag}
       onPointerLeave={endDrag}
+      onPointerCancel={endDrag}
     >
       <Canvas
         fallback={
@@ -143,7 +146,7 @@ export default function SnowGlobeScene({ achievements, rank, year, username, sha
         <WobbleGroup world={world}>
           <group scale={DISPLAY_SCALE}>
             <GlobeShell />
-            <Base username={username} />
+            <Base username={username} woodYears={woodYears} />
             <Achievements world={world} achievements={tumblingItems} />
             {/* Two visual layers, still 680 particles total: defined flakes
                 carry the foreground while softer powder adds depth. */}

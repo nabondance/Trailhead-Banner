@@ -4,42 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Mp4Spike from './Mp4Spike';
 import { videoSupport, recordGlobeVideo, RECORD_SECONDS } from './snowglobe/recording';
+import { extractUsernameFromUrl, validateUsernameFormat } from '../utils/usernameValidation';
 
 const SnowGlobeScene = dynamic(() => import('./SnowGlobeScene'), {
   ssr: false,
-  loading: () => <div style={{ textAlign: 'center', paddingTop: '2rem' }}>Loading globe…</div>,
+  loading: () => <div className='snowglobe-placeholder'>Building your globe…</div>,
 });
 
-const CURRENT_YEAR = 2026;
-
-const layout = {
-  controls: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '10px',
-    justifyContent: 'center',
-    alignItems: 'stretch',
-    marginBottom: '20px',
-  },
-  globeBox: {
-    // 4:5 portrait — LinkedIn's recommended vertical format for feed
-    // images (1080×1350) and the rewind image's own 2160×2700 ratio
-    // match the natural width of the controls row above (input + year + buttons)
-    width: '100%',
-    maxWidth: 720,
-    aspectRatio: '4 / 5',
-    margin: '0 auto',
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  placeholder: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-};
+const YEAR = 2026;
 
 function detectWebGL() {
   // ?nowebgl=1 forces the unsupported panel, for testing it on capable browsers
@@ -49,6 +21,21 @@ function detectWebGL() {
     return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
   } catch {
     return false;
+  }
+}
+
+function errorMessageFor(status, json) {
+  switch (status) {
+    case 400:
+      return json.error || 'Please check the username and try again.';
+    case 404:
+      return 'Trailhead profile not found. Check the username, and that the profile is public.';
+    case 429:
+      return json.message || 'Too many requests. Please wait a moment and try again.';
+    case 503:
+      return 'Trailhead is temporarily unavailable. Please try again in a few minutes.';
+    default:
+      return json.message || json.error || 'Something went wrong. Please try again.';
   }
 }
 
@@ -66,45 +53,53 @@ function WebGLHelpPanel({ onRetry }) {
   };
 
   return (
-    <div style={{ ...layout.placeholder, flexDirection: 'column', gap: '0.75rem', padding: '2rem' }}>
-      <div style={{ fontSize: '2.5rem' }}>🔮❌</div>
+    <div className='snowglobe-webgl-help'>
       <h3>Your browser can&apos;t display 3D right now</h3>
-      <p style={{ margin: 0, maxWidth: 460 }}>
-        The snow globe needs WebGL, which is disabled — usually because hardware acceleration is turned off in your
-        browser settings. Pages can&apos;t change browser settings, but it&apos;s a quick fix:
+      <p>
+        The snow globe needs WebGL, which is turned off — usually because hardware acceleration is disabled in your
+        browser settings. It&apos;s a quick fix:
       </p>
-      <ol style={{ margin: 0, textAlign: 'left', lineHeight: 1.8 }}>
+      <ol>
         <li>
           Open <code>chrome://settings/system</code>{' '}
-          <button className='button' style={{ padding: '2px 10px', fontSize: '0.85rem' }} onClick={copyAddress}>
+          <button type='button' className='button snowglobe-small-button' onClick={copyAddress}>
             {copied ? 'Copied ✅' : 'Copy address'}
           </button>{' '}
-          and paste it in a new tab
+          in a new tab
         </li>
         <li>
-          Enable <em>&ldquo;Use graphics acceleration when available&rdquo;</em>
+          Turn on <em>&ldquo;Use graphics acceleration when available&rdquo;</em>
         </li>
         <li>Relaunch the browser and come back</li>
       </ol>
-      <button className='button' onClick={onRetry}>
-        Check again 🔄
+      <button type='button' className='button' onClick={onRetry}>
+        Check again
       </button>
     </div>
   );
 }
 
+function downloadBlob(blob, fileName) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
 export default function SnowGlobePage() {
-  const [username, setUsername] = useState('nabondance');
-  const [year, setYear] = useState(CURRENT_YEAR);
+  const [input, setInput] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState('Enter a Trailhead username and load your globe.');
+  const [error, setError] = useState('');
+  const [actionStatus, setActionStatus] = useState('');
   const [shakeNonce, setShakeNonce] = useState(0);
   const [webglOk, setWebglOk] = useState(null); // null = not checked yet (SSR-safe)
   const [spikeMode, setSpikeMode] = useState(false); // ?mp4spike=1 — MediaRecorder MP4 test rig
   const [videoOk, setVideoOk] = useState(false); // WebCodecs or MediaRecorder available
-  const [recordingVideo, setRecordingVideo] = useState(false);
+  const [busy, setBusy] = useState(''); // '' | 'image' | 'video'
   const glRef = useRef(null);
+  const resultRef = useRef(null);
 
   useEffect(() => {
     setWebglOk(detectWebGL());
@@ -112,40 +107,66 @@ export default function SnowGlobePage() {
     setVideoOk(videoSupport().supported);
   }, []);
 
-  const loadData = async () => {
+  // bring the fresh globe into view: on most screens it starts below the form
+  useEffect(() => {
+    if (data) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [data]);
+
+  // the field keeps the raw text (a pasted or typed profile URL stays readable
+  // while editing); the username is extracted from it on submit
+  const handleInputChange = (e) => {
+    if (error) setError('');
+    setInput(e.target.value);
+  };
+
+  const loadGlobe = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+
+    const username = extractUsernameFromUrl(input)
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]/g, '')
+      .substring(0, 64);
+    const format = validateUsernameFormat(username);
+    if (!format.valid) {
+      setError(format.message);
+      return;
+    }
+
     setLoading(true);
-    setStatus('Fetching Trailhead data…');
+    setError('');
+    setActionStatus('');
+    setData(null);
+    glRef.current = null;
     try {
       const res = await fetch('/api/snowglobe/data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), year }),
+        body: JSON.stringify({ username }),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setStatus(json.error || 'Failed to load data');
-        setData(null);
+        setError(errorMessageFor(res.status, json));
         return;
       }
       setData(json);
-      setStatus(
-        `${json.totals.certifications} certification${json.totals.certifications === 1 ? '' : 's'} and ${json.totals.stamps} stamp${json.totals.stamps === 1 ? '' : 's'} in ${json.year} — shake it!`
-      );
     } catch {
-      setStatus('Network error while loading data');
-      setData(null);
+      setError('Unable to reach the server. Check your connection and try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const takeSnapshot = () => {
+  const downloadImage = () => {
     const capture = glRef.current?.capture;
-    if (!capture) return;
+    if (!capture || busy) return;
+    setBusy('image');
+    setActionStatus('');
     try {
       capture((blob) => {
         if (!blob) {
-          setStatus('Snapshot failed: empty canvas');
+          setActionStatus('Image download failed, please try again.');
+          setBusy('');
           return;
         }
         // composite the transparent render over the page background so the
@@ -161,104 +182,112 @@ export default function SnowGlobePage() {
           ctx.drawImage(img, 0, 0);
           URL.revokeObjectURL(img.src);
           canvas.toBlob((finalBlob) => {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(finalBlob);
-            link.download = `snowglobe-${username.trim()}-${year}.png`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            setStatus('Snapshot saved — canvas is clean ✅');
+            downloadBlob(finalBlob, `snowglobe-${data.username}-${YEAR}.png`);
+            setActionStatus('Image saved — ready to share!');
+            setBusy('');
           }, 'image/png');
         };
         img.src = URL.createObjectURL(blob);
       });
-    } catch (error) {
-      // SecurityError here means a texture tainted the canvas — the spike failed
-      setStatus(`Snapshot failed: ${error.message}`);
+    } catch {
+      setActionStatus('Image download failed, please try again.');
+      setBusy('');
     }
   };
 
-  const takeVideo = async () => {
+  const downloadVideo = async () => {
     const canvas = glRef.current?.gl?.domElement;
-    if (!canvas || recordingVideo) return;
-    setRecordingVideo(true);
-    setStatus(`Recording ${RECORD_SECONDS}s — shake it while it films! 🎬`);
+    if (!canvas || busy) return;
+    setBusy('video');
+    setActionStatus(`Recording ${RECORD_SECONDS} seconds — shake the globe while it films!`);
     try {
       const { blob } = await recordGlobeVideo(canvas);
       const ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `snowglobe-${username.trim()}-${year}.${ext}`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-      setStatus('Video saved 🎬');
-    } catch (error) {
-      setStatus(`Video failed: ${error.message}`);
+      downloadBlob(blob, `snowglobe-${data.username}-${YEAR}.${ext}`);
+      setActionStatus('Video saved — ready to share!');
+    } catch {
+      setActionStatus('Video recording failed, please try again.');
     } finally {
-      setRecordingVideo(false);
+      setBusy('');
     }
   };
 
   return (
-    <div className='page-container'>
-      <h1>Trailhead Rewind {year} — Snow Globe</h1>
-      <h2>{status}</h2>
-      <div style={layout.controls}>
-        <input
-          className='input'
-          style={{ flex: '0 1 220px' }}
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !loading && loadData()}
-          placeholder='Trailhead username'
-        />
-        <select
-          className='input'
-          style={{ flex: '0 1 110px' }}
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-        >
-          {[2026, 2025, 2024].map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-        <button className='button' onClick={loadData} disabled={loading || !username.trim() || webglOk === false}>
-          {loading ? 'Loading…' : 'Load'}
-        </button>
-        <button className='button' onClick={() => setShakeNonce((n) => n + 1)} disabled={!data}>
-          Shake ❄️
-        </button>
-      </div>
-      <div style={layout.globeBox}>
-        {webglOk === false ? (
-          <WebGLHelpPanel onRetry={() => setWebglOk(detectWebGL())} />
-        ) : data ? (
-          <SnowGlobeScene
-            achievements={data.achievements}
-            rank={data.rank}
-            year={data.year}
-            username={data.username}
-            shakeNonce={shakeNonce}
-            onReady={(gl) => {
-              glRef.current = gl;
-            }}
+    <div className='page-container snowglobe-page'>
+      <h1>Your {YEAR} Trailhead Snow Globe</h1>
+      <p className='snowglobe-tagline'>
+        Fill a snow globe with the certifications and stamps you earned in {YEAR}, shake it, and share it.
+      </p>
+
+      {webglOk === false ? (
+        <WebGLHelpPanel onRetry={() => setWebglOk(detectWebGL())} />
+      ) : (
+        <form className='snowglobe-form' onSubmit={loadGlobe}>
+          <input
+            aria-label='Trailhead username or profile URL'
+            className={`input snowglobe-input ${error ? 'input-error' : ''}`}
+            value={input}
+            onChange={handleInputChange}
+            placeholder='Trailhead username or profile URL'
+            autoComplete='off'
+            autoCapitalize='none'
+            spellCheck='false'
+            enterKeyHint='go'
+            data-lpignore='true'
           />
-        ) : (
-          <div style={layout.placeholder}>Your globe will appear here</div>
-        )}
-      </div>
-      {/* share artifacts live under the globe they capture */}
-      <div style={{ ...layout.controls, marginTop: 14, marginBottom: 0 }}>
-        <button className='button' onClick={takeSnapshot} disabled={!data}>
-          Snapshot 📸
-        </button>
-        {videoOk && (
-          <button className='button' onClick={takeVideo} disabled={!data || recordingVideo}>
-            {recordingVideo ? 'Recording… 🔴' : 'Video 🎬'}
+          <button type='submit' className='button snowglobe-submit' disabled={loading}>
+            {loading ? 'Loading…' : data ? 'Update globe' : 'Create my globe'}
           </button>
-        )}
-      </div>
+        </form>
+      )}
+
+      {error && <div className='error-message snowglobe-error'>{error}</div>}
+
+      {loading && (
+        <div className='loading-container'>
+          <p>Collecting your {YEAR} achievements…</p>
+          <div className='loading-icon'></div>
+        </div>
+      )}
+
+      {data && !loading && (
+        <section ref={resultRef} className='snowglobe-result'>
+          <div className='snowglobe-box'>
+            <SnowGlobeScene
+              achievements={data.achievements}
+              rank={data.rank}
+              year={data.year}
+              username={data.username}
+              // years on Trailhead, counted inclusively (joined this year = 1)
+              woodYears={data.firstAchievementYear ? YEAR - data.firstAchievementYear + 1 : 1}
+              shakeNonce={shakeNonce}
+              onReady={(gl) => {
+                glRef.current = gl;
+              }}
+            />
+          </div>
+          <p className='snowglobe-hint'>Drag the globe sideways or press Shake to make it snow.</p>
+          <div className='snowglobe-actions'>
+            <button type='button' className='button' onClick={() => setShakeNonce((n) => n + 1)}>
+              Shake ❄️
+            </button>
+            <button type='button' className='button' onClick={downloadImage} disabled={!!busy}>
+              {busy === 'image' ? 'Saving…' : 'Download image'}
+            </button>
+            {videoOk && (
+              <button type='button' className='button' onClick={downloadVideo} disabled={!!busy}>
+                {busy === 'video' ? 'Recording… 🔴' : 'Download video'}
+              </button>
+            )}
+          </div>
+          {actionStatus && (
+            <p className='snowglobe-status' role='status'>
+              {actionStatus}
+            </p>
+          )}
+        </section>
+      )}
+
       {spikeMode && <Mp4Spike getCanvas={() => glRef.current?.gl?.domElement} />}
     </div>
   );

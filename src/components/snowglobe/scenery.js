@@ -149,11 +149,19 @@ function GlobeShell() {
 }
 
 /* Wooden base with the username engraved front and center */
-function Base({ username }) {
+function Base({ username, woodYears }) {
   const [nameTex, setNameTex] = useState(null);
-  const woodTex = useMemo(() => makeWoodTexture(), []);
+  // the username seeds this globe's own piece of wood; years on Trailhead
+  // set its growth rings
+  const woodTex = useMemo(() => makeWoodTexture({ username, years: woodYears }), [username, woodYears]);
 
-  useEffect(() => () => woodTex.dispose(), [woodTex]);
+  useEffect(
+    () => () => {
+      woodTex.map.dispose();
+      woodTex.bumpMap.dispose();
+    },
+    [woodTex]
+  );
 
   // bake the engraving only once the font is loaded, so measureText
   // sizes the arc for the real glyphs instead of the serif fallback
@@ -182,16 +190,19 @@ function Base({ username }) {
         <torusGeometry args={[1.78, 0.026, 10, 64]} />
         <meshStandardMaterial color='#f2d778' metalness={0.88} roughness={0.2} />
       </mesh>
+      {/* thetaStart π: the texture's wrap point faces away from the camera
+          (three.js starts cylinders at +z, dead center in front) */}
       <mesh position={[0, -0.5, 0]}>
-        <cylinderGeometry args={[1.84, 2.02, 0.8, 48]} />
+        <cylinderGeometry args={[1.84, 2.02, 0.8, 48, 1, false, Math.PI, Math.PI * 2]} />
         <meshPhysicalMaterial
-          map={woodTex}
-          bumpMap={woodTex}
-          bumpScale={0.018}
-          roughness={0.6}
-          metalness={0.015}
-          clearcoat={0.045}
-          clearcoatRoughness={0.82}
+          map={woodTex.map}
+          bumpMap={woodTex.bumpMap}
+          bumpScale={0.6}
+          roughness={0.62}
+          metalness={0}
+          // satin varnish: a soft sheen over the grain, not a plastic gloss
+          clearcoat={0.35}
+          clearcoatRoughness={0.38}
         />
       </mesh>
       {/* darker foot grounds the base and gives the tapered body more depth */}
