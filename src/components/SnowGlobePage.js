@@ -270,15 +270,16 @@ export default function SnowGlobePage({
     e.preventDefault();
     if (loading) return;
 
-    const username = extractUsernameFromUrl(input)
-      .toLowerCase()
-      .replace(/[^a-z0-9._-]/g, '')
-      .substring(0, 64);
-    const format = validateUsernameFormat(username);
+    // a profile URL, or text pasted from the Trailhead app with the URL in
+    // it, gives the username; check it before cleaning it up, so an email or
+    // a phrase gets its own message instead of turning into a mangled name
+    const extracted = extractUsernameFromUrl(input).trim().toLowerCase();
+    const format = validateUsernameFormat(extracted);
     if (!format.valid) {
       setError(format.message);
       return;
     }
+    const username = extracted.replace(/[^a-z0-9._-]/g, '').substring(0, 64);
 
     await buildGlobe(username);
   };
@@ -435,8 +436,13 @@ export default function SnowGlobePage({
     <div className='container snowglobe-page'>
       <div className='snowglobe-header'>
         {isLink ? (
+          // the username unless there is no globe for it (unknown profile,
+          // nothing saved after the Rewind period): an unknown name must not
+          // read as someone's Rewind
           <h1>
-            {linkUsername}&apos;s {YEAR} Trailhead Rewind
+            {!error && !loadFailed && (data || open)
+              ? `${linkUsername}'s ${YEAR} Trailhead Rewind`
+              : `${YEAR} Trailhead Rewind`}
           </h1>
         ) : (
           <>
