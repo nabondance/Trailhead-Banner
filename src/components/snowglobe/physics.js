@@ -96,9 +96,12 @@ function Achievements({ world, achievements, floor }) {
     ).then((loaded) => {
       if (cancelled) return;
       const ok = loaded.filter(Boolean);
-      const sizeScale = Math.min(1, Math.sqrt(14 / Math.max(ok.length, 1)));
+      // the achievements are the hero of the globe: big enough to read, and
+      // shrinking gently (never below ~55%) as a busy year fills the glass.
+      // They still settle half into the snow (floorY below)
+      const sizeScale = Math.min(1, Math.max(0.55, Math.sqrt(10 / Math.max(ok.length, 1))));
       const built = ok.map((a) => {
-        const size = (a.type === 'rank' ? 0.72 : a.type === 'certification' ? 0.62 : 0.55) * sizeScale;
+        const size = (a.type === 'rank' ? 0.98 : a.type === 'certification' ? 0.9 : 0.78) * sizeScale;
         const img = a.tex.image;
         const aspect = Math.min(2, Math.max(0.5, img ? img.width / img.height : 1));
         const pos = randomPointInGlobe(GLOBE_RADIUS * 0.7);

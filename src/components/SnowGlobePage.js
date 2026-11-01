@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { videoSupport, recordGlobeVideo, RECORD_SECONDS } from './snowglobe/recording';
 import { extractUsernameFromUrl, validateUsernameFormat } from '../utils/usernameValidation';
 import GenerationCount from './GenerationCount';
+import GlobeLegend from './snowglobe/GlobeLegend';
 
 const SnowGlobeScene = dynamic(() => import('./SnowGlobeScene'), {
   ssr: false,
@@ -440,6 +441,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
               {actionStatus}
             </p>
           )}
+          <GlobeLegend data={data} year={YEAR} />
         </section>
       )}
     </div>

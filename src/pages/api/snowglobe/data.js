@@ -155,6 +155,7 @@ export default async function handler(req, res) {
       firstAchievementYear,
       // snow depth: progress toward the next rank (All Star Ranger = full)
       rankProgress: rankProgress(rankData),
+      nextRankTitle: rankData.nextRank?.title || null,
       topRank: !!rankData.rank && !rankData.nextRank,
       // engraved plaque on the foot of the base (all-time)
       stats: {

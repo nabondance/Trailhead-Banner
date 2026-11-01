@@ -495,6 +495,11 @@ function FootPlaque({ stats }) {
   );
 }
 
+// engraved username: centered on the front of the wood
+const NAME_HEIGHT = 0.6;
+const NAME_CENTER_Y = -0.42;
+const NAME_MAX_ARC = 1.35; // ~77°: wider than this, the ends curve out of view
+
 /* Wooden base with the username engraved front and center */
 function Base({ username, woodYears, rankTitle, isMvp, stats }) {
   const metals = useMemo(() => getRankMetals(rankTitle), [rankTitle]);
@@ -524,10 +529,18 @@ function Base({ username, woodYears, rankTitle, isMvp, stats }) {
     };
   }, [username]);
 
+  // Engraving size: full height for most names; a long name shrinks so it
+  // always stays on the readable front (at most NAME_MAX_ARC radians wide)
+  // instead of wrapping around the sides of the base
+  const nameLayout = useMemo(() => {
+    if (!nameTex) return null;
+    const radius = woodRadiusAt(NAME_CENTER_Y) + 0.025;
+    const naturalArc = (NAME_HEIGHT * nameTex.userData.aspect) / radius;
+    const shrink = Math.min(1, NAME_MAX_ARC / naturalArc);
+    return { height: NAME_HEIGHT * shrink, arc: naturalArc * shrink };
+  }, [nameTex]);
   // half the engraving's arc (radians), so the MVP rosette can sit beside it
-  const nameHalfArc = nameTex
-    ? Math.min((0.6 * nameTex.userData.aspect) / (woodRadiusAt(-0.42) + 0.025), 2.4) / 2
-    : 0.6;
+  const nameHalfArc = nameLayout ? nameLayout.arc / 2 : 0.6;
 
   return (
     <group position={[0, BASE_TOP_Y, 0]} scale={[1, 0.95, 1]}>
@@ -563,13 +576,12 @@ function Base({ username, woodYears, rankTitle, isMvp, stats }) {
         (() => {
           // curved engraving hugging the wood: same taper as the base
           // cylinder, offset outward, arc width sized to the text length
-          const height = 0.6;
-          const centerY = -0.42;
-          const top = woodRadiusAt(centerY + height / 2) + 0.025;
-          const bottom = woodRadiusAt(centerY - height / 2) + 0.025;
-          const thetaLength = Math.min((height * nameTex.userData.aspect) / ((top + bottom) / 2), 2.4);
+          const { height } = nameLayout;
+          const top = woodRadiusAt(NAME_CENTER_Y + height / 2) + 0.025;
+          const bottom = woodRadiusAt(NAME_CENTER_Y - height / 2) + 0.025;
+          const thetaLength = (height * nameTex.userData.aspect) / ((top + bottom) / 2);
           return (
-            <mesh position={[0, centerY, 0]}>
+            <mesh position={[0, NAME_CENTER_Y, 0]}>
               <cylinderGeometry args={[top, bottom, height, 24, 1, true, -thetaLength / 2, thetaLength]} />
               <meshBasicMaterial map={nameTex} transparent depthWrite={false} />
             </mesh>
