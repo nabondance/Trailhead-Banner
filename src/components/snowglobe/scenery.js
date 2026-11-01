@@ -9,6 +9,7 @@ import {
   makeEngravedNameTexture,
   makeHighlightTexture,
   makeMvpRosetteTexture,
+  makePlaqueTexture,
   makeSnowTexture,
   makeWoodTexture,
   loadFont,
@@ -301,7 +302,9 @@ function GlobeShell({ world, floor, sparkles, activity }) {
 // Wood body in the base group's local space (the group scales y by 0.95):
 // its top edge meets the glass at the seat, and it flares gently to the foot
 const WOOD_TOP = 0.1;
-const WOOD_BOTTOM = -0.88;
+const WOOD_BOTTOM = -0.78;
+// dark foot under the wood, tall enough to carry the engraved stats plaque
+const FOOT_BOTTOM = -0.95;
 // Like a real globe in cross-section: the glass comes down to exactly the
 // wood's top edge, and the rank ring sits over that joint on the outside,
 // half on the glass foot and half on the wood's flared side.
@@ -457,8 +460,43 @@ function useFontsLoaded(family, url) {
   return loaded;
 }
 
+/* "848 BADGES · 412,000 POINTS · 120 TRAILS" engraved on the foot, centered
+   at the front, hugging its slight taper. Skipped when there are no stats. */
+const formatCount = (n) => Number(n).toLocaleString('en-US');
+
+function FootPlaque({ stats }) {
+  const loaded = useFontsLoaded('Anta', '/assets/fonts/Anta-Regular.ttf');
+  const text = useMemo(() => {
+    if (!stats) return null;
+    const parts = [
+      [stats.badges, 'badges'],
+      [stats.points, 'points'],
+      [stats.trails, 'trails'],
+    ]
+      .filter(([n]) => Number.isFinite(n))
+      .map(([n, label]) => `${formatCount(n)} ${label}`.toUpperCase());
+    return parts.length ? parts.join('  ·  ') : null;
+  }, [stats]);
+  const tex = useMemo(() => (loaded && text ? makePlaqueTexture(text) : null), [loaded, text]);
+  useEffect(() => () => tex?.dispose(), [tex]);
+  if (!tex) return null;
+  const height = 0.085;
+  const centerY = (WOOD_BOTTOM + FOOT_BOTTOM) / 2;
+  const t = (centerY + height / 2 - WOOD_BOTTOM) / (FOOT_BOTTOM - WOOD_BOTTOM);
+  const b = (centerY - height / 2 - WOOD_BOTTOM) / (FOOT_BOTTOM - WOOD_BOTTOM);
+  const top = WOOD_BOTTOM_RADIUS + 0.035 * t + 0.006;
+  const bottom = WOOD_BOTTOM_RADIUS + 0.035 * b + 0.006;
+  const thetaLength = Math.min((height * tex.userData.aspect) / ((top + bottom) / 2), 2.6);
+  return (
+    <mesh position={[0, centerY, 0]}>
+      <cylinderGeometry args={[top, bottom, height, 48, 1, true, -thetaLength / 2, thetaLength]} />
+      <meshBasicMaterial map={tex} transparent depthWrite={false} />
+    </mesh>
+  );
+}
+
 /* Wooden base with the username engraved front and center */
-function Base({ username, woodYears, rankTitle, isMvp }) {
+function Base({ username, woodYears, rankTitle, isMvp, stats }) {
   const metals = useMemo(() => getRankMetals(rankTitle), [rankTitle]);
   const [nameTex, setNameTex] = useState(null);
   // the username seeds this globe's own piece of wood; years on Trailhead
@@ -495,6 +533,8 @@ function Base({ username, woodYears, rankTitle, isMvp }) {
     <group position={[0, BASE_TOP_Y, 0]} scale={[1, 0.95, 1]}>
       {/* rank ring where the wood meets the glass */}
       <RankRing radius={RING_RADIUS} y={(RING_CENTER_Y - BASE_TOP_Y) / 0.95} metals={metals} />
+      {/* engraved stats plaque on the foot */}
+      <FootPlaque stats={stats} />
       {/* MVP rosette just left of the (always centered) name */}
       {isMvp && <MvpRosette rightEdge={-nameHalfArc - 0.04} />}
       {/* thetaStart π: the texture's wrap point faces away from the camera
@@ -515,8 +555,8 @@ function Base({ username, woodYears, rankTitle, isMvp }) {
         />
       </mesh>
       {/* darker foot grounds the base and gives the tapered body more depth */}
-      <mesh position={[0, -0.915, 0]}>
-        <cylinderGeometry args={[WOOD_BOTTOM_RADIUS, WOOD_BOTTOM_RADIUS + 0.035, 0.07, 64]} />
+      <mesh position={[0, (WOOD_BOTTOM + FOOT_BOTTOM) / 2, 0]}>
+        <cylinderGeometry args={[WOOD_BOTTOM_RADIUS, WOOD_BOTTOM_RADIUS + 0.035, WOOD_BOTTOM - FOOT_BOTTOM, 96]} />
         <meshStandardMaterial color='#28140f' roughness={0.5} />
       </mesh>
       {nameTex &&

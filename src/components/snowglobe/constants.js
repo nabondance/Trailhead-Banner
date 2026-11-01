@@ -60,7 +60,7 @@ function makeSnowFloor(level = 0.45) {
 
 // base group origin; the wood's top edge sits at local y 0.1 (group y scale 0.95)
 const BASE_TOP_Y = GLASS_SEAT_Y - 0.095;
-const BASE_BOTTOM_Y = BASE_TOP_Y - 0.9;
+const BASE_BOTTOM_Y = BASE_TOP_Y - 0.95 * 0.95; // foot bottom (local -0.95, y scale 0.95)
 const SCENE_TOP_Y = CENTER_Y + GLOBE_RADIUS + 0.15; // glass shell + wobble headroom
 const SCENE_HALF_WIDTH = 2.5; // base radius + full shake sway
 

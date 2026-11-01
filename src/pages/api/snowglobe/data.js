@@ -156,6 +156,12 @@ export default async function handler(req, res) {
       // snow depth: progress toward the next rank (All Star Ranger = full)
       rankProgress: rankProgress(rankData),
       topRank: !!rankData.rank && !rankData.nextRank,
+      // engraved plaque on the foot of the base (all-time)
+      stats: {
+        badges: rankData.earnedBadgesCount ?? null,
+        points: rankData.earnedPointsSum ?? null,
+        trails: rankData.completedTrailCount ?? null,
+      },
       // MVP ribbon around the base
       isMvp: responseMap.GET_MVP_STATUS?.data?.data?.profileData?.isMvp === true,
       // aurora: achievements per month of the Rewind year (Jan..Dec)

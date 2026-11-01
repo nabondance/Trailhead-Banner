@@ -357,6 +357,37 @@ function makeWoodTexture({ username = '', years = 1 } = {}) {
   return { map, bumpMap };
 }
 
+/* Trophy plaque line engraved on the dark foot: all-time stats in muted gold
+   Anta capitals, e.g. "848 BADGES · 412,000 POINTS · 120 TRAILS" */
+function makePlaqueTexture(text) {
+  const canvas = document.createElement('canvas');
+  let ctx = canvas.getContext('2d');
+  const font = '44px Anta, sans-serif';
+  ctx.font = font;
+  ctx.letterSpacing = '4px';
+  canvas.width = Math.ceil(ctx.measureText(text).width) + 40;
+  canvas.height = 72;
+  ctx = canvas.getContext('2d');
+  ctx.font = font;
+  ctx.letterSpacing = '4px';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // dark groove under the letters, then the gold fill
+  ctx.fillStyle = 'rgba(0,0,0,0.85)';
+  ctx.fillText(text, canvas.width / 2, canvas.height / 2 + 2);
+  const gold = ctx.createLinearGradient(0, 14, 0, 58);
+  gold.addColorStop(0, '#f1d58a');
+  gold.addColorStop(0.55, '#c9a24a');
+  gold.addColorStop(1, '#8a6a24');
+  ctx.fillStyle = gold;
+  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  tex.userData.aspect = canvas.width / canvas.height;
+  return tex;
+}
+
 /* MVP prize rosette, in the colors of the banner's MVP ribbon
    (assets/ribbons/mvp.svg): pleated navy and light-blue rosette, "MVP" in
    Anta on the center disc, two V-cut tails. Transparent around it. */
@@ -743,6 +774,7 @@ export {
   makeHighlightTexture,
   makeWoodTexture,
   makeMvpRosetteTexture,
+  makePlaqueTexture,
   RANK_ACCENTS,
   loadFont,
   makeBackdropTexture,
