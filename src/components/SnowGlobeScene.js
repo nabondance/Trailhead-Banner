@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { useEffect, useMemo, useRef } from 'react';
 import { CENTER, DISPLAY_SCALE, makeSnowFloor } from './snowglobe/constants';
 import { getSnowStyle, getSparkles, getSnowfall } from './snowglobe/snowStyles';
-import { makeFlakeTexture, makePowderTexture } from './snowglobe/textures';
+import { makeBigFlakeTexture, makeFlakeTexture, makePowderTexture } from './snowglobe/textures';
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
@@ -36,6 +36,7 @@ export default function SnowGlobeScene({
   const sparkles = useMemo(() => getSparkles(snowStyle, topRank), [snowStyle, topRank]);
   // falling snow: more flakes for more badges (all-time)
   const snowfall = getSnowfall(stats?.badges);
+  const bigFlakes = Number.isFinite(stats?.superbadges) ? Math.max(0, stats.superbadges) : 0;
   // supersample 1.5× beyond the display's pixel ratio (capped) for a crisper globe
   const dpr = Math.min(window.devicePixelRatio * 1.5, 3);
   // the rank emblem tumbles with the achievements (the base now carries the username)
@@ -277,6 +278,23 @@ export default function SnowGlobeScene({
               kickScale={1.12}
               {...snowStyle.powder}
             />
+            {/* one big gold-edged flake per superbadge: falls slower and
+                stays fully visible once it lands, so they can be counted */}
+            {bigFlakes > 0 && (
+              <SnowSystem
+                key={`superbadges-${bigFlakes}`}
+                world={world}
+                floor={floor}
+                count={bigFlakes}
+                makeTexture={makeBigFlakeTexture}
+                {...snowStyle.flakes}
+                minSize={0.3}
+                maxSize={0.4}
+                opacity={1}
+                settledOpacity={1}
+                gravityScale={0.7}
+              />
+            )}
           </group>
         </WobbleGroup>
       </Canvas>

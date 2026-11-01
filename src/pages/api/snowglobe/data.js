@@ -68,8 +68,18 @@ export default async function handler(req, res) {
   const startedAt = Date.now();
   try {
     const mvp = QUERY_MAP.GET_MVP_STATUS;
+    const superbadges = QUERY_MAP.GET_TRAILHEAD_BADGES_SUPERBADGE;
     const queries = [
       ...buildRewindQueries(username),
+      // superbadge count (one big snowflake each); optional: without it the
+      // globe just has no big flakes
+      {
+        name: 'GET_TRAILHEAD_BADGES_SUPERBADGE',
+        query: superbadges.query,
+        variables: superbadges.buildVariables(username, {}),
+        url: superbadges.url,
+        optional: true,
+      },
       // optional: the community API is read-only since Oct 30, 2026 and may go
       // away; if it fails the globe just has no MVP ribbon
       {
@@ -154,6 +164,9 @@ export default async function handler(req, res) {
         badges: rankData.earnedBadgesCount ?? null,
         points: rankData.earnedPointsSum ?? null,
         trails: rankData.completedTrailCount ?? null,
+        // not on the plaque: one big falling snowflake per superbadge
+        superbadges:
+          responseMap.GET_TRAILHEAD_BADGES_SUPERBADGE?.data?.data?.profile?.trailheadStats?.superbadgeCount ?? null,
       },
       // MVP ribbon around the base
       isMvp: responseMap.GET_MVP_STATUS?.data?.data?.profileData?.isMvp === true,

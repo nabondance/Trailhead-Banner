@@ -19,6 +19,11 @@ function activeMonths(activity) {
   return SHORT_MONTHS.filter((_, i) => (activity?.certifications?.[i] || 0) + (activity?.stamps?.[i] || 0) > 0);
 }
 
+function bigFlakeText(superbadges) {
+  if (!Number.isFinite(superbadges) || superbadges < 1) return '';
+  return superbadges === 1 ? ' · 1 big flake, your superbadge' : ` · ${superbadges} big flakes, one per superbadge`;
+}
+
 /* One short line per detail: what you see, and the data behind it */
 function legendItems(data, year) {
   const items = [];
@@ -34,7 +39,7 @@ function legendItems(data, year) {
     items.push({
       icon: '🌨️',
       title: getSnowfall(badges).label,
-      text: `${badges.toLocaleString('en-US')} badge${badges === 1 ? '' : 's'}`,
+      text: `${badges.toLocaleString('en-US')} badge${badges === 1 ? '' : 's'}${bigFlakeText(data.stats.superbadges)}`,
     });
   }
 

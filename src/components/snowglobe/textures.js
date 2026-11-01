@@ -20,6 +20,47 @@ function makeFlakeTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
+/* Big six-armed flake for superbadges: white arms with small branches over a
+   gold edge (the superbadge color of the standard banner, #f9a825) */
+function makeBigFlakeTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.lineCap = 'round';
+  const c = 64;
+  const arm = 52;
+  const drawFlake = () => {
+    for (let i = 0; i < 6; i++) {
+      const a = (i * Math.PI) / 3;
+      const dx = Math.cos(a);
+      const dy = Math.sin(a);
+      ctx.beginPath();
+      ctx.moveTo(c, c);
+      ctx.lineTo(c + dx * arm, c + dy * arm);
+      for (const at of [0.45, 0.72]) {
+        const bx = c + dx * arm * at;
+        const by = c + dy * arm * at;
+        const len = at < 0.6 ? 16 : 11;
+        for (const side of [-1, 1]) {
+          const b = a + side * 0.75;
+          ctx.moveTo(bx, by);
+          ctx.lineTo(bx + Math.cos(b) * len, by + Math.sin(b) * len);
+        }
+      }
+      ctx.stroke();
+    }
+  };
+  ctx.strokeStyle = 'rgba(249,168,37,0.95)';
+  ctx.lineWidth = 10;
+  drawFlake();
+  ctx.strokeStyle = 'rgba(255,255,255,1)';
+  ctx.lineWidth = 4.5;
+  drawFlake();
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 /* Soft powder motes fill the gaps between the crisp flakes. Keeping these
    round and diffuse makes the flurry feel layered instead of like a field of
    identical symbols. */
@@ -832,6 +873,7 @@ function makeBackdropTexture(username, rankTitle, year) {
 
 export {
   makeFlakeTexture,
+  makeBigFlakeTexture,
   makePowderTexture,
   makeSnowTexture,
   makeEngravedNameTexture,
