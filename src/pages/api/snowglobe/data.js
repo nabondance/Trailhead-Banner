@@ -44,12 +44,14 @@ export default async function handler(req, res) {
 
   if (!(await enforceRateLimit(req, res, 'snowglobe'))) return;
 
-  const { username } = req.body || {};
+  const { username: rawUsername } = req.body || {};
   const year = YEAR;
 
-  if (!username || typeof username !== 'string' || username.length > 100) {
+  if (!rawUsername || typeof rawUsername !== 'string' || rawUsername.length > 100) {
     return res.status(400).json({ error: 'Username is required', validationError: true });
   }
+  // lowercase, like the form sends it: the personal link looks globes up by it
+  const username = rawUsername.trim().toLowerCase();
 
   const usernameValidation = await validateUsername(username);
   if (!usernameValidation.valid) {
@@ -127,24 +129,7 @@ export default async function handler(req, res) {
         ? `/api/snowglobe/local-image?type=Rank&name=${encodeURIComponent(rankFileName)}`
         : rankData.rank?.imageUrl || null;
 
-    // Each globe counts as one 2026 Rewind (non-blocking: waitUntil keeps
-    // the function alive after the response so the insert can finish)
-    waitUntil(
-      SupabaseUtils.recordSnowglobeRewind({
-        th_username: username,
-        year,
-        processing_time_ms: Date.now() - startedAt,
-        rank_title: rankData.rank?.title || null,
-        yearly_stamps_count: yearlyData.stamps.length,
-        yearly_certifications_count: yearlyData.certifications.length,
-        achievements: achievements.map(({ type, name }) => ({ type, name: name || null })),
-        agentblazer: agentblazer || null,
-      }).catch((error) => {
-        console.error('Error recording snow globe rewind:', error.message);
-      })
-    );
-
-    return res.status(200).json({
+    const globe = {
       username,
       year,
       rank: {
@@ -176,7 +161,28 @@ export default async function handler(req, res) {
         certifications: yearlyData.certifications.length,
         stamps: yearlyData.stamps.length,
       },
-    });
+    };
+
+    // Each globe counts as one 2026 Rewind and is saved for the personal link
+    // (non-blocking: waitUntil keeps the function alive after the response so
+    // the insert can finish)
+    waitUntil(
+      SupabaseUtils.recordSnowglobeRewind({
+        th_username: username,
+        year,
+        processing_time_ms: Date.now() - startedAt,
+        rank_title: rankData.rank?.title || null,
+        yearly_stamps_count: yearlyData.stamps.length,
+        yearly_certifications_count: yearlyData.certifications.length,
+        achievements: achievements.map(({ type, name }) => ({ type, name: name || null })),
+        agentblazer: agentblazer || null,
+        globe,
+      }).catch((error) => {
+        console.error('Error recording snow globe rewind:', error.message);
+      })
+    );
+
+    return res.status(200).json(globe);
   } catch (error) {
     return handleBannerError(error, res, 'snowglobe-data', {
       username: username ?? 'unknown',

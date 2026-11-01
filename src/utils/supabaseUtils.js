@@ -310,7 +310,8 @@ class SupabaseUtils {
   /**
    * Records a snow globe generation (the 2026 Rewind) as a `rewinds` row, so
    * it counts toward that year's Rewind total. Only the fields the globe
-   * actually has; the poster-specific columns stay empty.
+   * actually has; the poster-specific columns stay empty. `globe_data` keeps
+   * the exact globe the API returned, so the personal link shows it later.
    */
   static async recordSnowglobeRewind(globe_data) {
     if (!supabase) {
@@ -331,6 +332,7 @@ class SupabaseUtils {
             yearly_certifications_count: globe_data.yearly_certifications_count,
             yearly_achievements: globe_data.achievements,
             agentblazer_progress: globe_data.agentblazer,
+            globe_data: globe_data.globe,
           },
         ]);
         if (error) {
@@ -340,6 +342,32 @@ class SupabaseUtils {
     } catch (error) {
       console.error('Error adding snow globe rewind (after retries):', error.message);
       throw error;
+    }
+  }
+
+  /**
+   * Latest saved snow globe of a user for a Rewind year (in this environment),
+   * shown by the personal link /rewind/<year>/<username>.
+   * @returns {Promise<{ globe: object|null, failed: boolean }>}
+   */
+  static async getSavedSnowglobe(username, year) {
+    if (!supabase) return { globe: null, failed: false };
+    try {
+      const { data, error } = await supabase
+        .from('rewinds')
+        .select('globe_data')
+        .eq('th_username', username)
+        .eq('year', year)
+        .eq('source_env', SERVER_ENV)
+        .not('globe_data', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return { globe: data?.globe_data ?? null, failed: false };
+    } catch (error) {
+      console.error('Error reading saved snow globe:', error.message);
+      return { globe: null, failed: true };
     }
   }
 
