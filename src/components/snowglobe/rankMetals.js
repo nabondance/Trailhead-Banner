@@ -2,17 +2,27 @@
    distinct metal look per rank. The first ranks climb through single metals;
    from Double Star Ranger on the ring becomes a braid with one strand per
    star, ending with All Star Ranger braiding every metal together.
-   The engraved username takes the ring's lead metal. */
+   (The engraved username always stays gold.) */
 
+// metalness kept below a mirror finish: the scene has no environment to
+// reflect, so a pure mirror metal renders near-black instead of its color
 const METALS = {
-  copper: { color: '#c27a50', metalness: 0.9, roughness: 0.32, engrave: ['#f3b48c', '#c27a50', '#7d4529'] },
-  bronze: { color: '#a8783e', metalness: 0.85, roughness: 0.4, engrave: ['#e0b77c', '#a8783e', '#6a4a22'] },
-  brass: { color: '#d9b44a', metalness: 0.9, roughness: 0.3, engrave: ['#f5de8f', '#d9b44a', '#8c7024'] },
-  steel: { color: '#9aa3ad', metalness: 0.9, roughness: 0.35, engrave: ['#dfe5ec', '#9aa3ad', '#5c636b'] },
-  silver: { color: '#e4e7ec', metalness: 0.95, roughness: 0.18, engrave: ['#ffffff', '#cfd4db', '#868c95'] },
-  gold: { color: '#e8c45c', metalness: 0.88, roughness: 0.22, engrave: ['#f6dd8b', '#d4af37', '#96751c'] },
-  roseGold: { color: '#e5a48a', metalness: 0.9, roughness: 0.25, engrave: ['#ffd2c0', '#e5a48a', '#9c6350'] },
-  platinum: { color: '#c9cdd4', metalness: 1, roughness: 0.08, engrave: ['#f4f6f8', '#bfc4cc', '#7a7f87'] },
+  copper: { color: '#d08458', metalness: 0.75, roughness: 0.3 },
+  bronze: { color: '#b8853f', metalness: 0.72, roughness: 0.36 },
+  brass: { color: '#e2bd52', metalness: 0.75, roughness: 0.28 },
+  steel: { color: '#aeb6c0', metalness: 0.7, roughness: 0.32 },
+  silver: { color: '#d3d8df', metalness: 0.72, roughness: 0.24 },
+  gold: { color: '#f0cb5e', metalness: 0.75, roughness: 0.24 },
+  roseGold: { color: '#efb096', metalness: 0.75, roughness: 0.26 },
+  // cool blue-white with a soft glow so it stands out from the snow: Ranger
+  // is a big milestone, its ring should shine
+  platinum: {
+    color: '#c8d6ea',
+    metalness: 0.6,
+    roughness: 0.18,
+    emissive: '#5f7fae',
+    emissiveIntensity: 0.35,
+  },
 };
 
 const RANK_METALS = {

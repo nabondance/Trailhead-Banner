@@ -368,8 +368,14 @@ function RankRing({ radius, y, metals }) {
     const [metal] = metals;
     return (
       <mesh position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[radius, 0.03, 12, 96]} />
-        <meshStandardMaterial color={metal.color} metalness={metal.metalness} roughness={metal.roughness} />
+        <torusGeometry args={[radius, 0.04, 16, 128]} />
+        <meshStandardMaterial
+          color={metal.color}
+          metalness={metal.metalness}
+          roughness={metal.roughness}
+          emissive={metal.emissive || '#000000'}
+          emissiveIntensity={metal.emissiveIntensity || 0}
+        />
       </mesh>
     );
   }
@@ -377,7 +383,13 @@ function RankRing({ radius, y, metals }) {
     <group position={[0, y, 0]}>
       {strands.map(({ metal, geometry }) => (
         <mesh key={metal.name} geometry={geometry}>
-          <meshStandardMaterial color={metal.color} metalness={metal.metalness} roughness={metal.roughness} />
+          <meshStandardMaterial
+            color={metal.color}
+            metalness={metal.metalness}
+            roughness={metal.roughness}
+            emissive={metal.emissive || '#000000'}
+            emissiveIntensity={metal.emissiveIntensity || 0}
+          />
         </mesh>
       ))}
     </group>
@@ -441,15 +453,14 @@ function Base({ username, woodYears, rankTitle, isMvp }) {
     if (!username) return undefined;
     let cancelled = false;
     loadFont('Great Vibes', '/assets/fonts/GreatVibes-Regular.ttf').then(() => {
-      if (!cancelled) setNameTex(makeEngravedNameTexture(username, metals[0].engrave));
+      if (!cancelled) setNameTex(makeEngravedNameTexture(username));
     });
     return () => {
       cancelled = true;
     };
-  }, [username, metals]);
+  }, [username]);
 
   // half the engraving's arc (radians), so the MVP rosette can sit beside it
-  const nameOffset = isMvp ? 0.2 : 0;
   const nameHalfArc = nameTex
     ? Math.min((0.6 * nameTex.userData.aspect) / (woodRadiusAt(-0.42) + 0.025), 2.4) / 2
     : 0.6;
@@ -458,9 +469,8 @@ function Base({ username, woodYears, rankTitle, isMvp }) {
     <group position={[0, BASE_TOP_Y, 0]} scale={[1, 0.95, 1]}>
       {/* rank ring where the wood meets the glass */}
       <RankRing radius={RING_RADIUS} y={(RING_CENTER_Y - BASE_TOP_Y) / 0.95} metals={metals} />
-      {/* MVP rosette just left of the name; with it, the name shifts right so
-          both stay near the front */}
-      {isMvp && <MvpRosette rightEdge={nameOffset - nameHalfArc - 0.04} />}
+      {/* MVP rosette just left of the (always centered) name */}
+      {isMvp && <MvpRosette rightEdge={-nameHalfArc - 0.04} />}
       {/* thetaStart π: the texture's wrap point faces away from the camera
           (three.js starts cylinders at +z, dead center in front) */}
       <mesh position={[0, (WOOD_TOP + WOOD_BOTTOM) / 2, 0]}>
@@ -494,7 +504,7 @@ function Base({ username, woodYears, rankTitle, isMvp }) {
           const thetaLength = Math.min((height * nameTex.userData.aspect) / ((top + bottom) / 2), 2.4);
           return (
             <mesh position={[0, centerY, 0]}>
-              <cylinderGeometry args={[top, bottom, height, 24, 1, true, nameOffset - thetaLength / 2, thetaLength]} />
+              <cylinderGeometry args={[top, bottom, height, 24, 1, true, -thetaLength / 2, thetaLength]} />
               <meshBasicMaterial map={nameTex} transparent depthWrite={false} />
             </mesh>
           );

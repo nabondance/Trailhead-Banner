@@ -94,7 +94,7 @@ function makeSnowTexture() {
 /* Username engraved in gold on the wooden base: gold-leaf gradient letters
    set in a dark groove (shadow above = inset, lit from above). The @ is
    drawn smaller than the name, like a signature flourish. */
-function makeEngravedNameTexture(username, engrave = ['#f6dd8b', '#d4af37', '#96751c']) {
+function makeEngravedNameTexture(username) {
   const canvas = document.createElement('canvas');
   // Great Vibes: flowing connected calligraphy with tall swashes
   const nameFont = '400 115px "Great Vibes", cursive';
@@ -120,12 +120,12 @@ function makeEngravedNameTexture(username, engrave = ['#f6dd8b', '#d4af37', '#96
   };
   // dark groove rim above the letters
   drawLayer('rgba(20,10,4,0.9)', 104);
-  // metal leaf (the rank's lead metal): light catches the top, deepens toward the bottom
-  const leaf = ctx.createLinearGradient(0, 50, 0, 170);
-  leaf.addColorStop(0, engrave[0]);
-  leaf.addColorStop(0.5, engrave[1]);
-  leaf.addColorStop(1, engrave[2]);
-  drawLayer(leaf, 110);
+  // gold leaf: light catches the top, deepens toward the bottom
+  const gold = ctx.createLinearGradient(0, 50, 0, 170);
+  gold.addColorStop(0, '#f6dd8b');
+  gold.addColorStop(0.5, '#d4af37');
+  gold.addColorStop(1, '#96751c');
+  drawLayer(gold, 110);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.userData.aspect = canvas.width / canvas.height;
