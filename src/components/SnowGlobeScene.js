@@ -288,8 +288,8 @@ export default function SnowGlobeScene({
                 count={bigFlakes}
                 makeTexture={makeBigFlakeTexture}
                 {...snowStyle.flakes}
-                minSize={0.3}
-                maxSize={0.4}
+                minSize={0.2}
+                maxSize={0.26}
                 opacity={1}
                 settledOpacity={1}
                 gravityScale={0.7}
