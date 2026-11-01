@@ -88,9 +88,11 @@ function Aurora({ activity, world }) {
   );
   useEffect(() => () => tex.dispose(), [tex]);
 
-  // Light hanging in the water: the curtain trails the globe's sway on a
-  // soft spring (so it sloshes back and forth as it settles), and ripples
-  // faster and brighter with the energy of the shake.
+  // Like the glass glare, the lights are not painted on the glass: the
+  // globe's tilt is cancelled, and the curtain mostly holds its place while
+  // the glass moves around it, catching up on a soft spring (so it sloshes
+  // as it settles). It also ripples faster and brighter with the shake.
+  const groupRef = useRef();
   const meshRef = useRef();
   const motion = useRef({ offset: 0, offsetVel: 0, energy: 0 });
   useFrame((state, dt) => {
@@ -108,27 +110,32 @@ function Aurora({ activity, world }) {
     uniforms.uPhase.value += d * (0.35 + m.energy * 2.2);
     uniforms.uEnergy.value = m.energy;
     uniforms.uBend.value = m.offset;
-    if (meshRef.current) {
-      meshRef.current.position.x = m.offset * 0.3;
-      meshRef.current.rotation.y = m.offset * 0.22;
+    if (groupRef.current) {
+      // WobbleGroup tilts the globe by -sway * 0.12 around its center: undo it
+      groupRef.current.rotation.z = sway * 0.12;
+      groupRef.current.position.x = m.offset * 0.7;
     }
+    if (meshRef.current) meshRef.current.rotation.y = m.offset * 0.22;
   });
   if (!active) return null;
   // a wide arc behind the center of the globe, in the upper glass
   const arc = 2.3;
   return (
-    <mesh ref={meshRef} position={[0, 0.55, 0]} renderOrder={-1}>
-      <cylinderGeometry args={[1.45, 1.45, 1.5, 96, 1, true, Math.PI - arc / 2, arc]} />
-      <shaderMaterial
-        uniforms={uniforms}
-        vertexShader={AURORA_VERTEX}
-        fragmentShader={AURORA_FRAGMENT}
-        transparent
-        depthWrite={false}
-        side={THREE.DoubleSide}
-        blending={THREE.AdditiveBlending}
-      />
-    </mesh>
+    // group at the globe center, so the tilt is undone around the right pivot
+    <group ref={groupRef}>
+      <mesh ref={meshRef} position={[0, 0.55, 0]} renderOrder={-1}>
+        <cylinderGeometry args={[1.45, 1.45, 1.5, 96, 1, true, Math.PI - arc / 2, arc]} />
+        <shaderMaterial
+          uniforms={uniforms}
+          vertexShader={AURORA_VERTEX}
+          fragmentShader={AURORA_FRAGMENT}
+          transparent
+          depthWrite={false}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+    </group>
   );
 }
 
