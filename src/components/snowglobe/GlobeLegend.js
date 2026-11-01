@@ -70,9 +70,7 @@ function legendItems(data, year) {
   items.push({
     icon: '🪵',
     title: 'Wood rings',
-    text: data.firstAchievementYear
-      ? `on Trailhead since ${data.firstAchievementYear}`
-      : 'no certification or stamp yet',
+    text: 'the age of your account',
   });
 
   return items;
