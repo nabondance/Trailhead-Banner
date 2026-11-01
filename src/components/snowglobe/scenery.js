@@ -7,6 +7,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GLOBE_RADIUS, CENTER_Y, GLASS_SEAT_Y, BASE_TOP_Y, glassRadiusAt, smoothstep, snowBump } from './constants';
 import {
   makeEngravedNameTexture,
+  makeMakerMarkTexture,
   makeHighlightTexture,
   makeMvpRosetteTexture,
   makePlaqueTexture,
@@ -500,8 +501,29 @@ const NAME_HEIGHT = 0.6;
 const NAME_CENTER_Y = -0.42;
 const NAME_MAX_ARC = 1.35; // ~77°: wider than this, the ends curve out of view
 
+/* Maker's mark burned into the back of the wood, opposite the name: only
+   seen when the globe turns around */
+const MARK_HEIGHT = 0.5;
+function MakerMark({ year }) {
+  const loaded = useFontsLoaded('Anta', '/assets/fonts/Anta-Regular.ttf');
+  const tex = useMemo(() => (loaded ? makeMakerMarkTexture(year) : null), [loaded, year]);
+  useEffect(() => () => tex?.dispose(), [tex]);
+  if (!tex) return null;
+  const top = woodRadiusAt(NAME_CENTER_Y + MARK_HEIGHT / 2) + 0.004;
+  const bottom = woodRadiusAt(NAME_CENTER_Y - MARK_HEIGHT / 2) + 0.004;
+  const thetaLength = MARK_HEIGHT / ((top + bottom) / 2);
+  return (
+    <mesh position={[0, NAME_CENTER_Y, 0]}>
+      {/* centered on the back: three.js measures theta from +z (the front) */}
+      <cylinderGeometry args={[top, bottom, MARK_HEIGHT, 24, 1, true, Math.PI - thetaLength / 2, thetaLength]} />
+      {/* lit like the wood around it, so it reads as burned in, not printed on */}
+      <meshStandardMaterial map={tex} transparent depthWrite={false} roughness={0.8} />
+    </mesh>
+  );
+}
+
 /* Wooden base with the username engraved front and center */
-function Base({ username, woodYears, rankTitle, isMvp, stats }) {
+function Base({ username, woodYears, rankTitle, isMvp, stats, year }) {
   const metals = useMemo(() => getRankMetals(rankTitle), [rankTitle]);
   const [nameTex, setNameTex] = useState(null);
   // the username seeds this globe's own piece of wood; years on Trailhead
@@ -548,6 +570,7 @@ function Base({ username, woodYears, rankTitle, isMvp, stats }) {
       <RankRing radius={RING_RADIUS} y={(RING_CENTER_Y - BASE_TOP_Y) / 0.95} metals={metals} />
       {/* engraved stats plaque on the foot */}
       <FootPlaque stats={stats} />
+      <MakerMark year={year} />
       {/* MVP rosette just left of the (always centered) name */}
       {isMvp && <MvpRosette rightEdge={-nameHalfArc - 0.04} />}
       {/* thetaStart π: the texture's wrap point faces away from the camera

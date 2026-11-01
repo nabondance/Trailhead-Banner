@@ -132,6 +132,64 @@ function makeEngravedNameTexture(username) {
   return tex;
 }
 
+/* Maker's mark burned into the back of the wood (only seen when the globe
+   turns): a round pyrography stamp, double ring, snowflake, THB and the year.
+   Dark brown with soft scorched edges; alpha only where the wood is burned. */
+function makeMakerMarkTexture(year) {
+  const S = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = S;
+  const ctx = canvas.getContext('2d');
+  const c = S / 2;
+  ctx.strokeStyle = ctx.fillStyle = 'rgba(38,16,6,0.88)';
+  ctx.shadowColor = 'rgba(30,12,4,0.7)';
+  ctx.shadowBlur = 10; // scorched halo around every line
+  ctx.lineCap = 'round';
+
+  ctx.lineWidth = 14;
+  ctx.beginPath();
+  ctx.arc(c, c, c - 24, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(c, c, c - 50, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // six-armed snowflake above the letters
+  const fx = c;
+  const fy = c - 112;
+  const arm = 44;
+  ctx.lineWidth = 7;
+  for (let i = 0; i < 6; i++) {
+    const a = (i * Math.PI) / 3;
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    ctx.beginPath();
+    ctx.moveTo(fx, fy);
+    ctx.lineTo(fx + dx * arm, fy + dy * arm);
+    // a small V on each arm
+    const bx = fx + dx * arm * 0.6;
+    const by = fy + dy * arm * 0.6;
+    for (const side of [-1, 1]) {
+      const b = a + side * 0.7;
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + Math.cos(b) * 16, by + Math.sin(b) * 16);
+    }
+    ctx.stroke();
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '400 130px Anta, sans-serif';
+  ctx.fillText('THB', c, c + 22);
+  ctx.font = '400 54px Anta, sans-serif';
+  ctx.fillText(String(year), c, c + 128);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 /* Big soft specular blob — sells the glass more than transparency does */
 function makeHighlightTexture() {
   const canvas = document.createElement('canvas');
@@ -780,6 +838,7 @@ export {
   makePowderTexture,
   makeSnowTexture,
   makeEngravedNameTexture,
+  makeMakerMarkTexture,
   makeHighlightTexture,
   makeWoodTexture,
   makeMvpRosetteTexture,

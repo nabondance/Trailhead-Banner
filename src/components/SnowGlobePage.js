@@ -369,9 +369,7 @@ export default function SnowGlobePage({
     }
   };
 
-  const snowflake = (
-    <FontAwesomeIcon icon={faSnowflake} className='snowglobe-hint-icon' aria-label='the snowflake button' />
-  );
+  const snowflake = <FontAwesomeIcon icon={faSnowflake} aria-label='the snowflake button' />;
   const hint =
     motionState === 'on' ? (
       <>Shake your phone, swipe the globe, or tap {snowflake} to make it snow.</>
@@ -472,6 +470,7 @@ export default function SnowGlobePage({
               activity={data.activity}
               stats={data.stats}
               shakeNonce={shakeNonce}
+              spinLocked={busy === 'video'}
               onReady={(gl) => {
                 glRef.current = gl;
               }}

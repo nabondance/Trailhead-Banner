@@ -24,6 +24,7 @@ export default function SnowGlobeScene({
   activity,
   stats,
   shakeNonce,
+  spinLocked = false,
   onReady,
 }) {
   // floor depth from rank progress, snow kind from the year's Agentblazer rank
@@ -51,7 +52,29 @@ export default function SnowGlobeScene({
     dragVel: 0,
     prevPosX: 0,
     prevVelX: 0,
+    spin: null,
   });
+
+  /* Secret: 10 drags, swipes or arrow presses the same way in a row (each
+     within 1.5 s of the last) turn the globe once around in that direction.
+     Never while a video records, so it can't spoil the clip. */
+  const spinLockedRef = useRef(spinLocked);
+  spinLockedRef.current = spinLocked;
+  const streak = useRef({ dir: 0, count: 0, last: 0 });
+  const countMove = (dir) => {
+    const w = world.current;
+    if (w.spin || spinLockedRef.current) return;
+    const now = performance.now();
+    const s = streak.current;
+    s.count = s.dir === dir && now - s.last < 1500 ? s.count + 1 : 1;
+    s.dir = dir;
+    s.last = now;
+    if (s.count >= 10) {
+      s.count = 0;
+      w.spin = { dir, t: 0, swirled: false };
+    }
+  };
+  const dragStartX = useRef(null);
 
   useEffect(() => {
     if (!shakeNonce) return;
@@ -95,6 +118,7 @@ export default function SnowGlobeScene({
   }, [shakeNonce]);
 
   const startDrag = (e) => {
+    dragStartX.current = e.clientX;
     world.current.dragging = true;
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
@@ -102,9 +126,15 @@ export default function SnowGlobeScene({
     if (!world.current.dragging) return;
     world.current.dragTarget = THREE.MathUtils.clamp(world.current.dragTarget + e.movementX * 0.005, -0.7, 0.7);
   };
-  const endDrag = () => {
+  const endDrag = (e) => {
     const w = world.current;
     if (!w.dragging) return;
+    // a drag or swipe of 30px or more counts toward the secret turn
+    if (dragStartX.current != null && Number.isFinite(e?.clientX)) {
+      const dx = e.clientX - dragStartX.current;
+      if (Math.abs(dx) >= 30) countMove(Math.sign(dx));
+    }
+    dragStartX.current = null;
     w.dragging = false;
     w.dragTarget = 0;
     // releasing the globe puffs the snow outward in random horizontal
@@ -127,12 +157,15 @@ export default function SnowGlobeScene({
   // mouse. Ignored while typing in a field.
   const endDragRef = useRef(endDrag);
   endDragRef.current = endDrag;
+  const countMoveRef = useRef(countMove);
+  countMoveRef.current = countMove;
   useEffect(() => {
     const held = new Set();
     const isTyping = (target) => target?.closest?.('input, textarea, select, [contenteditable="true"]');
     const onKeyDown = (e) => {
       if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || isTyping(e.target)) return;
       e.preventDefault(); // no horizontal page scroll
+      if (!e.repeat) countMoveRef.current(e.key === 'ArrowLeft' ? -1 : 1);
       held.add(e.key);
       const w = world.current;
       w.dragging = true;
@@ -193,7 +226,14 @@ export default function SnowGlobeScene({
         <WobbleGroup world={world}>
           <group scale={DISPLAY_SCALE}>
             <GlobeShell world={world} floor={floor} sparkles={sparkles} activity={activity} />
-            <Base username={username} woodYears={woodYears} rankTitle={rank?.title} isMvp={isMvp} stats={stats} />
+            <Base
+              username={username}
+              woodYears={woodYears}
+              rankTitle={rank?.title}
+              isMvp={isMvp}
+              stats={stats}
+              year={year}
+            />
             <Achievements world={world} achievements={tumblingItems} floor={floor} />
             {/* Two visual layers, still 680 particles total: defined flakes
                 carry the foreground while softer powder adds depth. */}

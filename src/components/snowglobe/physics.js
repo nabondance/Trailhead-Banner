@@ -523,6 +523,39 @@ function SnowSystem({
    release), wobbles after a shake — and feeds the globe's acceleration back
    into the contents as inertia, so dragging sloshes items and snow like a
    real hand-held snow globe. */
+/* The secret turn: one full spin around the vertical axis, eased in and out */
+const SPIN_SECONDS = 1.4;
+const easeInOutCubic = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+
+/* The water lags behind the turning glass: in the globe's own frame the
+   contents swirl the other way, so give everything a tangential push */
+function swirlContents(w, dir) {
+  w.items.forEach((it) => {
+    const k = it.kick ?? 1;
+    it.embedded = false;
+    it.landedThisFrame = false;
+    const px = it.pos.x - CENTER.x;
+    const pz = it.pos.z - CENTER.z;
+    it.vel.x += -dir * pz * 3.2 * k;
+    it.vel.z += dir * px * 3.2 * k;
+    it.vel.y += (0.6 + Math.random() * 0.8) * k;
+  });
+  w.snowSystems.forEach(({ positions, velocities, count, kicks, settles, alphas, sizes, baseSizes }) => {
+    for (let i = 0; i < count; i++) {
+      const ix = i * 3;
+      const k = kicks ? kicks[i] : 1;
+      const px = positions[ix] - CENTER.x;
+      const pz = positions[ix + 2] - CENTER.z;
+      velocities[ix] += -dir * pz * 3.6 * k;
+      velocities[ix + 2] += dir * px * 3.6 * k;
+      velocities[ix + 1] = Math.min(velocities[ix + 1] + (0.4 + Math.random() * 1.2) * k, 2.6);
+      if (settles) settles[i] = 0;
+      if (alphas) alphas[i] = 1;
+      if (sizes && baseSizes) sizes[i] = baseSizes[i];
+    }
+  });
+}
+
 function WobbleGroup({ world, children }) {
   const ref = useRef();
   useFrame((_, dt) => {
@@ -548,6 +581,21 @@ function WobbleGroup({ world, children }) {
     const posX = w.dragPos + w.shakePos;
     ref.current.position.x = posX;
     ref.current.rotation.z = -posX * 0.12; // tilt with the motion, pivoting like a held globe
+
+    // secret turn (dir +1 = the front swings right)
+    if (w.spin) {
+      w.spin.t += d;
+      const p = Math.min(w.spin.t / SPIN_SECONDS, 1);
+      ref.current.rotation.y = w.spin.dir * Math.PI * 2 * easeInOutCubic(p);
+      if (!w.spin.swirled && p > 0.12) {
+        w.spin.swirled = true;
+        swirlContents(w, w.spin.dir);
+      }
+      if (p >= 1) {
+        ref.current.rotation.y = 0;
+        w.spin = null;
+      }
+    }
 
     // inertia: contents feel the opposite of the globe's acceleration
     const velNow = (posX - w.prevPosX) / d;
