@@ -299,7 +299,7 @@ export default function SnowGlobePage({
     try {
       await navigator.share({
         files: [file],
-        title: `My ${YEAR} Trailhead Snow Globe`,
+        title: `My ${YEAR} Trailhead Rewind`,
         text: postText(data.username),
       });
       pendingShare.current = null;
@@ -379,11 +379,11 @@ export default function SnowGlobePage({
       <div className='snowglobe-header'>
         {isLink ? (
           <h1>
-            {linkUsername}&apos;s {YEAR} Trailhead Snow Globe
+            {linkUsername}&apos;s {YEAR} Trailhead Rewind
           </h1>
         ) : (
           <>
-            <h1>Your {YEAR} Trailhead Snow Globe</h1>
+            <h1>Your {YEAR} Trailhead Rewind</h1>
             <p className='snowglobe-tagline'>
               Fill a snow globe with your {YEAR} achievements, shake it, and share it.
             </p>
