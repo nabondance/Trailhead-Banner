@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSnowflake } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faDownload, faLink, faShareNodes, faSnowflake, faVideo } from '@fortawesome/free-solid-svg-icons';
 import { videoSupport, recordGlobeVideo, RECORD_SECONDS } from './snowglobe/recording';
 import { extractUsernameFromUrl, validateUsernameFormat } from '../utils/usernameValidation';
 import GenerationCount from './GenerationCount';
@@ -146,6 +146,7 @@ export default function SnowGlobePage({
   const [webglOk, setWebglOk] = useState(null); // null = not checked yet (SSR-safe)
   const [videoOk, setVideoOk] = useState(false); // WebCodecs or MediaRecorder available
   const [busy, setBusy] = useState(''); // '' | 'image' | 'video' | 'share'
+  const [linkCopied, setLinkCopied] = useState(false);
   const [shareOk, setShareOk] = useState(false); // native share sheet can take image files
   const [isTouch, setIsTouch] = useState(false);
   const [motionState, setMotionState] = useState('unknown'); // 'unknown' | 'needs-permission' | 'on' | 'denied'
@@ -342,7 +343,9 @@ export default function SnowGlobePage({
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(personalUrl(data.username));
-      setActionStatus('Link copied!');
+      // the Link part shows "Copied" for a moment instead of a status line
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       setActionStatus(personalUrl(data.username));
     }
@@ -491,23 +494,27 @@ export default function SnowGlobePage({
               </>
             )}
           </p>
-          <div className='snowglobe-actions'>
+          <div className='snowglobe-segments'>
             {sharePrimary ? (
-              <button type='button' className='button' onClick={shareImage} disabled={!!busy}>
+              <button type='button' onClick={shareImage} disabled={!!busy}>
+                <FontAwesomeIcon icon={faShareNodes} />
                 {busy === 'share' ? 'Preparing…' : 'Share'}
               </button>
             ) : (
-              <button type='button' className='button' onClick={downloadImage} disabled={!!busy}>
-                {busy === 'image' ? 'Saving…' : 'Download image'}
+              <button type='button' onClick={downloadImage} disabled={!!busy}>
+                <FontAwesomeIcon icon={faDownload} />
+                {busy === 'image' ? 'Saving…' : 'Image'}
               </button>
             )}
             {videoOk && (
-              <button type='button' className='snowglobe-link-button' onClick={downloadVideo} disabled={!!busy}>
-                {busy === 'video' ? 'Recording… 🔴' : 'Video'}
+              <button type='button' onClick={downloadVideo} disabled={!!busy}>
+                <FontAwesomeIcon icon={faVideo} />
+                {busy === 'video' ? 'Recording…' : 'Video'}
               </button>
             )}
-            <button type='button' className='snowglobe-link-button' onClick={copyLink}>
-              Copy link
+            <button type='button' onClick={copyLink}>
+              <FontAwesomeIcon icon={linkCopied ? faCheck : faLink} />
+              {linkCopied ? 'Copied' : 'Link'}
             </button>
           </div>
           {actionStatus && (

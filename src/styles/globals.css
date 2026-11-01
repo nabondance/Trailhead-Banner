@@ -2553,6 +2553,44 @@ select:focus {
   text-decoration: none;
 }
 
+/* image / video / link actions under the globe: one rounded bar split
+   into equal parts */
+.snowglobe-segments {
+  display: inline-flex;
+  margin-top: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--primary);
+}
+
+.snowglobe-segments button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 112px;
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.snowglobe-segments button + button {
+  border-left: 1px solid rgb(255 255 255 / 35%);
+}
+
+.snowglobe-segments button:hover:not(:disabled) {
+  background: var(--secondary);
+}
+
+.snowglobe-segments button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
 .snowglobe-status {
   margin-top: 12px;
   color: var(--text-contrast);
