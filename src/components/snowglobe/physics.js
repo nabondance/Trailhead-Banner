@@ -524,7 +524,7 @@ function SnowSystem({
    into the contents as inertia, so dragging sloshes items and snow like a
    real hand-held snow globe. */
 /* The secret turn: one full spin around the vertical axis, eased in and out */
-const SPIN_SECONDS = 1.4;
+const SPIN_SECONDS = 2.5;
 const easeInOutCubic = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
 
 /* The water lags behind the turning glass: in the globe's own frame the
