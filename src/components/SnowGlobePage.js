@@ -88,6 +88,28 @@ function downloadBlob(blob, fileName) {
   URL.revokeObjectURL(link.href);
 }
 
+/* Globes built from the form in this browser (stored in the browser only):
+   on its own personal link the owner gets the decoded block, the sharing
+   actions and a rebuild, which visitors don't. It never changes the globe,
+   which always comes from the API. */
+const OWN_KEY = 'thb-rewind-own';
+function readOwn() {
+  try {
+    const list = JSON.parse(localStorage.getItem(OWN_KEY) || '[]');
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+function rememberOwn(username) {
+  try {
+    const list = readOwn().filter((u) => u !== username);
+    localStorage.setItem(OWN_KEY, JSON.stringify([username, ...list].slice(0, 20)));
+  } catch {
+    /* storage unavailable (private mode): the link just shows the visitor view */
+  }
+}
+
 // personal link of a globe (same origin, so preview deployments link to themselves)
 const personalPath = (username) => `/rewind/${YEAR}/${username}`;
 const personalUrl = (username) => `${window.location.origin}${personalPath(username)}`;
@@ -166,6 +188,13 @@ export default function SnowGlobePage({
   open = true,
 }) {
   const isLink = !!linkUsername;
+  // read after mount (localStorage), so the server render is the visitor view
+  const [isOwner, setIsOwner] = useState(false);
+  useEffect(() => {
+    if (isLink) setIsOwner(readOwn().includes(linkUsername));
+  }, [isLink, linkUsername]);
+  // the visitor view of someone else's globe: no decoded block, no sharing
+  const isVisitor = isLink && !isOwner;
   const [input, setInput] = useState('');
   const [data, setData] = useState(savedGlobe);
   const [loading, setLoading] = useState(false);
@@ -248,7 +277,9 @@ export default function SnowGlobePage({
         return;
       }
       setData(json);
-      // the address bar becomes the personal link, ready to copy
+      // the address bar becomes the personal link, ready to copy; this browser
+      // now owns it (a link's first visitor building it doesn't)
+      if (!isLink || isOwner) rememberOwn(json.username);
       if (!isLink) window.history.replaceState(null, '', personalPath(json.username));
       countRef.current?.fetchCount(); // the live broadcast also catches this globe once it is recorded
     } catch {
@@ -439,11 +470,18 @@ export default function SnowGlobePage({
           // the username unless there is no globe for it (unknown profile,
           // nothing saved after the Rewind period): an unknown name must not
           // read as someone's Rewind
-          <h1>
-            {!error && !loadFailed && (data || open)
-              ? `${linkUsername}'s ${YEAR} Trailhead Rewind`
-              : `${YEAR} Trailhead Rewind`}
-          </h1>
+          <>
+            <h1>
+              {!error && !loadFailed && (data || open)
+                ? `${isOwner ? 'Your' : `${linkUsername}'s`} ${YEAR} Trailhead Rewind`
+                : `${YEAR} Trailhead Rewind`}
+            </h1>
+            {data && (
+              <p className='snowglobe-tagline'>
+                {isOwner ? 'Your' : 'Their'} {YEAR} Trailhead achievements, in a snow globe.
+              </p>
+            )}
+          </>
         ) : (
           <>
             <h1>Your {YEAR} Trailhead Rewind</h1>
@@ -557,45 +595,53 @@ export default function SnowGlobePage({
               </>
             )}
           </p>
-          <div className='snowglobe-segments'>
-            {sharePrimary ? (
-              <button type='button' onClick={shareImage} disabled={!!busy}>
-                <FontAwesomeIcon icon={faShareNodes} />
-                {busy === 'share' ? 'Preparing…' : 'Share'}
+          {!isVisitor && (
+            <div className='snowglobe-segments'>
+              {sharePrimary ? (
+                <button type='button' onClick={shareImage} disabled={!!busy}>
+                  <FontAwesomeIcon icon={faShareNodes} />
+                  {busy === 'share' ? 'Preparing…' : 'Share'}
+                </button>
+              ) : (
+                <button type='button' onClick={downloadImage} disabled={!!busy}>
+                  <FontAwesomeIcon icon={faDownload} />
+                  {busy === 'image' ? 'Saving…' : 'Image'}
+                </button>
+              )}
+              {videoOk && (
+                <button type='button' onClick={downloadVideo} disabled={!!busy}>
+                  <FontAwesomeIcon icon={faVideo} />
+                  {busy === 'video' ? 'Recording…' : 'Video'}
+                </button>
+              )}
+              <button type='button' onClick={copyLink}>
+                <FontAwesomeIcon icon={linkCopied ? faCheck : faLink} />
+                {linkCopied ? 'Copied' : 'Link'}
               </button>
-            ) : (
-              <button type='button' onClick={downloadImage} disabled={!!busy}>
-                <FontAwesomeIcon icon={faDownload} />
-                {busy === 'image' ? 'Saving…' : 'Image'}
-              </button>
-            )}
-            {videoOk && (
-              <button type='button' onClick={downloadVideo} disabled={!!busy}>
-                <FontAwesomeIcon icon={faVideo} />
-                {busy === 'video' ? 'Recording…' : 'Video'}
-              </button>
-            )}
-            <button type='button' onClick={copyLink}>
-              <FontAwesomeIcon icon={linkCopied ? faCheck : faLink} />
-              {linkCopied ? 'Copied' : 'Link'}
-            </button>
-          </div>
+            </div>
+          )}
           {actionStatus && (
             <p className='snowglobe-status' role='status'>
               {actionStatus}
             </p>
           )}
-          {/* worded for the owner ("your active months"): only on /rewind, a link
-              can't tell its owner from a visitor */}
-          {!isLink && <GlobeLegend data={data} year={YEAR} />}
+          {/* worded for the owner: not on someone else's link */}
+          {!isVisitor && <GlobeLegend data={data} year={YEAR} />}
         </section>
       )}
 
       {isLink && !loading && (
         <div className='snowglobe-actions snowglobe-make-own'>
-          <a className='button submit-button' href='/rewind'>
-            {open ? 'Make your own ❄️' : 'Make your own in December ❄️'}
-          </a>
+          {isOwner && open ? (
+            // rebuild with fresh data (new certifications in December)
+            <button type='button' className='button submit-button' onClick={() => buildGlobe(linkUsername)}>
+              Let it snow again ❄️
+            </button>
+          ) : isOwner ? null : (
+            <a className='button submit-button' href='/rewind'>
+              {open ? 'Make your own ❄️' : 'Make your own in December ❄️'}
+            </a>
+          )}
         </div>
       )}
     </div>
