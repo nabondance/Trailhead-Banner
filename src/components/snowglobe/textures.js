@@ -742,12 +742,21 @@ function makeBackdropTexture(username, rankTitle, year) {
   // discreet watermark pill, same design and placement as the banner/rewind
   // artifacts (src/assets/watermarks/thb.svg, bottom-right corner). Drawn
   // natively — the SVG's remote @import font wouldn't rasterize in a canvas.
+  // It carries the globe's personal link, shrunk to fit long usernames, or the
+  // plain Rewind address when even the smallest size doesn't fit.
   ctx.save();
-  ctx.font = '400 20px Anta, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const url = 'thb.nabondance.me';
-  const pillH = 28;
+  const MAX_TEXT_W = W * 0.62;
+  let url = username ? `thb.nabondance.me/rewind/${year}/${username}` : 'thb.nabondance.me/rewind';
+  let fontSize = 22;
+  ctx.font = `400 ${fontSize}px Anta, sans-serif`;
+  while (ctx.measureText(url).width > MAX_TEXT_W && fontSize > 15) {
+    fontSize -= 1;
+    ctx.font = `400 ${fontSize}px Anta, sans-serif`;
+  }
+  if (ctx.measureText(url).width > MAX_TEXT_W) url = 'thb.nabondance.me/rewind';
+  const pillH = Math.round(fontSize * 1.4);
   const pillW = ctx.measureText(url).width + 34;
   const pillX = W - pillW - 14;
   const pillY = H - pillH - 14;
