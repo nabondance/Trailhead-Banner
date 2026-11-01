@@ -2577,20 +2577,19 @@ select:focus {
 
 .globe-legend ul {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 10px 16px;
   display: grid;
   gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--middleground);
 }
 
 .globe-legend li {
   display: flex;
   gap: 10px;
   align-items: center;
-  padding: 7px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--middleground);
   font-size: 0.95em;
   line-height: 1.4;
 }
