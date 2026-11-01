@@ -1,7 +1,7 @@
 'use client';
 
 import * as THREE from 'three';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 
 /* Northern lights inside the glass, drawn from the user's year: a curtain
@@ -21,6 +21,9 @@ const AURORA_VERTEX = /* glsl */ `
 const AURORA_FRAGMENT = /* glsl */ `
   uniform sampler2D uMonths;
   uniform float uTime;
+  uniform float uPhase;   // ray drift, runs faster while the globe moves
+  uniform float uEnergy;  // 0 calm → 1 hard shake
+  uniform float uBend;    // sideways lag of the curtain, strongest at the top
   varying vec2 vUv;
   float hash(float n) { return fract(sin(n) * 43758.5453); }
   float noise(float x) {
@@ -29,17 +32,20 @@ const AURORA_FRAGMENT = /* glsl */ `
   }
   void main() {
     float u = 1.0 - vUv.x; // the cylinder runs right to left: January on the left
-    vec4 month = texture2D(uMonths, vec2(u, 0.5));
+    // the curtain bends with the motion: the top trails behind the most
+    u += uBend * vUv.y * vUv.y * 0.18;
+    vec4 month = texture2D(uMonths, vec2(clamp(u, 0.0, 1.0), 0.5));
     float level = month.r;
     float certShare = month.g;
     // the curtain sways slowly
-    float v = vUv.y + 0.05 * sin(u * 9.0 + uTime * 0.5) + 0.025 * sin(u * 23.0 - uTime * 0.8);
+    float wave = 1.0 + uEnergy * 2.5;
+    float v = vUv.y + wave * (0.05 * sin(u * 9.0 + uTime * 0.5 + uPhase) + 0.025 * sin(u * 23.0 - uTime * 0.8 - uPhase * 1.3));
     float top = 0.3 + 0.7 * level;
     float body = smoothstep(0.0, 0.15, v) * (1.0 - smoothstep(top - 0.3, top, v));
     // fine vertical rays drifting sideways
-    float rays = (0.55 + 0.45 * noise(u * 95.0 + uTime * 0.35)) * (0.7 + 0.3 * noise(u * 29.0 - uTime * 0.2));
+    float rays = (0.55 + 0.45 * noise(u * 95.0 + uPhase)) * (0.7 + 0.3 * noise(u * 29.0 - uPhase * 0.6));
     float sides = smoothstep(0.0, 0.07, vUv.x) * (1.0 - smoothstep(0.93, 1.0, vUv.x));
-    float alpha = body * rays * level * sides * 0.75;
+    float alpha = body * rays * level * sides * 0.75 * (1.0 + uEnergy * 0.9);
     vec3 low = mix(vec3(0.35, 0.8, 1.0), vec3(1.0, 0.82, 0.4), certShare);
     vec3 color = mix(low, vec3(0.58, 0.44, 1.0), smoothstep(0.1, top, v));
     gl_FragColor = vec4(color, alpha);
@@ -68,18 +74,50 @@ function makeMonthsTexture(activity) {
   return { tex, active: totals.some(Boolean) };
 }
 
-function Aurora({ activity }) {
+function Aurora({ activity, world }) {
   const { tex, active } = useMemo(() => makeMonthsTexture(activity), [activity]);
-  const uniforms = useMemo(() => ({ uMonths: { value: tex }, uTime: { value: 0 } }), [tex]);
+  const uniforms = useMemo(
+    () => ({
+      uMonths: { value: tex },
+      uTime: { value: 0 },
+      uPhase: { value: 0 },
+      uEnergy: { value: 0 },
+      uBend: { value: 0 },
+    }),
+    [tex]
+  );
   useEffect(() => () => tex.dispose(), [tex]);
-  useFrame((state) => {
+
+  // Light hanging in the water: the curtain trails the globe's sway on a
+  // soft spring (so it sloshes back and forth as it settles), and ripples
+  // faster and brighter with the energy of the shake.
+  const meshRef = useRef();
+  const motion = useRef({ offset: 0, offsetVel: 0, energy: 0 });
+  useFrame((state, dt) => {
+    const d = Math.min(dt, 0.05);
+    const m = motion.current;
+    const w = world?.current;
+    const sway = w ? w.dragPos + w.shakePos : 0;
+    const speed = w ? Math.abs(w.dragVel + w.shakeVel) : 0;
+    m.offsetVel += (-sway - m.offset) * 9 * d - m.offsetVel * 2.2 * d;
+    m.offset += m.offsetVel * d;
+    const target = Math.min(speed / 2.5, 1);
+    // rise fast, fade slowly
+    m.energy += (target - m.energy) * (target > m.energy ? 6 : 0.9) * d;
     uniforms.uTime.value = state.clock.elapsedTime;
+    uniforms.uPhase.value += d * (0.35 + m.energy * 2.2);
+    uniforms.uEnergy.value = m.energy;
+    uniforms.uBend.value = m.offset;
+    if (meshRef.current) {
+      meshRef.current.position.x = m.offset * 0.3;
+      meshRef.current.rotation.y = m.offset * 0.22;
+    }
   });
   if (!active) return null;
   // a wide arc behind the center of the globe, in the upper glass
   const arc = 2.3;
   return (
-    <mesh position={[0, 0.55, 0]} renderOrder={-1}>
+    <mesh ref={meshRef} position={[0, 0.55, 0]} renderOrder={-1}>
       <cylinderGeometry args={[1.45, 1.45, 1.5, 96, 1, true, Math.PI - arc / 2, arc]} />
       <shaderMaterial
         uniforms={uniforms}

@@ -289,7 +289,7 @@ function GlobeShell({ world, floor, sparkles, activity }) {
         </sprite>
       ))}
       {/* northern lights from the year's monthly activity */}
-      <Aurora activity={activity} />
+      <Aurora activity={activity} world={world} />
       {/* snow floor: one organic drifted surface (matches floor.surfaceY) */}
       <SnowMound floor={floor} />
       <SnowSparkles floor={floor} {...sparkles} />
