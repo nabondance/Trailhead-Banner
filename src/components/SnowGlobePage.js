@@ -2,11 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Mp4Spike from './Mp4Spike';
 import { videoSupport, recordGlobeVideo, RECORD_SECONDS } from './snowglobe/recording';
 import { extractUsernameFromUrl, validateUsernameFormat } from '../utils/usernameValidation';
 import GenerationCount from './GenerationCount';
-import { APP_ENV } from '../utils/envUtils';
 
 const SnowGlobeScene = dynamic(() => import('./SnowGlobeScene'), {
   ssr: false,
@@ -16,8 +14,6 @@ const SnowGlobeScene = dynamic(() => import('./SnowGlobeScene'), {
 const YEAR = 2026;
 
 function detectWebGL() {
-  // ?nowebgl=1 forces the unsupported panel, for testing it on capable browsers
-  if (new URLSearchParams(window.location.search).has('nowebgl')) return false;
   try {
     const canvas = document.createElement('canvas');
     return !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
@@ -133,13 +129,11 @@ export default function SnowGlobePage({ fallbackCount = null }) {
   const [actionStatus, setActionStatus] = useState('');
   const [shakeNonce, setShakeNonce] = useState(0);
   const [webglOk, setWebglOk] = useState(null); // null = not checked yet (SSR-safe)
-  const [spikeMode, setSpikeMode] = useState(false); // ?mp4spike=1 — MediaRecorder MP4 test rig
   const [videoOk, setVideoOk] = useState(false); // WebCodecs or MediaRecorder available
   const [busy, setBusy] = useState(''); // '' | 'image' | 'video' | 'share'
   const [shareOk, setShareOk] = useState(false); // native share sheet can take image files
   const [isTouch, setIsTouch] = useState(false);
   const [motionState, setMotionState] = useState('unknown'); // 'unknown' | 'needs-permission' | 'on' | 'denied'
-  const [snowOverride, setSnowOverride] = useState({});
   const pendingShare = useRef(null); // image ready to share when the browser needed a second tap
   const glRef = useRef(null);
   const resultRef = useRef(null);
@@ -147,18 +141,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
 
   useEffect(() => {
     setWebglOk(detectWebGL());
-    setSpikeMode(new URLSearchParams(window.location.search).has('mp4spike'));
     setVideoOk(videoSupport().supported);
-    // testing only (never in production): ?snow=Champion|Innovator|Legend|classic
-    // and ?level=0..1 override the snow kind and depth from the data
-    if (APP_ENV !== 'production') {
-      const params = new URLSearchParams(window.location.search);
-      const level = Number.parseFloat(params.get('level'));
-      setSnowOverride({
-        snow: params.get('snow') || undefined,
-        level: Number.isFinite(level) ? level : undefined,
-      });
-    }
     try {
       const probe = new File([new Blob()], 'probe.png', { type: 'image/png' });
       setShareOk(!!navigator.canShare?.({ files: [probe] }));
@@ -411,9 +394,10 @@ export default function SnowGlobePage({ fallbackCount = null }) {
               username={data.username}
               // years on Trailhead, counted inclusively (joined this year = 1)
               woodYears={data.firstAchievementYear ? YEAR - data.firstAchievementYear + 1 : 1}
-              snowLevel={snowOverride.level ?? (data.topRank ? 1 : (data.rankProgress ?? 0.45))}
-              topRank={snowOverride.level === undefined && data.topRank}
-              agentblazerTitle={snowOverride.snow ?? data.agentblazerTitle}
+              snowLevel={data.topRank ? 1 : (data.rankProgress ?? 0.45)}
+              topRank={data.topRank}
+              agentblazerTitle={data.agentblazerTitle}
+              isMvp={data.isMvp}
               shakeNonce={shakeNonce}
               onReady={(gl) => {
                 glRef.current = gl;
@@ -456,8 +440,6 @@ export default function SnowGlobePage({ fallbackCount = null }) {
           )}
         </section>
       )}
-
-      {spikeMode && <Mp4Spike getCanvas={() => glRef.current?.gl?.domElement} />}
     </div>
   );
 }

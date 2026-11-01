@@ -4,7 +4,15 @@ import * as THREE from 'three';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { GLOBE_RADIUS, CENTER_Y, GLASS_SEAT_Y, BASE_TOP_Y, glassRadiusAt, smoothstep, snowBump } from './constants';
-import { makeEngravedNameTexture, makeHighlightTexture, makeSnowTexture, makeWoodTexture, loadFont } from './textures';
+import {
+  makeEngravedNameTexture,
+  makeHighlightTexture,
+  makeMvpRosetteTexture,
+  makeSnowTexture,
+  makeWoodTexture,
+  loadFont,
+} from './textures';
+import { getRankMetals } from './rankMetals';
 
 const GLASS_RIM_VERTEX = /* glsl */ `
   varying vec3 vNormal;
@@ -290,13 +298,130 @@ function GlobeShell({ world, floor, sparkles }) {
 // its top edge meets the glass at the seat, and it flares gently to the foot
 const WOOD_TOP = 0.1;
 const WOOD_BOTTOM = -0.88;
-const WOOD_TOP_RADIUS = glassRadiusAt(GLASS_SEAT_Y) + 0.03;
+// Like a real globe in cross-section: the glass comes down to exactly the
+// wood's top edge, and the rank ring sits over that joint on the outside,
+// half on the glass foot and half on the wood's flared side.
+const sphereRadiusAt = (y, radius) => {
+  const dy = y - CENTER_Y;
+  return Math.sqrt(Math.max(radius * radius - dy * dy, 0));
+};
+const WOOD_TOP_RADIUS = sphereRadiusAt(GLASS_SEAT_Y, GLOBE_RADIUS + 0.02); // glass shell radius
+const RING_HALF_THICKNESS = 0.045;
+// ring center: a bit below the joint, and pushed out just enough that no
+// part of its upper half is inside the glass (which flares out above)
+const RING_CENTER_Y = GLASS_SEAT_Y - RING_HALF_THICKNESS * 0.25;
+const RING_RADIUS = Array.from({ length: 13 }, (_, i) => (i / 12) * Math.PI).reduce(
+  (r, a) =>
+    Math.max(
+      r,
+      sphereRadiusAt(RING_CENTER_Y + RING_HALF_THICKNESS * Math.sin(a), GLOBE_RADIUS + 0.03) -
+        RING_HALF_THICKNESS * Math.cos(a)
+    ),
+  0
+);
 const WOOD_BOTTOM_RADIUS = WOOD_TOP_RADIUS + 0.22;
 const woodRadiusAt = (y) =>
   WOOD_BOTTOM_RADIUS + ((WOOD_TOP_RADIUS - WOOD_BOTTOM_RADIUS) * (y - WOOD_BOTTOM)) / (WOOD_TOP - WOOD_BOTTOM);
 
+/* One strand of a braided ring: a helix wound around the ring's circle, so
+   several strands with spread phases twist together like a rope */
+class BraidStrand extends THREE.Curve {
+  constructor(ringRadius, braidRadius, twists, phase) {
+    super();
+    this.ringRadius = ringRadius;
+    this.braidRadius = braidRadius;
+    this.twists = twists;
+    this.phase = phase;
+  }
+
+  getPoint(t, target = new THREE.Vector3()) {
+    const theta = t * Math.PI * 2;
+    const a = theta * this.twists + this.phase;
+    const r = this.ringRadius + this.braidRadius * Math.cos(a);
+    return target.set(Math.cos(theta) * r, this.braidRadius * Math.sin(a), Math.sin(theta) * r);
+  }
+}
+
+/* The rank ring: one solid metal for the first ranks, then a braid with one
+   strand per star (see rankMetals.js) */
+function RankRing({ radius, y, metals }) {
+  const strands = useMemo(() => {
+    if (metals.length < 2) return null;
+    const braidRadius = 0.024;
+    const tube = metals.length === 2 ? 0.02 : Math.max(0.013, braidRadius * Math.sin(Math.PI / metals.length) * 1.2);
+    const twists = 40;
+    return metals.map((metal, i) => ({
+      metal,
+      geometry: new THREE.TubeGeometry(
+        new BraidStrand(radius, braidRadius, twists, (i / metals.length) * Math.PI * 2),
+        twists * 16,
+        tube,
+        8,
+        true
+      ),
+    }));
+  }, [radius, metals]);
+
+  useEffect(() => () => strands?.forEach((s) => s.geometry.dispose()), [strands]);
+
+  if (!strands) {
+    const [metal] = metals;
+    return (
+      <mesh position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[radius, 0.03, 12, 96]} />
+        <meshStandardMaterial color={metal.color} metalness={metal.metalness} roughness={metal.roughness} />
+      </mesh>
+    );
+  }
+  return (
+    <group position={[0, y, 0]}>
+      {strands.map(({ metal, geometry }) => (
+        <mesh key={metal.name} geometry={geometry}>
+          <meshStandardMaterial color={metal.color} metalness={metal.metalness} roughness={metal.roughness} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* MVP prize rosette pinned on the wood beside the engraved name, curved to
+   hug the tapered base like the engraving (banner MVP ribbon colors) */
+const ROSETTE_HEIGHT = 0.8;
+
+function MvpRosette({ rightEdge }) {
+  const loaded = useFontsLoaded('Anta', '/assets/fonts/Anta-Regular.ttf');
+  const tex = useMemo(() => (loaded ? makeMvpRosetteTexture() : null), [loaded]);
+  useEffect(() => () => tex?.dispose(), [tex]);
+  if (!tex) return null;
+  const centerY = -0.42;
+  const top = woodRadiusAt(centerY + ROSETTE_HEIGHT / 2) + 0.03;
+  const bottom = woodRadiusAt(centerY - ROSETTE_HEIGHT / 2) + 0.03;
+  const width = ROSETTE_HEIGHT * tex.userData.aspect;
+  const thetaLength = width / ((top + bottom) / 2);
+  const angle = rightEdge - thetaLength / 2;
+  return (
+    <mesh position={[0, centerY, 0]}>
+      <cylinderGeometry args={[top, bottom, ROSETTE_HEIGHT, 24, 1, true, angle - thetaLength / 2, thetaLength]} />
+      <meshStandardMaterial map={tex} transparent alphaTest={0.05} roughness={0.55} side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+function useFontsLoaded(family, url) {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    loadFont(family, url).then(() => !cancelled && setLoaded(true));
+    return () => {
+      cancelled = true;
+    };
+  }, [family, url]);
+  return loaded;
+}
+
 /* Wooden base with the username engraved front and center */
-function Base({ username, woodYears }) {
+function Base({ username, woodYears, rankTitle, isMvp }) {
+  const metals = useMemo(() => getRankMetals(rankTitle), [rankTitle]);
   const [nameTex, setNameTex] = useState(null);
   // the username seeds this globe's own piece of wood; years on Trailhead
   // set its growth rings
@@ -316,20 +441,26 @@ function Base({ username, woodYears }) {
     if (!username) return undefined;
     let cancelled = false;
     loadFont('Great Vibes', '/assets/fonts/GreatVibes-Regular.ttf').then(() => {
-      if (!cancelled) setNameTex(makeEngravedNameTexture(username));
+      if (!cancelled) setNameTex(makeEngravedNameTexture(username, metals[0].engrave));
     });
     return () => {
       cancelled = true;
     };
-  }, [username]);
+  }, [username, metals]);
+
+  // half the engraving's arc (radians), so the MVP rosette can sit beside it
+  const nameOffset = isMvp ? 0.2 : 0;
+  const nameHalfArc = nameTex
+    ? Math.min((0.6 * nameTex.userData.aspect) / (woodRadiusAt(-0.42) + 0.025), 2.4) / 2
+    : 0.6;
 
   return (
     <group position={[0, BASE_TOP_Y, 0]} scale={[1, 0.95, 1]}>
-      {/* thin gold lip where the wood meets the glass */}
-      <mesh position={[0, WOOD_TOP, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[WOOD_TOP_RADIUS, 0.03, 12, 96]} />
-        <meshStandardMaterial color='#e8c45c' metalness={0.88} roughness={0.22} />
-      </mesh>
+      {/* rank ring where the wood meets the glass */}
+      <RankRing radius={RING_RADIUS} y={(RING_CENTER_Y - BASE_TOP_Y) / 0.95} metals={metals} />
+      {/* MVP rosette just left of the name; with it, the name shifts right so
+          both stay near the front */}
+      {isMvp && <MvpRosette rightEdge={nameOffset - nameHalfArc - 0.04} />}
       {/* thetaStart π: the texture's wrap point faces away from the camera
           (three.js starts cylinders at +z, dead center in front) */}
       <mesh position={[0, (WOOD_TOP + WOOD_BOTTOM) / 2, 0]}>
@@ -363,7 +494,7 @@ function Base({ username, woodYears }) {
           const thetaLength = Math.min((height * nameTex.userData.aspect) / ((top + bottom) / 2), 2.4);
           return (
             <mesh position={[0, centerY, 0]}>
-              <cylinderGeometry args={[top, bottom, height, 24, 1, true, -thetaLength / 2, thetaLength]} />
+              <cylinderGeometry args={[top, bottom, height, 24, 1, true, nameOffset - thetaLength / 2, thetaLength]} />
               <meshBasicMaterial map={nameTex} transparent depthWrite={false} />
             </mesh>
           );

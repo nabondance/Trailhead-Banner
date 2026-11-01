@@ -94,7 +94,7 @@ function makeSnowTexture() {
 /* Username engraved in gold on the wooden base: gold-leaf gradient letters
    set in a dark groove (shadow above = inset, lit from above). The @ is
    drawn smaller than the name, like a signature flourish. */
-function makeEngravedNameTexture(username) {
+function makeEngravedNameTexture(username, engrave = ['#f6dd8b', '#d4af37', '#96751c']) {
   const canvas = document.createElement('canvas');
   // Great Vibes: flowing connected calligraphy with tall swashes
   const nameFont = '400 115px "Great Vibes", cursive';
@@ -120,12 +120,12 @@ function makeEngravedNameTexture(username) {
   };
   // dark groove rim above the letters
   drawLayer('rgba(20,10,4,0.9)', 104);
-  // gold leaf: light catches the top, deepens toward the bottom
-  const gold = ctx.createLinearGradient(0, 50, 0, 170);
-  gold.addColorStop(0, '#f6dd8b');
-  gold.addColorStop(0.5, '#d4af37');
-  gold.addColorStop(1, '#96751c');
-  drawLayer(gold, 110);
+  // metal leaf (the rank's lead metal): light catches the top, deepens toward the bottom
+  const leaf = ctx.createLinearGradient(0, 50, 0, 170);
+  leaf.addColorStop(0, engrave[0]);
+  leaf.addColorStop(0.5, engrave[1]);
+  leaf.addColorStop(1, engrave[2]);
+  drawLayer(leaf, 110);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.userData.aspect = canvas.width / canvas.height;
@@ -355,6 +355,101 @@ function makeWoodTexture({ username = '', years = 1 } = {}) {
   map.colorSpace = THREE.SRGBColorSpace;
   const bumpMap = finish(new THREE.DataTexture(bump, W, H, THREE.RGBAFormat));
   return { map, bumpMap };
+}
+
+/* MVP prize rosette, in the colors of the banner's MVP ribbon
+   (assets/ribbons/mvp.svg): pleated navy and light-blue rosette, "MVP" in
+   Anta on the center disc, two V-cut tails. Transparent around it. */
+function makeMvpRosetteTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 768;
+  const ctx = canvas.getContext('2d');
+  const cx = 256;
+  const cy = 250;
+  const navy = '#0d2b4e';
+  const blue = '#40a2db';
+
+  // tails first, behind the rosette
+  [-1, 1].forEach((side) => {
+    ctx.save();
+    ctx.translate(cx + side * 62, cy + 120);
+    ctx.rotate(side * 0.2);
+    const w = 108;
+    const h = 380;
+    ctx.beginPath();
+    ctx.moveTo(-w / 2, 0);
+    ctx.lineTo(w / 2, 0);
+    ctx.lineTo(w / 2, h);
+    ctx.lineTo(0, h - 62);
+    ctx.lineTo(-w / 2, h);
+    ctx.closePath();
+    const tail = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
+    tail.addColorStop(0, '#0a2240');
+    tail.addColorStop(0.5, '#173f6e');
+    tail.addColorStop(1, '#0a2240');
+    ctx.fillStyle = tail;
+    ctx.fill();
+    ctx.fillStyle = blue;
+    ctx.fillRect(-w / 2 + 12, 0, 9, h - 24);
+    ctx.fillRect(w / 2 - 21, 0, 9, h - 24);
+    ctx.restore();
+  });
+
+  // pleated outer ring: alternating light and shadow wedges with a wavy edge
+  const pleats = 32;
+  for (let i = 0; i < pleats; i++) {
+    const a0 = (i / pleats) * Math.PI * 2;
+    const a1 = ((i + 1) / pleats) * Math.PI * 2;
+    const am = (a0 + a1) / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(a0) * 212, cy + Math.sin(a0) * 212);
+    ctx.quadraticCurveTo(
+      cx + Math.cos(am) * 240,
+      cy + Math.sin(am) * 240,
+      cx + Math.cos(a1) * 212,
+      cy + Math.sin(a1) * 212
+    );
+    ctx.closePath();
+    ctx.fillStyle = i % 2 ? '#123866' : '#1d4f8a';
+    ctx.fill();
+  }
+  // light-blue pleated inner ring
+  for (let i = 0; i < pleats; i++) {
+    const a0 = (i / pleats) * Math.PI * 2;
+    const a1 = ((i + 1) / pleats) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, 158, a0, a1);
+    ctx.closePath();
+    ctx.fillStyle = i % 2 ? '#3a93c9' : '#5cb6e6';
+    ctx.fill();
+  }
+  // center disc with a soft dome highlight
+  const disc = ctx.createRadialGradient(cx - 30, cy - 40, 10, cx, cy, 120);
+  disc.addColorStop(0, '#1f5491');
+  disc.addColorStop(1, navy);
+  ctx.beginPath();
+  ctx.arc(cx, cy, 116, 0, Math.PI * 2);
+  ctx.fillStyle = disc;
+  ctx.fill();
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 104, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '86px Anta, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('MVP', cx, cy + 4);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  tex.userData.aspect = canvas.width / canvas.height;
+  return tex;
 }
 
 /* Rank accent palette, mirrored from drawUtils.getRankAccentColor (drawUtils
@@ -647,6 +742,7 @@ export {
   makeEngravedNameTexture,
   makeHighlightTexture,
   makeWoodTexture,
+  makeMvpRosetteTexture,
   RANK_ACCENTS,
   loadFont,
   makeBackdropTexture,

@@ -20,6 +20,7 @@ export default function SnowGlobeScene({
   snowLevel,
   topRank,
   agentblazerTitle,
+  isMvp,
   shakeNonce,
   onReady,
 }) {
@@ -162,7 +163,7 @@ export default function SnowGlobeScene({
         <WobbleGroup world={world}>
           <group scale={DISPLAY_SCALE}>
             <GlobeShell world={world} floor={floor} sparkles={sparkles} />
-            <Base username={username} woodYears={woodYears} />
+            <Base username={username} woodYears={woodYears} rankTitle={rank?.title} isMvp={isMvp} />
             <Achievements world={world} achievements={tumblingItems} floor={floor} />
             {/* Two visual layers, still 680 particles total: defined flakes
                 carry the foreground while softer powder adds depth. */}

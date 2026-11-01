@@ -1,4 +1,4 @@
-import { buildRewindQueries } from '../../../banner/api/queryBuilder';
+import { buildRewindQueries, QUERY_MAP } from '../../../banner/api/queryBuilder';
 import { fetchUserData, handleBannerError } from '../../../banner/api/shared';
 import { validateUsername } from '../../../banner/api/validators';
 import { filterDataByYear, getCombinedAchievements, getAgentblazerRankForYear } from '../../../utils/rewindUtils';
@@ -53,7 +53,19 @@ export default async function handler(req, res) {
 
   const startedAt = Date.now();
   try {
-    const queries = buildRewindQueries(username);
+    const mvp = QUERY_MAP.GET_MVP_STATUS;
+    const queries = [
+      ...buildRewindQueries(username),
+      // optional: the community API is read-only since Oct 30, 2026 and may go
+      // away; if it fails the globe just has no MVP ribbon
+      {
+        name: 'GET_MVP_STATUS',
+        query: mvp.query,
+        variables: mvp.buildVariables(username, {}),
+        url: mvp.url,
+        optional: true,
+      },
+    ];
     const { responseMap } = await fetchUserData(queries, username);
 
     const rankResponse = responseMap.GET_TRAILBLAZER_RANK;
@@ -139,6 +151,8 @@ export default async function handler(req, res) {
       // snow depth: progress toward the next rank (All Star Ranger = full)
       rankProgress: rankProgress(rankData),
       topRank: !!rankData.rank && !rankData.nextRank,
+      // MVP ribbon around the base
+      isMvp: responseMap.GET_MVP_STATUS?.data?.data?.profileData?.isMvp === true,
       // snow kind: the Agentblazer rank earned in the Rewind year
       agentblazerTitle: agentblazer?.title || null,
       totals: {
