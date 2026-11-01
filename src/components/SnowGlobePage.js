@@ -91,8 +91,6 @@ function downloadBlob(blob, fileName) {
 // personal link of a globe (same origin, so preview deployments link to themselves)
 const personalPath = (username) => `/rewind/${YEAR}/${username}`;
 const personalUrl = (username) => `${window.location.origin}${personalPath(username)}`;
-const postText = (username) =>
-  `My ${YEAR} on Trailhead, shaken into a snow globe ❄️\n\n${personalUrl(username)}\n\n#Trailhead #Salesforce #Trailblazer`;
 
 /* The phone's motion drives the globe like a real one held in the hand: its
    acceleration (gravity excluded) is passed on continuously, so the globe
@@ -336,11 +334,9 @@ export default function SnowGlobePage({
 
   const openShareSheet = async (file) => {
     try {
-      await navigator.share({
-        files: [file],
-        title: `My ${YEAR} Trailhead Rewind`,
-        text: postText(data.username),
-      });
+      // the image only: with text alongside, some apps (Slack, WhatsApp)
+      // keep the text and drop the image. The link is in the watermark.
+      await navigator.share({ files: [file] });
       pendingShare.current = null;
       setActionStatus('');
     } catch (err) {
