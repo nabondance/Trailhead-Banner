@@ -230,10 +230,16 @@ function GlobeShell({ world, floor, sparkles, activity }) {
     const cos = Math.cos(tilt);
     const sin = Math.sin(tilt);
     const speed = Math.min(Math.abs(w.dragVel + w.shakeVel), 3);
+    // the secret turn spins the glass, not the light: undo it as well
+    const spin = w.spinAngle || 0;
+    const spinCos = Math.cos(spin);
+    const spinSin = Math.sin(spin);
     GLARES.forEach((glare, i) => {
       const sprite = glareRefs.current[i];
       if (!sprite) return;
-      const [x, y, z] = glare.position;
+      const [x0, y, z0] = glare.position;
+      const x = x0 * spinCos - z0 * spinSin;
+      const z = x0 * spinSin + z0 * spinCos;
       sprite.position.set(x * cos - y * sin - sway * 0.3, x * sin + y * cos, z);
       sprite.material.opacity = glare.opacity * (1 + speed * 0.12);
     });

@@ -101,8 +101,11 @@ function Aurora({ activity, world }) {
     uniforms.uPhase.value += d * (0.35 + energyRef.current * 1.6);
     uniforms.uEnergy.value = energyRef.current;
     if (groupRef.current) {
-      // WobbleGroup tilts the globe by -sway * 0.12: undo it, and lag the sway
-      groupRef.current.rotation.z = sway * 0.12;
+      // WobbleGroup turns the globe (secret spin) then tilts it by
+      // -sway * 0.12: undo both (ZYX: the tilt is undone first, then the
+      // turn), so the lights hang in place behind the turning glass
+      groupRef.current.rotation.order = 'ZYX';
+      groupRef.current.rotation.set(0, -(w?.spinAngle || 0), sway * 0.12);
       groupRef.current.position.x = -sway * 0.3;
     }
   });

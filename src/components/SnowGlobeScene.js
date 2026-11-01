@@ -9,7 +9,7 @@ import { makeFlakeTexture, makePowderTexture } from './snowglobe/textures';
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
-import { Achievements, SnowSystem, WobbleGroup } from './snowglobe/physics';
+import { Achievements, SnowSystem, SpinDriver, WobbleGroup } from './snowglobe/physics';
 
 export default function SnowGlobeScene({
   achievements,
@@ -223,6 +223,7 @@ export default function SnowGlobeScene({
         <pointLight position={[0, 3, 2.5]} intensity={12} color='#bcd7ff' />
         <CameraFitter />
         <SnapshotHelper onReady={onReady} />
+        <SpinDriver world={world} />
         <WobbleGroup world={world}>
           <group scale={DISPLAY_SCALE}>
             <GlobeShell world={world} floor={floor} sparkles={sparkles} activity={activity} />

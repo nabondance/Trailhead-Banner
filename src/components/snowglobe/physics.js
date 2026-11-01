@@ -556,6 +556,32 @@ function swirlContents(w, dir) {
   });
 }
 
+/* Advances the secret turn and publishes its angle as world.spinAngle.
+   Rendered before WobbleGroup so its frame runs first: the globe and the
+   parts that cancel the turn (glare, northern lights) all read the same
+   angle in the same frame. dir +1 = the front swings right. */
+function SpinDriver({ world }) {
+  useFrame((_, dt) => {
+    const w = world.current;
+    if (!w.spin) {
+      w.spinAngle = 0;
+      return;
+    }
+    w.spin.t += Math.min(dt, 0.05);
+    const p = Math.min(w.spin.t / SPIN_SECONDS, 1);
+    w.spinAngle = w.spin.dir * Math.PI * 2 * easeInOutCubic(p);
+    if (!w.spin.swirled && p > 0.12) {
+      w.spin.swirled = true;
+      swirlContents(w, w.spin.dir);
+    }
+    if (p >= 1) {
+      w.spinAngle = 0;
+      w.spin = null;
+    }
+  });
+  return null;
+}
+
 function WobbleGroup({ world, children }) {
   const ref = useRef();
   useFrame((_, dt) => {
@@ -582,20 +608,7 @@ function WobbleGroup({ world, children }) {
     ref.current.position.x = posX;
     ref.current.rotation.z = -posX * 0.12; // tilt with the motion, pivoting like a held globe
 
-    // secret turn (dir +1 = the front swings right)
-    if (w.spin) {
-      w.spin.t += d;
-      const p = Math.min(w.spin.t / SPIN_SECONDS, 1);
-      ref.current.rotation.y = w.spin.dir * Math.PI * 2 * easeInOutCubic(p);
-      if (!w.spin.swirled && p > 0.12) {
-        w.spin.swirled = true;
-        swirlContents(w, w.spin.dir);
-      }
-      if (p >= 1) {
-        ref.current.rotation.y = 0;
-        w.spin = null;
-      }
-    }
+    ref.current.rotation.y = w.spinAngle || 0; // secret turn (SpinDriver)
 
     // inertia: contents feel the opposite of the globe's acceleration
     const velNow = (posX - w.prevPosX) / d;
@@ -628,4 +641,4 @@ function WobbleGroup({ world, children }) {
   return <group ref={ref}>{children}</group>;
 }
 
-export { Achievements, SnowSystem, WobbleGroup };
+export { Achievements, SnowSystem, SpinDriver, WobbleGroup };
