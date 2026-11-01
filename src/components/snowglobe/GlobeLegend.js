@@ -13,10 +13,6 @@ const SNOW_NAMES = {
   Legend: 'Gold glitter snow',
 };
 
-const plural = (n, word) => `${n.toLocaleString('en-US')} ${word}${n === 1 ? '' : 's'}`;
-const listWords = (words) =>
-  words.length <= 1 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
-
 const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function activeMonths(activity) {
@@ -26,14 +22,6 @@ function activeMonths(activity) {
 /* One short line per detail: what you see, and the data behind it */
 function legendItems(data, year) {
   const items = [];
-  const rank = data.rank?.title || 'Trailhead';
-
-  const inside = [];
-  if (data.totals?.certifications) inside.push(plural(data.totals.certifications, 'certification'));
-  if (data.totals?.stamps) inside.push(plural(data.totals.stamps, 'stamp'));
-  if (data.agentblazerTitle) inside.push(`Agentblazer ${data.agentblazerTitle}`);
-  inside.push(`${rank} emblem`);
-  items.push({ icon: '🎖️', title: 'Inside', text: listWords(inside) });
 
   items.push({
     icon: '❄️',
