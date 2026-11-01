@@ -2518,6 +2518,14 @@ select:focus {
   justify-content: center;
 }
 
+.snowglobe-make-own {
+  margin-top: 2rem;
+}
+
+.snowglobe-make-own a {
+  text-decoration: none;
+}
+
 .snowglobe-status {
   margin-top: 12px;
   color: var(--text-contrast);

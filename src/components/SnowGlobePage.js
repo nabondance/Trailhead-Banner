@@ -506,7 +506,7 @@ export default function SnowGlobePage({
       )}
 
       {isLink && !loading && (
-        <div className='snowglobe-actions'>
+        <div className='snowglobe-actions snowglobe-make-own'>
           <a className='button submit-button' href='/rewind'>
             {open ? 'Make your own ❄️' : 'Make your own in December ❄️'}
           </a>
