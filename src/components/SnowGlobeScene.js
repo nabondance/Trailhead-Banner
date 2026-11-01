@@ -145,7 +145,7 @@ export default function SnowGlobeScene({ achievements, rank, year, username, woo
         <SnapshotHelper onReady={onReady} />
         <WobbleGroup world={world}>
           <group scale={DISPLAY_SCALE}>
-            <GlobeShell />
+            <GlobeShell world={world} />
             <Base username={username} woodYears={woodYears} />
             <Achievements world={world} achievements={tumblingItems} />
             {/* Two visual layers, still 680 particles total: defined flakes

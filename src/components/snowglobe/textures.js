@@ -136,24 +136,6 @@ function makeHighlightTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
-/* Cool diffused light behind the contents. A dedicated texture gives the
-   globe depth without turning the whole glass shell milky or overexposed. */
-function makeInteriorGlowTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  const glow = ctx.createRadialGradient(128, 118, 0, 128, 128, 128);
-  glow.addColorStop(0, 'rgba(218,238,255,0.52)');
-  glow.addColorStop(0.38, 'rgba(139,190,244,0.3)');
-  glow.addColorStop(0.72, 'rgba(78,121,196,0.11)');
-  glow.addColorStop(1, 'rgba(45,72,130,0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, 256, 256);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
 /* Value noise that repeats every `period` cells along x, so a texture built
    from it wraps around the cylindrical base without a seam. */
 function wrappedNoise(x, y, period, seed) {
@@ -256,15 +238,15 @@ function makeWoodTexture({ username = '', years = 1 } = {}) {
   // Wood eyes (knots). u = 0.5 faces the camera (the base cylinder starts
   // at the back) and the engraved username sits around it, so visible knots
   // go in the low and high bands beside the name, mirrored at random; one
-  // more sits at the back. Sizes are in base units (~12 around, 0.8 tall).
-  const CIRCUMFERENCE = 12;
-  const HEIGHT = 0.8;
+  // more sits at the back. Sizes are in base units (~9.8 around, 0.93 tall).
+  const CIRCUMFERENCE = 9.8;
+  const HEIGHT = 0.93;
   const between = (min, max) => min + random() * (max - min);
   const makeKnot = (u, v, rx) => ({ u, v, rx, ry: rx * between(0.27, 0.36), seed: seed + Math.floor(random() * 1000) });
   const side = random() < 0.5 ? 1 : -1;
   const knots = [
-    makeKnot(0.5 - side * between(0.06, 0.1), between(0.13, 0.25), between(0.15, 0.24)),
-    makeKnot(0.5 + side * between(0.07, 0.11), between(0.76, 0.87), between(0.11, 0.18)),
+    makeKnot(0.5 - side * between(0.06, 0.1), between(0.08, 0.17), between(0.14, 0.22)),
+    makeKnot(0.5 + side * between(0.07, 0.11), between(0.8, 0.88), between(0.1, 0.16)),
     makeKnot(between(0.0, 0.1), between(0.3, 0.7), between(0.15, 0.22)),
   ];
   // about one in three pieces shows a single front knot
@@ -654,7 +636,6 @@ export {
   makeSnowTexture,
   makeEngravedNameTexture,
   makeHighlightTexture,
-  makeInteriorGlowTexture,
   makeWoodTexture,
   RANK_ACCENTS,
   loadFont,
