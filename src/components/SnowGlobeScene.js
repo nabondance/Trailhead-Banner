@@ -130,14 +130,20 @@ export default function SnowGlobeScene({
     });
   }, [shakeNonce]);
 
+  // last pointer x: Safari on iPhone reports movementX as 0 for touch, so
+  // the drag distance comes from clientX instead
+  const lastX = useRef(null);
   const startDrag = (e) => {
     dragStartX.current = e.clientX;
+    lastX.current = e.clientX;
     world.current.dragging = true;
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
   const moveDrag = (e) => {
     if (!world.current.dragging) return;
-    world.current.dragTarget = THREE.MathUtils.clamp(world.current.dragTarget + e.movementX * 0.005, -0.7, 0.7);
+    const dx = lastX.current == null ? 0 : e.clientX - lastX.current;
+    lastX.current = e.clientX;
+    world.current.dragTarget = THREE.MathUtils.clamp(world.current.dragTarget + dx * 0.005, -0.7, 0.7);
   };
   const endDrag = (e) => {
     const w = world.current;

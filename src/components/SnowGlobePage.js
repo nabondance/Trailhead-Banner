@@ -97,7 +97,7 @@ const postText = (username) =>
 /* Shake detection from the phone's accelerometer: a sharp jolt (gravity
    excluded) shakes the globe. iOS needs a permission tap first; Android and
    others deliver motion events right away. */
-const SHAKE_THRESHOLD = 14; // m/s², well above walking or tilting the phone
+const SHAKE_THRESHOLD = 11; // m/s², well above walking or tilting the phone
 const SHAKE_COOLDOWN_MS = 700;
 
 function motionPermissionNeeded() {
@@ -111,10 +111,18 @@ function useDeviceShake(onShake, enabled) {
   useEffect(() => {
     if (!enabled || typeof window === 'undefined' || !window.DeviceMotionEvent) return undefined;
     let last = 0;
+    let prevG = null; // fallback: change of the gravity-included reading
     const handleMotion = (e) => {
       const a = e.acceleration;
-      if (!a || a.x == null) return;
-      const magnitude = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+      let magnitude;
+      if (a && a.x != null) {
+        magnitude = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+      } else {
+        const g = e.accelerationIncludingGravity;
+        if (!g || g.x == null) return;
+        magnitude = prevG ? Math.hypot(g.x - prevG.x, g.y - prevG.y, g.z - prevG.z) : 0;
+        prevG = { x: g.x, y: g.y, z: g.z };
+      }
       const now = Date.now();
       if (magnitude > SHAKE_THRESHOLD && now - last > SHAKE_COOLDOWN_MS) {
         last = now;
@@ -479,7 +487,17 @@ export default function SnowGlobePage({
               }}
             />
             {/* on screen only: captures render the 3D scene, not this button */}
-            <button type='button' className='snowglobe-shake-button' onClick={shake} aria-label='Shake the globe'>
+            <button
+              type='button'
+              className='snowglobe-shake-button'
+              onClick={() => {
+                shake();
+                // iOS asks for motion access from a tap: the first tap on the
+                // snowflake also turns on shaking with the phone
+                if (motionState === 'needs-permission') enableMotion();
+              }}
+              aria-label='Shake the globe'
+            >
               <FontAwesomeIcon icon={faSnowflake} />
             </button>
           </div>
