@@ -620,4 +620,4 @@ function Base({ username, woodYears, rankTitle, isMvp, stats, year }) {
   );
 }
 
-export { SnowMound, GlobeShell, Base };
+export { SnowMound, GlobeShell, Base, RankRing };
