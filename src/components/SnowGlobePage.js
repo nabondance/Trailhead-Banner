@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Mp4Spike from './Mp4Spike';
 import { videoSupport, recordGlobeVideo, RECORD_SECONDS } from './snowglobe/recording';
 import { extractUsernameFromUrl, validateUsernameFormat } from '../utils/usernameValidation';
+import GenerationCount from './GenerationCount';
 
 const SnowGlobeScene = dynamic(() => import('./SnowGlobeScene'), {
   ssr: false,
@@ -87,7 +88,7 @@ function downloadBlob(blob, fileName) {
   URL.revokeObjectURL(link.href);
 }
 
-const SHARE_URL = 'https://thb.nabondance.me/snowglobe';
+const SHARE_URL = 'https://thb.nabondance.me/rewind';
 const postText = () =>
   `My ${YEAR} on Trailhead, shaken into a snow globe ❄️\n\nMake yours: ${SHARE_URL}\n\n#Trailhead #Salesforce #Trailblazer`;
 
@@ -123,7 +124,7 @@ function useDeviceShake(onShake, enabled) {
   }, [enabled]);
 }
 
-export default function SnowGlobePage() {
+export default function SnowGlobePage({ fallbackCount = null }) {
   const [input, setInput] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -140,6 +141,7 @@ export default function SnowGlobePage() {
   const pendingShare = useRef(null); // image ready to share when the browser needed a second tap
   const glRef = useRef(null);
   const resultRef = useRef(null);
+  const countRef = useRef(null);
 
   useEffect(() => {
     setWebglOk(detectWebGL());
@@ -211,6 +213,7 @@ export default function SnowGlobePage() {
         return;
       }
       setData(json);
+      countRef.current?.fetchCount(); // the live broadcast also catches this globe once it is recorded
     } catch {
       setError('Unable to reach the server. Check your connection and try again.');
     } finally {
@@ -348,6 +351,16 @@ export default function SnowGlobePage() {
     <div className='page-container snowglobe-page'>
       <h1>Your {YEAR} Trailhead Snow Globe</h1>
       <p className='snowglobe-tagline'>Fill a snow globe with your achievements of {YEAR}, shake it, and share it.</p>
+      <GenerationCount
+        ref={countRef}
+        table='rewinds'
+        year={YEAR}
+        elementId='rewind-countup-element'
+        fallbackCount={fallbackCount}
+        className='rewind-count'
+        before=''
+        after={` Rewinds of ${YEAR} already shaken ❄️`}
+      />
 
       {webglOk === false ? (
         <WebGLHelpPanel onRetry={() => setWebglOk(detectWebGL())} />

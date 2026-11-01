@@ -157,7 +157,7 @@ When **removing** a page, remove it from both files as well.
 - **Vercel Blob**: Server-side asset cache for certification logo images (not used for generated banners)
 - **Supabase**: Analytics database — tracks every banner/rewind generation (`banners`, `rewinds` tables) and errors (`errors` table); implemented in `src/utils/supabaseUtils.js`.
   The server writes with `SUPABASE_SERVICE_ROLE_KEY` (server-only, never `NEXT_PUBLIC_`);
-  the browser uses `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` only for the `announcement` table and the `generation_count` database function behind the generation counters.
+  the browser uses `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` only for the `announcement` table and the `generation_count` database function behind the generation counters (a 3-argument overload counts one Rewind year, see `docs/rewind-2026-snowglobe.md`).
   The anon key cannot read or write the analytics tables
 
 ## Debugging Quick Tips

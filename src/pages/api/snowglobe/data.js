@@ -2,7 +2,9 @@ import { buildRewindQueries } from '../../../banner/api/queryBuilder';
 import { fetchUserData, handleBannerError } from '../../../banner/api/shared';
 import { validateUsername } from '../../../banner/api/validators';
 import { filterDataByYear, getCombinedAchievements, getAgentblazerRankForYear } from '../../../utils/rewindUtils';
+import { waitUntil } from '@vercel/functions';
 import { enforceRateLimit } from '../../../utils/rateLimit';
+import SupabaseUtils from '../../../utils/supabaseUtils';
 
 // The snow globe is a 2026-only experience
 const YEAR = 2026;
@@ -32,6 +34,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: usernameValidation.message, validationError: true });
   }
 
+  const startedAt = Date.now();
   try {
     const queries = buildRewindQueries(username);
     const { responseMap } = await fetchUserData(queries, username);
@@ -89,6 +92,23 @@ export default async function handler(req, res) {
       rankFileName && RANK_NAME_PATTERN.test(rankFileName)
         ? `/api/snowglobe/local-image?type=Rank&name=${encodeURIComponent(rankFileName)}`
         : rankData.rank?.imageUrl || null;
+
+    // Each globe counts as one 2026 Rewind (non-blocking: waitUntil keeps
+    // the function alive after the response so the insert can finish)
+    waitUntil(
+      SupabaseUtils.recordSnowglobeRewind({
+        th_username: username,
+        year,
+        processing_time_ms: Date.now() - startedAt,
+        rank_title: rankData.rank?.title || null,
+        yearly_stamps_count: yearlyData.stamps.length,
+        yearly_certifications_count: yearlyData.certifications.length,
+        achievements: achievements.map(({ type, name }) => ({ type, name: name || null })),
+        agentblazer: agentblazer || null,
+      }).catch((error) => {
+        console.error('Error recording snow globe rewind:', error.message);
+      })
+    );
 
     return res.status(200).json({
       username,

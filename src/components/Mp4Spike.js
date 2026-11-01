@@ -6,7 +6,7 @@ import { MEDIA_RECORDER_TYPES, RECORD_SECONDS, FPS, recordWebCodecs, recordMedia
 /**
  * MP4 export spike (roadmap item A): proves — or disproves — client-side MP4
  * capture on the target browsers, iPhone Safari above all. Enabled with
- * /snowglobe?mp4spike=1, not linked anywhere. Exercises the two capture paths
+ * /rewind?mp4spike=1, not linked anywhere. Exercises the two capture paths
  * from snowglobe/recording.js separately (the product Video button
  * auto-picks), and reports codec support up front. A globe must be loaded.
  */

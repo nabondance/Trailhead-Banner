@@ -9,14 +9,16 @@ const COUNT_TIMEOUT_MS = 5000;
  * Used for crawler-facing surfaces (metadata, JSON-LD, llms.txt) and as the deploy-time
  * fallback of the visible GenerationCount counter.
  * @param {string} table - 'banners', 'rewinds' or 'company_banners'
+ * @param {number} [year] - count only that Rewind edition (rewinds only)
  * @returns {Promise<number|null>} null when the count can't be fetched
  */
-export const getGenerationCount = cache(async (table) => {
+export const getGenerationCount = cache(async (table, year) => {
   if (!supabase) return null;
   try {
     // Called during static builds: a hung request must not stall the deploy
     const { count, error } = await fetchGenerationCount(supabase, table, {
       signal: AbortSignal.timeout(COUNT_TIMEOUT_MS),
+      year,
     });
     if (error) console.error(`Error fetching ${table} count:`, error);
     return count;

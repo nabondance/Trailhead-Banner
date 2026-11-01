@@ -307,6 +307,42 @@ class SupabaseUtils {
     }
   }
 
+  /**
+   * Records a snow globe generation (the 2026 Rewind) as a `rewinds` row, so
+   * it counts toward that year's Rewind total. Only the fields the globe
+   * actually has; the poster-specific columns stay empty.
+   */
+  static async recordSnowglobeRewind(globe_data) {
+    if (!supabase) {
+      console.log('[Supabase] Credentials not configured, skipping snow globe rewind record.');
+      return;
+    }
+    try {
+      await SupabaseUtils.retryWithBackoff(async () => {
+        const { error } = await supabase.from('rewinds').insert([
+          {
+            th_username: globe_data.th_username,
+            year: globe_data.year,
+            source_env: SERVER_ENV,
+            thb_version: packageJson.version,
+            rewind_processing_time: globe_data.processing_time_ms,
+            th_current_rank: globe_data.rank_title,
+            yearly_stamps_count: globe_data.yearly_stamps_count,
+            yearly_certifications_count: globe_data.yearly_certifications_count,
+            yearly_achievements: globe_data.achievements,
+            agentblazer_progress: globe_data.agentblazer,
+          },
+        ]);
+        if (error) {
+          throw new Error('Failed to add snow globe rewind: ' + error.message);
+        }
+      });
+    } catch (error) {
+      console.error('Error adding snow globe rewind (after retries):', error.message);
+      throw error;
+    }
+  }
+
   static async updateCompanyBannerCounter(company_data) {
     if (!supabase) {
       console.log('[Supabase] Credentials not configured, skipping company banner counter update.');

@@ -30,9 +30,11 @@ const RETRY_DELAYS_MS = [1000, 3000];
  * @param {string} [before='Already '] - Text rendered before the count
  * @param {string} after - Text rendered after the count
  * @param {number|null} [fallbackCount=null] - Count fetched at deploy time (see getGenerationCount)
+ * @param {number} [year] - Count only that Rewind edition. The broadcast carries the table's all-years
+ *   total, so with a year each broadcast just triggers a fresh year-filtered fetch.
  */
 const GenerationCount = forwardRef(
-  ({ table, elementId, className = 'banner-count', before = 'Already ', after, fallbackCount = null }, ref) => {
+  ({ table, elementId, className = 'banner-count', before = 'Already ', after, fallbackCount = null, year }, ref) => {
     const [count, setCount] = useState(0);
     const countUpRef = useRef(null);
     const latestUpdate = useRef(0);
@@ -66,7 +68,7 @@ const GenerationCount = forwardRef(
       clearTimeout(retryTimer.current);
       // Fetches and broadcasts can overlap: a response is dropped if a newer update arrived meanwhile
       const updateId = ++latestUpdate.current;
-      const { count: newCount, error, status, retryable } = await fetchGenerationCount(supabase, table);
+      const { count: newCount, error, status, retryable } = await fetchGenerationCount(supabase, table, { year });
       if (updateId !== latestUpdate.current) return;
       if (applyCount(newCount)) return;
 
@@ -87,6 +89,10 @@ const GenerationCount = forwardRef(
       const channel = supabase
         .channel(`generation-count:${table}:${APP_ENV}`, { config: { private: true } })
         .on('broadcast', { event: 'count' }, ({ payload }) => {
+          if (year) {
+            fetchCount();
+            return;
+          }
           // Only a valid count supersedes in-flight fetches; a malformed payload must not cancel them
           if (applyCount(payload?.count)) {
             latestUpdate.current++;

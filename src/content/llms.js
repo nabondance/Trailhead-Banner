@@ -30,7 +30,7 @@ their Trailhead username and receive a downloadable PNG banner.
 - https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
 - https://thb.nabondance.me/background-library — Browse the ${backgroundCount} available background images for the banner.
 - https://thb.nabondance.me/company — Generate a company/team banner aggregating multiple Trailhead profiles.
-- https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
+- https://thb.nabondance.me/rewind — Trailhead Rewind 2026: shake a 3D snow globe filled with your 2026 achievements and share it as an image or video (active December–January).
 - https://thb.nabondance.me/releases — Changelog and release history.
 - https://thb.nabondance.me/sponsors — Sponsors and supporters who help keep the project running.
 - https://thb.nabondance.me/legal — Terms of use and privacy information.
@@ -75,7 +75,7 @@ their rank, certifications, superbadges, badge counts, and more.
 - https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
 - https://thb.nabondance.me/background-library — Browse all ${backgroundCount} available background images for the banner.
 - https://thb.nabondance.me/company — Generate a company/team banner aggregating multiple Trailhead profiles into a single banner with collective certifications, badges, Agentblazer levels, and optional CSV team data export (skills matrix, certifications per product, upcoming maintenance).
-- https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
+- https://thb.nabondance.me/rewind — Trailhead Rewind 2026: shake a 3D snow globe filled with your 2026 achievements and share it as an image or video (active December–January).
 - https://thb.nabondance.me/releases — Changelog and release history.
 - https://thb.nabondance.me/sponsors — Sponsors and supporters who help keep the project running.
 - https://thb.nabondance.me/legal — Terms of use and privacy information.
