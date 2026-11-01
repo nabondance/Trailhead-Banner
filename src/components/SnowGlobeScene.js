@@ -258,6 +258,7 @@ export default function SnowGlobeScene({
               floor={floor}
               count={snowfall.flakes}
               makeTexture={makeFlakeTexture}
+              solid
               minSize={0.055}
               maxSize={0.18}
               opacity={0.9}

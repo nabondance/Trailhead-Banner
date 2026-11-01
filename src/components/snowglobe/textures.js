@@ -4,20 +4,7 @@ import * as THREE from 'three';
 
 /* Six-spoke asterisk — the ✳-style flakes from the reference CSS snow globe */
 function makeFlakeTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 64;
-  const ctx = canvas.getContext('2d');
-  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
-  ctx.lineWidth = 4;
-  ctx.lineCap = 'round';
-  for (let i = 0; i < 3; i++) {
-    const a = (i * Math.PI) / 3;
-    ctx.beginPath();
-    ctx.moveTo(32 + Math.cos(a) * 24, 32 + Math.sin(a) * 24);
-    ctx.lineTo(32 - Math.cos(a) * 24, 32 - Math.sin(a) * 24);
-    ctx.stroke();
-  }
-  return new THREE.CanvasTexture(canvas);
+  return makeCrystalTexture({ gold: false });
 }
 
 /* Snow crystal for superbadges: a translucent hexagonal ice plate at the
@@ -25,6 +12,11 @@ function makeFlakeTexture() {
    superbadge color of the standard banner, #f9a825) under white ice. Drawn
    for the 3D tumbling flakes, so it reads as a crystal from any angle. */
 function makeBigFlakeTexture() {
+  return makeCrystalTexture({ gold: true });
+}
+
+/* Shared crystal drawing; the gold edge only for superbadge flakes */
+function makeCrystalTexture({ gold }) {
   const S = 256;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = S;
@@ -83,15 +75,18 @@ function makeBigFlakeTexture() {
   };
 
   // gold edge: the same crystal drawn wider underneath
-  ctx.strokeStyle = 'rgba(249,168,37,0.95)';
-  ctx.fillStyle = 'rgba(249,168,37,0.95)';
-  drawArms(2.1);
-  hexagon(S * 0.14);
-  ctx.fill();
+  if (gold) {
+    ctx.strokeStyle = 'rgba(249,168,37,0.95)';
+    ctx.fillStyle = 'rgba(249,168,37,0.95)';
+    drawArms(2.1);
+    hexagon(S * 0.14);
+    ctx.fill();
+  }
 
-  // ice: bright arms, a translucent plate with a faceted inner hexagon
+  // ice: bright arms (bolder on the small plain flakes, so they still read
+  // at a few pixels wide), a translucent plate with a faceted inner hexagon
   ctx.strokeStyle = 'rgba(255,255,255,1)';
-  drawArms(1);
+  drawArms(gold ? 1 : 1.6);
   hexagon(S * 0.11);
   ctx.fillStyle = 'rgba(225,240,255,0.75)';
   ctx.fill();

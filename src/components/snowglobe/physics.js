@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { GLOBE_RADIUS, GRAVITY, DRAG, BOUNCE, CENTER, DISPLAY_SCALE, proxied, randomPointInGlobe } from './constants';
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+const WHITE = new THREE.Color('#ffffff');
 const ACHIEVEMENT_COLLISION_PASSES = 2;
 
 /* Sprites always face the camera, so their meaningful overlap is in screen
@@ -403,28 +404,43 @@ function SnowSystem({
     };
   }, [count, minSize, maxSize, gravityScale, kickScale, solid]);
 
-  // solid flakes: one lit, double-sided material; the scratch objects are
-  // reused every frame
-  const solidMaterial = useMemo(
-    () =>
-      solid
-        ? new THREE.MeshStandardMaterial({
-            map: tex,
-            color,
-            emissive: color,
-            emissiveMap: tex,
-            emissiveIntensity: 0.8,
-            roughness: 0.3,
-            metalness: 0.15,
-            transparent: true,
-            opacity,
-            alphaTest: 0.05,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-          })
-        : null,
-    [solid, tex, color, opacity]
-  );
+  // solid flakes: one lit, double-sided material. Each flake's color (snow
+  // style tint, iridescence, twinkle) lives in its instance color, which also
+  // tints the glow so tinted flakes stay tinted in the shade. The scratch
+  // objects are reused every frame.
+  const solidMaterial = useMemo(() => {
+    if (!solid) return null;
+    const material = new THREE.MeshStandardMaterial({
+      map: tex,
+      emissive: '#ffffff',
+      emissiveMap: tex,
+      emissiveIntensity: 0.8,
+      roughness: 0.3,
+      metalness: 0.15,
+      transparent: true,
+      opacity,
+      alphaTest: 0.05,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    material.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n#ifdef USE_COLOR\n  totalEmissiveRadiance *= vColor.rgb;\n#endif'
+      );
+    };
+    return material;
+  }, [solid, tex, opacity]);
+  // per-flake base color: a share of the flakes in the second tint
+  const baseColors = useMemo(() => {
+    if (!solid) return null;
+    const first = new THREE.Color(color);
+    const second = new THREE.Color(tint2);
+    return Array.from({ length: count }, (_, i) => {
+      const f = (data.driftPhases[i] * 7.13) % 1;
+      return f < tintMix ? second : first;
+    });
+  }, [solid, count, color, tint2, tintMix, data]);
   useEffect(() => () => solidMaterial?.dispose(), [solidMaterial]);
   const scratch = useMemo(
     () => ({
@@ -433,6 +449,8 @@ function SnowSystem({
       tumble: new THREE.Quaternion(),
       // landed flakes lie flat: the plane's normal (+z) turned to point up
       flat: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2),
+      color: new THREE.Color(),
+      rainbow: new THREE.Color(),
     }),
     []
   );
@@ -543,9 +561,10 @@ function SnowSystem({
     }
     if (meshRef.current) {
       // a point's size is in screen terms; this turns it into the same
-      // on-screen size for a plane (camera fov 42°) inside the scaled group
-      const toWorld = (Math.tan(THREE.MathUtils.degToRad(21)) / DISPLAY_SCALE) * 1;
-      const { obj, axis, tumble, flat } = scratch;
+      // on-screen size for a plane (camera fov 42°) inside the scaled group,
+      // plus 25%: a tumbling flake shows less of itself than a flat sticker
+      const toWorld = (Math.tan(THREE.MathUtils.degToRad(21)) / DISPLAY_SCALE) * 1.25;
+      const { obj, axis, tumble, flat, color: c, rainbow } = scratch;
       const { spinAxes, spinRates, spinAngles } = data;
       for (let i = 0; i < count; i++) {
         const ix = i * 3;
@@ -555,11 +574,28 @@ function SnowSystem({
         tumble.setFromAxisAngle(axis, spinAngles[i]);
         obj.quaternion.slerpQuaternions(tumble, flat, settles[i]);
         obj.position.set(positions[ix], positions[ix + 1], positions[ix + 2]);
-        obj.scale.setScalar(sizes[i] * toWorld);
+        // a landed flake lies flat and shrinks into the mound; the fainter
+        // its settled opacity, the more it shrinks (a plane has no per-flake
+        // opacity)
+        obj.scale.setScalar(sizes[i] * toWorld * (0.3 + 0.7 * alphas[i]));
         obj.updateMatrix();
         meshRef.current.setMatrixAt(i, obj.matrix);
+
+        // color: same snow style rules as the point shader
+        const phase = driftPhases[i];
+        c.copy(baseColors[i]);
+        if (iridescence > 0) {
+          rainbow.setHSL((phase * 0.159 + time * 0.12) % 1, 1, 0.5).lerp(WHITE, 0.4);
+          c.lerp(rainbow, iridescence);
+        }
+        if (twinkle > 0) {
+          const glint = Math.pow(Math.max(Math.sin(time * 2.1 + phase * 5), 0), 6);
+          c.multiplyScalar(1 - twinkle * 0.3 + twinkle * glint * 0.6);
+        }
+        meshRef.current.setColorAt(i, c);
       }
       meshRef.current.instanceMatrix.needsUpdate = true;
+      if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
     }
     if (pointsRef.current) {
       pointsRef.current.geometry.attributes.position.needsUpdate = true;
