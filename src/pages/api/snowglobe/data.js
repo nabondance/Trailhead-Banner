@@ -10,9 +10,8 @@ import {
 import { waitUntil } from '@vercel/functions';
 import { enforceRateLimit } from '../../../utils/rateLimit';
 import SupabaseUtils from '../../../utils/supabaseUtils';
+import { REWIND_YEAR as YEAR, isRewindOpen } from '../../../utils/rewindPeriod';
 
-// The snow globe is a 2026-only experience
-const YEAR = 2026;
 const MAX_ITEMS = 24;
 
 /* Progress (0..1) from the current Trailhead rank toward the next one. A rank
@@ -40,6 +39,14 @@ const RANK_NAME_PATTERN = /^[a-z0-9-]+\.png$/;
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed', message: 'Only POST requests are supported' });
+  }
+
+  // the page closes outside the Rewind period, and so does building: no new
+  // 2026 globe can be saved with next year's rank and stats
+  if (!isRewindOpen()) {
+    return res
+      .status(403)
+      .json({ error: 'Rewind closed', message: 'Trailhead Rewind is open in December and January.' });
   }
 
   if (!(await enforceRateLimit(req, res, 'snowglobe'))) return;

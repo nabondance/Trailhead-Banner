@@ -3,10 +3,12 @@ import RewindWaitingPage from '../../components/RewindWaitingPage';
 import JsonLd from '../../components/JsonLd';
 import { breadcrumbJsonLd } from '../../utils/seoUtils';
 import { getGenerationCount } from '../../utils/bannerCountUtils';
-import { SERVER_ENV } from '../../utils/envUtils';
+import { REWIND_YEAR, isRewindOpen } from '../../utils/rewindPeriod';
 
-// The 2026 Rewind is the snow globe
-const REWIND_YEAR = 2026;
+// re-render hourly: the page opens and closes with the Rewind period, which a
+// page built once at deploy time would miss
+export const revalidate = 3600;
+
 const TITLE = 'Trailhead Rewind 2026 – Your Year in a Snow Globe';
 const DESCRIPTION =
   'Shake a 3D snow globe filled with your 2026 Trailhead achievements, then share it as an image or video.';
@@ -39,15 +41,10 @@ export const metadata = {
 };
 
 export default async function Rewind() {
-  const currentMonth = new Date().getMonth(); // 0 = January, 11 = December
-  // always open outside production (local dev, Vercel previews) for testing;
-  // production opens December–January
-  const isRewindActive = SERVER_ENV !== 'production' || currentMonth === 11 || currentMonth === 0;
-
   return (
     <>
       <JsonLd data={breadcrumbJsonLd('Trailhead Rewind', '/rewind')} />
-      {isRewindActive ? (
+      {isRewindOpen() ? (
         <SnowGlobePage fallbackCount={await getGenerationCount('rewinds', REWIND_YEAR)} />
       ) : (
         <RewindWaitingPage />
