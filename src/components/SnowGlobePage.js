@@ -86,9 +86,11 @@ function downloadBlob(blob, fileName) {
   URL.revokeObjectURL(link.href);
 }
 
-const SHARE_URL = 'https://thb.nabondance.me/rewind';
-const postText = () =>
-  `My ${YEAR} on Trailhead, shaken into a snow globe ❄️\n\nMake yours: ${SHARE_URL}\n\n#Trailhead #Salesforce #Trailblazer`;
+// personal link of a globe (same origin, so preview deployments link to themselves)
+const personalPath = (username) => `/rewind/${YEAR}/${username}`;
+const personalUrl = (username) => `${window.location.origin}${personalPath(username)}`;
+const postText = (username) =>
+  `My ${YEAR} on Trailhead, shaken into a snow globe ❄️\n\n${personalUrl(username)}\n\n#Trailhead #Salesforce #Trailblazer`;
 
 /* Shake detection from the phone's accelerometer: a sharp jolt (gravity
    excluded) shakes the globe. iOS needs a permission tap first; Android and
@@ -122,9 +124,19 @@ function useDeviceShake(onShake, enabled) {
   }, [enabled]);
 }
 
-export default function SnowGlobePage({ fallbackCount = null }) {
+/* Two uses: the /rewind form, and the personal link /rewind/2026/<username>
+   (linkUsername set), which shows that user's saved globe, builds it once if
+   there is none yet during the Rewind period, and has no form. */
+export default function SnowGlobePage({
+  fallbackCount = null,
+  linkUsername = null,
+  savedGlobe = null,
+  loadFailed = false,
+  open = true,
+}) {
+  const isLink = !!linkUsername;
   const [input, setInput] = useState('');
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(savedGlobe);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [actionStatus, setActionStatus] = useState('');
@@ -139,6 +151,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
   const glRef = useRef(null);
   const resultRef = useRef(null);
   const countRef = useRef(null);
+  const autoBuilt = useRef(false);
 
   useEffect(() => {
     setWebglOk(detectWebGL());
@@ -168,8 +181,8 @@ export default function SnowGlobePage({ fallbackCount = null }) {
 
   // bring the fresh globe into view: on most screens it starts below the form
   useEffect(() => {
-    if (data) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [data]);
+    if (data && !isLink) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [data, isLink]);
 
   // the field keeps the raw text (a pasted or typed profile URL stays readable
   // while editing); the username is extracted from it on submit
@@ -178,20 +191,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
     setInput(e.target.value);
   };
 
-  const loadGlobe = async (e) => {
-    e.preventDefault();
-    if (loading) return;
-
-    const username = extractUsernameFromUrl(input)
-      .toLowerCase()
-      .replace(/[^a-z0-9._-]/g, '')
-      .substring(0, 64);
-    const format = validateUsernameFormat(username);
-    if (!format.valid) {
-      setError(format.message);
-      return;
-    }
-
+  const buildGlobe = async (username) => {
     setLoading(true);
     setError('');
     setActionStatus('');
@@ -209,12 +209,39 @@ export default function SnowGlobePage({ fallbackCount = null }) {
         return;
       }
       setData(json);
+      // the address bar becomes the personal link, ready to copy
+      if (!isLink) window.history.replaceState(null, '', personalPath(json.username));
       countRef.current?.fetchCount(); // the live broadcast also catches this globe once it is recorded
     } catch {
       setError('Unable to reach the server. Check your connection and try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // personal link with no saved globe yet: build (and save) it once
+  useEffect(() => {
+    if (!isLink || savedGlobe || loadFailed || !open || autoBuilt.current) return;
+    autoBuilt.current = true;
+    buildGlobe(linkUsername);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLink, savedGlobe, loadFailed, open, linkUsername]);
+
+  const loadGlobe = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+
+    const username = extractUsernameFromUrl(input)
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]/g, '')
+      .substring(0, 64);
+    const format = validateUsernameFormat(username);
+    if (!format.valid) {
+      setError(format.message);
+      return;
+    }
+
+    await buildGlobe(username);
   };
 
   // High-res PNG of the globe as it is right now (2160×2700, see capture.js)
@@ -270,7 +297,11 @@ export default function SnowGlobePage({ fallbackCount = null }) {
 
   const openShareSheet = async (file) => {
     try {
-      await navigator.share({ files: [file], title: `My ${YEAR} Trailhead Snow Globe`, text: postText() });
+      await navigator.share({
+        files: [file],
+        title: `My ${YEAR} Trailhead Snow Globe`,
+        text: postText(data.username),
+      });
       pendingShare.current = null;
       setActionStatus('');
     } catch (err) {
@@ -306,6 +337,15 @@ export default function SnowGlobePage({ fallbackCount = null }) {
     }
   };
 
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(personalUrl(data.username));
+      setActionStatus('Link copied!');
+    } catch {
+      setActionStatus(personalUrl(data.username));
+    }
+  };
+
   const downloadVideo = async () => {
     const canvas = glRef.current?.gl?.domElement;
     if (!canvas || busy) return;
@@ -337,23 +377,35 @@ export default function SnowGlobePage({ fallbackCount = null }) {
   return (
     <div className='container snowglobe-page'>
       <div className='snowglobe-header'>
-        <h1>Your {YEAR} Trailhead Snow Globe</h1>
-        <p className='snowglobe-tagline'>Fill a snow globe with your achievements of {YEAR}, shake it, and share it.</p>
+        {isLink ? (
+          <h1>
+            {linkUsername}&apos;s {YEAR} Trailhead Snow Globe
+          </h1>
+        ) : (
+          <>
+            <h1>Your {YEAR} Trailhead Snow Globe</h1>
+            <p className='snowglobe-tagline'>
+              Fill a snow globe with your achievements of {YEAR}, shake it, and share it.
+            </p>
+          </>
+        )}
       </div>
-      <GenerationCount
-        ref={countRef}
-        table='rewinds'
-        year={YEAR}
-        elementId='rewind-countup-element'
-        fallbackCount={fallbackCount}
-        className='rewind-count'
-        before=''
-        after={` Rewinds of ${YEAR} already shaken ❄️`}
-      />
+      {!isLink && (
+        <GenerationCount
+          ref={countRef}
+          table='rewinds'
+          year={YEAR}
+          elementId='rewind-countup-element'
+          fallbackCount={fallbackCount}
+          className='rewind-count'
+          before=''
+          after={` Rewinds of ${YEAR} already shaken ❄️`}
+        />
+      )}
 
       {webglOk === false ? (
         <WebGLHelpPanel onRetry={() => setWebglOk(detectWebGL())} />
-      ) : (
+      ) : isLink ? null : (
         // same form card as the home page: full-width input, big submit button
         <form className='form' onSubmit={loadGlobe}>
           <div className='input-container'>
@@ -377,6 +429,11 @@ export default function SnowGlobePage({ fallbackCount = null }) {
       )}
 
       {error && <div className='error-message snowglobe-error'>{error}</div>}
+      {isLink && !data && !loading && !error && (loadFailed || !open) && (
+        <div className='error-message snowglobe-error'>
+          {loadFailed ? 'This globe could not be loaded. Please try again later.' : `No ${YEAR} Rewind for this user.`}
+        </div>
+      )}
 
       {loading && (
         <div className='loading-container'>
@@ -385,7 +442,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
         </div>
       )}
 
-      {data && !loading && (
+      {data && !loading && webglOk !== false && (
         <section ref={resultRef} className='snowglobe-result'>
           <div className='snowglobe-box'>
             <SnowGlobeScene
@@ -435,6 +492,9 @@ export default function SnowGlobePage({ fallbackCount = null }) {
                 {busy === 'video' ? 'Recording… 🔴' : 'Download video'}
               </button>
             )}
+            <button type='button' className='button' onClick={copyLink}>
+              Copy link
+            </button>
           </div>
           {actionStatus && (
             <p className='snowglobe-status' role='status'>
@@ -443,6 +503,14 @@ export default function SnowGlobePage({ fallbackCount = null }) {
           )}
           <GlobeLegend data={data} year={YEAR} />
         </section>
+      )}
+
+      {isLink && !loading && (
+        <div className='snowglobe-actions'>
+          <a className='button submit-button' href='/rewind'>
+            {open ? 'Make your own ❄️' : 'Make your own in December ❄️'}
+          </a>
+        </div>
       )}
     </div>
   );
