@@ -3,14 +3,30 @@
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useMemo, useRef } from 'react';
-import { CENTER, DISPLAY_SCALE } from './snowglobe/constants';
+import { CENTER, DISPLAY_SCALE, makeSnowFloor } from './snowglobe/constants';
+import { getSnowStyle, getSparkles } from './snowglobe/snowStyles';
 import { makeFlakeTexture, makePowderTexture } from './snowglobe/textures';
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
 import { Achievements, SnowSystem, WobbleGroup } from './snowglobe/physics';
 
-export default function SnowGlobeScene({ achievements, rank, year, username, woodYears, shakeNonce, onReady }) {
+export default function SnowGlobeScene({
+  achievements,
+  rank,
+  year,
+  username,
+  woodYears,
+  snowLevel,
+  topRank,
+  agentblazerTitle,
+  shakeNonce,
+  onReady,
+}) {
+  // floor depth from rank progress, snow kind from the year's Agentblazer rank
+  const floor = useMemo(() => makeSnowFloor(snowLevel), [snowLevel]);
+  const snowStyle = getSnowStyle(agentblazerTitle);
+  const sparkles = useMemo(() => getSparkles(snowStyle, topRank), [snowStyle, topRank]);
   // supersample 1.5× beyond the display's pixel ratio (capped) for a crisper globe
   const dpr = Math.min(window.devicePixelRatio * 1.5, 3);
   // the rank emblem tumbles with the achievements (the base now carries the username)
@@ -145,31 +161,34 @@ export default function SnowGlobeScene({ achievements, rank, year, username, woo
         <SnapshotHelper onReady={onReady} />
         <WobbleGroup world={world}>
           <group scale={DISPLAY_SCALE}>
-            <GlobeShell world={world} />
+            <GlobeShell world={world} floor={floor} sparkles={sparkles} />
             <Base username={username} woodYears={woodYears} />
-            <Achievements world={world} achievements={tumblingItems} />
+            <Achievements world={world} achievements={tumblingItems} floor={floor} />
             {/* Two visual layers, still 680 particles total: defined flakes
                 carry the foreground while softer powder adds depth. */}
             <SnowSystem
               world={world}
+              floor={floor}
               count={400}
               makeTexture={makeFlakeTexture}
               minSize={0.055}
               maxSize={0.18}
               opacity={0.9}
               settledOpacity={0.22}
+              {...snowStyle.flakes}
             />
             <SnowSystem
               world={world}
+              floor={floor}
               count={280}
               makeTexture={makePowderTexture}
-              color='#eaf4ff'
               minSize={0.025}
               maxSize={0.095}
               opacity={0.68}
               settledOpacity={0.06}
               gravityScale={0.72}
               kickScale={1.12}
+              {...snowStyle.powder}
             />
           </group>
         </WobbleGroup>

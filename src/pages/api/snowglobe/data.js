@@ -9,6 +9,23 @@ import SupabaseUtils from '../../../utils/supabaseUtils';
 // The snow globe is a 2026-only experience
 const YEAR = 2026;
 const MAX_ITEMS = 24;
+
+/* Progress (0..1) from the current Trailhead rank toward the next one. A rank
+   needs both its points and its badges, so progress is the lesser of the two.
+   null when there is no next rank (All Star Ranger). */
+function rankProgress(stats) {
+  const current = stats.rank;
+  const next = stats.nextRank;
+  if (!next) return null;
+  const part = (earned, from, to) => {
+    if (!Number.isFinite(earned) || !Number.isFinite(to) || to <= (from || 0)) return 1;
+    return Math.min(Math.max((earned - (from || 0)) / (to - (from || 0)), 0), 1);
+  };
+  return Math.min(
+    part(stats.earnedPointsSum, current?.requiredPointsSum, next.requiredPointsSum),
+    part(stats.earnedBadgesCount, current?.requiredBadgesCount, next.requiredBadgesCount)
+  );
+}
 const RANK_NAME_PATTERN = /^[a-z0-9-]+\.png$/;
 
 /**
@@ -119,6 +136,11 @@ export default async function handler(req, res) {
       },
       achievements,
       firstAchievementYear,
+      // snow depth: progress toward the next rank (All Star Ranger = full)
+      rankProgress: rankProgress(rankData),
+      topRank: !!rankData.rank && !rankData.nextRank,
+      // snow kind: the Agentblazer rank earned in the Rewind year
+      agentblazerTitle: agentblazer?.title || null,
       totals: {
         certifications: yearlyData.certifications.length,
         stamps: yearlyData.stamps.length,

@@ -6,6 +6,7 @@ import Mp4Spike from './Mp4Spike';
 import { videoSupport, recordGlobeVideo, RECORD_SECONDS } from './snowglobe/recording';
 import { extractUsernameFromUrl, validateUsernameFormat } from '../utils/usernameValidation';
 import GenerationCount from './GenerationCount';
+import { APP_ENV } from '../utils/envUtils';
 
 const SnowGlobeScene = dynamic(() => import('./SnowGlobeScene'), {
   ssr: false,
@@ -138,6 +139,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
   const [shareOk, setShareOk] = useState(false); // native share sheet can take image files
   const [isTouch, setIsTouch] = useState(false);
   const [motionState, setMotionState] = useState('unknown'); // 'unknown' | 'needs-permission' | 'on' | 'denied'
+  const [snowOverride, setSnowOverride] = useState({});
   const pendingShare = useRef(null); // image ready to share when the browser needed a second tap
   const glRef = useRef(null);
   const resultRef = useRef(null);
@@ -147,6 +149,16 @@ export default function SnowGlobePage({ fallbackCount = null }) {
     setWebglOk(detectWebGL());
     setSpikeMode(new URLSearchParams(window.location.search).has('mp4spike'));
     setVideoOk(videoSupport().supported);
+    // testing only (never in production): ?snow=Champion|Innovator|Legend|classic
+    // and ?level=0..1 override the snow kind and depth from the data
+    if (APP_ENV !== 'production') {
+      const params = new URLSearchParams(window.location.search);
+      const level = Number.parseFloat(params.get('level'));
+      setSnowOverride({
+        snow: params.get('snow') || undefined,
+        level: Number.isFinite(level) ? level : undefined,
+      });
+    }
     try {
       const probe = new File([new Blob()], 'probe.png', { type: 'image/png' });
       setShareOk(!!navigator.canShare?.({ files: [probe] }));
@@ -399,6 +411,9 @@ export default function SnowGlobePage({ fallbackCount = null }) {
               username={data.username}
               // years on Trailhead, counted inclusively (joined this year = 1)
               woodYears={data.firstAchievementYear ? YEAR - data.firstAchievementYear + 1 : 1}
+              snowLevel={snowOverride.level ?? (data.topRank ? 1 : (data.rankProgress ?? 0.45))}
+              topRank={snowOverride.level === undefined && data.topRank}
+              agentblazerTitle={snowOverride.snow ?? data.agentblazerTitle}
               shakeNonce={shakeNonce}
               onReady={(gl) => {
                 glRef.current = gl;

@@ -3,17 +3,7 @@
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  GLOBE_RADIUS,
-  GRAVITY,
-  DRAG,
-  BOUNCE,
-  CENTER,
-  MOUND_RX,
-  moundSurfaceY,
-  proxied,
-  randomPointInGlobe,
-} from './constants';
+import { GLOBE_RADIUS, GRAVITY, DRAG, BOUNCE, CENTER, proxied, randomPointInGlobe } from './constants';
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 const ACHIEVEMENT_COLLISION_PASSES = 2;
@@ -77,7 +67,7 @@ function spreadAchievementCollisions(items) {
 }
 
 /* Certs and stamps tumbling inside the globe */
-function Achievements({ world, achievements }) {
+function Achievements({ world, achievements, floor }) {
   const [items, setItems] = useState(null);
   const spritesRef = useRef([]);
   const shadowsRef = useRef([]);
@@ -112,7 +102,7 @@ function Achievements({ world, achievements }) {
         const img = a.tex.image;
         const aspect = Math.min(2, Math.max(0.5, img ? img.width / img.height : 1));
         const pos = randomPointInGlobe(GLOBE_RADIUS * 0.7);
-        const startFloorY = moundSurfaceY(pos.x, pos.z) + size * 0.28;
+        const startFloorY = floor.surfaceY(pos.x, pos.z) + size * 0.28;
         if (pos.y < startFloorY) pos.y = startFloorY + 0.12 + Math.random() * 0.42;
         // per-type weight + per-item jitter: the rank sinks and settles first,
         // certs follow, agentblazer and stamps flutter longest — different
@@ -144,7 +134,7 @@ function Achievements({ world, achievements }) {
       cancelled = true;
       world.current.items = [];
     };
-  }, [achievements, world]);
+  }, [achievements, world, floor]);
 
   useFrame((_, dt) => {
     if (!items) return;
@@ -187,7 +177,7 @@ function Achievements({ world, achievements }) {
       }
 
       // settle into the snow: rest half a radius deep, snow friction kills sliding
-      const floorY = moundSurfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
+      const floorY = floor.surfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
       if (it.pos.y < floorY) {
         it.pos.y = floorY;
         it.landedThisFrame = true;
@@ -199,7 +189,7 @@ function Achievements({ world, achievements }) {
     items.forEach((it, i) => {
       // Collision correction can nudge the lower badge into the snow or an
       // outer badge past the glass. Re-apply the visible resting bounds once.
-      const floorY = moundSurfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
+      const floorY = floor.surfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
       if (it.pos.y < floorY) it.pos.y = floorY;
 
       tmp.copy(it.pos).sub(CENTER);
@@ -218,7 +208,7 @@ function Achievements({ world, achievements }) {
           it.pos.z *= scale;
         }
       }
-      const correctedFloorY = moundSurfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
+      const correctedFloorY = floor.surfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
       if (it.landedThisFrame || it.pos.y < correctedFloorY) it.pos.y = correctedFloorY;
 
       // Resolve the impact collision once, then let the snow hold the item in
@@ -239,7 +229,7 @@ function Achievements({ world, achievements }) {
       // disc around the globe with them.
       const shadow = shadowsRef.current[i];
       if (shadow) {
-        const surfaceY = moundSurfaceY(it.pos.x, it.pos.z);
+        const surfaceY = floor.surfaceY(it.pos.x, it.pos.z);
         const height = Math.max(0, it.pos.y - surfaceY - it.r * 0.45);
         const contact = THREE.MathUtils.clamp(1 - height / Math.max(it.size * 0.7, 0.01), 0, 1);
         shadow.position.set(it.pos.x, surfaceY + 0.018, it.pos.z);
@@ -254,7 +244,7 @@ function Achievements({ world, achievements }) {
     <group key={i}>
       <mesh
         ref={(el) => (shadowsRef.current[i] = el)}
-        position={[it.pos.x, moundSurfaceY(it.pos.x, it.pos.z) + 0.018, it.pos.z]}
+        position={[it.pos.x, floor.surfaceY(it.pos.x, it.pos.z) + 0.018, it.pos.z]}
         rotation={[-Math.PI / 2, 0, 0]}
         scale={[it.size * 0.72, it.size * 0.34, 1]}
         renderOrder={1}
@@ -280,30 +270,52 @@ function Achievements({ world, achievements }) {
 const SNOW_VERTEX = /* glsl */ `
   attribute float size;
   attribute float alpha;
+  attribute float phase;
   uniform float uScale;
+  uniform float uTime;
+  uniform vec3 color;
+  uniform vec3 uTint2;
+  uniform float uTintMix;
+  uniform float uIridescence;
+  uniform float uTwinkle;
   varying float vAlpha;
+  varying vec3 vColor;
+  vec3 hue(float h) {
+    return clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+  }
   void main() {
-    vAlpha = alpha;
+    // snow style (see SNOW_STYLES): a share of the flakes in a second tint,
+    // optional color-shifting iridescence, optional twinkle
+    vec3 c = fract(phase * 7.13) < uTintMix ? uTint2 : color;
+    vec3 rainbow = mix(vec3(1.0), hue(fract(phase * 0.159 + uTime * 0.12)), 0.6);
+    vColor = mix(c, rainbow, uIridescence);
+    float glint = pow(max(sin(uTime * 2.1 + phase * 5.0), 0.0), 6.0);
+    vAlpha = alpha * (1.0 - uTwinkle * 0.45 + uTwinkle * glint * 0.9);
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = size * (uScale / -mvPosition.z);
+    gl_PointSize = size * (1.0 + uTwinkle * glint * 0.35) * (uScale / -mvPosition.z);
     gl_Position = projectionMatrix * mvPosition;
   }
 `;
 const SNOW_FRAGMENT = /* glsl */ `
   uniform sampler2D map;
-  uniform vec3 color;
   uniform float uOpacity;
   varying float vAlpha;
+  varying vec3 vColor;
   void main() {
-    gl_FragColor = vec4(color, uOpacity * vAlpha) * texture2D(map, gl_PointCoord);
+    gl_FragColor = vec4(vColor, uOpacity * vAlpha) * texture2D(map, gl_PointCoord);
   }
 `;
 
 function SnowSystem({
   world,
+  floor,
   count,
   makeTexture,
   color = '#dbe8fc',
+  tint2 = color,
+  tintMix = 0,
+  iridescence = 0,
+  twinkle = 0,
   minSize = 0.04,
   maxSize = 0.2,
   opacity = 0.9,
@@ -317,10 +329,15 @@ function SnowSystem({
     () => ({
       map: { value: tex },
       color: { value: new THREE.Color(color) },
+      uTint2: { value: new THREE.Color(tint2) },
+      uTintMix: { value: tintMix },
+      uIridescence: { value: iridescence },
+      uTwinkle: { value: twinkle },
+      uTime: { value: 0 },
       uScale: { value: 1000 },
       uOpacity: { value: opacity },
     }),
-    [tex, color, opacity]
+    [tex, color, tint2, tintMix, iridescence, twinkle, opacity]
   );
   const data = useMemo(() => {
     const positions = new Float32Array(count * 3);
@@ -397,7 +414,7 @@ function SnowSystem({
       positions[ix + 1] += velocities[ix + 1] * d;
       positions[ix + 2] += velocities[ix + 2] * d;
 
-      const surfY = moundSurfaceY(positions[ix], positions[ix + 2]) + 0.02;
+      const surfY = floor.surfaceY(positions[ix], positions[ix + 2]) + 0.02;
       const airborne = positions[ix + 1] > surfY + 0.03;
 
       // Once landed, flakes slowly compress into the mound instead of
@@ -454,8 +471,8 @@ function SnowSystem({
       } else {
         // grounded: stay on the mound disc and settle onto the surface
         const rh = Math.sqrt(positions[ix] * positions[ix] + positions[ix + 2] * positions[ix + 2]);
-        if (rh > MOUND_RX) {
-          const s = MOUND_RX / rh;
+        if (rh > floor.rx) {
+          const s = floor.rx / rh;
           positions[ix] *= s;
           positions[ix + 2] *= s;
           velocities[ix] *= 0.2;
@@ -476,6 +493,7 @@ function SnowSystem({
       pointsRef.current.geometry.attributes.alpha.needsUpdate = true;
       // match PointsMaterial's size attenuation: scale = drawing buffer height / 2
       uniforms.uScale.value = gl.drawingBufferHeight / 2;
+      uniforms.uTime.value = time;
     }
   });
 
@@ -485,6 +503,7 @@ function SnowSystem({
         <bufferAttribute attach='attributes-position' args={[data.positions, 3]} />
         <bufferAttribute attach='attributes-size' args={[data.sizes, 1]} />
         <bufferAttribute attach='attributes-alpha' args={[data.alphas, 1]} />
+        <bufferAttribute attach='attributes-phase' args={[data.driftPhases, 1]} />
       </bufferGeometry>
       <shaderMaterial
         uniforms={uniforms}

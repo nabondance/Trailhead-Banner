@@ -19,26 +19,43 @@ function glassRadiusAt(y) {
 // Where the glass enters the wooden base: high, so most of the sphere shows
 const GLASS_SEAT_Y = CENTER_Y - 1.55;
 
-// snow mound: squashed sphere at the globe floor, a layer above the seat.
-// Its rim is sized to the glass at that height, so the snow meets the glass
-// from inside instead of spilling out over the base
-const MOUND_CENTER_Y = GLASS_SEAT_Y + 0.2;
-const MOUND_RX = glassRadiusAt(MOUND_CENTER_Y) - 0.03;
-const MOUND_RY = GLOBE_RADIUS * 0.96 * 0.18;
-// snow banks up against the glass: extra height that ramps in near the rim
-const MOUND_BANK = 0.26;
-
 const smoothstep = (e0, e1, x) => {
   const t = Math.min(Math.max((x - e0) / (e1 - e0), 0), 1);
   return t * t * (3 - 2 * t);
 };
 
-/* Extra snow height at relative distance t (0 center → 1 rim), varying
-   around the globe so the bank reads as drifts, not an even ring */
-function snowBank(t, x, z) {
-  const angle = Math.atan2(z, x);
-  const drift = 1 + 0.35 * Math.sin(3 * angle + 0.5) + 0.2 * Math.sin(7 * angle - 1.2);
-  return MOUND_BANK * drift * smoothstep(0.5, 1, t) ** 1.6;
+/* The snow floor of one globe: a squashed sphere resting above the seat,
+   with drifts banked up against the glass. Its rim is sized to the glass at
+   that height, so the snow meets the glass from inside.
+
+   `level` (0..1) sets how deep it is: the user's progress toward their next
+   Trailhead rank, so the globe fills up as they near it (1 = All Star
+   Ranger). The mesh, the glints and the physics all read this same object,
+   so flakes and badges land exactly on the visible surface. */
+function makeSnowFloor(level = 0.45) {
+  const l = Math.min(Math.max(Number.isFinite(level) ? level : 0.45, 0), 1);
+  const centerY = GLASS_SEAT_Y + 0.06 + l * 0.36;
+  const rx = glassRadiusAt(centerY) - 0.03;
+  const ry = GLOBE_RADIUS * 0.96 * 0.18 * (0.6 + l * 0.65);
+  const bankHeight = 0.26 * (0.55 + l * 0.7);
+
+  /* Extra snow height at relative distance t (0 center → 1 rim), varying
+     around the globe so the bank reads as drifts, not an even ring */
+  const bank = (t, x, z) => {
+    const angle = Math.atan2(z, x);
+    const drift = 1 + 0.35 * Math.sin(3 * angle + 0.5) + 0.2 * Math.sin(7 * angle - 1.2);
+    return bankHeight * drift * smoothstep(0.5, 1, t) ** 1.6;
+  };
+
+  /* Height of the snow surface at a given horizontal position */
+  const surfaceY = (x, z) => {
+    const d = Math.sqrt(x * x + z * z);
+    const t = Math.min(d / rx, 1);
+    const s = Math.sqrt(1 - t * t);
+    return centerY + (ry + snowBump(x, z)) * s + bank(t, x, z);
+  };
+
+  return { level: l, centerY, rx, ry, bank, surfaceY };
 }
 
 // base group origin; the wood's top edge sits at local y 0.1 (group y scale 0.95)
@@ -52,14 +69,6 @@ function snowBump(x, z) {
   return (
     0.13 * Math.sin(x * 1.9 + 0.7) * Math.cos(z * 1.6 - 0.4) + 0.07 * Math.sin(x * 3.7 - 1.1) * Math.cos(z * 3.1 + 0.9)
   );
-}
-
-/* Height of the snow surface at a given horizontal position */
-function moundSurfaceY(x, z) {
-  const d = Math.sqrt(x * x + z * z);
-  const t = Math.min(d / MOUND_RX, 1);
-  const s = Math.sqrt(1 - t * t);
-  return MOUND_CENTER_Y + (MOUND_RY + snowBump(x, z)) * s + snowBank(t, x, z);
 }
 
 function proxied(url, folder) {
@@ -83,9 +92,6 @@ export {
   DRAG,
   BOUNCE,
   CENTER,
-  MOUND_CENTER_Y,
-  MOUND_RX,
-  MOUND_RY,
   GLASS_SEAT_Y,
   BASE_TOP_Y,
   BASE_BOTTOM_Y,
@@ -93,9 +99,8 @@ export {
   SCENE_HALF_WIDTH,
   glassRadiusAt,
   smoothstep,
-  snowBank,
+  makeSnowFloor,
   snowBump,
-  moundSurfaceY,
   proxied,
   randomPointInGlobe,
 };

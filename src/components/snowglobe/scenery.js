@@ -3,20 +3,7 @@
 import * as THREE from 'three';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import {
-  GLOBE_RADIUS,
-  CENTER_Y,
-  MOUND_CENTER_Y,
-  GLASS_SEAT_Y,
-  MOUND_RX,
-  MOUND_RY,
-  BASE_TOP_Y,
-  glassRadiusAt,
-  smoothstep,
-  snowBank,
-  snowBump,
-  moundSurfaceY,
-} from './constants';
+import { GLOBE_RADIUS, CENTER_Y, GLASS_SEAT_Y, BASE_TOP_Y, glassRadiusAt, smoothstep, snowBump } from './constants';
 import { makeEngravedNameTexture, makeHighlightTexture, makeSnowTexture, makeWoodTexture, loadFont } from './textures';
 
 const GLASS_RIM_VERTEX = /* glsl */ `
@@ -45,7 +32,7 @@ const GLASS_RIM_FRAGMENT = /* glsl */ `
 /* Single displaced surface: the squashed sphere gets smooth drift bumps baked
    into its vertices, so the snow reads as one wind-blown mound instead of
    separate blobs. Displacement uses the same snowBump() as the physics. */
-function SnowMound() {
+function SnowMound({ floor }) {
   const snowTex = useMemo(() => makeSnowTexture(), []);
   const geometry = useMemo(() => {
     const r = GLOBE_RADIUS * 0.96;
@@ -55,27 +42,27 @@ function SnowMound() {
     // and on the sides seen through the glass, like snow in soft shade
     const colors = new Float32Array(pos.count * 3);
     for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i) * (MOUND_RX / r);
-      const z = pos.getZ(i) * (MOUND_RX / r);
+      const x = pos.getX(i) * (floor.rx / r);
+      const z = pos.getZ(i) * (floor.rx / r);
       const y = pos.getY(i);
-      let ny = y * (MOUND_RY / r);
+      let ny = y * (floor.ry / r);
       let stretch = 1;
       let shade = 0;
       if (y < 0) {
         // underside fills the bottom of the glass down into the wood, so
         // the snow reads as one layer resting in the glass
-        ny = (y / r) * (MOUND_CENTER_Y - GLASS_SEAT_Y + 0.06);
+        ny = (y / r) * (floor.centerY - GLASS_SEAT_Y + 0.06);
         const rad = Math.sqrt(x * x + z * z);
-        if (rad > 1e-6) stretch = Math.max(glassRadiusAt(MOUND_CENTER_Y + ny) - 0.03, 0) / rad;
+        if (rad > 1e-6) stretch = Math.max(glassRadiusAt(floor.centerY + ny) - 0.03, 0) / rad;
         shade = 0.6;
       } else {
         if (y > 0) ny += snowBump(x, z) * (y / r);
         // bank the snow up against the glass, and push the raised rim out to
-        // follow the glass as it widens upward (matches moundSurfaceY)
-        const t = Math.min(Math.sqrt(x * x + z * z) / MOUND_RX, 1);
-        ny += snowBank(t, x, z);
-        const glassR = glassRadiusAt(MOUND_CENTER_Y + ny) - 0.03;
-        stretch = 1 + (glassR / MOUND_RX - 1) * smoothstep(0.5, 1, t);
+        // follow the glass as it widens upward (matches floor.surfaceY)
+        const t = Math.min(Math.sqrt(x * x + z * z) / floor.rx, 1);
+        ny += floor.bank(t, x, z);
+        const glassR = glassRadiusAt(floor.centerY + ny) - 0.03;
+        stretch = 1 + (glassR / floor.rx - 1) * smoothstep(0.5, 1, t);
         // hollows between drifts, plus the dip at the foot of the bank
         const hollow = smoothstep(0.04, -0.14, snowBump(x, z)) * 0.7;
         const trough = smoothstep(0.55, 0.78, t) * (1 - smoothstep(0.85, 0.97, t)) * 0.35;
@@ -89,7 +76,7 @@ function SnowMound() {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.computeVertexNormals();
     return geo;
-  }, []);
+  }, [floor]);
 
   useEffect(
     () => () => {
@@ -100,7 +87,7 @@ function SnowMound() {
   );
 
   return (
-    <mesh geometry={geometry} position={[0, MOUND_CENTER_Y - CENTER_Y, 0]}>
+    <mesh geometry={geometry} position={[0, floor.centerY - CENTER_Y, 0]}>
       <meshPhysicalMaterial
         map={snowTex}
         vertexColors
@@ -120,17 +107,19 @@ const SPARKLE_VERTEX = /* glsl */ `
   attribute float aSpeed;
   uniform float uTime;
   uniform float uScale;
+  uniform float uRate;
   varying float vGlint;
   void main() {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     // mostly dark, with a brief sharp glint now and then
-    vGlint = pow(max(sin(uTime * aSpeed + aPhase), 0.0), 14.0);
+    vGlint = pow(max(sin(uTime * aSpeed * uRate + aPhase), 0.0), 14.0);
     gl_PointSize = (0.08 + vGlint * 0.07) * uScale / -mvPosition.z;
     gl_Position = projectionMatrix * mvPosition;
   }
 `;
 
 const SPARKLE_FRAGMENT = /* glsl */ `
+  uniform vec3 uColor;
   varying float vGlint;
   void main() {
     vec2 p = gl_PointCoord - 0.5;
@@ -139,7 +128,7 @@ const SPARKLE_FRAGMENT = /* glsl */ `
     float core = smoothstep(0.5, 0.0, d);
     float star = max(smoothstep(0.06, 0.0, abs(p.x)), smoothstep(0.06, 0.0, abs(p.y))) * smoothstep(0.5, 0.1, d);
     float alpha = (core * core + star * 0.6) * vGlint;
-    gl_FragColor = vec4(vec3(1.0, 0.98, 0.92), alpha);
+    gl_FragColor = vec4(uColor, alpha);
   }
 `;
 
@@ -148,8 +137,16 @@ const DRAWING_BUFFER_SIZE = new THREE.Vector2();
 /* Glints on the snow surface: tiny ice crystals catching the light, each
    twinkling on its own rhythm. Fixed points on the mound (deterministic
    layout), drawn additively so they only ever brighten the snow. */
-function SnowSparkles({ count = 280 }) {
-  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uScale: { value: 500 } }), []);
+function SnowSparkles({ floor, count = 280, color = '#fffaeb', rate = 1 }) {
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uScale: { value: 500 },
+      uColor: { value: new THREE.Color(color) },
+      uRate: { value: rate },
+    }),
+    [color, rate]
+  );
   const geometry = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const phases = new Float32Array(count);
@@ -158,10 +155,10 @@ function SnowSparkles({ count = 280 }) {
       // golden-angle spiral: even coverage without clumps
       const t = Math.sqrt((i + 0.5) / count) * 0.8;
       const angle = i * 2.39996;
-      const x = Math.cos(angle) * t * MOUND_RX;
-      const z = Math.sin(angle) * t * MOUND_RX;
+      const x = Math.cos(angle) * t * floor.rx;
+      const z = Math.sin(angle) * t * floor.rx;
       positions[i * 3] = x;
-      positions[i * 3 + 1] = moundSurfaceY(x, z) + 0.012 - CENTER_Y;
+      positions[i * 3 + 1] = floor.surfaceY(x, z) + 0.012 - CENTER_Y;
       positions[i * 3 + 2] = z;
       phases[i] = (Math.sin(i * 12.9898) * 43758.5453) % (Math.PI * 2);
       speeds[i] = 0.6 + ((Math.sin(i * 78.233) + 1) / 2) * 1.4;
@@ -171,7 +168,7 @@ function SnowSparkles({ count = 280 }) {
     geo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
     geo.setAttribute('aSpeed', new THREE.BufferAttribute(speeds, 1));
     return geo;
-  }, [count]);
+  }, [count, floor]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
   useFrame((state) => {
@@ -206,7 +203,7 @@ const GLARES = [
   { position: [-1.15, 0.3, 1.55], scale: [0.3, 0.2, 1], rotation: 1.2, opacity: 0.5 },
 ];
 
-function GlobeShell({ world }) {
+function GlobeShell({ world, floor, sparkles }) {
   const glareRefs = useRef([]);
 
   // The glare is a reflection of a fixed light, so it must not ride along
@@ -281,9 +278,9 @@ function GlobeShell({ world }) {
           />
         </sprite>
       ))}
-      {/* snow floor: one organic drifted surface (matches moundSurfaceY) */}
-      <SnowMound />
-      <SnowSparkles />
+      {/* snow floor: one organic drifted surface (matches floor.surfaceY) */}
+      <SnowMound floor={floor} />
+      <SnowSparkles floor={floor} {...sparkles} />
     </group>
   );
 }
