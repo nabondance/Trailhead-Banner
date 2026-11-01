@@ -4,7 +4,7 @@ The 2026 Rewind is the 3D snow globe (no poster image this year). It lives at
 `/rewind`, opens on **December 1st** (the page shows `RewindWaitingPage` outside
 December–January), and `/snowglobe` permanently redirects there.
 
-Before launch, preview it outside production with `/rewind?preview`.
+Outside production (local dev and Vercel preview deployments) `/rewind` is always open, for testing.
 
 ## Rewinds-of-2026 counter
 

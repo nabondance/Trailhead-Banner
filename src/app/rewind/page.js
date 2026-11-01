@@ -38,11 +38,11 @@ export const metadata = {
   },
 };
 
-export default async function Rewind({ searchParams }) {
+export default async function Rewind() {
   const currentMonth = new Date().getMonth(); // 0 = January, 11 = December
-  // ?preview opens the Rewind early outside production, for testing before Dec 1
-  const preview = SERVER_ENV !== 'production' && (await searchParams)?.preview !== undefined;
-  const isRewindActive = preview || currentMonth === 11 || currentMonth === 0;
+  // always open outside production (local dev, Vercel previews) for testing;
+  // production opens December–January
+  const isRewindActive = SERVER_ENV !== 'production' || currentMonth === 11 || currentMonth === 0;
 
   return (
     <>
