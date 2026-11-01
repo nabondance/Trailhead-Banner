@@ -802,7 +802,7 @@ function makeBackdropTexture(username, rankTitle, year) {
   // natively — the SVG's remote @import font wouldn't rasterize in a canvas.
   // It carries the globe's personal link. Text and pill height never change:
   // a longer link only widens the pill to the left (its bottom-right corner
-  // stays put), and past 75% of the image width it shows the plain Rewind
+  // stays put), and past 85% of the image width it shows the plain Rewind
   // address instead.
   ctx.save();
   ctx.textAlign = 'center';
@@ -811,7 +811,7 @@ function makeBackdropTexture(username, rankTitle, year) {
   const PILL_PADDING_X = 34; // both sides together
   const pillH = 31;
   let url = username ? `thb.nabondance.me/rewind/${year}/${username}` : 'thb.nabondance.me/rewind';
-  if (ctx.measureText(url).width + PILL_PADDING_X > W * 0.75) url = 'thb.nabondance.me/rewind';
+  if (ctx.measureText(url).width + PILL_PADDING_X > W * 0.85) url = 'thb.nabondance.me/rewind';
   const pillW = ctx.measureText(url).width + PILL_PADDING_X;
   const pillX = W - pillW - 14;
   const pillY = H - pillH - 14;
