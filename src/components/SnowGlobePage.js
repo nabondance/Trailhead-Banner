@@ -501,7 +501,9 @@ export default function SnowGlobePage({
               {actionStatus}
             </p>
           )}
-          <GlobeLegend data={data} year={YEAR} />
+          {/* worded for the owner ("your active months"): only on /rewind, a link
+              can't tell its owner from a visitor */}
+          {!isLink && <GlobeLegend data={data} year={YEAR} />}
         </section>
       )}
 
