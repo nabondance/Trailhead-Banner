@@ -64,7 +64,7 @@ function legendItems(data, year) {
   items.push({
     icon: '🌌',
     title: 'Northern lights',
-    text: months.length ? `your active months: ${months.join(', ')}` : `none, no ${year} activity yet`,
+    text: months.length ? `active in ${months.join(', ')}` : `none, no ${year} activity yet`,
   });
 
   items.push({
