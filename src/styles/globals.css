@@ -2509,14 +2509,22 @@ select:focus {
   border: none;
   border-radius: 50%;
   background: var(--primary);
-  font-size: 1.6rem;
-  line-height: 1;
+  color: #fff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   cursor: pointer;
   box-shadow: 0 2px 8px rgb(0 0 0 / 40%);
 }
 
 .snowglobe-shake-button:hover {
   background: var(--secondary);
+}
+
+.snowglobe-hint-icon {
+  color: var(--primary);
 }
 
 .snowglobe-placeholder {

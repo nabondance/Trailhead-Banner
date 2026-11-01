@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSnowflake } from '@fortawesome/free-solid-svg-icons';
 import { videoSupport, recordGlobeVideo, RECORD_SECONDS } from './snowglobe/recording';
 import { extractUsernameFromUrl, validateUsernameFormat } from '../utils/usernameValidation';
 import GenerationCount from './GenerationCount';
@@ -367,12 +369,17 @@ export default function SnowGlobePage({
     }
   };
 
+  const snowflake = (
+    <FontAwesomeIcon icon={faSnowflake} className='snowglobe-hint-icon' aria-label='the snowflake button' />
+  );
   const hint =
-    motionState === 'on'
-      ? 'Shake your phone, swipe the globe, or tap ❄️ to make it snow.'
-      : isTouch
-        ? 'Swipe the globe sideways or tap ❄️ to make it snow.'
-        : 'Drag the globe sideways, use the ← → keys, or click ❄️ to make it snow.';
+    motionState === 'on' ? (
+      <>Shake your phone, swipe the globe, or tap {snowflake} to make it snow.</>
+    ) : isTouch ? (
+      <>Swipe the globe sideways or tap {snowflake} to make it snow.</>
+    ) : (
+      <>Drag the globe sideways, use the ← → keys, or click {snowflake} to make it snow.</>
+    );
 
   // phones share the image through the share sheet (which can also save it);
   // computers download it
@@ -471,7 +478,7 @@ export default function SnowGlobePage({
             />
             {/* on screen only: captures render the 3D scene, not this button */}
             <button type='button' className='snowglobe-shake-button' onClick={shake} aria-label='Shake the globe'>
-              ❄️
+              <FontAwesomeIcon icon={faSnowflake} />
             </button>
           </div>
           <p className='snowglobe-hint'>
