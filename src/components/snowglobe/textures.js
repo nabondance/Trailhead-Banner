@@ -782,7 +782,6 @@ export {
   makeEngravedNameTexture,
   makeHighlightTexture,
   makeWoodTexture,
-  woodRingCount,
   makeMvpRosetteTexture,
   makePlaqueTexture,
   RANK_ACCENTS,

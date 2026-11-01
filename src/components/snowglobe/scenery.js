@@ -469,12 +469,12 @@ function FootPlaque({ stats }) {
   const text = useMemo(() => {
     if (!stats) return null;
     const parts = [
-      [stats.badges, 'badges'],
-      [stats.points, 'points'],
-      [stats.trails, 'trails'],
+      [stats.badges, 'badge'],
+      [stats.points, 'point'],
+      [stats.trails, 'trail'],
     ]
       .filter(([n]) => Number.isFinite(n))
-      .map(([n, label]) => `${formatCount(n)} ${label}`.toUpperCase());
+      .map(([n, label]) => `${formatCount(n)} ${label}${n === 1 ? '' : 's'}`.toUpperCase());
     return parts.length ? parts.join('  ·  ') : null;
   }, [stats]);
   const tex = useMemo(() => (loaded && text ? makePlaqueTexture(text) : null), [loaded, text]);

@@ -28,7 +28,7 @@ function errorMessageFor(status, json) {
     case 400:
       return json.error || 'Please check the username and try again.';
     case 404:
-      return 'Trailhead profile not found. Check the username, and that the profile is public.';
+      return 'Trailhead profile not found. Check the username and that the profile is public.';
     case 429:
       return json.message || 'Too many requests. Please wait a moment and try again.';
     case 503:
@@ -369,7 +369,7 @@ export default function SnowGlobePage({
 
   const hint =
     motionState === 'on'
-      ? 'Shake your phone, drag the globe or press Shake to make it snow.'
+      ? 'Shake your phone, drag the globe, or press Shake to make it snow.'
       : isTouch
         ? 'Swipe the globe sideways or press Shake to make it snow.'
         : 'Drag the globe sideways, use the ← → keys, or press Shake to make it snow.';
@@ -385,7 +385,7 @@ export default function SnowGlobePage({
           <>
             <h1>Your {YEAR} Trailhead Snow Globe</h1>
             <p className='snowglobe-tagline'>
-              Fill a snow globe with your achievements of {YEAR}, shake it, and share it.
+              Fill a snow globe with your {YEAR} achievements, shake it, and share it.
             </p>
           </>
         )}
@@ -437,7 +437,9 @@ export default function SnowGlobePage({
 
       {loading && (
         <div className='loading-container'>
-          <p>Packing your {YEAR} into a snow globe…</p>
+          <p>
+            Packing {isLink ? `${linkUsername}'s` : 'your'} {YEAR} into a snow globe…
+          </p>
           <div className='loading-icon'></div>
         </div>
       )}

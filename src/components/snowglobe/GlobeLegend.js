@@ -1,7 +1,6 @@
 'use client';
 
 import { getRankMetals } from './rankMetals';
-import { woodRingCount } from './textures';
 
 /* "Your globe, decoded": every personal detail of the globe and the data it
    comes from, in plain words, so the user can read their own globe. */
@@ -53,15 +52,12 @@ function legendItems(data, year) {
     text: months.length ? `your active months: ${months.join(', ')}` : `none, no ${year} activity yet`,
   });
 
-  const years = data.firstAchievementYear ? year - data.firstAchievementYear + 1 : 1;
   items.push({
     icon: '🪵',
-    title: `${woodRingCount(years)} wood rings`,
-    text: !data.firstAchievementYear
-      ? 'no certification or stamp yet'
-      : years > 1
-        ? `${years} years since your first certification or stamp`
-        : `your first certification or stamp was in ${year}`,
+    title: 'Wood rings',
+    text: data.firstAchievementYear
+      ? `on Trailhead since ${data.firstAchievementYear}`
+      : 'no certification or stamp yet',
   });
 
   return items;
