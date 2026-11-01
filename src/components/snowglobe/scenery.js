@@ -2,7 +2,8 @@
 
 import * as THREE from 'three';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GLOBE_RADIUS, CENTER_Y, GLASS_SEAT_Y, BASE_TOP_Y, glassRadiusAt, smoothstep, snowBump } from './constants';
 import {
   makeEngravedNameTexture,
@@ -342,9 +343,27 @@ class BraidStrand extends THREE.Curve {
   }
 }
 
+/* Reflections for the ring only: a soft studio room baked into a PMREM map.
+   Metal is defined by what it reflects; without it, the ring is flat color.
+   Scoped to the ring so the glass, snow and wood keep their current look. */
+function useRingEnvMap() {
+  const { gl } = useThree();
+  const envMap = useMemo(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const texture = pmrem.fromScene(room, 0.04).texture;
+    room.dispose?.();
+    pmrem.dispose();
+    return texture;
+  }, [gl]);
+  useEffect(() => () => envMap.dispose(), [envMap]);
+  return envMap;
+}
+
 /* The rank ring: one solid metal for the first ranks, then a braid with one
    strand per star (see rankMetals.js) */
 function RankRing({ radius, y, metals }) {
+  const envMap = useRingEnvMap();
   const strands = useMemo(() => {
     if (metals.length < 2) return null;
     const braidRadius = 0.024;
@@ -375,6 +394,8 @@ function RankRing({ radius, y, metals }) {
           roughness={metal.roughness}
           emissive={metal.emissive || '#000000'}
           emissiveIntensity={metal.emissiveIntensity || 0}
+          envMap={envMap}
+          envMapIntensity={1.1}
         />
       </mesh>
     );
@@ -389,6 +410,8 @@ function RankRing({ radius, y, metals }) {
             roughness={metal.roughness}
             emissive={metal.emissive || '#000000'}
             emissiveIntensity={metal.emissiveIntensity || 0}
+            envMap={envMap}
+            envMapIntensity={1.1}
           />
         </mesh>
       ))}

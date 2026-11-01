@@ -4,24 +4,24 @@
    star, ending with All Star Ranger braiding every metal together.
    (The engraved username always stays gold.) */
 
-// metalness kept below a mirror finish: the scene has no environment to
-// reflect, so a pure mirror metal renders near-black instead of its color
+// Real metal values: the ring has its own reflection map (scenery.js
+// useRingEnvMap), so full metalness reads as polished metal, not black
 const METALS = {
-  copper: { color: '#d08458', metalness: 0.75, roughness: 0.3 },
-  bronze: { color: '#b8853f', metalness: 0.72, roughness: 0.36 },
-  brass: { color: '#e2bd52', metalness: 0.75, roughness: 0.28 },
-  steel: { color: '#aeb6c0', metalness: 0.7, roughness: 0.32 },
-  silver: { color: '#d3d8df', metalness: 0.72, roughness: 0.24 },
-  gold: { color: '#f0cb5e', metalness: 0.75, roughness: 0.24 },
-  roseGold: { color: '#efb096', metalness: 0.75, roughness: 0.26 },
+  copper: { color: '#d4895c', metalness: 1, roughness: 0.28 },
+  bronze: { color: '#c08a46', metalness: 1, roughness: 0.34 },
+  brass: { color: '#e6c25a', metalness: 1, roughness: 0.24 },
+  steel: { color: '#b4bcc6', metalness: 1, roughness: 0.3 },
+  silver: { color: '#e3e7ec', metalness: 1, roughness: 0.18 },
+  gold: { color: '#f2cd62', metalness: 1, roughness: 0.2 },
+  roseGold: { color: '#f0b39a', metalness: 1, roughness: 0.22 },
   // cool blue-white with a soft glow so it stands out from the snow: Ranger
   // is a big milestone, its ring should shine
   platinum: {
-    color: '#c8d6ea',
-    metalness: 0.6,
-    roughness: 0.18,
+    color: '#d6e2f2',
+    metalness: 1,
+    roughness: 0.12,
     emissive: '#5f7fae',
-    emissiveIntensity: 0.35,
+    emissiveIntensity: 0.18,
   },
 };
 
