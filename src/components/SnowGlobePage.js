@@ -287,7 +287,7 @@ export default function SnowGlobePage({
     setActionStatus('');
     try {
       downloadBlob(await captureImage(), imageFileName());
-      setActionStatus('Image saved — ready to share!');
+      setActionStatus('Image saved ❄️');
     } catch {
       setActionStatus('Image download failed, please try again.');
     } finally {
@@ -358,7 +358,7 @@ export default function SnowGlobePage({
       const { blob } = await recordGlobeVideo(canvas);
       const ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
       downloadBlob(blob, `snowglobe-${data.username}-${YEAR}.${ext}`);
-      setActionStatus('Video saved — ready to share!');
+      setActionStatus('Video saved ❄️');
     } catch {
       setActionStatus('Video recording failed, please try again.');
     } finally {
