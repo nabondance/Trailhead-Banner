@@ -62,6 +62,16 @@ function makeSnowTexture() {
     ctx.fill();
   }
 
+  // fine grain: thousands of tiny bright and cool specks, so the snow reads
+  // as packed crystals up close instead of smooth plaster
+  for (let i = 0; i < 6000; i++) {
+    const x = (((Math.sin(i * 12.9898) * 43758.5453) % 1) + 1) % 1;
+    const y = (((Math.sin(i * 78.233) * 24634.6345) % 1) + 1) % 1;
+    const bright = i % 3 !== 0;
+    ctx.fillStyle = bright ? 'rgba(255,255,255,0.4)' : 'rgba(140,170,210,0.2)';
+    ctx.fillRect(x * canvas.width, y * canvas.height, bright ? 1.4 : 1.1, bright ? 1.4 : 1.1);
+  }
+
   for (let line = 0; line < 7; line++) {
     const baseY = 90 + line * 44;
     ctx.beginPath();

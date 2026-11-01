@@ -2558,3 +2558,17 @@ select:focus {
   padding: 2px 10px;
   font-size: 0.85rem;
 }
+
+.snowglobe-secondary {
+  background-color: var(--primary-faded);
+}
+
+.snowglobe-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -87,6 +87,42 @@ function downloadBlob(blob, fileName) {
   URL.revokeObjectURL(link.href);
 }
 
+const SHARE_URL = 'https://thb.nabondance.me/snowglobe';
+const postText = () =>
+  `My ${YEAR} on Trailhead, shaken into a snow globe ❄️\n\nMake yours: ${SHARE_URL}\n\n#Trailhead #Salesforce #Trailblazer`;
+
+/* Shake detection from the phone's accelerometer: a sharp jolt (gravity
+   excluded) shakes the globe. iOS needs a permission tap first; Android and
+   others deliver motion events right away. */
+const SHAKE_THRESHOLD = 14; // m/s², well above walking or tilting the phone
+const SHAKE_COOLDOWN_MS = 700;
+
+function motionPermissionNeeded() {
+  return typeof window !== 'undefined' && typeof window.DeviceMotionEvent?.requestPermission === 'function';
+}
+
+function useDeviceShake(onShake, enabled) {
+  const onShakeRef = useRef(onShake);
+  onShakeRef.current = onShake;
+
+  useEffect(() => {
+    if (!enabled || typeof window === 'undefined' || !window.DeviceMotionEvent) return undefined;
+    let last = 0;
+    const handleMotion = (e) => {
+      const a = e.acceleration;
+      if (!a || a.x == null) return;
+      const magnitude = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+      const now = Date.now();
+      if (magnitude > SHAKE_THRESHOLD && now - last > SHAKE_COOLDOWN_MS) {
+        last = now;
+        onShakeRef.current();
+      }
+    };
+    window.addEventListener('devicemotion', handleMotion);
+    return () => window.removeEventListener('devicemotion', handleMotion);
+  }, [enabled]);
+}
+
 export default function SnowGlobePage() {
   const [input, setInput] = useState('');
   const [data, setData] = useState(null);
@@ -97,7 +133,11 @@ export default function SnowGlobePage() {
   const [webglOk, setWebglOk] = useState(null); // null = not checked yet (SSR-safe)
   const [spikeMode, setSpikeMode] = useState(false); // ?mp4spike=1 — MediaRecorder MP4 test rig
   const [videoOk, setVideoOk] = useState(false); // WebCodecs or MediaRecorder available
-  const [busy, setBusy] = useState(''); // '' | 'image' | 'video'
+  const [busy, setBusy] = useState(''); // '' | 'image' | 'video' | 'share'
+  const [shareOk, setShareOk] = useState(false); // native share sheet can take image files
+  const [isTouch, setIsTouch] = useState(false);
+  const [motionState, setMotionState] = useState('unknown'); // 'unknown' | 'needs-permission' | 'on' | 'denied'
+  const pendingShare = useRef(null); // image ready to share when the browser needed a second tap
   const glRef = useRef(null);
   const resultRef = useRef(null);
 
@@ -105,7 +145,28 @@ export default function SnowGlobePage() {
     setWebglOk(detectWebGL());
     setSpikeMode(new URLSearchParams(window.location.search).has('mp4spike'));
     setVideoOk(videoSupport().supported);
+    try {
+      const probe = new File([new Blob()], 'probe.png', { type: 'image/png' });
+      setShareOk(!!navigator.canShare?.({ files: [probe] }));
+    } catch {
+      setShareOk(false);
+    }
+    const touch = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+    setIsTouch(touch);
+    if (touch && window.DeviceMotionEvent) setMotionState(motionPermissionNeeded() ? 'needs-permission' : 'on');
   }, []);
+
+  const shake = () => setShakeNonce((n) => n + 1);
+  useDeviceShake(shake, !!data && motionState === 'on');
+
+  const enableMotion = async () => {
+    try {
+      const result = await window.DeviceMotionEvent.requestPermission();
+      setMotionState(result === 'granted' ? 'on' : 'denied');
+    } catch {
+      setMotionState('denied');
+    }
+  };
 
   // bring the fresh globe into view: on most screens it starts below the form
   useEffect(() => {
@@ -157,20 +218,21 @@ export default function SnowGlobePage() {
     }
   };
 
-  const downloadImage = () => {
-    const capture = glRef.current?.capture;
-    if (!capture || busy) return;
-    setBusy('image');
-    setActionStatus('');
-    try {
+  // High-res PNG of the globe as it is right now (2160×2700, see capture.js)
+  const captureImage = () =>
+    new Promise((resolve, reject) => {
+      const capture = glRef.current?.capture;
+      if (!capture) {
+        reject(new Error('Globe not ready'));
+        return;
+      }
       capture((blob) => {
         if (!blob) {
-          setActionStatus('Image download failed, please try again.');
-          setBusy('');
+          reject(new Error('Empty capture'));
           return;
         }
-        // composite the transparent render over the page background so the
-        // PNG looks like what's on screen instead of floating on black
+        // composite over the page background in case the backdrop hasn't
+        // loaded yet, so the PNG never ends up transparent
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
@@ -181,17 +243,76 @@ export default function SnowGlobePage() {
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0);
           URL.revokeObjectURL(img.src);
-          canvas.toBlob((finalBlob) => {
-            downloadBlob(finalBlob, `snowglobe-${data.username}-${YEAR}.png`);
-            setActionStatus('Image saved — ready to share!');
-            setBusy('');
-          }, 'image/png');
+          canvas.toBlob(
+            (finalBlob) => (finalBlob ? resolve(finalBlob) : reject(new Error('Encode failed'))),
+            'image/png'
+          );
         };
+        img.onerror = () => reject(new Error('Decode failed'));
         img.src = URL.createObjectURL(blob);
       });
+    });
+
+  const imageFileName = () => `snowglobe-${data.username}-${YEAR}.png`;
+
+  const downloadImage = async () => {
+    if (busy) return;
+    setBusy('image');
+    setActionStatus('');
+    try {
+      downloadBlob(await captureImage(), imageFileName());
+      setActionStatus('Image saved — ready to share!');
     } catch {
       setActionStatus('Image download failed, please try again.');
+    } finally {
       setBusy('');
+    }
+  };
+
+  const openShareSheet = async (file) => {
+    try {
+      await navigator.share({ files: [file], title: `My ${YEAR} Trailhead Snow Globe`, text: postText() });
+      pendingShare.current = null;
+      setActionStatus('');
+    } catch (err) {
+      if (err?.name === 'AbortError') {
+        pendingShare.current = null; // the user closed the share sheet
+      } else if (err?.name === 'NotAllowedError') {
+        // preparing the image took longer than the browser lets a tap count
+        // as consent: keep the file so the next tap shares it instantly
+        pendingShare.current = file;
+        setActionStatus('Your image is ready — tap Share again.');
+      } else {
+        pendingShare.current = null;
+        setActionStatus('Sharing failed — use Download image instead.');
+      }
+    }
+  };
+
+  const shareImage = async () => {
+    if (busy) return;
+    if (pendingShare.current) {
+      await openShareSheet(pendingShare.current);
+      return;
+    }
+    setBusy('share');
+    setActionStatus('');
+    try {
+      const blob = await captureImage();
+      await openShareSheet(new File([blob], imageFileName(), { type: 'image/png' }));
+    } catch {
+      setActionStatus('Sharing failed — use Download image instead.');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const copyPostText = async () => {
+    try {
+      await navigator.clipboard.writeText(postText());
+      setActionStatus('Post text copied — paste it into LinkedIn with your image.');
+    } catch {
+      setActionStatus('Could not copy the text, sorry.');
     }
   };
 
@@ -199,7 +320,10 @@ export default function SnowGlobePage() {
     const canvas = glRef.current?.gl?.domElement;
     if (!canvas || busy) return;
     setBusy('video');
-    setActionStatus(`Recording ${RECORD_SECONDS} seconds — shake the globe while it films!`);
+    setActionStatus(`Recording ${RECORD_SECONDS} seconds of snow…`);
+    // shake right after the recording starts, so every video catches the
+    // flurry and the snow settling, even if nobody touches the globe
+    const shakeTimer = setTimeout(shake, 400);
     try {
       const { blob } = await recordGlobeVideo(canvas);
       const ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
@@ -208,9 +332,17 @@ export default function SnowGlobePage() {
     } catch {
       setActionStatus('Video recording failed, please try again.');
     } finally {
+      clearTimeout(shakeTimer);
       setBusy('');
     }
   };
+
+  const hint =
+    motionState === 'on'
+      ? 'Shake your phone, drag the globe or press Shake to make it snow.'
+      : isTouch
+        ? 'Swipe the globe sideways or press Shake to make it snow.'
+        : 'Drag the globe sideways or press Shake to make it snow.';
 
   return (
     <div className='page-container snowglobe-page'>
@@ -264,11 +396,26 @@ export default function SnowGlobePage() {
               }}
             />
           </div>
-          <p className='snowglobe-hint'>Drag the globe sideways or press Shake to make it snow.</p>
+          <p className='snowglobe-hint'>
+            {hint}
+            {motionState === 'needs-permission' && (
+              <>
+                {' '}
+                <button type='button' className='snowglobe-link-button' onClick={enableMotion}>
+                  Shake with your phone 📱
+                </button>
+              </>
+            )}
+          </p>
           <div className='snowglobe-actions'>
-            <button type='button' className='button' onClick={() => setShakeNonce((n) => n + 1)}>
+            <button type='button' className='button' onClick={shake}>
               Shake ❄️
             </button>
+            {shareOk && (
+              <button type='button' className='button' onClick={shareImage} disabled={!!busy}>
+                {busy === 'share' ? 'Preparing…' : 'Share'}
+              </button>
+            )}
             <button type='button' className='button' onClick={downloadImage} disabled={!!busy}>
               {busy === 'image' ? 'Saving…' : 'Download image'}
             </button>
@@ -277,6 +424,9 @@ export default function SnowGlobePage() {
                 {busy === 'video' ? 'Recording… 🔴' : 'Download video'}
               </button>
             )}
+            <button type='button' className='button snowglobe-secondary' onClick={copyPostText}>
+              Copy post text
+            </button>
           </div>
           {actionStatus && (
             <p className='snowglobe-status' role='status'>
