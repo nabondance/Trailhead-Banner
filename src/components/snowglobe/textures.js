@@ -2,21 +2,105 @@ import * as THREE from 'three';
 
 /* Canvas-generated textures and font/image loaders for the snow globe */
 
-/* Six-spoke asterisk — the ✳-style flakes from the reference CSS snow globe */
+/* Falling snow: a stellar dendrite crystal (see makeCrystalTexture) */
 function makeFlakeTexture() {
-  return makeCrystalTexture({ gold: false });
+  return makeCrystalTexture();
 }
 
-/* Snow crystal for superbadges: a translucent hexagonal ice plate at the
-   heart, six tapered arms with two levels of side branches, a gold edge (the
-   superbadge color of the standard banner, #f9a825) under white ice. Drawn
-   for the 3D tumbling flakes, so it reads as a crystal from any angle. */
+/* Superbadge flake: a different crystal from the falling snow, a sectored
+   plate. Six broad, pointed petals around a hexagonal plate, each petal
+   ridged down the middle with side veins, all outlined in gold (the
+   superbadge color of the standard banner, #f9a825) under white ice. */
 function makeBigFlakeTexture() {
-  return makeCrystalTexture({ gold: true });
+  const S = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = S;
+  const ctx = canvas.getContext('2d');
+  const c = S / 2;
+  const tip = S * 0.47; // petal tip, from the center
+  const shoulder = S * 0.3; // where a petal is widest
+  const halfWidth = S * 0.085;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const petal = (a) => {
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    const px = -dy; // perpendicular
+    const py = dx;
+    ctx.beginPath();
+    ctx.moveTo(c + dx * S * 0.08 + px * halfWidth * 0.55, c + dy * S * 0.08 + py * halfWidth * 0.55);
+    ctx.lineTo(c + dx * shoulder + px * halfWidth, c + dy * shoulder + py * halfWidth);
+    ctx.lineTo(c + dx * tip, c + dy * tip);
+    ctx.lineTo(c + dx * shoulder - px * halfWidth, c + dy * shoulder - py * halfWidth);
+    ctx.lineTo(c + dx * S * 0.08 - px * halfWidth * 0.55, c + dy * S * 0.08 - py * halfWidth * 0.55);
+    ctx.closePath();
+  };
+  const hexagon = (r) => {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i * Math.PI) / 3 + Math.PI / 6;
+      const x = c + Math.cos(a) * r;
+      const y = c + Math.sin(a) * r;
+      if (i) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    }
+    ctx.closePath();
+  };
+  const angles = Array.from({ length: 6 }, (_, i) => (i * Math.PI) / 3 - Math.PI / 2);
+
+  // gold outline: every shape stroked wide first
+  ctx.strokeStyle = 'rgba(249,168,37,0.95)';
+  ctx.lineWidth = 16;
+  angles.forEach((a) => {
+    petal(a);
+    ctx.stroke();
+  });
+  hexagon(S * 0.15);
+  ctx.stroke();
+
+  // white ice petals and plate
+  ctx.fillStyle = 'rgba(240,248,255,0.95)';
+  angles.forEach((a) => {
+    petal(a);
+    ctx.fill();
+  });
+  hexagon(S * 0.15);
+  ctx.fill();
+
+  // facets: a ridge down each petal with side veins, an inner hexagon
+  ctx.strokeStyle = 'rgba(170,205,245,0.95)';
+  ctx.lineWidth = 3.5;
+  angles.forEach((a) => {
+    const dx = Math.cos(a);
+    const dy = Math.sin(a);
+    ctx.beginPath();
+    ctx.moveTo(c + dx * S * 0.15, c + dy * S * 0.15);
+    ctx.lineTo(c + dx * tip * 0.92, c + dy * tip * 0.92);
+    for (const at of [0.42, 0.62]) {
+      const bx = c + dx * tip * at;
+      const by = c + dy * tip * at;
+      for (const side of [-1, 1]) {
+        const b = a + side * 0.9;
+        ctx.moveTo(bx, by);
+        ctx.lineTo(bx + Math.cos(b) * halfWidth * 0.8, by + Math.sin(b) * halfWidth * 0.8);
+      }
+    }
+    ctx.stroke();
+  });
+  hexagon(S * 0.08);
+  ctx.stroke();
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
 }
 
-/* Shared crystal drawing; the gold edge only for superbadge flakes */
-function makeCrystalTexture({ gold }) {
+/* Stellar dendrite: a translucent hexagonal ice plate at the heart, six
+   tapered arms with two levels of side branches. Drawn for the 3D tumbling
+   flakes, so it reads as a crystal from any angle. */
+function makeCrystalTexture() {
   const S = 256;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = S;
@@ -74,19 +158,10 @@ function makeCrystalTexture({ gold }) {
     ctx.closePath();
   };
 
-  // gold edge: the same crystal drawn wider underneath
-  if (gold) {
-    ctx.strokeStyle = 'rgba(249,168,37,0.95)';
-    ctx.fillStyle = 'rgba(249,168,37,0.95)';
-    drawArms(2.1);
-    hexagon(S * 0.14);
-    ctx.fill();
-  }
-
   // ice: bright arms (bolder on the small plain flakes, so they still read
   // at a few pixels wide), a translucent plate with a faceted inner hexagon
   ctx.strokeStyle = 'rgba(255,255,255,1)';
-  drawArms(gold ? 1 : 1.6);
+  drawArms(1.6);
   hexagon(S * 0.11);
   ctx.fillStyle = 'rgba(225,240,255,0.75)';
   ctx.fill();
