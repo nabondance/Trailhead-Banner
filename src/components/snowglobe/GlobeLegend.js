@@ -1,6 +1,7 @@
 'use client';
 
 import { getRankMetals } from './rankMetals';
+import { getSnowfall } from './snowStyles';
 
 /* "Your globe, decoded": every personal detail of the globe and the data it
    comes from, in plain words, so the user can read their own globe. */
@@ -27,6 +28,15 @@ function legendItems(data, year) {
     title: SNOW_NAMES[data.agentblazerTitle] || 'Classic white snow',
     text: data.agentblazerTitle ? `Agentblazer ${data.agentblazerTitle} in ${year}` : `no Agentblazer rank in ${year}`,
   });
+
+  if (Number.isFinite(data.stats?.badges)) {
+    const badges = data.stats.badges;
+    items.push({
+      icon: '🌨️',
+      title: getSnowfall(badges).label,
+      text: `${badges.toLocaleString('en-US')} badge${badges === 1 ? '' : 's'}`,
+    });
+  }
 
   if (data.topRank) {
     items.push({ icon: '🏔️', title: 'Full snow', text: `top rank reached` });

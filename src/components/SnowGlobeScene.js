@@ -4,7 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useEffect, useMemo, useRef } from 'react';
 import { CENTER, DISPLAY_SCALE, makeSnowFloor } from './snowglobe/constants';
-import { getSnowStyle, getSparkles } from './snowglobe/snowStyles';
+import { getSnowStyle, getSparkles, getSnowfall } from './snowglobe/snowStyles';
 import { makeFlakeTexture, makePowderTexture } from './snowglobe/textures';
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
@@ -34,6 +34,8 @@ export default function SnowGlobeScene({
   const floor = useMemo(() => makeSnowFloor(snowLevel), [snowLevel]);
   const snowStyle = getSnowStyle(agentblazerTitle);
   const sparkles = useMemo(() => getSparkles(snowStyle, topRank), [snowStyle, topRank]);
+  // falling snow: more flakes for more badges (all-time)
+  const snowfall = getSnowfall(stats?.badges);
   // supersample 1.5× beyond the display's pixel ratio (capped) for a crisper globe
   const dpr = Math.min(window.devicePixelRatio * 1.5, 3);
   // the rank emblem tumbles with the achievements (the base now carries the username)
@@ -246,12 +248,14 @@ export default function SnowGlobeScene({
               year={year}
             />
             <Achievements world={world} achievements={tumblingItems} floor={floor} />
-            {/* Two visual layers, still 680 particles total: defined flakes
-                carry the foreground while softer powder adds depth. */}
+            {/* Two visual layers (300 to 1,000 particles, from the badge
+                count): defined flakes carry the foreground while softer
+                powder adds depth. */}
             <SnowSystem
+              key={`flakes-${snowfall.flakes}`}
               world={world}
               floor={floor}
-              count={400}
+              count={snowfall.flakes}
               makeTexture={makeFlakeTexture}
               minSize={0.055}
               maxSize={0.18}
@@ -260,9 +264,10 @@ export default function SnowGlobeScene({
               {...snowStyle.flakes}
             />
             <SnowSystem
+              key={`powder-${snowfall.powder}`}
               world={world}
               floor={floor}
-              count={280}
+              count={snowfall.powder}
               makeTexture={makePowderTexture}
               minSize={0.025}
               maxSize={0.095}

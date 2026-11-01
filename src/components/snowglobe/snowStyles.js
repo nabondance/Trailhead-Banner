@@ -41,3 +41,26 @@ function getSparkles(style, topRank) {
 }
 
 export { SNOW_STYLES, getSnowStyle, getSparkles };
+
+/* Falling snow: how many flakes swirl when the globe is shaken, from the
+   all-time badge count (log scale, so beginners still get a flurry and big
+   collectors a blizzard without overloading phones). 0 badges → 300 flakes,
+   100 → ~570, 1,000 → ~840, 3,000+ → 1,000. Split between the two layers in
+   the original 400 flakes / 280 powder proportion. */
+const SNOWFALL_MIN = 300;
+const SNOWFALL_MAX = 1000;
+const SNOWFALL_FULL_AT = 3000; // badges
+
+function getSnowfall(badges) {
+  const b = Number.isFinite(badges) && badges > 0 ? badges : 0;
+  const t = Math.min(Math.log10(1 + b) / Math.log10(1 + SNOWFALL_FULL_AT), 1);
+  const total = Math.round(SNOWFALL_MIN + (SNOWFALL_MAX - SNOWFALL_MIN) * Math.pow(t, 1.75));
+  const flakes = Math.round((total * 400) / 680);
+  return {
+    flakes,
+    powder: total - flakes,
+    label: total < 500 ? 'Light snowfall' : total < 800 ? 'Steady snowfall' : 'Heavy snowfall',
+  };
+}
+
+export { getSnowfall };
