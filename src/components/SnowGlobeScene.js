@@ -25,6 +25,9 @@ export default function SnowGlobeScene({
   stats,
   shakeNonce,
   spinLocked = false,
+  // design lab only: hold the globe turned (π = the back) and trigger a turn
+  viewAngle = 0,
+  spinNonce = 0,
   onReady,
 }) {
   // floor depth from rank progress, snow kind from the year's Agentblazer rank
@@ -75,6 +78,13 @@ export default function SnowGlobeScene({
     }
   };
   const dragStartX = useRef(null);
+
+  useEffect(() => {
+    world.current.restAngle = viewAngle;
+  }, [viewAngle]);
+  useEffect(() => {
+    if (spinNonce) world.current.spin = { dir: 1, t: 0, swirled: false };
+  }, [spinNonce]);
 
   useEffect(() => {
     if (!shakeNonce) return;

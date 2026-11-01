@@ -563,19 +563,20 @@ function swirlContents(w, dir) {
 function SpinDriver({ world }) {
   useFrame((_, dt) => {
     const w = world.current;
+    const rest = w.restAngle || 0; // design lab can hold the globe turned
     if (!w.spin) {
-      w.spinAngle = 0;
+      w.spinAngle = rest;
       return;
     }
     w.spin.t += Math.min(dt, 0.05);
     const p = Math.min(w.spin.t / SPIN_SECONDS, 1);
-    w.spinAngle = w.spin.dir * Math.PI * 2 * easeInOutCubic(p);
+    w.spinAngle = rest + w.spin.dir * Math.PI * 2 * easeInOutCubic(p);
     if (!w.spin.swirled && p > 0.12) {
       w.spin.swirled = true;
       swirlContents(w, w.spin.dir);
     }
     if (p >= 1) {
-      w.spinAngle = 0;
+      w.spinAngle = rest;
       w.spin = null;
     }
   });
