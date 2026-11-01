@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { GLOBE_RADIUS, GRAVITY, DRAG, BOUNCE, CENTER, proxied, randomPointInGlobe } from './constants';
+import { GLOBE_RADIUS, GRAVITY, DRAG, BOUNCE, CENTER, DISPLAY_SCALE, proxied, randomPointInGlobe } from './constants';
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 const ACHIEVEMENT_COLLISION_PASSES = 2;
@@ -325,8 +325,12 @@ function SnowSystem({
   settledOpacity = 0.2,
   gravityScale = 1,
   kickScale = 1,
+  // solid: real 3D flakes (thin textured crystals that tumble as they fall and
+  // lie flat once landed) instead of camera-facing points
+  solid = false,
 }) {
   const pointsRef = useRef();
+  const meshRef = useRef();
   const tex = useMemo(() => makeTexture(), [makeTexture]);
   const uniforms = useMemo(
     () => ({
@@ -370,6 +374,16 @@ function SnowSystem({
       driftPhases[i] = (i * GOLDEN_ANGLE) % (Math.PI * 2);
       driftRates[i] = 0.65 + ((i * 37) % 101) / 160;
     }
+    // solid flakes: a random tumble axis, speed and starting angle each
+    const spinAxes = solid ? new Float32Array(count * 3) : null;
+    const spinRates = solid ? new Float32Array(count) : null;
+    const spinAngles = solid ? new Float32Array(count) : null;
+    for (let i = 0; solid && i < count; i++) {
+      const axis = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+      spinAxes.set([axis.x, axis.y, axis.z], i * 3);
+      spinRates[i] = (0.8 + Math.random() * 1.6) * (Math.random() < 0.5 ? -1 : 1);
+      spinAngles[i] = Math.random() * Math.PI * 2;
+    }
     return {
       positions,
       velocities,
@@ -382,9 +396,46 @@ function SnowSystem({
       kicks,
       driftPhases,
       driftRates,
+      spinAxes,
+      spinRates,
+      spinAngles,
       count,
     };
-  }, [count, minSize, maxSize, gravityScale, kickScale]);
+  }, [count, minSize, maxSize, gravityScale, kickScale, solid]);
+
+  // solid flakes: one lit, double-sided material; the scratch objects are
+  // reused every frame
+  const solidMaterial = useMemo(
+    () =>
+      solid
+        ? new THREE.MeshStandardMaterial({
+            map: tex,
+            color,
+            emissive: color,
+            emissiveMap: tex,
+            emissiveIntensity: 0.8,
+            roughness: 0.3,
+            metalness: 0.15,
+            transparent: true,
+            opacity,
+            alphaTest: 0.05,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          })
+        : null,
+    [solid, tex, color, opacity]
+  );
+  useEffect(() => () => solidMaterial?.dispose(), [solidMaterial]);
+  const scratch = useMemo(
+    () => ({
+      obj: new THREE.Object3D(),
+      axis: new THREE.Vector3(),
+      tumble: new THREE.Quaternion(),
+      // landed flakes lie flat: the plane's normal (+z) turned to point up
+      flat: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2),
+    }),
+    []
+  );
 
   useEffect(() => () => tex.dispose(), [tex]);
 
@@ -490,6 +541,26 @@ function SnowSystem({
         }
       }
     }
+    if (meshRef.current) {
+      // a point's size is in screen terms; this turns it into the same
+      // on-screen size for a plane (camera fov 42°) inside the scaled group
+      const toWorld = (Math.tan(THREE.MathUtils.degToRad(21)) / DISPLAY_SCALE) * 1;
+      const { obj, axis, tumble, flat } = scratch;
+      const { spinAxes, spinRates, spinAngles } = data;
+      for (let i = 0; i < count; i++) {
+        const ix = i * 3;
+        // tumble while falling, slowing down as the flake settles
+        spinAngles[i] += spinRates[i] * d * (1 - settles[i]);
+        axis.set(spinAxes[ix], spinAxes[ix + 1], spinAxes[ix + 2]);
+        tumble.setFromAxisAngle(axis, spinAngles[i]);
+        obj.quaternion.slerpQuaternions(tumble, flat, settles[i]);
+        obj.position.set(positions[ix], positions[ix + 1], positions[ix + 2]);
+        obj.scale.setScalar(sizes[i] * toWorld);
+        obj.updateMatrix();
+        meshRef.current.setMatrixAt(i, obj.matrix);
+      }
+      meshRef.current.instanceMatrix.needsUpdate = true;
+    }
     if (pointsRef.current) {
       pointsRef.current.geometry.attributes.position.needsUpdate = true;
       pointsRef.current.geometry.attributes.size.needsUpdate = true;
@@ -499,6 +570,14 @@ function SnowSystem({
       uniforms.uTime.value = time;
     }
   });
+
+  if (solid) {
+    return (
+      <instancedMesh ref={meshRef} args={[null, null, count]} material={solidMaterial} frustumCulled={false}>
+        <planeGeometry args={[1, 1]} />
+      </instancedMesh>
+    );
+  }
 
   return (
     <points ref={pointsRef}>

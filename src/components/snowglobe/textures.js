@@ -20,44 +20,91 @@ function makeFlakeTexture() {
   return new THREE.CanvasTexture(canvas);
 }
 
-/* Big six-armed flake for superbadges: white arms with small branches over a
-   gold edge (the superbadge color of the standard banner, #f9a825) */
+/* Snow crystal for superbadges: a translucent hexagonal ice plate at the
+   heart, six tapered arms with two levels of side branches, a gold edge (the
+   superbadge color of the standard banner, #f9a825) under white ice. Drawn
+   for the 3D tumbling flakes, so it reads as a crystal from any angle. */
 function makeBigFlakeTexture() {
+  const S = 256;
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 128;
+  canvas.width = canvas.height = S;
   const ctx = canvas.getContext('2d');
+  const c = S / 2;
+  const arm = S * 0.46;
   ctx.lineCap = 'round';
-  const c = 64;
-  const arm = 52;
-  const drawFlake = () => {
+  ctx.lineJoin = 'round';
+
+  const branch = (x, y, angle, length, width) => {
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.cos(angle) * length, y + Math.sin(angle) * length);
+    ctx.stroke();
+  };
+  const drawArms = (scale) => {
     for (let i = 0; i < 6; i++) {
-      const a = (i * Math.PI) / 3;
+      const a = (i * Math.PI) / 3 - Math.PI / 2;
       const dx = Math.cos(a);
       const dy = Math.sin(a);
-      ctx.beginPath();
-      ctx.moveTo(c, c);
-      ctx.lineTo(c + dx * arm, c + dy * arm);
-      for (const at of [0.45, 0.72]) {
+      // main arm, thicker at the root
+      branch(c, c, a, arm * 0.92, 9 * scale);
+      branch(c + dx * arm * 0.5, c + dy * arm * 0.5, a, arm * 0.5, 6 * scale);
+      // side branches (dendrites), longer near the middle of the arm
+      for (const [at, len] of [
+        [0.34, 0.3],
+        [0.56, 0.26],
+        [0.76, 0.16],
+      ]) {
         const bx = c + dx * arm * at;
         const by = c + dy * arm * at;
-        const len = at < 0.6 ? 16 : 11;
         for (const side of [-1, 1]) {
-          const b = a + side * 0.75;
-          ctx.moveTo(bx, by);
-          ctx.lineTo(bx + Math.cos(b) * len, by + Math.sin(b) * len);
+          const b = a + side * 1.0;
+          branch(bx, by, b, arm * len, 5 * scale);
+          // tiny twigs on the longest branches
+          if (len > 0.2) {
+            const tx = bx + Math.cos(b) * arm * len * 0.55;
+            const ty = by + Math.sin(b) * arm * len * 0.55;
+            branch(tx, ty, a, arm * 0.09, 3.5 * scale);
+          }
         }
       }
-      ctx.stroke();
     }
   };
+  const hexagon = (r) => {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i * Math.PI) / 3 - Math.PI / 2;
+      const x = c + Math.cos(a) * r;
+      const y = c + Math.sin(a) * r;
+      if (i) ctx.lineTo(x, y);
+      else ctx.moveTo(x, y);
+    }
+    ctx.closePath();
+  };
+
+  // gold edge: the same crystal drawn wider underneath
   ctx.strokeStyle = 'rgba(249,168,37,0.95)';
-  ctx.lineWidth = 10;
-  drawFlake();
+  ctx.fillStyle = 'rgba(249,168,37,0.95)';
+  drawArms(2.1);
+  hexagon(S * 0.14);
+  ctx.fill();
+
+  // ice: bright arms, a translucent plate with a faceted inner hexagon
   ctx.strokeStyle = 'rgba(255,255,255,1)';
-  ctx.lineWidth = 4.5;
-  drawFlake();
+  drawArms(1);
+  hexagon(S * 0.11);
+  ctx.fillStyle = 'rgba(225,240,255,0.75)';
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+  ctx.stroke();
+  hexagon(S * 0.05);
+  ctx.strokeStyle = 'rgba(190,220,255,0.9)';
+  ctx.stroke();
+
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
   return tex;
 }
 
