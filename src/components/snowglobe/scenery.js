@@ -480,7 +480,7 @@ function FootPlaque({ stats }) {
   const tex = useMemo(() => (loaded && text ? makePlaqueTexture(text) : null), [loaded, text]);
   useEffect(() => () => tex?.dispose(), [tex]);
   if (!tex) return null;
-  const height = 0.085;
+  const height = 0.115;
   const centerY = (WOOD_BOTTOM + FOOT_BOTTOM) / 2;
   const t = (centerY + height / 2 - WOOD_BOTTOM) / (FOOT_BOTTOM - WOOD_BOTTOM);
   const b = (centerY - height / 2 - WOOD_BOTTOM) / (FOOT_BOTTOM - WOOD_BOTTOM);
