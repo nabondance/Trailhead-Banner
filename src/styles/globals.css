@@ -2459,7 +2459,6 @@ select:focus {
   font-size: 1.15em;
   color: var(--text-contrast);
   margin: 0 auto 24px;
-  max-width: 560px;
 }
 
 .snowglobe-form {

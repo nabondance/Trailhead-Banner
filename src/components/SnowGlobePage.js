@@ -215,9 +215,7 @@ export default function SnowGlobePage() {
   return (
     <div className='page-container snowglobe-page'>
       <h1>Your {YEAR} Trailhead Snow Globe</h1>
-      <p className='snowglobe-tagline'>
-        Fill a snow globe with the certifications and stamps you earned in {YEAR}, shake it, and share it.
-      </p>
+      <p className='snowglobe-tagline'>Fill a snow globe with your achievements of {YEAR}, shake it, and share it.</p>
 
       {webglOk === false ? (
         <WebGLHelpPanel onRetry={() => setWebglOk(detectWebGL())} />
@@ -236,7 +234,7 @@ export default function SnowGlobePage() {
             data-lpignore='true'
           />
           <button type='submit' className='button snowglobe-submit' disabled={loading}>
-            {loading ? 'Loading…' : data ? 'Update globe' : 'Create my globe'}
+            {loading ? 'Shoveling snow…' : data ? 'Let it snow again ❄️' : 'Let it snow ❄️'}
           </button>
         </form>
       )}
@@ -245,7 +243,7 @@ export default function SnowGlobePage() {
 
       {loading && (
         <div className='loading-container'>
-          <p>Collecting your {YEAR} achievements…</p>
+          <p>Packing your {YEAR} into a snow globe…</p>
           <div className='loading-icon'></div>
         </div>
       )}
