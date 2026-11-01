@@ -1,7 +1,12 @@
 import { buildRewindQueries, QUERY_MAP } from '../../../banner/api/queryBuilder';
 import { fetchUserData, handleBannerError } from '../../../banner/api/shared';
 import { validateUsername } from '../../../banner/api/validators';
-import { filterDataByYear, getCombinedAchievements, getAgentblazerRankForYear } from '../../../utils/rewindUtils';
+import {
+  filterDataByYear,
+  getCombinedAchievements,
+  getAgentblazerRankForYear,
+  getMonthlyBreakdown,
+} from '../../../utils/rewindUtils';
 import { waitUntil } from '@vercel/functions';
 import { enforceRateLimit } from '../../../utils/rateLimit';
 import SupabaseUtils from '../../../utils/supabaseUtils';
@@ -153,6 +158,11 @@ export default async function handler(req, res) {
       topRank: !!rankData.rank && !rankData.nextRank,
       // MVP ribbon around the base
       isMvp: responseMap.GET_MVP_STATUS?.data?.data?.profileData?.isMvp === true,
+      // aurora: achievements per month of the Rewind year (Jan..Dec)
+      activity: {
+        certifications: getMonthlyBreakdown(yearlyData.certifications, 'dateCompleted'),
+        stamps: getMonthlyBreakdown(yearlyData.stamps, 'eventDate'),
+      },
       // snow kind: the Agentblazer rank earned in the Rewind year
       agentblazerTitle: agentblazer?.title || null,
       totals: {

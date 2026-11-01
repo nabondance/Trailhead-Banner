@@ -14,6 +14,7 @@ import {
   loadFont,
 } from './textures';
 import { getRankMetals } from './rankMetals';
+import { Aurora } from './aurora';
 
 const GLASS_RIM_VERTEX = /* glsl */ `
   varying vec3 vNormal;
@@ -212,7 +213,7 @@ const GLARES = [
   { position: [-1.15, 0.3, 1.55], scale: [0.3, 0.2, 1], rotation: 1.2, opacity: 0.5 },
 ];
 
-function GlobeShell({ world, floor, sparkles }) {
+function GlobeShell({ world, floor, sparkles, activity }) {
   const glareRefs = useRef([]);
 
   // The glare is a reflection of a fixed light, so it must not ride along
@@ -287,6 +288,8 @@ function GlobeShell({ world, floor, sparkles }) {
           />
         </sprite>
       ))}
+      {/* northern lights from the year's monthly activity */}
+      <Aurora activity={activity} />
       {/* snow floor: one organic drifted surface (matches floor.surfaceY) */}
       <SnowMound floor={floor} />
       <SnowSparkles floor={floor} {...sparkles} />

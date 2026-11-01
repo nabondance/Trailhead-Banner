@@ -398,6 +398,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
               topRank={data.topRank}
               agentblazerTitle={data.agentblazerTitle}
               isMvp={data.isMvp}
+              activity={data.activity}
               shakeNonce={shakeNonce}
               onReady={(gl) => {
                 glRef.current = gl;
