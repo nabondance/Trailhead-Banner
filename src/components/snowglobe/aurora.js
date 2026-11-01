@@ -107,13 +107,14 @@ function Aurora({ activity, world }) {
     }
   });
   if (!active) return null;
-  // a wide arc behind the center of the globe, in the upper glass
+  // a wide arc in the upper glass, above the badge pile (narrower radius so
+  // its top corners stay inside the sphere)
   const arc = 2.3;
   return (
     // group at the globe center, so the tilt is undone around the right pivot
     <group ref={groupRef}>
-      <mesh position={[0, 0.55, 0]} renderOrder={-1}>
-        <cylinderGeometry args={[1.45, 1.45, 1.5, 96, 1, true, Math.PI - arc / 2, arc]} />
+      <mesh position={[0, 1.0, 0]} renderOrder={-1}>
+        <cylinderGeometry args={[1.25, 1.25, 1.2, 96, 1, true, Math.PI - arc / 2, arc]} />
         <shaderMaterial
           uniforms={uniforms}
           vertexShader={AURORA_VERTEX}
