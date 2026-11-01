@@ -21,7 +21,7 @@ function activeMonths(activity) {
 
 function bigFlakeText(superbadges) {
   if (!Number.isFinite(superbadges) || superbadges < 1) return '';
-  return superbadges === 1 ? ' · 1 big flake, your superbadge' : ` · ${superbadges} big flakes, one per superbadge`;
+  return ` · ${superbadges} superbadge${superbadges === 1 ? '' : 's'}`;
 }
 
 /* One short line per detail: what you see, and the data behind it */
