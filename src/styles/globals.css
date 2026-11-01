@@ -2523,10 +2523,6 @@ select:focus {
   background: var(--secondary);
 }
 
-.snowglobe-hint-icon {
-  color: var(--primary);
-}
-
 .snowglobe-placeholder {
   height: 100%;
   display: flex;
