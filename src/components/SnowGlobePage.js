@@ -94,44 +94,67 @@ const personalUrl = (username) => `${window.location.origin}${personalPath(usern
 const postText = (username) =>
   `My ${YEAR} on Trailhead, shaken into a snow globe ❄️\n\n${personalUrl(username)}\n\n#Trailhead #Salesforce #Trailblazer`;
 
-/* Shake detection from the phone's accelerometer: a sharp jolt (gravity
-   excluded) shakes the globe. iOS needs a permission tap first; Android and
-   others deliver motion events right away. */
-const SHAKE_THRESHOLD = 11; // m/s², well above walking or tilting the phone
-const SHAKE_COOLDOWN_MS = 700;
+/* The phone's motion drives the globe like a real one held in the hand: its
+   acceleration (gravity excluded) is passed on continuously, so the globe
+   leans with every move and the snow sloshes the other way, with no delay
+   and in the right direction. A hard shake also stirs up the full flurry.
+   iOS needs a permission tap first; Android and others deliver motion
+   events right away. */
+const FLURRY_THRESHOLD = 18; // m/s²: a hard shake also tumbles everything
+const FLURRY_COOLDOWN_MS = 700;
 
 function motionPermissionNeeded() {
   return typeof window !== 'undefined' && typeof window.DeviceMotionEvent?.requestPermission === 'function';
 }
 
-function useDeviceShake(onShake, enabled) {
-  const onShakeRef = useRef(onShake);
-  onShakeRef.current = onShake;
+function useDeviceMotion(phoneMotion, onFlurry, enabled) {
+  const onFlurryRef = useRef(onFlurry);
+  onFlurryRef.current = onFlurry;
 
   useEffect(() => {
     if (!enabled || typeof window === 'undefined' || !window.DeviceMotionEvent) return undefined;
     let last = 0;
     let prevG = null; // fallback: change of the gravity-included reading
+    // sideways speed (m/s) and position (m) of the phone, both leaking back to
+    // 0 so sensor noise never drifts: the globe follows the hand's position
+    let vx = 0;
+    let px = 0;
+    let prevT = 0;
     const handleMotion = (e) => {
       const a = e.acceleration;
-      let magnitude;
+      let x;
+      let y;
       if (a && a.x != null) {
-        magnitude = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+        x = a.x;
+        y = a.y;
       } else {
         const g = e.accelerationIncludingGravity;
         if (!g || g.x == null) return;
-        magnitude = prevG ? Math.hypot(g.x - prevG.x, g.y - prevG.y, g.z - prevG.z) : 0;
-        prevG = { x: g.x, y: g.y, z: g.z };
+        x = prevG ? g.x - prevG.x : 0;
+        y = prevG ? g.y - prevG.y : 0;
+        prevG = { x: g.x, y: g.y };
       }
+      // device axes → screen axes when the phone is turned sideways
+      const angle = ((window.screen?.orientation?.angle ?? window.orientation ?? 0) * Math.PI) / 180;
+      const sx = x * Math.cos(angle) + y * Math.sin(angle);
+      const sy = -x * Math.sin(angle) + y * Math.cos(angle);
+      const nowT = performance.now();
+      const dt = prevT ? Math.min((nowT - prevT) / 1000, 0.05) : 0.016;
+      prevT = nowT;
+      vx = (vx + sx * dt) * Math.exp(-dt * 4);
+      px = (px + vx * dt) * Math.exp(-dt * 3);
+      phoneMotion.current = { x: sx, y: sy, px, t: nowT };
+
+      const magnitude = Math.hypot(x, y, a?.z ?? 0);
       const now = Date.now();
-      if (magnitude > SHAKE_THRESHOLD && now - last > SHAKE_COOLDOWN_MS) {
+      if (magnitude > FLURRY_THRESHOLD && now - last > FLURRY_COOLDOWN_MS) {
         last = now;
-        onShakeRef.current();
+        onFlurryRef.current();
       }
     };
     window.addEventListener('devicemotion', handleMotion);
     return () => window.removeEventListener('devicemotion', handleMotion);
-  }, [enabled]);
+  }, [enabled, phoneMotion]);
 }
 
 /* Two uses: the /rewind form, and the personal link /rewind/2026/<username>
@@ -151,6 +174,8 @@ export default function SnowGlobePage({
   const [error, setError] = useState('');
   const [actionStatus, setActionStatus] = useState('');
   const [shakeNonce, setShakeNonce] = useState(0);
+  const [shakeSway, setShakeSway] = useState(true); // false: the phone already moves the globe
+  const phoneMotion = useRef({ x: 0, y: 0, t: 0 }); // live phone acceleration, screen axes
   const [webglOk, setWebglOk] = useState(null); // null = not checked yet (SSR-safe)
   const [videoOk, setVideoOk] = useState(false); // WebCodecs or MediaRecorder available
   const [busy, setBusy] = useState(''); // '' | 'image' | 'video' | 'share'
@@ -178,8 +203,11 @@ export default function SnowGlobePage({
     if (touch && window.DeviceMotionEvent) setMotionState(motionPermissionNeeded() ? 'needs-permission' : 'on');
   }, []);
 
-  const shake = () => setShakeNonce((n) => n + 1);
-  useDeviceShake(shake, !!data && motionState === 'on');
+  const shake = (sway = true) => {
+    setShakeSway(sway);
+    setShakeNonce((n) => n + 1);
+  };
+  useDeviceMotion(phoneMotion, () => shake(false), !!data && motionState === 'on');
 
   const enableMotion = async () => {
     try {
@@ -366,7 +394,7 @@ export default function SnowGlobePage({
     setActionStatus(`Recording ${RECORD_SECONDS} seconds of snow…`);
     // shake right after the recording starts, so every video catches the
     // flurry and the snow settling, even if nobody touches the globe
-    const shakeTimer = setTimeout(shake, 400);
+    const shakeTimer = setTimeout(() => shake(), 400);
     try {
       const { blob } = await recordGlobeVideo(canvas);
       const ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
@@ -481,6 +509,8 @@ export default function SnowGlobePage({
               activity={data.activity}
               stats={data.stats}
               shakeNonce={shakeNonce}
+              shakeSway={shakeSway}
+              phoneMotion={phoneMotion}
               spinLocked={busy === 'video'}
               onReady={(gl) => {
                 glRef.current = gl;

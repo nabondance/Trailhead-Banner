@@ -9,7 +9,7 @@ import { makeBigFlakeTexture, makeFlakeTexture, makePowderTexture } from './snow
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
-import { Achievements, SnowSystem, SpinDriver, WobbleGroup } from './snowglobe/physics';
+import { Achievements, SnowSystem, SpinDriver, WobbleGroup, puffSnow } from './snowglobe/physics';
 
 export default function SnowGlobeScene({
   achievements,
@@ -24,6 +24,8 @@ export default function SnowGlobeScene({
   activity,
   stats,
   shakeNonce,
+  shakeSway = true,
+  phoneMotion = null,
   spinLocked = false,
   // design lab only: hold the globe turned (π = the back) and trigger a turn
   viewAngle = 0,
@@ -86,14 +88,21 @@ export default function SnowGlobeScene({
     world.current.restAngle = viewAngle;
   }, [viewAngle]);
   useEffect(() => {
+    world.current.phoneMotion = phoneMotion;
+  }, [phoneMotion]);
+  useEffect(() => {
     if (spinNonce) world.current.spin = { dir: 1, t: 0, swirled: false };
   }, [spinNonce]);
 
   useEffect(() => {
     if (!shakeNonce) return;
     const w = world.current;
-    w.wobble = 0.9; // 0.45s sway + settle
-    w.shakeDir = Math.random() < 0.5 ? -1 : 1;
+    // the button sways the globe to a random side; a phone shake doesn't,
+    // the phone's own motion already moves it
+    if (shakeSway) {
+      w.wobble = 0.9; // 0.45s sway + settle
+      w.shakeDir = Math.random() < 0.5 ? -1 : 1;
+    }
     // sideways-biased swirl: a random horizontal direction per item with a mild
     // upward kick, so the contents scatter instead of funneling to the top center
     w.items.forEach((it) => {
@@ -128,6 +137,7 @@ export default function SnowGlobeScene({
         if (sizes && baseSizes) sizes[i] = baseSizes[i];
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shakeNonce]);
 
   // last pointer x: Safari on iPhone reports movementX as 0 for touch, so
@@ -156,19 +166,7 @@ export default function SnowGlobeScene({
     dragStartX.current = null;
     w.dragging = false;
     w.dragTarget = 0;
-    // releasing the globe puffs the snow outward in random horizontal
-    // directions — held-drag inertia otherwise herds the flakes against the
-    // dome and they drain down the middle as a column
-    w.snowSystems.forEach(({ velocities, count, kicks }) => {
-      for (let i = 0; i < count; i++) {
-        const ix = i * 3;
-        const kick = kicks ? kicks[i] : 1;
-        const angle = Math.random() * Math.PI * 2;
-        const mag = (0.8 + Math.random() * 1.6) * kick;
-        velocities[ix] += Math.cos(angle) * mag;
-        velocities[ix + 2] += Math.sin(angle) * mag;
-      }
-    });
+    puffSnow(w);
   };
 
   // Arrow keys move the globe like a held drag: ← / → push it to that side,
@@ -210,7 +208,9 @@ export default function SnowGlobeScene({
       onPointerDown={startDrag}
       onPointerMove={moveDrag}
       onPointerUp={endDrag}
-      onPointerLeave={endDrag}
+      // touch: iOS reports a leave a few ms into every swipe, even with the
+      // finger still on the globe; pointer capture keeps the drag anyway
+      onPointerLeave={(e) => e.pointerType === 'mouse' && endDrag(e)}
       onPointerCancel={endDrag}
     >
       <Canvas

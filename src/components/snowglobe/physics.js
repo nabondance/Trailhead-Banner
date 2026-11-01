@@ -638,6 +638,23 @@ function SnowSystem({
    release), wobbles after a shake — and feeds the globe's acceleration back
    into the contents as inertia, so dragging sloshes items and snow like a
    real hand-held snow globe. */
+/* Letting go of the globe (end of a drag, swipe or phone move) puffs the
+   snow outward in random horizontal directions — held inertia otherwise
+   herds the flakes against the dome and they drain down the middle as a
+   column */
+function puffSnow(w) {
+  w.snowSystems.forEach(({ velocities, count, kicks }) => {
+    for (let i = 0; i < count; i++) {
+      const ix = i * 3;
+      const kick = kicks ? kicks[i] : 1;
+      const angle = Math.random() * Math.PI * 2;
+      const mag = (0.8 + Math.random() * 1.6) * kick;
+      velocities[ix] += Math.cos(angle) * mag;
+      velocities[ix + 2] += Math.sin(angle) * mag;
+    }
+  });
+}
+
 /* The secret turn: one full spin around the vertical axis, eased in and out */
 const SPIN_SECONDS = 2.5;
 const easeInOutCubic = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
@@ -705,6 +722,25 @@ function WobbleGroup({ world, children }) {
     if (!ref.current) return;
     const d = Math.min(dt, 0.05);
 
+    // phone motion (fresh readings only): the globe moves with the phone's
+    // sideways position, in step with the hand and as far as a swipe takes
+    // it; the contents then slosh from that real motion (inertia below). Its
+    // up/down push jolts the contents directly. When a real move ends, the
+    // snow puffs like letting go of a swipe.
+    const pm = w.phoneMotion?.current;
+    const fresh = pm && performance.now() - pm.t < 150;
+    const phoneY = fresh ? pm.y : 0;
+    // In a fast back-and-forth shake the hand barely travels but accelerates
+    // hard, and that acceleration peaks (opposite sign) exactly when the hand
+    // is at the end of its swing: adding it keeps the globe in step and gives
+    // a frantic shake the same reach as a swipe.
+    const phoneLean = fresh ? THREE.MathUtils.clamp(pm.px * 6 - pm.x * 0.03, -0.75, 0.75) : 0;
+    w.phonePeak = Math.max((w.phonePeak || 0) * Math.exp(-d * 1.5), Math.abs(phoneLean));
+    if (w.phonePeak > 0.3 && Math.abs(phoneLean) < 0.06) {
+      w.phonePeak = 0;
+      puffSnow(w);
+    }
+
     // spring the globe toward the pointer target (or back to center)
     const target = w.dragging ? w.dragTarget : 0;
     w.dragVel += (target - w.dragPos) * 60 * d - w.dragVel * 10 * d;
@@ -720,11 +756,28 @@ function WobbleGroup({ world, children }) {
     w.shakeVel += (shakeTarget - w.shakePos) * 28 * d - w.shakeVel * 6 * d;
     w.shakePos += w.shakeVel * d;
 
-    const posX = w.dragPos + w.shakePos;
+    // the phone's position applies directly (no spring): no lag behind the hand
+    const posX = w.dragPos + w.shakePos + phoneLean;
     ref.current.position.x = posX;
     ref.current.rotation.z = -posX * 0.12; // tilt with the motion, pivoting like a held globe
 
     ref.current.rotation.y = w.spinAngle || 0; // secret turn (SpinDriver)
+
+    if (Math.abs(phoneY) > 2) {
+      // contents lag behind a vertical move: pushed down when the phone goes up
+      const jolt = -phoneY * d;
+      w.items.forEach((it) => {
+        if (it.embedded && Math.abs(phoneY) < 8) return;
+        it.embedded = false;
+        it.vel.y += jolt * 0.35 * (it.kick ?? 1);
+      });
+      w.snowSystems.forEach(({ velocities, count, kicks, settles }) => {
+        for (let i = 0; i < count; i++) {
+          velocities[i * 3 + 1] += jolt * 0.45 * (kicks ? kicks[i] : 1);
+          if (settles && Math.abs(phoneY) > 6) settles[i] = Math.min(settles[i], 0.5);
+        }
+      });
+    }
 
     // inertia: contents feel the opposite of the globe's acceleration
     const velNow = (posX - w.prevPosX) / d;
@@ -757,4 +810,4 @@ function WobbleGroup({ world, children }) {
   return <group ref={ref}>{children}</group>;
 }
 
-export { Achievements, SnowSystem, SpinDriver, WobbleGroup };
+export { Achievements, SnowSystem, SpinDriver, WobbleGroup, puffSnow };
