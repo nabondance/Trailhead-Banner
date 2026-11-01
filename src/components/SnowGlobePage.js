@@ -201,7 +201,9 @@ export default function SnowGlobePage({
     if (touch && window.DeviceMotionEvent) setMotionState(motionPermissionNeeded() ? 'needs-permission' : 'on');
   }, []);
 
+  const lastShakeAt = useRef(0);
   const shake = (sway = true) => {
+    lastShakeAt.current = Date.now();
     setShakeSway(sway);
     setShakeNonce((n) => n + 1);
   };
@@ -318,11 +320,21 @@ export default function SnowGlobePage({
 
   const imageFileName = () => `snowglobe-${data.username}-${YEAR}.png`;
 
+  // Still images: if the snow has settled (no shake for a few seconds), stir
+  // it up first and wait for the flurry, so an image is never half empty.
+  // No sway, so the globe stays centered in the picture.
+  const stirForStill = async () => {
+    if (Date.now() - lastShakeAt.current < 2500) return;
+    shake(false);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  };
+
   const downloadImage = async () => {
     if (busy) return;
     setBusy('image');
     setActionStatus('');
     try {
+      await stirForStill();
       downloadBlob(await captureImage(), imageFileName());
       setActionStatus('Image saved ❄️');
     } catch {
@@ -363,6 +375,7 @@ export default function SnowGlobePage({
     setBusy('share');
     setActionStatus('');
     try {
+      await stirForStill();
       const blob = await captureImage();
       await openShareSheet(new File([blob], imageFileName(), { type: 'image/png' }));
     } catch {
