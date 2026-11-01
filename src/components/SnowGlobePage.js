@@ -310,15 +310,6 @@ export default function SnowGlobePage({ fallbackCount = null }) {
     }
   };
 
-  const copyPostText = async () => {
-    try {
-      await navigator.clipboard.writeText(postText());
-      setActionStatus('Post text copied — paste it into LinkedIn with your image.');
-    } catch {
-      setActionStatus('Could not copy the text, sorry.');
-    }
-  };
-
   const downloadVideo = async () => {
     const canvas = glRef.current?.gl?.domElement;
     if (!canvas || busy) return;
@@ -348,9 +339,11 @@ export default function SnowGlobePage({ fallbackCount = null }) {
         : 'Drag the globe sideways or press Shake to make it snow.';
 
   return (
-    <div className='page-container snowglobe-page'>
-      <h1>Your {YEAR} Trailhead Snow Globe</h1>
-      <p className='snowglobe-tagline'>Fill a snow globe with your achievements of {YEAR}, shake it, and share it.</p>
+    <div className='container snowglobe-page'>
+      <div className='snowglobe-header'>
+        <h1>Your {YEAR} Trailhead Snow Globe</h1>
+        <p className='snowglobe-tagline'>Fill a snow globe with your achievements of {YEAR}, shake it, and share it.</p>
+      </div>
       <GenerationCount
         ref={countRef}
         table='rewinds'
@@ -365,20 +358,23 @@ export default function SnowGlobePage({ fallbackCount = null }) {
       {webglOk === false ? (
         <WebGLHelpPanel onRetry={() => setWebglOk(detectWebGL())} />
       ) : (
-        <form className='snowglobe-form' onSubmit={loadGlobe}>
-          <input
-            aria-label='Trailhead username or profile URL'
-            className={`input snowglobe-input ${error ? 'input-error' : ''}`}
-            value={input}
-            onChange={handleInputChange}
-            placeholder='Trailhead username or profile URL'
-            autoComplete='off'
-            autoCapitalize='none'
-            spellCheck='false'
-            enterKeyHint='go'
-            data-lpignore='true'
-          />
-          <button type='submit' className='button snowglobe-submit' disabled={loading}>
+        // same form card as the home page: full-width input, big submit button
+        <form className='form' onSubmit={loadGlobe}>
+          <div className='input-container'>
+            <input
+              aria-label='Trailhead username or profile URL'
+              className={`input snowglobe-input ${error ? 'input-error' : ''}`}
+              value={input}
+              onChange={handleInputChange}
+              placeholder='Enter Trailhead username or profile URL'
+              autoComplete='off'
+              autoCapitalize='none'
+              spellCheck='false'
+              enterKeyHint='go'
+              data-lpignore='true'
+            />
+          </div>
+          <button type='submit' className='button submit-button' disabled={loading}>
             {loading ? 'Shoveling snow…' : data ? 'Let it snow again ❄️' : 'Let it snow ❄️'}
           </button>
         </form>
@@ -437,9 +433,6 @@ export default function SnowGlobePage({ fallbackCount = null }) {
                 {busy === 'video' ? 'Recording… 🔴' : 'Download video'}
               </button>
             )}
-            <button type='button' className='button snowglobe-secondary' onClick={copyPostText}>
-              Copy post text
-            </button>
           </div>
           {actionStatus && (
             <p className='snowglobe-status' role='status'>
