@@ -122,6 +122,34 @@ export default function SnowGlobeScene({
     });
   };
 
+  // Arrow keys move the globe like a held drag: ← / → push it to that side,
+  // releasing springs it back with the same snow puff as letting go of the
+  // mouse. Ignored while typing in a field.
+  const endDragRef = useRef(endDrag);
+  endDragRef.current = endDrag;
+  useEffect(() => {
+    const held = new Set();
+    const isTyping = (target) => target?.closest?.('input, textarea, select, [contenteditable="true"]');
+    const onKeyDown = (e) => {
+      if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || isTyping(e.target)) return;
+      e.preventDefault(); // no horizontal page scroll
+      held.add(e.key);
+      const w = world.current;
+      w.dragging = true;
+      w.dragTarget = e.key === 'ArrowLeft' ? -0.55 : 0.55;
+    };
+    const onKeyUp = (e) => {
+      if (!held.delete(e.key) || held.size) return;
+      endDragRef.current();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    };
+  }, []);
+
   return (
     <div
       // pan-y: vertical swipes still scroll the page on phones (the globe fills

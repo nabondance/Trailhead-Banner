@@ -331,7 +331,7 @@ export default function SnowGlobePage({ fallbackCount = null }) {
       ? 'Shake your phone, drag the globe or press Shake to make it snow.'
       : isTouch
         ? 'Swipe the globe sideways or press Shake to make it snow.'
-        : 'Drag the globe sideways or press Shake to make it snow.';
+        : 'Drag the globe sideways, use the ← → keys, or press Shake to make it snow.';
 
   return (
     <div className='container snowglobe-page'>
