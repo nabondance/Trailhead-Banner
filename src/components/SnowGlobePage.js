@@ -314,7 +314,7 @@ export default function SnowGlobePage({
         setActionStatus('Your image is ready — tap Share again.');
       } else {
         pendingShare.current = null;
-        setActionStatus('Sharing failed — use Download image instead.');
+        setActionStatus('Sharing failed, please try again.');
       }
     }
   };
@@ -331,7 +331,7 @@ export default function SnowGlobePage({
       const blob = await captureImage();
       await openShareSheet(new File([blob], imageFileName(), { type: 'image/png' }));
     } catch {
-      setActionStatus('Sharing failed — use Download image instead.');
+      setActionStatus('Sharing failed, please try again.');
     } finally {
       setBusy('');
     }
@@ -369,10 +369,14 @@ export default function SnowGlobePage({
 
   const hint =
     motionState === 'on'
-      ? 'Shake your phone, drag the globe, or press Shake to make it snow.'
+      ? 'Shake your phone, swipe the globe, or tap ❄️ to make it snow.'
       : isTouch
-        ? 'Swipe the globe sideways or press Shake to make it snow.'
-        : 'Drag the globe sideways, use the ← → keys, or press Shake to make it snow.';
+        ? 'Swipe the globe sideways or tap ❄️ to make it snow.'
+        : 'Drag the globe sideways, use the ← → keys, or click ❄️ to make it snow.';
+
+  // phones share the image through the share sheet (which can also save it);
+  // computers download it
+  const sharePrimary = shareOk && isTouch;
 
   return (
     <div className='container snowglobe-page'>
@@ -465,6 +469,10 @@ export default function SnowGlobePage({
                 glRef.current = gl;
               }}
             />
+            {/* on screen only: captures render the 3D scene, not this button */}
+            <button type='button' className='snowglobe-shake-button' onClick={shake} aria-label='Shake the globe'>
+              ❄️
+            </button>
           </div>
           <p className='snowglobe-hint'>
             {hint}
@@ -478,23 +486,21 @@ export default function SnowGlobePage({
             )}
           </p>
           <div className='snowglobe-actions'>
-            <button type='button' className='button' onClick={shake}>
-              Shake ❄️
-            </button>
-            {shareOk && (
+            {sharePrimary ? (
               <button type='button' className='button' onClick={shareImage} disabled={!!busy}>
                 {busy === 'share' ? 'Preparing…' : 'Share'}
               </button>
-            )}
-            <button type='button' className='button' onClick={downloadImage} disabled={!!busy}>
-              {busy === 'image' ? 'Saving…' : 'Download image'}
-            </button>
-            {videoOk && (
-              <button type='button' className='button' onClick={downloadVideo} disabled={!!busy}>
-                {busy === 'video' ? 'Recording… 🔴' : 'Download video'}
+            ) : (
+              <button type='button' className='button' onClick={downloadImage} disabled={!!busy}>
+                {busy === 'image' ? 'Saving…' : 'Download image'}
               </button>
             )}
-            <button type='button' className='button' onClick={copyLink}>
+            {videoOk && (
+              <button type='button' className='snowglobe-link-button' onClick={downloadVideo} disabled={!!busy}>
+                {busy === 'video' ? 'Recording… 🔴' : 'Video'}
+              </button>
+            )}
+            <button type='button' className='snowglobe-link-button' onClick={copyLink}>
               Copy link
             </button>
           </div>

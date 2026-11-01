@@ -2495,6 +2495,28 @@ select:focus {
   margin: 0 auto;
   border-radius: 12px;
   overflow: hidden;
+  position: relative;
+}
+
+/* round Shake button on the globe's bottom-left corner (the watermark pill
+   holds the bottom-right) */
+.snowglobe-shake-button {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 40%);
+}
+
+.snowglobe-shake-button:hover {
+  background: var(--secondary);
 }
 
 .snowglobe-placeholder {
@@ -2514,8 +2536,9 @@ select:focus {
 .snowglobe-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 10px 20px;
   justify-content: center;
+  align-items: center;
 }
 
 .snowglobe-make-own {
