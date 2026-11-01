@@ -64,7 +64,6 @@ function legendItems(data, year) {
         : `your first certification or stamp was in ${year}`,
   });
 
-  if (data.isMvp) items.push({ icon: '🏅', title: 'MVP rosette', text: 'Trailblazer MVP' });
   return items;
 }
 
