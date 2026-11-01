@@ -18,35 +18,26 @@ so the year counter just refetches its own count on each broadcast.
 ### Migration (run once in the Supabase SQL editor)
 
 ```sql
--- Count one Rewind edition (rewinds.year) in one environment.
--- Overload of generation_count(p_table, p_env); PostgREST picks it when
--- p_year is passed.
+-- Count one Rewind edition (rewinds.year) in one environment. Overload of
+-- generation_count(p_table, p_env), written in the same style; PostgREST
+-- picks it when p_year is passed. Other tables return null.
 create or replace function public.generation_count(p_table text, p_env text, p_year integer)
 returns bigint
-language plpgsql
+language sql
 stable
 security definer
-set search_path = public
-as $$
-declare
-  result bigint;
-begin
-  if p_table <> 'rewinds' then
-    raise exception 'generation_count: year filter is only supported for rewinds';
-  end if;
-  select count(*) into result
-  from public.rewinds
-  where source_env = p_env and year = p_year;
-  return result;
-end;
-$$;
+set search_path to ''
+as $function$
+  select case p_table
+    when 'rewinds' then (select count(*) from public.rewinds where source_env = p_env and year = p_year)
+  end;
+$function$;
 
 revoke all on function public.generation_count(text, text, integer) from public;
 grant execute on function public.generation_count(text, text, integer) to anon, authenticated, service_role;
 ```
 
-Check that `source_env` is the column the existing 2-argument function filters
-on; adjust the `where` clause if it differs.
+Test: `select public.generation_count('rewinds', 'development', 2026);`
 
 Until the migration runs, the year counter's fetch fails and the page shows
 the deploy-time fallback (also null), so the counter line stays at 0.
