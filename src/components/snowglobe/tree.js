@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import { getRankMetals } from './rankMetals';
+import { useRingEnvMap } from './scenery';
 
 const TIERS = [
   // [bottom y, height, radius] of each cone, from the bottom up
@@ -61,24 +62,26 @@ function makeTierGeometry(height, radius, seed) {
   return geo;
 }
 
+/* A faceted 3D star, like a tree topper: five points around a raised center
+   on both faces, so every facet catches the light differently as it turns */
 function makeStarGeometry() {
-  const shape = new THREE.Shape();
+  const points = [];
   for (let i = 0; i < 10; i++) {
-    const r = i % 2 ? 0.045 : 0.11;
+    const r = i % 2 ? 0.055 : 0.13;
     const a = (i / 10) * Math.PI * 2 + Math.PI / 2;
-    const x = Math.cos(a) * r;
-    const y = Math.sin(a) * r;
-    if (i) shape.lineTo(x, y);
-    else shape.moveTo(x, y);
+    points.push([Math.cos(a) * r, Math.sin(a) * r, 0]);
   }
-  shape.closePath();
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.035,
-    bevelEnabled: true,
-    bevelSize: 0.01,
-    bevelThickness: 0.01,
-  });
-  geo.center();
+  const front = [0, 0, 0.05];
+  const back = [0, 0, -0.05];
+  const vertices = [];
+  for (let i = 0; i < 10; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % 10];
+    vertices.push(...front, ...a, ...b, ...back, ...b, ...a);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geo.computeVertexNormals();
   return geo;
 }
 
@@ -104,6 +107,9 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
     [tiers, star]
   );
   const metal = useMemo(() => getRankMetals(rankTitle)[0], [rankTitle]);
+  // polished metal needs something to reflect: the same room map as the ring
+  const envMap = useRingEnvMap();
+  const starRef = useRef();
 
   const [x, z] = position;
   const baseY = floor.surfaceY(x, z) - 0.12; // planted a little into the snow
@@ -127,6 +133,8 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
       // a faint breathing so the tree never looks frozen in place
       swayRef.current.rotation.x = s.angleX + Math.sin(clock.elapsedTime * 0.7) * 0.006;
     }
+    // the star turns slowly on itself, so its facets glint
+    if (starRef.current) starRef.current.rotation.y = clock.elapsedTime * 0.6;
     // the tree bends: each tier leans a little more than the one below, and
     // lags a touch, so the top whips after the trunk
     tierRefs.current.forEach((tier, i) => {
@@ -153,13 +161,14 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
         ))}
         {/* the star follows the top tier's bend */}
         <group ref={(el) => (tierRefs.current[TIERS.length] = el)}>
-          <mesh position={[0, TOP_Y, 0]} geometry={star}>
+          <mesh ref={starRef} position={[0, TOP_Y, 0]} geometry={star}>
             <meshStandardMaterial
               color={metal.color}
-              metalness={0.6}
-              roughness={0.3}
-              emissive={metal.color}
-              emissiveIntensity={0.35}
+              metalness={1}
+              roughness={0.18}
+              envMap={envMap}
+              envMapIntensity={1.3}
+              flatShading
             />
           </mesh>
         </group>
