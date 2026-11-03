@@ -784,6 +784,7 @@ function WobbleGroup({ world, children }) {
     const impulse = THREE.MathUtils.clamp(-(velNow - w.prevVelX) * 0.85, -1.2, 1.2);
     w.prevPosX = posX;
     w.prevVelX = velNow;
+    w.lastImpulse = impulse; // read by the quiet-year fir tree (tree.js)
     if (Math.abs(impulse) > 0.001) {
       w.items.forEach((it) => {
         if (it.embedded) {

@@ -9,6 +9,7 @@ import { makeBigFlakeTexture, makeFlakeTexture, makePowderTexture } from './snow
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
+import { FirTree } from './snowglobe/tree';
 import { Achievements, SnowSystem, SpinDriver, WobbleGroup, puffSnow } from './snowglobe/physics';
 
 export default function SnowGlobeScene({
@@ -255,6 +256,8 @@ export default function SnowGlobeScene({
               year={year}
             />
             <Achievements world={world} achievements={tumblingItems} floor={floor} />
+            {/* a quiet year (nothing from 2026): a snowy fir keeps the globe company */}
+            {!achievements?.length && <FirTree world={world} floor={floor} rankTitle={rank?.title} />}
             {/* Two visual layers (300 to 1,000 particles, from the badge
                 count): defined flakes carry the foreground while softer
                 powder adds depth. */}
