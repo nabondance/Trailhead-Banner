@@ -35,7 +35,7 @@ function legendItems(data, year) {
   items.push({
     icon: '❄️',
     title: SNOW_NAMES[data.agentblazerTitle] || 'Classic white snow',
-    text: data.agentblazerTitle ? `Agentblazer ${data.agentblazerTitle} in ${year}` : `no Agentblazer rank in ${year}`,
+    text: data.agentblazerTitle ? `Agentblazer ${data.agentblazerTitle} in ${year}` : null,
   });
 
   if (Number.isFinite(data.stats?.badges)) {
@@ -89,7 +89,8 @@ export default function GlobeLegend({ data, year }) {
               {item.icon}
             </span>
             <span>
-              <strong>{item.title}</strong>: {item.text}
+              <strong>{item.title}</strong>
+              {item.text && `: ${item.text}`}
             </span>
           </li>
         ))}
