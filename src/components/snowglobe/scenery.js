@@ -248,6 +248,31 @@ function GlobeShell({ world, floor, sparkles, activity }) {
 
   const highlightTex = useMemo(() => makeHighlightTexture(), []);
   const envMap = useRingEnvMap();
+  const glassMaterial = useMemo(() => {
+    const material = new THREE.MeshPhysicalMaterial({
+      color: '#000000',
+      roughness: 0.2,
+      metalness: 0,
+      ior: 1.5,
+      envMap,
+      envMapIntensity: 0.14,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    // glassEdgeOnly: scale the reflection by how side-on the glass is seen,
+    // so the room's light spots vanish from the middle of the globe
+    material.onBeforeCompile = (shader) => {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <dithering_fragment>',
+        `float edge = 1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0);
+        gl_FragColor.rgb *= pow(edge, 2.5);
+        #include <dithering_fragment>`
+      );
+    };
+    return material;
+  }, [envMap]);
+  useEffect(() => () => glassMaterial.dispose(), [glassMaterial]);
   const rimUniforms = useMemo(() => ({ uColor: { value: new THREE.Color('#d8efff') } }), []);
 
   useEffect(() => () => highlightTex.dispose(), [highlightTex]);
@@ -255,21 +280,11 @@ function GlobeShell({ world, floor, sparkles, activity }) {
   return (
     <group position={[0, CENTER_Y, 0]}>
       {/* Glass = a faint reflection added on top of the scene (no haze): a
-          soft studio room mirrored with real glass Fresnel, almost nothing
-          through the middle, a gentle sheen toward the edges */}
-      <mesh renderOrder={10}>
+          soft studio room mirrored on the glass, faded out toward the middle
+          (glassEdgeOnly) so only the edges shine and the center, where the
+          northern lights are, stays clear */}
+      <mesh renderOrder={10} material={glassMaterial}>
         <sphereGeometry args={[GLOBE_RADIUS + 0.02, 64, 64]} />
-        <meshPhysicalMaterial
-          color='#000000'
-          roughness={0.32}
-          metalness={0}
-          ior={1.5}
-          envMap={envMap}
-          envMapIntensity={0.08}
-          transparent
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
       </mesh>
       {/* Fresnel rim: clear through the center, reflective at glancing angles */}
       <mesh renderOrder={9}>
