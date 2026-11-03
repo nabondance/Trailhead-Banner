@@ -36,7 +36,7 @@ const GLASS_RIM_FRAGMENT = /* glsl */ `
   void main() {
     // a thin, crisp bright edge where the glass is seen side-on
     float rim = pow(1.0 - clamp(dot(vNormal, vViewDirection), 0.0, 1.0), 6.0);
-    gl_FragColor = vec4(uColor, rim * 0.55);
+    gl_FragColor = vec4(uColor, rim * 0.4);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
@@ -262,11 +262,11 @@ function GlobeShell({ world, floor, sparkles, activity }) {
         <sphereGeometry args={[GLOBE_RADIUS - 0.01, 64, 64]} />
         <meshPhysicalMaterial
           color='#000000'
-          roughness={0.08}
+          roughness={0.25}
           metalness={0}
           ior={1.5}
           envMap={envMap}
-          envMapIntensity={0.22}
+          envMapIntensity={0.1}
           side={THREE.BackSide}
           transparent
           blending={THREE.AdditiveBlending}
@@ -277,11 +277,11 @@ function GlobeShell({ world, floor, sparkles, activity }) {
         <sphereGeometry args={[GLOBE_RADIUS + 0.02, 64, 64]} />
         <meshPhysicalMaterial
           color='#000000'
-          roughness={0.04}
+          roughness={0.16}
           metalness={0}
           ior={1.5}
           envMap={envMap}
-          envMapIntensity={0.85}
+          envMapIntensity={0.5}
           transparent
           blending={THREE.AdditiveBlending}
           depthWrite={false}
