@@ -1,10 +1,9 @@
 'use client';
 
-/* A snowy fir tree for a quiet year: shown only when the API returns no 2026
-   item at all (no certification, stamp or Agentblazer rank), so the globe
-   still has a centerpiece. It sways when the globe is shaken, the snow on its
-   branches slides off, then slowly builds up again. The star on top is in
-   the rank's ring metal. */
+/* A fir tree for a quiet year: shown only when the API returns no 2026 item
+   at all (no certification, stamp or Agentblazer rank), so the globe still
+   has a centerpiece. It bends and swings when the globe is shaken, the top
+   more than the foot. The star on top is in the rank's ring metal. */
 
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
@@ -20,40 +19,45 @@ const TIERS = [
 ];
 const TOP_Y = 1.44;
 
+const GREEN = new THREE.Color('#24533a');
+const GREEN_DARK = new THREE.Color('#1b4430');
+const BRANCHES = 7; // branch tips around each tier
+
+const hash = (n) => {
+  const v = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+  return v - Math.floor(v);
+};
+
 /* A cone with a ragged hem and slightly uneven sides, so it reads as
-   branches rather than a party hat */
+   branches rather than a party hat. Non-indexed so every facet gets its own
+   shade of green, like light catching separate branches. */
 function makeTierGeometry(height, radius, seed) {
-  const geo = new THREE.ConeGeometry(radius, height, 14, 3, true);
-  const pos = geo.attributes.position;
+  const cone = new THREE.ConeGeometry(radius, height, 28, 5, true);
+  const pos = cone.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const y = pos.getY(i);
     const z = pos.getZ(i);
     const angle = Math.atan2(z, x);
     const t = (height / 2 - y) / height; // 0 at the tip, 1 at the hem
-    const ragged = 1 + 0.12 * Math.sin(angle * 7 + seed) * t + 0.06 * Math.sin(angle * 13 - seed * 2) * t;
+    const ragged = 1 + 0.12 * Math.sin(angle * BRANCHES + seed) * t + 0.06 * Math.sin(angle * 13 - seed * 2) * t;
     pos.setX(i, x * ragged);
     pos.setZ(i, z * ragged);
     // the hem droops between branch tips
-    if (t > 0.95) pos.setY(i, y - 0.05 * (1 + Math.sin(angle * 7 + seed)));
+    if (t > 0.95) pos.setY(i, y - 0.05 * (1 + Math.sin(angle * BRANCHES + seed)));
   }
+  const geo = cone.toNonIndexed();
+  cone.dispose();
   geo.computeVertexNormals();
-  return geo;
-}
-
-/* Snow lying on a tier: a thinner, lighter shell over its upper part */
-function makeSnowCapGeometry(height, radius, seed) {
-  const geo = new THREE.ConeGeometry(radius * 0.86, height * 0.62, 14, 2, true);
-  const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const z = pos.getZ(i);
-    const angle = Math.atan2(z, x);
-    const lumpy = 1 + 0.1 * Math.sin(angle * 5 + seed * 3);
-    pos.setX(i, x * lumpy);
-    pos.setZ(i, z * lumpy);
+  const p = geo.attributes.position;
+  const faces = p.count / 3;
+  const colors = new Float32Array(p.count * 3);
+  const shade = new THREE.Color();
+  for (let f = 0; f < faces; f++) {
+    shade.copy(GREEN).lerp(GREEN_DARK, hash(f * 3.1 + seed) * 0.7);
+    for (let k = 0; k < 3; k++) colors.set([shade.r, shade.g, shade.b], (f * 3 + k) * 3);
   }
-  geo.computeVertexNormals();
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   return geo;
 }
 
@@ -80,26 +84,21 @@ function makeStarGeometry() {
 
 function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
   const swayRef = useRef();
-  const capsRef = useRef([]);
-  const state = useRef({ angleX: 0, angleZ: 0, velX: 0, velZ: 0, snow: 1 });
+  const tierRefs = useRef([]);
+  const state = useRef({ angleX: 0, angleZ: 0, velX: 0, velZ: 0 });
 
   const tiers = useMemo(
     () =>
       TIERS.map(([y, h, r], i) => ({
         y: y + h / 2,
-        capY: y + h * 0.69,
         tier: makeTierGeometry(h, r, i * 1.7),
-        cap: makeSnowCapGeometry(h, r, i * 1.7),
       })),
     []
   );
   const star = useMemo(() => makeStarGeometry(), []);
   useEffect(
     () => () => {
-      tiers.forEach((t) => {
-        t.tier.dispose();
-        t.cap.dispose();
-      });
+      tiers.forEach((t) => t.tier.dispose());
       star.dispose();
     },
     [tiers, star]
@@ -113,25 +112,24 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
     const w = world.current;
     const s = state.current;
     const d = Math.min(dt, 0.05);
-    // the globe's sideways jolts (WobbleGroup) push the top the other way;
-    // a spring brings it back with a few damped swings
+    // the globe's sideways jolts (WobbleGroup) push the top the other way; a
+    // loose spring brings it back with several swings
     const push = w.lastImpulse || 0;
-    s.velZ += (push * 9 - s.angleZ * 38) * d - s.velZ * 3.2 * d;
-    s.angleZ += s.velZ * d;
-    s.velX += -s.angleX * 38 * d - s.velX * 3.2 * d;
+    s.velZ += (push * 110 - s.angleZ * 30) * d - s.velZ * 2.2 * d;
+    s.angleZ = THREE.MathUtils.clamp(s.angleZ + s.velZ * d, -0.4, 0.4);
+    s.velX += -s.angleX * 30 * d - s.velX * 2.2 * d;
     s.angleX += s.velX * d;
-    // hard jolts knock the snow off the branches; it builds up again slowly
-    if (Math.abs(push) > 0.25) s.snow = Math.max(0, s.snow - Math.abs(push) * d * 6);
-    else s.snow = Math.min(1, s.snow + d * 0.06);
     if (swayRef.current) {
-      swayRef.current.rotation.z = THREE.MathUtils.clamp(s.angleZ, -0.25, 0.25);
+      swayRef.current.rotation.z = s.angleZ * 0.6;
       // a faint breathing so the tree never looks frozen in place
       swayRef.current.rotation.x = s.angleX + Math.sin(clock.elapsedTime * 0.7) * 0.006;
     }
-    capsRef.current.forEach((cap) => {
-      if (!cap) return;
-      cap.visible = s.snow > 0.03;
-      cap.scale.set(0.9 + 0.1 * s.snow, 0.35 + 0.65 * s.snow, 0.9 + 0.1 * s.snow);
+    // the tree bends: each tier leans a little more than the one below, and
+    // lags a touch, so the top whips after the trunk
+    tierRefs.current.forEach((tier, i) => {
+      if (!tier) return;
+      const target = s.angleZ * 0.12 * (i + 1);
+      tier.rotation.z += (target - tier.rotation.z) * Math.min(1, d * (14 - i * 2));
     });
   });
 
@@ -144,24 +142,24 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
           <meshStandardMaterial color='#4a2e1c' roughness={0.9} />
         </mesh>
         {tiers.map((t, i) => (
-          <group key={i}>
+          <group key={i} ref={(el) => (tierRefs.current[i] = el)}>
             <mesh position={[0, t.y, 0]} geometry={t.tier}>
-              <meshStandardMaterial color='#24533a' roughness={0.85} flatShading side={THREE.DoubleSide} />
-            </mesh>
-            <mesh ref={(el) => (capsRef.current[i] = el)} position={[0, t.capY, 0]} geometry={t.cap}>
-              <meshStandardMaterial color='#f4f8ff' roughness={0.75} flatShading side={THREE.DoubleSide} />
+              <meshStandardMaterial vertexColors roughness={0.85} flatShading side={THREE.DoubleSide} />
             </mesh>
           </group>
         ))}
-        <mesh position={[0, TOP_Y, 0]} geometry={star}>
-          <meshStandardMaterial
-            color={metal.color}
-            metalness={0.6}
-            roughness={0.3}
-            emissive={metal.color}
-            emissiveIntensity={0.35}
-          />
-        </mesh>
+        {/* the star follows the top tier's bend */}
+        <group ref={(el) => (tierRefs.current[TIERS.length] = el)}>
+          <mesh position={[0, TOP_Y, 0]} geometry={star}>
+            <meshStandardMaterial
+              color={metal.color}
+              metalness={0.6}
+              roughness={0.3}
+              emissive={metal.color}
+              emissiveIntensity={0.35}
+            />
+          </mesh>
+        </group>
       </group>
     </group>
   );
