@@ -64,12 +64,9 @@ function legendItems(data, year) {
     });
   }
 
+  // no line when there are no northern lights (no activity that year)
   const months = activeMonths(data.activity);
-  items.push({
-    icon: '🌌',
-    title: 'Northern lights',
-    text: months.length ? `active in ${months.join(', ')}` : `none, no ${year} activity yet`,
-  });
+  if (months.length) items.push({ icon: '🌌', title: 'Northern lights', text: `active in ${months.join(', ')}` });
 
   items.push({
     icon: '🪵',
