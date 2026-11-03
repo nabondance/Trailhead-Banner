@@ -32,11 +32,15 @@ function legendItems(data, year) {
     items.push({ icon: '🌲', title: 'Fir tree', text: `a quiet ${year}, no certification or stamp yet` });
   }
 
-  items.push({
-    icon: '❄️',
-    title: SNOW_NAMES[data.agentblazerTitle] || 'Classic white snow',
-    text: data.agentblazerTitle ? `Agentblazer ${data.agentblazerTitle} in ${year}` : null,
-  });
+  // snow kind: only when the Agentblazer rank changed it (classic white snow
+  // says nothing)
+  if (data.agentblazerTitle) {
+    items.push({
+      icon: '❄️',
+      title: SNOW_NAMES[data.agentblazerTitle] || 'Classic white snow',
+      text: `Agentblazer ${data.agentblazerTitle} in ${year}`,
+    });
+  }
 
   if (Number.isFinite(data.stats?.badges)) {
     const badges = data.stats.badges;
