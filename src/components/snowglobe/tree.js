@@ -113,9 +113,12 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
     const s = state.current;
     const d = Math.min(dt, 0.05);
     // the globe's sideways jolts (WobbleGroup) push the top the other way; a
-    // loose spring brings it back with several swings
-    const push = w.lastImpulse || 0;
-    s.velZ += (push * 110 - s.angleZ * 30) * d - s.velZ * 2.2 * d;
+    // spring brings it back with a few swings. Small jolts (the globe
+    // following a held drag step by step) are ignored, so holding the globe
+    // to one side leaves the tree still and only real moves and shakes swing it.
+    const raw = w.lastImpulse || 0;
+    const push = Math.sign(raw) * Math.max(0, Math.abs(raw) - 0.03);
+    s.velZ += (push * 85 - s.angleZ * 30) * d - s.velZ * 3.2 * d;
     s.angleZ = THREE.MathUtils.clamp(s.angleZ + s.velZ * d, -0.4, 0.4);
     s.velX += -s.angleX * 30 * d - s.velX * 2.2 * d;
     s.angleX += s.velX * d;
