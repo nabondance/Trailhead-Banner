@@ -109,7 +109,6 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
   const metal = useMemo(() => getRankMetals(rankTitle)[0], [rankTitle]);
   // polished metal needs something to reflect: the same room map as the ring
   const envMap = useRingEnvMap();
-  const starRef = useRef();
 
   const [x, z] = position;
   const baseY = floor.surfaceY(x, z) - 0.12; // planted a little into the snow
@@ -133,8 +132,6 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
       // a faint breathing so the tree never looks frozen in place
       swayRef.current.rotation.x = s.angleX + Math.sin(clock.elapsedTime * 0.7) * 0.006;
     }
-    // the star turns slowly on itself, so its facets glint
-    if (starRef.current) starRef.current.rotation.y = clock.elapsedTime * 0.6;
     // the tree bends: each tier leans a little more than the one below, and
     // lags a touch, so the top whips after the trunk
     tierRefs.current.forEach((tier, i) => {
@@ -161,7 +158,7 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
         ))}
         {/* the star follows the top tier's bend */}
         <group ref={(el) => (tierRefs.current[TIERS.length] = el)}>
-          <mesh ref={starRef} position={[0, TOP_Y, 0]} geometry={star}>
+          <mesh position={[0, TOP_Y, 0]} geometry={star}>
             <meshStandardMaterial
               color={metal.color}
               metalness={1}
