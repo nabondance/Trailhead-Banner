@@ -2553,6 +2553,11 @@ select:focus {
   text-decoration: none;
 }
 
+/* room around the label: the shared submit button only has 10px */
+.snowglobe-make-own .submit-button {
+  padding: 12px 36px;
+}
+
 /* image / video / link actions under the globe: one rounded bar split
    into equal parts */
 .snowglobe-segments {
