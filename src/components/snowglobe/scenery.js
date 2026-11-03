@@ -34,8 +34,9 @@ const GLASS_RIM_FRAGMENT = /* glsl */ `
   varying vec3 vNormal;
   varying vec3 vViewDirection;
   void main() {
-    float rim = pow(1.0 - clamp(dot(vNormal, vViewDirection), 0.0, 1.0), 2.35);
-    gl_FragColor = vec4(uColor, rim * 0.2);
+    // a thin, crisp bright edge where the glass is seen side-on
+    float rim = pow(1.0 - clamp(dot(vNormal, vViewDirection), 0.0, 1.0), 6.0);
+    gl_FragColor = vec4(uColor, rim * 0.55);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
@@ -246,20 +247,43 @@ function GlobeShell({ world, floor, sparkles, activity }) {
   });
 
   const highlightTex = useMemo(() => makeHighlightTexture(), []);
+  const envMap = useRingEnvMap();
   const rimUniforms = useMemo(() => ({ uColor: { value: new THREE.Color('#d8efff') } }), []);
 
   useEffect(() => () => highlightTex.dispose(), [highlightTex]);
 
   return (
     <group position={[0, CENTER_Y, 0]}>
+      {/* Glass = reflections only, added on top of the scene (no haze): a
+          soft studio room mirrored with real glass Fresnel, faint through the
+          middle and strong toward the edges. The far wall's inside reflects
+          too, more faintly, which gives the glass its thickness. */}
+      <mesh renderOrder={8}>
+        <sphereGeometry args={[GLOBE_RADIUS - 0.01, 64, 64]} />
+        <meshPhysicalMaterial
+          color='#000000'
+          roughness={0.08}
+          metalness={0}
+          ior={1.5}
+          envMap={envMap}
+          envMapIntensity={0.22}
+          side={THREE.BackSide}
+          transparent
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
       <mesh renderOrder={10}>
         <sphereGeometry args={[GLOBE_RADIUS + 0.02, 64, 64]} />
-        <meshPhongMaterial
-          color='#cfe8ff'
+        <meshPhysicalMaterial
+          color='#000000'
+          roughness={0.04}
+          metalness={0}
+          ior={1.5}
+          envMap={envMap}
+          envMapIntensity={0.85}
           transparent
-          opacity={0.035}
-          shininess={180}
-          specular='#ffffff'
+          blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </mesh>
