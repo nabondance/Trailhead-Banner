@@ -154,21 +154,21 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
             <mesh position={[0, t.y, 0]} geometry={t.tier}>
               <meshStandardMaterial vertexColors roughness={0.85} flatShading side={THREE.DoubleSide} />
             </mesh>
+            {/* the star sits on the top tier, fixed to it */}
+            {i === TIERS.length - 1 && (
+              <mesh position={[0, TOP_Y, 0]} geometry={star}>
+                <meshStandardMaterial
+                  color={metal.color}
+                  metalness={1}
+                  roughness={0.18}
+                  envMap={envMap}
+                  envMapIntensity={1.3}
+                  flatShading
+                />
+              </mesh>
+            )}
           </group>
         ))}
-        {/* the star follows the top tier's bend */}
-        <group ref={(el) => (tierRefs.current[TIERS.length] = el)}>
-          <mesh position={[0, TOP_Y, 0]} geometry={star}>
-            <meshStandardMaterial
-              color={metal.color}
-              metalness={1}
-              roughness={0.18}
-              envMap={envMap}
-              envMapIntensity={1.3}
-              flatShading
-            />
-          </mesh>
-        </group>
       </group>
     </group>
   );
