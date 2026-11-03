@@ -29,7 +29,7 @@ function legendItems(data, year) {
   const items = [];
 
   if (!data.achievements?.length) {
-    items.push({ icon: '🌲', title: 'Fir tree', text: `a quiet ${year}, the globe waits for your next badge` });
+    items.push({ icon: '🌲', title: 'Fir tree', text: `a quiet ${year}, no certification or stamp yet` });
   }
 
   items.push({
