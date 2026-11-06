@@ -32,12 +32,16 @@ const smoothstep = (e0, e1, x) => {
    Trailhead rank, so the globe fills up as they near it (1 = All Star
    Ranger). The mesh, the glints and the physics all read this same object,
    so flakes and badges land exactly on the visible surface. */
+// full snow stays shallow enough to leave the items in view
+const MAX_SNOW_DEPTH = 0.6;
+
 function makeSnowFloor(level = 0.45) {
   const l = Math.min(Math.max(Number.isFinite(level) ? level : 0.45, 0), 1);
-  const centerY = GLASS_SEAT_Y + 0.06 + l * 0.36;
+  const depth = l * MAX_SNOW_DEPTH;
+  const centerY = GLASS_SEAT_Y + 0.06 + depth * 0.36;
   const rx = glassRadiusAt(centerY) - 0.03;
-  const ry = GLOBE_RADIUS * 0.96 * 0.18 * (0.6 + l * 0.65);
-  const bankHeight = 0.26 * (0.55 + l * 0.7);
+  const ry = GLOBE_RADIUS * 0.96 * 0.18 * (0.6 + depth * 0.65);
+  const bankHeight = 0.26 * (0.55 + depth * 0.7);
 
   /* Extra snow height at relative distance t (0 center → 1 rim), varying
      around the globe so the bank reads as drifts, not an even ring */
