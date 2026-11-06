@@ -11,7 +11,7 @@ import GlobeLegend from './snowglobe/GlobeLegend';
 
 const SnowGlobeScene = dynamic(() => import('./SnowGlobeScene'), {
   ssr: false,
-  loading: () => <div className='snowglobe-placeholder'>Building your globe…</div>,
+  loading: () => <div className='snowglobe-placeholder'>Building the globe…</div>,
 });
 
 const YEAR = 2026;
@@ -538,9 +538,12 @@ export default function SnowGlobePage({
 
       {loading && (
         <div className='loading-container'>
-          <p>
-            Packing {isLink ? `${linkUsername}'s` : 'your'} {YEAR} into a snow globe…
-          </p>
+          {/* the form's button already says it is working */}
+          {isLink && (
+            <p>
+              Packing {linkUsername}&apos;s {YEAR} into a snow globe…
+            </p>
+          )}
           <div className='loading-icon'></div>
         </div>
       )}
