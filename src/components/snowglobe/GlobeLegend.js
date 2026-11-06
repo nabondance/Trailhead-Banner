@@ -19,6 +19,13 @@ function activeMonths(activity) {
   return SHORT_MONTHS.filter((_, i) => (activity?.certifications?.[i] || 0) + (activity?.stamps?.[i] || 0) > 0);
 }
 
+// what lit the sky: only the kinds earned that year
+function activityKinds(activity) {
+  const has = (list) => (list || []).some((n) => n > 0);
+  const kinds = [has(activity?.certifications) && 'certifications', has(activity?.stamps) && 'stamps'];
+  return kinds.filter(Boolean).join(' and ');
+}
+
 function bigFlakeText(superbadges) {
   if (!Number.isFinite(superbadges) || superbadges < 1) return '';
   return ` · ${superbadges} superbadge${superbadges === 1 ? '' : 's'}`;
@@ -68,15 +75,24 @@ function legendItems(data, year) {
     });
   }
 
-  // no line when there are no northern lights (no activity that year)
+  // no line when there are no northern lights (no certification or stamp that year)
   const months = activeMonths(data.activity);
-  if (months.length) items.push({ icon: '🌌', title: 'Northern lights', text: `active in ${months.join(', ')}` });
+  if (months.length) {
+    items.push({
+      icon: '🌌',
+      title: 'Northern lights',
+      text: `${activityKinds(data.activity)} in ${months.join(', ')}`,
+    });
+  }
 
-  items.push({
-    icon: '🪵',
-    title: 'Wood rings',
-    text: 'the age of your account',
-  });
+  // rings count the years since the first dated achievement (profiles show no join date)
+  if (data.firstAchievementYear) {
+    items.push({
+      icon: '🪵',
+      title: 'Wood rings',
+      text: `years since your first certification or stamp, in ${data.firstAchievementYear}`,
+    });
+  }
 
   return items;
 }
