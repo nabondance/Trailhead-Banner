@@ -85,7 +85,13 @@ function makeStarGeometry() {
   return geo;
 }
 
-function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
+// where the tree stands (x, z) and how far its branches reach: the tumbling
+// rank emblem keeps out of this footprint, in front of the tree (physics.js)
+const TREE_POSITION = [-0.7, -0.25];
+const TREE_SCALE = 1.3;
+const TREE_FOOTPRINT = { x: TREE_POSITION[0], z: TREE_POSITION[1], radius: TIERS[0][2] * 1.12 * TREE_SCALE };
+
+function FirTree({ world, floor, rankTitle, position = TREE_POSITION }) {
   const swayRef = useRef();
   const tierRefs = useRef([]);
   const state = useRef({ angleX: 0, angleZ: 0, velX: 0, velZ: 0 });
@@ -142,7 +148,7 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
   });
 
   return (
-    <group position={[x, baseY, z]} scale={1.3}>
+    <group position={[x, baseY, z]} scale={TREE_SCALE}>
       {/* sway pivots at the trunk's foot */}
       <group ref={swayRef}>
         <mesh position={[0, 0.12, 0]}>
@@ -174,4 +180,4 @@ function FirTree({ world, floor, rankTitle, position = [-0.7, -0.25] }) {
   );
 }
 
-export { FirTree };
+export { FirTree, TREE_FOOTPRINT };

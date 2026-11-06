@@ -68,7 +68,22 @@ function spreadAchievementCollisions(items) {
 }
 
 /* Certs and stamps tumbling inside the globe */
-function Achievements({ world, achievements, floor }) {
+/* Keep an item out of a standing obstacle (the quiet-year fir): anywhere
+   within its reach sideways, the item moves forward (toward the camera, +z)
+   to just in front of it, so it is never hidden behind it. Reaching a full
+   half-width past the obstacle keeps the whole flat sprite in front, edges
+   included. Airborne items ease forward; a landing snaps to the spot. */
+function keepInFront(it, keepOut, ease) {
+  const dx = it.pos.x - keepOut.x;
+  const reach = keepOut.radius + it.r * Math.max(1, it.aspect);
+  if (Math.abs(dx) >= reach) return;
+  const frontZ = keepOut.z + Math.sqrt(reach * reach - dx * dx);
+  if (it.pos.z >= frontZ) return;
+  it.pos.z += (frontZ - it.pos.z) * ease;
+  if (it.vel.z < 0) it.vel.z = 0;
+}
+
+function Achievements({ world, achievements, floor, keepOut = null }) {
   const [items, setItems] = useState(null);
   const spritesRef = useRef([]);
   const shadowsRef = useRef([]);
@@ -190,9 +205,9 @@ function Achievements({ world, achievements, floor }) {
 
     spreadAchievementCollisions(items);
 
-    items.forEach((it, i) => {
-      // Collision correction can nudge the lower badge into the snow or an
-      // outer badge past the glass. Re-apply the visible resting bounds once.
+    /* Collision correction can nudge the lower badge into the snow or an
+       outer badge past the glass: re-apply the visible resting bounds */
+    const applyBounds = (it) => {
       const floorY = floor.surfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
       if (it.pos.y < floorY) it.pos.y = floorY;
 
@@ -214,6 +229,21 @@ function Achievements({ world, achievements, floor }) {
       }
       const correctedFloorY = floor.surfaceY(it.pos.x, it.pos.z) + it.r * 0.45;
       if (it.landedThisFrame || it.pos.y < correctedFloorY) it.pos.y = correctedFloorY;
+    };
+
+    items.forEach((it, i) => {
+      if (keepOut && it.landedThisFrame) {
+        // the glass can squeeze a spot in front of the tree back behind it:
+        // alternate both rules so the item settles where they agree, which
+        // drifts it toward the middle of the globe
+        for (let k = 0; k < 6; k++) {
+          keepInFront(it, keepOut, 1);
+          applyBounds(it);
+        }
+      } else {
+        if (keepOut && !it.embedded) keepInFront(it, keepOut, Math.min(1, d * 8));
+        applyBounds(it);
+      }
 
       // Resolve the impact collision once, then let the snow hold the item in
       // its final position permanently. Later shakes and inertia skip it.

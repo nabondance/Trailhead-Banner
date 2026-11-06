@@ -9,7 +9,7 @@ import { makeBigFlakeTexture, makeFlakeTexture, makePowderTexture } from './snow
 import { SceneBackdrop } from './snowglobe/SceneBackdrop';
 import { SnapshotHelper, CameraFitter } from './snowglobe/capture';
 import { GlobeShell, Base } from './snowglobe/scenery';
-import { FirTree } from './snowglobe/tree';
+import { FirTree, TREE_FOOTPRINT } from './snowglobe/tree';
 import { Achievements, SnowSystem, SpinDriver, WobbleGroup, puffSnow } from './snowglobe/physics';
 
 export default function SnowGlobeScene({
@@ -43,6 +43,7 @@ export default function SnowGlobeScene({
   // supersample 1.5× beyond the display's pixel ratio (capped) for a crisper globe
   const dpr = Math.min(window.devicePixelRatio * 1.5, 3);
   // the rank emblem tumbles with the achievements (the base now carries the username)
+  const quietYear = !achievements?.length;
   const tumblingItems = useMemo(() => {
     const list = [...(achievements || [])];
     if (rank?.logoUrl) list.push({ type: 'rank', name: rank.title || 'Rank', logoUrl: rank.logoUrl, folder: 'images' });
@@ -255,9 +256,15 @@ export default function SnowGlobeScene({
               stats={stats}
               year={year}
             />
-            <Achievements world={world} achievements={tumblingItems} floor={floor} />
-            {/* a quiet year (nothing from 2026): a snowy fir keeps the globe company */}
-            {!achievements?.length && <FirTree world={world} floor={floor} rankTitle={rank?.title} />}
+            {/* a quiet year (nothing from 2026): a fir keeps the globe company,
+                and the rank emblem settles in front of it */}
+            <Achievements
+              world={world}
+              achievements={tumblingItems}
+              floor={floor}
+              keepOut={quietYear ? TREE_FOOTPRINT : null}
+            />
+            {quietYear && <FirTree world={world} floor={floor} rankTitle={rank?.title} />}
             {/* Two visual layers (300 to 1,000 particles, from the badge
                 count): defined flakes carry the foreground while softer
                 powder adds depth. */}
