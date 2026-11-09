@@ -197,7 +197,6 @@ class SupabaseUtils {
             dateCompleted: cert.dateCompleted,
             dateExpired: cert.dateExpired,
             status: cert.status.title,
-            logoUrl: cert.logoUrl,
             product: cert.product,
           })) || [],
       },
@@ -211,7 +210,6 @@ class SupabaseUtils {
                     node: {
                       award: {
                         title: edge.node.award.title,
-                        icon: edge.node.award.icon,
                       },
                     },
                   };
