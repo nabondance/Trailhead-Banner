@@ -27,6 +27,7 @@ import {
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
 import BackgroundPreview from './BackgroundPreview';
+import OptionsToggle from './OptionsToggle';
 import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 
@@ -308,12 +309,14 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
         </p>
       )}
       {!isGenerating && (
-        <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
-          {showOptions ? 'Hide Options' : 'More Options'}
-        </button>
+        <OptionsToggle
+          expanded={showOptions}
+          onToggle={() => setShowOptions(!showOptions)}
+          controlsId='banner-options'
+        />
       )}
       {showOptions && (
-        <div className='options'>
+        <div className='options' id='banner-options'>
           <fieldset>
             <legend>Background Options</legend>
             <label className='picklist'>

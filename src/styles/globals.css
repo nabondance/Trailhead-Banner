@@ -719,12 +719,39 @@ main {
   background-color: var(--secondary);
 }
 
-.more-options-button {
-  background-color: var(--primary-faded);
+/* Disclosure toggle for the options panel: text-only, so Generate Banner stays the only filled button */
+.options-toggle {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 16px;
+  color: var(--text-form);
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.more-options-button:hover {
-  background-color: var(--primary);
+.options-toggle:hover {
+  color: var(--secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.options-toggle-chevron {
+  transition: transform 0.2s ease-in-out;
+}
+
+.options-toggle[aria-expanded='true'] .options-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .options-toggle-chevron {
+    transition: none;
+  }
 }
 
 .submit-button {
