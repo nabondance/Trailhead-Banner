@@ -65,13 +65,12 @@ jobs:
 
       # Assertions are warnings for now: the job reports scores without blocking PRs
       - name: Run Lighthouse CI (light theme)
-        run: |
-          pnpm dlx @lhci/cli@0.16.1 autorun
-          mkdir -p lighthouse-results
-          mv .lighthouseci/reports lighthouse-results/light
+        run: pnpm dlx @lhci/cli@0.16.1 autorun --upload.outputDir=lighthouse-results/light
 
-      # Accessibility only, 1 run: colors are the only thing the theme changes
+      # Accessibility only, 1 run: colors are the only thing the theme changes.
+      # Informational: a failure here must not fail the job or lose the light results
       - name: Run Lighthouse CI (dark theme)
+        continue-on-error: true
         run: |
           pnpm dlx @lhci/cli@0.16.1 collect --numberOfRuns=1 --settings.onlyCategories=accessibility \
             --settings.chromeFlags="--no-sandbox --blink-settings=preferredColorScheme=0"

@@ -17,7 +17,10 @@ export const CATEGORIES = [
   { key: 'agentic-browsing', label: 'Agentic browsing' },
 ];
 
-// Keep only a plain local path, so the page column cannot carry markdown or links
+// A page path as shown in tables: plain, so it cannot carry markdown or links
+export const PAGE_PATH = /^\/[a-z0-9\-/]*$/i;
+
+// Keep only a plain local path
 export function pagePath(url) {
   const match = typeof url === 'string' && url.match(/^http:\/\/localhost:3000(\/[a-z0-9\-/]*)?$/i);
   return match ? match[1] || '/' : null;
@@ -72,9 +75,17 @@ export function renderScores(manifestPath, categories = CATEGORIES) {
  * @param {{ min: number, max: number }} runsPerPage
  */
 export function describeRuns({ min, max }) {
-  const count = min === max ? `${max}` : `${min}–${max}`;
-  const runs = `${count} run${max > 1 ? 's' : ''} per page`;
+  const runs = formatRunCount({ min, max });
   return max > 1
     ? `Mobile, light theme, local production build · ${runs}, scores from the run with the median performance`
     : `Mobile, light theme, local production build · ${runs}`;
+}
+
+/**
+ * "3 runs per page", "1–2 runs per page".
+ * @param {{ min: number, max: number }} runsPerPage
+ */
+export function formatRunCount({ min, max }) {
+  const count = min === max ? `${max}` : `${min}–${max}`;
+  return `${count} run${max > 1 ? 's' : ''} per page`;
 }
