@@ -16,12 +16,14 @@ GitHub.
    - No PR: the current branch against `main`. If `git status --porcelain` is
      not empty, say that uncommitted changes are not part of the review.
 
-2. **Diff and tree**, in one Bash call (each call is a fresh shell), printing
-   both paths:
+2. **Diff and tree**, in one Bash call. The first output line is the work
+   folder `<dir>`, printed before anything can fail; the diff is
+   `<dir>/change.diff` and the tree `<dir>/tree`. Each Bash call is a fresh
+   shell, so later steps use that printed path, never `$d`.
    - PR:
-     `d=$(mktemp -d) && gh pr diff <pr> > "$d/change.diff" && git fetch -q origin "pull/<pr>/head" && git worktree add -q --detach "$d/tree" FETCH_HEAD && echo "$d"`
+     `d=$(mktemp -d) && echo "$d" && gh pr diff <pr> > "$d/change.diff" && git fetch -q origin "pull/<pr>/head" && git worktree add -q --detach "$d/tree" FETCH_HEAD`
    - Branch:
-     `d=$(mktemp -d) && git diff "$(git merge-base origin/main HEAD)" HEAD > "$d/change.diff" && git worktree add -q --detach "$d/tree" HEAD && echo "$d"`
+     `d=$(mktemp -d) && echo "$d" && git fetch -q origin main && git diff "$(git merge-base origin/main HEAD)" HEAD > "$d/change.diff" && git worktree add -q --detach "$d/tree" HEAD`
 
    An empty diff → say so and go to step 5. Any other failure → report its
    stderr and go to step 5.
@@ -48,8 +50,10 @@ GitHub.
      `Cold review: not run — code-goldfish agent not loaded (start a new session)`.
      A review in this context is not a cold review.
 
-5. **Clean up, always**, even after a failure:
-   `git worktree remove --force "$d/tree"; rm -rf "$d"`.
+5. **Clean up, always**, even after a failure, with the `<dir>` printed in
+   step 2 written out literally:
+   `git worktree remove --force "<dir>/tree"; rm -rf "<dir>"`.
+   No `<dir>` was printed → nothing to clean.
 
 ## Output
 

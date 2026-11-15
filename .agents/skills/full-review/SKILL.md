@@ -19,7 +19,11 @@ Read-only. The report goes to chat; nothing is written to the repo or GitHub.
    `src/banner/api/`, `src/utils/urlSafety.js`, `src/utils/imageSafety.js`,
    `src/utils/imageValidation.js`, `src/utils/usernameValidation.js` or
    `src/utils/rateLimit.js`: spawn the `security-reviewer` agent in the same
-   message, with the diff path and the tree path. Otherwise skip it.
+   message. Its prompt gives the diff path and the tree path, and says to
+   review only the changes in that diff, to read and cite files under the tree
+   only (never the current checkout, which is another branch), and to return
+   at most 5 findings in the `file:line — trigger → what goes wrong → fix`
+   form. Otherwise skip it.
 
 3. **Context side, in this session, while they run.** Read the diff file and the
    changed files in the tree. Do not read any agent output yet: the context

@@ -106,6 +106,7 @@ src/
   - Common types: `feat, fix, docs, style, refactor, perf, build, chore`
   - Common scopes: `core, deps, ui, config, util, release`
 - **Format Code**: Run `bash scripts/agent/format.sh` to check or `bash scripts/agent/format-fix.sh` to auto-fix
+- **Claude Code output style**: the repo sets `Lean` (`.claude/output-styles/lean.md`) as the default; set `outputStyle` in `.claude/settings.local.json` to use your own
 
 ## Common Tasks
 
