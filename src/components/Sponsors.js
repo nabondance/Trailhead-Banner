@@ -14,7 +14,15 @@ const hasAnySponsor =
 
 const PoweredByCard = ({ sponsor }) => (
   <a href={sponsor.url} target='_blank' rel='noopener noreferrer' className='powered-by-card'>
-    <Image src={sponsor.image} alt={sponsor.name} fill className='powered-by-bg' unoptimized />
+    <Image
+      src={sponsor.image}
+      alt={sponsor.name}
+      fill
+      className='powered-by-bg'
+      unoptimized
+      loading='eager'
+      fetchPriority='high'
+    />
     <div className='powered-by-overlay'>
       <span className='powered-by-name'>{sponsor.name}</span>
       {sponsor.badge && <span className='powered-by-badge'>{sponsor.badge}</span>}

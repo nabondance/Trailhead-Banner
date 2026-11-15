@@ -11,23 +11,9 @@ import { getBannerCount } from '../utils/bannerCountUtils';
 
 import ThemeProvider from '../components/ThemeProvider';
 
-import { Geist_Mono, Inter } from 'next/font/google';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const InterFont = Inter({
-  variable: '--font-inter',
-  weights: [400, 500, 600, 700],
-  subsets: ['latin'],
-  display: 'swap',
-});
 
 const siteUrl = 'https://thb.nabondance.me';
 const siteDescription =
@@ -154,7 +140,7 @@ export default async function RootLayout({ children }) {
         {process.env.VERCEL_ENV && <SpeedInsights />}
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
       </head>
-      <body className={`${geistMono.variable} antialiased`}>
+      <body className='antialiased'>
         <ThemeProvider>
           <header className='header'>
             <TrailheadBannerHeader />
