@@ -521,7 +521,7 @@ const CompanyBannerForm = () => {
                     <img
                       key={image.src}
                       src={image.src}
-                      alt={image.description}
+                      alt={image.alt}
                       width={200}
                       height={50}
                       className={`thumbnail ${options.backgroundLibraryUrl === `${typeof window !== 'undefined' ? window.location.origin : ''}${image.src}` ? 'selected' : ''}`}

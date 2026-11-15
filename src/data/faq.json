@@ -25,7 +25,7 @@
   {
     "question": "Can I use my own background image?",
     "answer": "Yes. Pick one of the built-in backgrounds in the library, use a solid color, paste an image URL, or upload and crop your own image.",
-    "link": { "href": "/background-library", "label": "Browse the background library" }
+    "link": { "href": "/gallery#backgrounds", "label": "Browse the background library" }
   },
   {
     "question": "How do I add the banner to my LinkedIn profile?",

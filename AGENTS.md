@@ -126,7 +126,7 @@ When creating a new page or editing an existing one, always add or update the `e
 
 > **Important:** page-level `openGraph` replaces (not merges) the layout default — always repeat the `images` array or the OG image will be lost.
 
-See any existing page (e.g. `src/app/examples/page.js`) as a reference.
+See any existing page (e.g. `src/app/gallery/page.js`) as a reference.
 
 When **adding** a new page, also update:
 
@@ -141,7 +141,16 @@ When **removing** a page, remove it from both files as well.
 1. Add to `public/assets/background-library/`
 2. Update `src/data/banners.json` with metadata (`src`, `alt`, `credit`), plus `focusY` when the subject isn't centered
    - `focusY` sets the vertical crop on the company banner (0 = keep top, 0.5 = center (default), 1 = keep bottom)
-3. Verify in background library page, and in the company form's Background Preview
+3. Verify in the Backgrounds section of `/gallery`, and in the company form's Background Preview
+
+### Update Gallery Examples
+
+The banners on `/gallery` are generated, not hand-made screenshots:
+
+1. Each example in `src/data/examples.json` is a `username` plus the `options` that differ from `defaultOptions` (the website defaults)
+2. Add, change, or remove entries there (removing an entry: also delete its `public/assets/examples/<id>.webp`)
+3. With the dev server running, run `bash scripts/agent/gallery-refresh.sh [id ...]` (no ids = all) to regenerate the WebP images
+4. Review the new images in the PR diff
 
 ### Modify Banner Layout
 
@@ -184,6 +193,7 @@ Reusable skills and their direct commands:
 - **`dev-start`** — `bash scripts/agent/dev-start.sh`; start the dev server in the background
 - **`dev-stop`** — `bash scripts/agent/dev-stop.sh`; stop the background dev server
 - **`img-test [username]`** — `bash scripts/agent/img-test.sh [username]`; test image generation
+- **`gallery-refresh [id...]`** — `bash scripts/agent/gallery-refresh.sh [id...]`; regenerate the `/gallery` example banners
 - **`verify [username...]`** — `bash scripts/agent/verify.sh [username...]`; run the full verification workflow
 - **`cold-review [pr]`** — zero-context review of a PR or the current branch by the `code-goldfish` agent, which sees only the diff, the code and the linked issue
 - **`full-review [pr]`** — `cold-review` in the background, a review with full project context, and `security-reviewer` when API or URL code changes, merged into one report
