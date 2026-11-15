@@ -129,6 +129,15 @@
         "backgroundKind": "procedural",
         "textColor": "#FFFFFF"
       }
+    },
+    {
+      "id": "accredited-professional",
+      "description": "Accredited Professional certifications only",
+      "username": "gauravkheterpal",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/clouds_mongo.jpg",
+        "displaySalesforceCertifications": false
+      }
     }
   ]
 }
