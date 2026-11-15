@@ -10,7 +10,7 @@ const OptionsToggle = ({ expanded, onToggle, controlsId }) => (
     className='options-toggle'
     onClick={onToggle}
     aria-expanded={expanded}
-    aria-controls={controlsId}
+    aria-controls={expanded ? controlsId : undefined}
   >
     <FontAwesomeIcon icon={faSliders} className='fa-fw' aria-hidden='true' />
     <span>Customize your banner</span>

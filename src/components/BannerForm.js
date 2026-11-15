@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useId, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -75,6 +75,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
   const [cropZoom, setCropZoom] = useState(1);
   const [showOptions, setShowOptions] = useState(false);
+  const optionsPanelId = useId();
   const [isGenerating, setIsGenerating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
@@ -309,14 +310,10 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
         </p>
       )}
       {!isGenerating && (
-        <OptionsToggle
-          expanded={showOptions}
-          onToggle={() => setShowOptions(!showOptions)}
-          controlsId='banner-options'
-        />
+        <OptionsToggle expanded={showOptions} onToggle={() => setShowOptions((v) => !v)} controlsId={optionsPanelId} />
       )}
       {showOptions && (
-        <div className='options' id='banner-options'>
+        <div className='options' id={optionsPanelId}>
           <fieldset>
             <legend>Background Options</legend>
             <label className='picklist'>

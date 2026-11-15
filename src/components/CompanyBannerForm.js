@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { zipSync, strToU8 } from 'fflate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
@@ -205,6 +205,7 @@ const CompanyBannerForm = () => {
   const [uploadedLogoFile, setUploadedLogoFile] = useState(null);
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [showOptions, setShowOptions] = useState(false);
+  const optionsPanelId = useId();
   const [isGenerating, setIsGenerating] = useState(false);
   const [fetchProgress, setFetchProgress] = useState(null); // { phase: 'fetch'|'retry'|'render', done, total }
   const [resultImageUrl, setResultImageUrl] = useState(null);
@@ -446,13 +447,13 @@ const CompanyBannerForm = () => {
         {!isGenerating && (
           <OptionsToggle
             expanded={showOptions}
-            onToggle={() => setShowOptions(!showOptions)}
-            controlsId='banner-options'
+            onToggle={() => setShowOptions((v) => !v)}
+            controlsId={optionsPanelId}
           />
         )}
 
         {showOptions && (
-          <div className='options' id='banner-options'>
+          <div className='options' id={optionsPanelId}>
             {/* Background Options */}
             <fieldset>
               <legend>Background Options</legend>
