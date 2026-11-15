@@ -11,9 +11,28 @@ import { getBannerCount } from '../utils/bannerCountUtils';
 
 import ThemeProvider from '../components/ThemeProvider';
 
+import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
+
+// Footer font. Not preloaded: the footer is below the fold, so it shouldn't compete with the LCP image
+const inter = Inter({
+  variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+});
+
+// Announcement banner font: Iosevka (SIL OFL 1.1) subset to Latin. Only fetched when an announcement shows
+const iosevka = localFont({
+  src: '../fonts/Iosevka-Regular-latin.woff2',
+  variable: '--font-iosevka',
+  weight: '400',
+  display: 'swap',
+  preload: false,
+});
 
 const siteUrl = 'https://thb.nabondance.me';
 const siteDescription =
@@ -140,7 +159,7 @@ export default async function RootLayout({ children }) {
         {process.env.VERCEL_ENV && <SpeedInsights />}
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
       </head>
-      <body className='antialiased'>
+      <body className={`${inter.variable} ${iosevka.variable} antialiased`}>
         <ThemeProvider>
           <header className='header'>
             <TrailheadBannerHeader />
