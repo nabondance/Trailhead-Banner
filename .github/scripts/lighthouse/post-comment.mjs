@@ -1,30 +1,17 @@
-import { existsSync, lstatSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { findPullRequestNumber, upsertComment } from '../shared/github-pr.mjs';
+import { describeRuns, renderScores } from './scores.mjs';
 
 // Runs from the default branch (workflow_run), with a write token. The manifest
 // was produced by a Lighthouse run on pull request code, possibly from a fork:
-// treat it as untrusted data. Only page paths and numeric scores are used.
+// treat it as untrusted data (see scores.mjs).
+//
+// Also runs when the artifact is missing (the Lighthouse run failed before
+// writing reports), to replace scores from an earlier commit with a notice.
 
 const SENTINEL = '<!-- lighthouse-comment -->';
-const MAX_MANIFEST_BYTES = 1024 * 1024;
-const MAX_PAGES = 20;
-
-const CATEGORIES = [
-  { key: 'performance', label: 'Performance' },
-  { key: 'accessibility', label: 'Accessibility' },
-  { key: 'best-practices', label: 'Best practices' },
-  { key: 'seo', label: 'SEO' },
-];
 
 const artifactDir = process.env.ARTIFACT_DIR;
-const manifestPath = artifactDir ? join(artifactDir, 'manifest.json') : null;
-
-if (!manifestPath || !existsSync(manifestPath) || !lstatSync(manifestPath).isFile()) {
-  console.log('No Lighthouse manifest found, skipping comment');
-  process.exit(0);
-}
-
 const runUrl = process.env.RUN_URL;
 const headSha = process.env.HEAD_SHA;
 const headOwner = process.env.HEAD_OWNER;
@@ -33,65 +20,27 @@ const sha = headSha?.slice(0, 7) ?? 'unknown';
 const repo = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
 
-if (!repo) {
-  console.error('ERROR: GITHUB_REPOSITORY is not set');
+if (!repo || !token) {
+  console.error('ERROR: GITHUB_REPOSITORY and GITHUB_TOKEN are required');
   process.exit(1);
 }
 if (!headSha || !headOwner || !headBranch) {
   console.error('ERROR: HEAD_SHA, HEAD_OWNER and HEAD_BRANCH are required');
   process.exit(1);
 }
-if (lstatSync(manifestPath).size > MAX_MANIFEST_BYTES) {
-  console.error('ERROR: Lighthouse manifest is too large');
-  process.exit(1);
-}
 
-// Keep only a plain local path, so the page column cannot carry markdown or links
-function pagePath(url) {
-  const match = typeof url === 'string' && url.match(/^http:\/\/localhost:3000(\/[a-z0-9\-/]*)?$/i);
-  return match ? match[1] || '/' : null;
-}
-
-// Lighthouse colors: green 90+, orange 50-89, red below 50
-function formatScore(value) {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 1) return '–';
-  const score = Math.round(value * 100);
-  const dot = score >= 90 ? '🟢' : score >= 50 ? '🟠' : '🔴';
-  return `${dot} ${score}`;
-}
-
-let manifest;
+let scores = null;
 try {
-  manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  scores = renderScores(artifactDir ? join(artifactDir, 'manifest.json') : null);
 } catch (err) {
-  console.error(`ERROR: Invalid Lighthouse manifest: ${err.message}`);
-  process.exit(1);
+  console.error(`Could not read the Lighthouse manifest: ${err.message}`);
 }
 
-const rows = (Array.isArray(manifest) ? manifest : [])
-  .filter((run) => run?.isRepresentativeRun === true)
-  .map((run) => ({ path: pagePath(run.url), summary: run.summary ?? {} }))
-  .filter((row) => row.path)
-  .slice(0, MAX_PAGES);
-
-if (rows.length === 0) {
-  console.log('No usable Lighthouse results, skipping comment');
-  process.exit(0);
-}
-
-const table = [
-  `| Page | ${CATEGORIES.map((c) => c.label).join(' | ')} |`,
-  `|---|${CATEGORIES.map(() => '---').join('|')}|`,
-  ...rows.map((row) => `| \`${row.path}\` | ${CATEGORIES.map((c) => formatScore(row.summary[c.key])).join(' | ')} |`),
-].join('\n');
-
-const body = `${SENTINEL}
-## Lighthouse
-
-Mobile, median of 3 runs on a local production build · commit \`${sha}\` · [workflow run](${runUrl}) (full reports in the \`lighthouse-reports\` artifact)
-
-${table}
-`;
+const runLink = runUrl ? ` · [workflow run](${runUrl})` : '';
+const content = scores
+  ? `${describeRuns(scores.runsPerPage)} · commit \`${sha}\`${runLink} (full reports in the \`lighthouse-reports\` artifact)\n\n${scores.table}`
+  : `No Lighthouse scores for commit \`${sha}\`: the run failed before producing results${runLink}.`;
+const body = `${SENTINEL}\n## Lighthouse\n\n${content}\n`;
 
 try {
   const prNumber = await findPullRequestNumber({ repo, token, headOwner, headBranch, headSha });

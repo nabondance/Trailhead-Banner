@@ -12,8 +12,12 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'next.config.mjs'
+      - 'postcss.config.mjs'
+      - 'jsconfig.json'
+      - '.node-version'
       - 'lighthouserc.json'
       - '.github/workflows/lighthouse.yml'
+      - '.github/scripts/lighthouse/**'
   workflow_dispatch:
 
 concurrency:
@@ -61,21 +65,13 @@ jobs:
 
       # Assertions are warnings for now: the job reports scores without blocking PRs
       - name: Run Lighthouse CI
-        run: npx -y @lhci/cli@0.16.1 autorun
+        run: pnpm dlx @lhci/cli@0.16.1 autorun
 
       - name: Write job summary
         if: always()
-        run: |
-          manifest=.lighthouseci/reports/manifest.json
-          [ -f "$manifest" ] || { echo "No Lighthouse results" >> "$GITHUB_STEP_SUMMARY"; exit 0; }
-          {
-            echo "### Lighthouse (mobile, median of 3 runs)"
-            echo ""
-            echo "| Page | Performance | Accessibility | Best practices | SEO |"
-            echo "|---|---|---|---|---|"
-            jq -r '.[] | select(.isRepresentativeRun) | .summary as $s
-              | "| \(.url | sub("http://localhost:3000"; "")) | \([$s.performance, $s.accessibility, $s["best-practices"], $s.seo] | map(. * 100 | round | tostring) | join(" | ")) |"' "$manifest"
-          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          MANIFEST_PATH: .lighthouseci/reports/manifest.json
+        run: node .github/scripts/lighthouse/summary.mjs
 
       - name: Upload reports
         if: always()

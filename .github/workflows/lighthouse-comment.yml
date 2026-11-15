@@ -55,8 +55,8 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Also runs without the artifact, to replace scores from an earlier commit
       - name: Post PR comment
-        if: steps.download.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ARTIFACT_DIR: ${{ runner.temp }}/lighthouse
