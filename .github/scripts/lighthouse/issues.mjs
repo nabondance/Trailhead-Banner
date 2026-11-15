@@ -2,7 +2,9 @@ import { existsSync, lstatSync, readFileSync, writeFileSync } from 'fs';
 import { basename, join } from 'path';
 import { CATEGORIES, PAGE_PATH, pagePath } from './scores.mjs';
 
-// Failing Lighthouse audits, for the collapsible details under the score table.
+// Failing Lighthouse audits, for the collapsible details under the score table. When a
+// category is below 100, its passing (0.9+) but imperfect audits are listed too, marked as
+// costing points: they explain scores like 98 that have no failing audit.
 //
 // extractIssues() runs in the Lighthouse job: it reads the full reports of each
 // page's representative run and keeps a small summary (issues.json), so the
@@ -67,9 +69,13 @@ export function extractIssues(reportsDir) {
       for (const { key } of CATEGORIES) {
         const category = lhr.categories?.[key];
         const categoryFails = typeof category?.score === 'number' && category.score < PASS_SCORE;
+        const categoryBelow100 = typeof category?.score === 'number' && category.score < 1;
         for (const ref of category?.auditRefs ?? []) {
           const audit = lhr.audits?.[ref.id];
-          if (typeof audit?.score !== 'number' || audit.score >= PASS_SCORE) continue;
+          if (typeof audit?.score !== 'number' || audit.score >= 1) continue;
+          // Passing (0.9+) but not perfect: listed when it's why the category isn't at 100
+          const passing = audit.score >= PASS_SCORE;
+          if (passing && !(categoryBelow100 && ref.weight > 0)) continue;
           const diagnostic = key === 'performance' && categoryFails && DIAGNOSTIC_MODES.has(audit.scoreDisplayMode);
           if (!(ref.weight > 0) && !diagnostic) continue;
           const items = detailItems(audit.details).map(itemOf).filter(Boolean);
@@ -78,6 +84,7 @@ export function extractIssues(reportsDir) {
             id: ref.id,
             title: capped(audit.title, LIMITS.title),
             displayValue: capped(audit.displayValue, LIMITS.displayValue),
+            passing,
             items: items.slice(0, KEPT_ITEMS_PER_AUDIT),
             more: Math.max(0, items.length - KEPT_ITEMS_PER_AUDIT),
           });
@@ -115,6 +122,9 @@ function text(value, max) {
     .replace(/\bGH-(?=\d)/gi, 'GH\u200b-')
     .replace(/\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)([0-9a-f]{4})([0-9a-f]{3,36})\b/gi, '$1\u200b$2');
 }
+
+// An audit that passes (0.9+) on every page it's listed for, but isn't at 100
+const isPassing = (audit) => audit.pages.every((p) => p.passing);
 
 // Inline code: content shows literally, only backticks and line breaks need removing
 function code(value, max) {
@@ -161,7 +171,7 @@ export function renderIssues(issuesPath, { label = '', auditIds } = {}) {
         });
       }
       const entry = byAudit.get(key);
-      entry.pages.push({ path, displayValue: audit.displayValue });
+      entry.pages.push({ path, displayValue: audit.displayValue, passing: audit.passing === true });
       for (const item of Array.isArray(audit.items) ? audit.items.slice(0, KEPT_ITEMS_PER_AUDIT) : []) {
         const id = `${item?.target ?? ''}|${item?.note ?? ''}`;
         if (!entry.items.has(id)) entry.items.set(id, item);
@@ -174,14 +184,21 @@ export function renderIssues(issuesPath, { label = '', auditIds } = {}) {
 
   const lines = [];
   for (const { key, label: categoryLabel } of CATEGORIES) {
-    const audits = [...byAudit.values()].filter((a) => a.category === key);
+    // Failing audits first, then the passing ones that still cost points
+    const audits = [...byAudit.values()].filter((a) => a.category === key).sort((a, b) => isPassing(a) - isPassing(b));
     if (audits.length === 0) continue;
     lines.push(`**${categoryLabel}**`, '');
     for (const audit of audits) {
+      const allPassing = isPassing(audit);
       const pages = audit.pages
-        .map((p) => (p.displayValue ? `${code(p.path, 60)} (${text(p.displayValue, 40)})` : code(p.path, 60)))
+        .map((p) => {
+          // Per page only when the audit fails elsewhere: otherwise the line says it once
+          const notes = [text(p.displayValue, 40), p.passing && !allPassing ? 'passing' : ''].filter(Boolean);
+          return notes.length > 0 ? `${code(p.path, 60)} (${notes.join(', ')})` : code(p.path, 60);
+        })
         .join(', ');
-      lines.push(`- ${text(audit.title, 160)} · ${code(audit.id, 80)} · ${pages}`);
+      const suffix = allPassing ? ' · passing, costs points' : '';
+      lines.push(`- ${text(audit.title, 160)} · ${code(audit.id, 80)} · ${pages}${suffix}`);
       const items = [...audit.items.values()];
       for (const item of items.slice(0, SHOWN_ITEMS_PER_AUDIT)) {
         const target = code(item?.target, 120);
@@ -198,6 +215,11 @@ export function renderIssues(issuesPath, { label = '', auditIds } = {}) {
   if (body.length > MAX_MARKDOWN_CHARS) {
     body = `${body.slice(0, MAX_MARKDOWN_CHARS).replace(/\n[^\n]*$/, '')}\n\n_Truncated, see the full reports._`;
   }
-  const count = byAudit.size;
-  return `<details>\n<summary>${count} failing audit${count > 1 ? 's' : ''}${label}</summary>\n\n${body}\n\n</details>`;
+  const passingCount = [...byAudit.values()].filter(isPassing).length;
+  const failingCount = byAudit.size - passingCount;
+  const counts = [
+    failingCount > 0 ? `${failingCount} failing audit${failingCount > 1 ? 's' : ''}` : '',
+    passingCount > 0 ? `${passingCount} costing points` : '',
+  ].filter(Boolean);
+  return `<details>\n<summary>${counts.join(' · ')}${label}</summary>\n\n${body}\n\n</details>`;
 }
