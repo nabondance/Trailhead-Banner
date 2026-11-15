@@ -156,7 +156,8 @@ export default async function RootLayout({ children }) {
           data-website-id='b540d5cc-247f-426e-87ec-0c1258767c22'
           strategy='afterInteractive'
         />
-        <SpeedInsights />
+        {/* Its script is served by Vercel only: elsewhere (local builds, Lighthouse CI) it 404s */}
+        {process.env.VERCEL_ENV && <SpeedInsights />}
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

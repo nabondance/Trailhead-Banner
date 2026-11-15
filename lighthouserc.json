@@ -20,10 +20,10 @@
     "assert": {
       "assertions": {
         "categories:performance": ["warn", { "minScore": 0.9, "aggregationMethod": "median-run" }],
-        "categories:accessibility": ["warn", { "minScore": 1 }],
-        "categories:best-practices": ["warn", { "minScore": 1 }],
-        "categories:seo": ["warn", { "minScore": 1 }],
-        "categories:agentic-browsing": ["warn", { "minScore": 1 }]
+        "categories:accessibility": ["warn", { "minScore": 1, "aggregationMethod": "median-run" }],
+        "categories:best-practices": ["warn", { "minScore": 1, "aggregationMethod": "median-run" }],
+        "categories:seo": ["warn", { "minScore": 1, "aggregationMethod": "median-run" }],
+        "categories:agentic-browsing": ["warn", { "minScore": 1, "aggregationMethod": "median-run" }]
       }
     },
     "upload": {

@@ -6,8 +6,8 @@ import { describeRuns, renderScores } from './scores.mjs';
 // was produced by a Lighthouse run on pull request code, possibly from a fork:
 // treat it as untrusted data (see scores.mjs).
 //
-// Also runs when the artifact is missing (the Lighthouse run failed before
-// writing reports), to replace scores from an earlier commit with a notice.
+// Also runs when the manifest is missing or unusable (for example the run
+// failed before writing it), to replace scores from an earlier commit with a notice.
 
 const SENTINEL = '<!-- lighthouse-comment -->';
 
@@ -39,7 +39,7 @@ try {
 const runLink = runUrl ? ` · [workflow run](${runUrl})` : '';
 const content = scores
   ? `${describeRuns(scores.runsPerPage)} · commit \`${sha}\`${runLink} (full reports in the \`lighthouse-reports\` artifact)\n\n${scores.table}`
-  : `No Lighthouse scores for commit \`${sha}\`: the run failed before producing results${runLink}.`;
+  : `No Lighthouse scores for commit \`${sha}\`: the run produced no usable results${runLink}.`;
 const body = `${SENTINEL}\n## Lighthouse\n\n${content}\n`;
 
 try {

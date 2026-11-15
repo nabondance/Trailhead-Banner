@@ -73,6 +73,16 @@ jobs:
           MANIFEST_PATH: .lighthouseci/reports/manifest.json
         run: node .github/scripts/lighthouse/summary.mjs
 
+      # Small artifact for lighthouse-comment.yml, which only needs the scores
+      - name: Upload manifest
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-manifest
+          path: .lighthouseci/reports/manifest.json
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v7

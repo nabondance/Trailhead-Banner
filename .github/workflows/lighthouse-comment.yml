@@ -44,13 +44,12 @@ jobs:
         with:
           node-version-file: .node-version
 
-      # Missing when the Lighthouse run failed before producing reports
-      - name: Download Lighthouse reports
-        id: download
+      # Missing when the Lighthouse run failed before producing results
+      - name: Download Lighthouse manifest
         continue-on-error: true
         uses: actions/download-artifact@v8
         with:
-          name: lighthouse-reports
+          name: lighthouse-manifest
           path: ${{ runner.temp }}/lighthouse
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

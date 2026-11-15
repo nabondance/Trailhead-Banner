@@ -35,7 +35,7 @@ function formatScore(value) {
  * Reads the manifest and renders the scores of each page's representative run
  * (the run with the median performance score).
  * @param {string} manifestPath
- * @returns {{ table: string, runsPerPage: number } | null} null when there is nothing usable
+ * @returns {{ table: string, runsPerPage: { min: number, max: number } } | null} null when there is nothing usable
  */
 export function renderScores(manifestPath) {
   if (!manifestPath || !existsSync(manifestPath) || !lstatSync(manifestPath).isFile()) return null;
@@ -53,7 +53,8 @@ export function renderScores(manifestPath) {
   const rows = runs.filter((run) => run.representative).slice(0, MAX_PAGES);
   if (rows.length === 0) return null;
 
-  const runsPerPage = Math.max(...rows.map((row) => runs.filter((run) => run.path === row.path).length));
+  const runCounts = rows.map((row) => runs.filter((run) => run.path === row.path).length);
+  const runsPerPage = { min: Math.min(...runCounts), max: Math.max(...runCounts) };
   const table = [
     `| Page | ${CATEGORIES.map((c) => c.label).join(' | ')} |`,
     `|---|${CATEGORIES.map(() => '---').join('|')}|`,
@@ -67,10 +68,12 @@ export function renderScores(manifestPath) {
 
 /**
  * One-line description of how the scores were measured.
- * @param {number} runsPerPage
+ * @param {{ min: number, max: number }} runsPerPage
  */
-export function describeRuns(runsPerPage) {
-  return runsPerPage > 1
-    ? `Mobile, local production build · ${runsPerPage} runs per page, scores from the run with the median performance`
-    : 'Mobile, local production build · 1 run per page';
+export function describeRuns({ min, max }) {
+  const count = min === max ? `${max}` : `${min}–${max}`;
+  const runs = `${count} run${max > 1 ? 's' : ''} per page`;
+  return max > 1
+    ? `Mobile, local production build · ${runs}, scores from the run with the median performance`
+    : `Mobile, local production build · ${runs}`;
 }
