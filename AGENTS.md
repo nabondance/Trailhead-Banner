@@ -190,12 +190,16 @@ Reusable skills and their direct commands:
 - **`format`** — `bash scripts/agent/format.sh`; check formatting without modifying files
 - **`format-fix`** — `bash scripts/agent/format-fix.sh`; run Prettier and Stylelint fixes
 - **`build`** — `bash scripts/agent/build.sh`; validate the production build
-- **`dev-start`** — `bash scripts/agent/dev-start.sh`; start the dev server in the background
+- **`dev-start`** — `bash scripts/agent/dev-start.sh`; start the dev server in the background, on the first free port from 3000 (written to `.dev-server.port`, so each worktree tests its own server)
 - **`dev-stop`** — `bash scripts/agent/dev-stop.sh`; stop the background dev server
 - **`img-test [username]`** — `bash scripts/agent/img-test.sh [username]`; test image generation
 - **`gallery-refresh [id...]`** — `bash scripts/agent/gallery-refresh.sh [id...]`; regenerate the `/gallery` example banners
 - **`verify [username...]`** — `bash scripts/agent/verify.sh [username...]`; run the full verification workflow
 - **`cold-review [pr]`** — zero-context review of a PR or the current branch by the `code-goldfish` agent, which sees only the diff, the code and the linked issue
+- **`check-dep-pins`** — audit the security-pinned `pnpm.overrides` in `package.json` and say which can be removed
+- **`context-budget`** — `bash scripts/agent/context-budget.sh`; token cost of the agent setup
+- **`harness-audit`** — `bash scripts/agent/harness-audit.sh`; check that skills, agents and the paths they mention all exist (also runs in CI)
+- **`ci-fix [pr]`** — watch a PR's checks, fix failures the PR caused, re-run flaky ones once, stop after 3 rounds
 - **`full-review [pr]`** — `cold-review` in the background, a review with full project context, and `security-reviewer` when API or URL code changes, merged into one report
 
 ### Design work (EGM plugin)
@@ -217,6 +221,8 @@ EGM artifact directory: docs/egm
 ## Verifying Changes
 
 Before committing non-trivial changes, run `bash scripts/agent/verify.sh`. It stops any running dev server (a production build breaks it), runs `pnpm build`, starts a fresh dev server, generates a banner via `POST /api/banner/standard` for each username, stops the server, and prints `Verify: PASS` or `FAIL`. For a quick iteration loop, use `bash scripts/agent/dev-start.sh` followed by `bash scripts/agent/img-test.sh`.
+
+A pull request that changes UI files (`src/app/`, `src/components/`, `src/styles/`, `public/`, CSS) needs a `## Screenshots` section in its body: screenshots, the pages to check on the Vercel preview, or `n/a — <why>`. A hook refuses `gh pr create` without it.
 
 ## Token-Saving References
 

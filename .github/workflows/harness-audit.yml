@@ -1,0 +1,39 @@
+---
+name: Harness Audit
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - '.claude/**'
+      - '.agents/**'
+      - '.codex/**'
+      - 'scripts/agent/**'
+      - 'src/**'
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  harness-audit:
+    name: Harness Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+
+      - name: Audit the agent setup
+        run: bash scripts/agent/harness-audit.sh

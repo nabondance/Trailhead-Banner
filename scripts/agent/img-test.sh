@@ -1,18 +1,23 @@
 #!/bin/bash
+# shellcheck source-path=SCRIPTDIR
 # Test banner generation with minimal output
 # Usage: bash scripts/agent/img-test.sh [username]
-# Requires: Dev server running on localhost:3000
+# Requires: this worktree's dev server (bash scripts/agent/dev-start.sh)
 
 set -e
+
+# shellcheck source=lib/dev-server.sh
+source "$(dirname "$0")/lib/dev-server.sh"
+BASE_URL=$(dev_url)
 
 USERNAME="${1:-nabondance}"
 
 echo "Testing image generation for: $USERNAME"
 
 # Check if server is running
-if ! curl -s http://localhost:3000 > /dev/null 2>&1; then
-  echo "ERROR: No server running on localhost:3000"
-  echo "Start with: pnpm dev"
+if ! dev_running || ! curl -s "$BASE_URL" > /dev/null 2>&1; then
+  echo "ERROR: This worktree's dev server is not running"
+  echo "Start with: bash scripts/agent/dev-start.sh"
   exit 1
 fi
 
@@ -43,7 +48,7 @@ EOF
 
 # Call the API and capture response
 START=$(date +%s)
-RESPONSE=$(curl -s -X POST http://localhost:3000/api/banner/standard \
+RESPONSE=$(curl -s -X POST "$BASE_URL/api/banner/standard" \
   -H "Content-Type: application/json" \
   -d "$PAYLOAD")
 END=$(date +%s)
