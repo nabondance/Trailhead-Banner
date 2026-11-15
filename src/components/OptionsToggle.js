@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSliders, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
-// Disclosure toggle for the banner forms' customization panel (expands in place, so not a filled button)
+// Disclosure toggle for the banner forms' customization panel (expands in place, so outlined rather than filled)
 const OptionsToggle = ({ expanded, onToggle, controlsId }) => (
   <button
     type='button'

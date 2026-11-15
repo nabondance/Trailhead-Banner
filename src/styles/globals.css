@@ -719,25 +719,27 @@ main {
   background-color: var(--secondary);
 }
 
-/* Disclosure toggle for the options panel: text-only, so Generate Banner stays the only filled button */
+/* Disclosure toggle for the options panel: outlined, not filled, so Generate Banner stays the only filled button */
 .options-toggle {
-  align-self: center;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
   font-size: 16px;
   color: var(--text-form);
   background: none;
-  border: none;
+  border: 1px solid var(--border);
   border-radius: 4px;
   cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 
 .options-toggle:hover {
-  color: var(--secondary);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  background-color: var(--middleground);
+  border-color: var(--secondary);
 }
 
 .options-toggle-chevron {
