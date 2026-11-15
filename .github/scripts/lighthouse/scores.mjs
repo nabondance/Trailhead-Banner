@@ -14,6 +14,7 @@ const CATEGORIES = [
   { key: 'accessibility', label: 'Accessibility' },
   { key: 'best-practices', label: 'Best practices' },
   { key: 'seo', label: 'SEO' },
+  { key: 'agentic-browsing', label: 'Agentic browsing' },
 ];
 
 // Keep only a plain local path, so the page column cannot carry markdown or links
