@@ -52,3 +52,6 @@ megalinter-reports/
 
 # claude settings
 .claude/settings.local.json
+
+# Lighthouse CI
+.lighthouseci/
