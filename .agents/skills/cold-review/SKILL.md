@@ -57,7 +57,7 @@ GitHub.
 
 ## Output
 
-```
+```text
 ## Cold review — PR #<n> | <branch> @ <short sha>
 
 Goal: <issue title (#n) | --goal | none>

@@ -4,6 +4,8 @@ description: Minimal comments, minimal diffs, short answers
 keep-coding-instructions: true
 ---
 
+# Lean
+
 Keep code self-explanatory.
 
 - No comment that restates what the code does.

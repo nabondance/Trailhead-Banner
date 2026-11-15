@@ -190,7 +190,17 @@ Reusable skills and their direct commands:
 
 ### Design work (EGM plugin)
 
-The [Elephant-Goldfish Model](https://github.com/google/elephant-goldfish-model) plugin (`egm@egm`) is enabled in `.claude/settings.json`. Codex users install it once: `codex plugin marketplace add google/elephant-goldfish-model && codex plugin add egm@egm`. Its skills are user-only, so the repo wraps them in skills agents can pick on their own: `design-brainstorm` (rough idea → brief), `design-draft` (brief → design doc), `design-review` (zero-context review of a design doc), `design-drift` (design docs vs code). Typing `/egm:egm-brainstorm` etc. still works.
+The [Elephant-Goldfish Model](https://github.com/google/elephant-goldfish-model) plugin (`egm@egm`) is enabled in `.claude/settings.json`.
+Codex users install it once: `codex plugin marketplace add google/elephant-goldfish-model && codex plugin add egm@egm`.
+
+Its skills are user-only, so the repo wraps them in skills agents can pick on their own:
+
+- `design-brainstorm` — rough idea → brief
+- `design-draft` — brief → design doc
+- `design-review` — zero-context review of a design doc
+- `design-drift` — design docs vs code
+
+Typing `/egm:egm-brainstorm` etc. still works.
 
 EGM artifact directory: docs/egm
 

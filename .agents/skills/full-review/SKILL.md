@@ -51,7 +51,7 @@ Read-only. The report goes to chat; nothing is written to the repo or GitHub.
 
 ## Output
 
-```
+```text
 ## Full review — PR #<n> | <branch> @ <short sha>
 
 Goal: <issue title (#n) | --goal | none>
