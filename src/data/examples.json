@@ -39,12 +39,11 @@
       "options": {}
     },
     {
-      "id": "expired-retired",
-      "description": "Expired certifications in grey, retired ones faded",
+      "id": "retired",
+      "description": "Retired certifications faded, sorted by difficulty",
       "username": "anna",
       "options": {
         "backgroundLibraryUrl": "/assets/background-library/sf_france.png",
-        "includeExpiredCertifications": true,
         "includeRetiredCertifications": true,
         "certificationSort": "difficulty",
         "certificationSortOrder": "ascendant",
@@ -100,10 +99,11 @@
     },
     {
       "id": "sfdx-hardis",
-      "description": "sfdx-hardis badge",
+      "description": "sfdx-hardis badge, expired certification in grey",
       "username": "nvuillamy",
       "options": {
-        "backgroundLibraryUrl": "/assets/background-library/salesforce_canyon_2.png"
+        "backgroundLibraryUrl": "/assets/background-library/salesforce_canyon_2.png",
+        "includeExpiredCertifications": true
       }
     },
     {
