@@ -6,19 +6,23 @@ if [ ! -d "node_modules" ]; then
   echo "WARNING: node_modules missing — run: pnpm install"
 fi
 
-# MegaLinter plugin — cloud sessions never install the plugins that
-# .claude/settings.json enables, so install it here (user scope, so the
-# tracked settings file is not rewritten). Local sessions get it through
+# Plugins — cloud sessions never install the plugins that
+# .claude/settings.json enables, so install them here (user scope, so the
+# tracked settings file is not rewritten). Local sessions get them through
 # the workspace trust prompt instead.
-if [ "$CLAUDE_CODE_REMOTE" = "true" ] && command -v claude > /dev/null 2>&1; then
-  if grep -q '"megalinter@megalinter"' ~/.claude/plugins/installed_plugins.json 2> /dev/null; then
-    echo "Plugin: megalinter installed"
-  elif timeout 60 claude plugin marketplace add oxsecurity/megalinter > /dev/null 2>&1 \
-    && timeout 60 claude plugin install megalinter@megalinter --scope user > /dev/null 2>&1; then
-    echo "Plugin: megalinter installed now — run /reload-plugins to load its skills"
+install_plugin() { # <plugin@marketplace> <github repo>
+  if grep -q "\"$1\"" ~/.claude/plugins/installed_plugins.json 2> /dev/null; then
+    echo "Plugin: $1 installed"
+  elif timeout 60 claude plugin marketplace add "$2" > /dev/null 2>&1 \
+    && timeout 60 claude plugin install "$1" --scope user > /dev/null 2>&1; then
+    echo "Plugin: $1 installed now — run /reload-plugins to load its skills"
   else
-    echo "WARNING: megalinter plugin install failed — run: claude plugin install megalinter@megalinter"
+    echo "WARNING: $1 plugin install failed — run: claude plugin install $1"
   fi
+}
+if [ "$CLAUDE_CODE_REMOTE" = "true" ] && command -v claude > /dev/null 2>&1; then
+  install_plugin megalinter@megalinter oxsecurity/megalinter
+  install_plugin egm@egm google/elephant-goldfish-model
 fi
 
 # Environment
