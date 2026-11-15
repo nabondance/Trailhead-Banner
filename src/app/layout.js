@@ -158,27 +158,6 @@ export default async function RootLayout({ children }) {
         />
         <SpeedInsights />
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
-        <link
-          rel='preload'
-          href='/_next/static/media/569ce4b8f30dc480-s.p.woff2'
-          as='font'
-          type='font/woff2'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='preload'
-          href='/_next/static/media/93f479601ee12b01-s.p.woff2'
-          as='font'
-          type='font/woff2'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='preload'
-          href='/_next/static/media/a34f9d1faa5f3315-s.p.woff2'
-          as='font'
-          type='font/woff2'
-          crossOrigin='anonymous'
-        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
