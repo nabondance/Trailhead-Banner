@@ -10,7 +10,7 @@ const RewindWaitingPage = () => {
         <h2>Rewind isn't available yet, see you in December !</h2>
         <p>In the meantime, keep learning and connecting with the Trailblazer community !</p>
         <p>
-          You can still generate your banner 👉 <Link href='https://thb.nabondance.me'>here</Link>
+          You can still <Link href='/'>generate your banner</Link> 👈
         </p>
         <p>🫶</p>
       </div>

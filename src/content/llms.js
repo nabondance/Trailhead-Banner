@@ -25,20 +25,19 @@ their Trailhead username and receive a downloadable PNG banner.
 
 ## Pages
 
-- https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
-- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
-- https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
-- https://thb.nabondance.me/background-library — Browse the ${backgroundCount} available background images for the banner.
-- https://thb.nabondance.me/company — Generate a company/team banner aggregating multiple Trailhead profiles.
-- https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
-- https://thb.nabondance.me/releases — Changelog and release history.
-- https://thb.nabondance.me/sponsors — Sponsors and supporters who help keep the project running.
-- https://thb.nabondance.me/legal — Terms of use and privacy information.
+- [Home](https://thb.nabondance.me): Enter a Trailhead username to generate a banner.
+- [How-to](https://thb.nabondance.me/how-to): Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
+- [Examples](https://thb.nabondance.me/examples): Gallery of example banners showing different configurations.
+- [Background library](https://thb.nabondance.me/background-library): Browse the ${backgroundCount} available background images for the banner.
+- [Company banner](https://thb.nabondance.me/company): Generate a company/team banner aggregating multiple Trailhead profiles.
+- [Trailhead Rewind](https://thb.nabondance.me/rewind): Generate a year-in-review banner (active December–January).
+- [Releases](https://thb.nabondance.me/releases): Changelog and release history.
+- [Sponsors](https://thb.nabondance.me/sponsors): Sponsors and supporters who help keep the project running.
+- [Legal](https://thb.nabondance.me/legal): Terms of use and privacy information.
 
 ## Full Reference
 
-A more detailed reference for AI agents (API docs, banner content, technical details) is available at:
-https://thb.nabondance.me/llms-full.txt
+- [llms-full.txt](https://thb.nabondance.me/llms-full.txt): A more detailed reference for AI agents (API docs, banner content, technical details)
 
 ## Key Facts
 
@@ -70,15 +69,15 @@ their rank, certifications, superbadges, badge counts, and more.
 
 ## Pages
 
-- https://thb.nabondance.me — Home page. Enter a Trailhead username to generate a banner.
-- https://thb.nabondance.me/how-to — Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
-- https://thb.nabondance.me/examples — Gallery of example banners showing different configurations.
-- https://thb.nabondance.me/background-library — Browse all ${backgroundCount} available background images for the banner.
-- https://thb.nabondance.me/company — Generate a company/team banner aggregating multiple Trailhead profiles into a single banner with collective certifications, badges, Agentblazer levels, and optional CSV team data export (skills matrix, certifications per product, upcoming maintenance).
-- https://thb.nabondance.me/rewind — Generate a year-in-review banner (active December–January).
-- https://thb.nabondance.me/releases — Changelog and release history.
-- https://thb.nabondance.me/sponsors — Sponsors and supporters who help keep the project running.
-- https://thb.nabondance.me/legal — Terms of use and privacy information.
+- [Home](https://thb.nabondance.me): Enter a Trailhead username to generate a banner.
+- [How-to](https://thb.nabondance.me/how-to): Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
+- [Examples](https://thb.nabondance.me/examples): Gallery of example banners showing different configurations.
+- [Background library](https://thb.nabondance.me/background-library): Browse all ${backgroundCount} available background images for the banner.
+- [Company banner](https://thb.nabondance.me/company): Generate a company/team banner aggregating multiple Trailhead profiles into a single banner with collective certifications, badges, Agentblazer levels, and optional CSV team data export (skills matrix, certifications per product, upcoming maintenance).
+- [Trailhead Rewind](https://thb.nabondance.me/rewind): Generate a year-in-review banner (active December–January).
+- [Releases](https://thb.nabondance.me/releases): Changelog and release history.
+- [Sponsors](https://thb.nabondance.me/sponsors): Sponsors and supporters who help keep the project running.
+- [Legal](https://thb.nabondance.me/legal): Terms of use and privacy information.
 
 ## Banner Content
 
