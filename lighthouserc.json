@@ -6,8 +6,7 @@
       "startServerReadyTimeout": 60000,
       "url": [
         "http://localhost:3000/",
-        "http://localhost:3000/examples",
-        "http://localhost:3000/background-library",
+        "http://localhost:3000/gallery",
         "http://localhost:3000/company",
         "http://localhost:3000/rewind"
       ],

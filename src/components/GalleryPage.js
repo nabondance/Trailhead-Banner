@@ -8,8 +8,11 @@ import { BANNER_SIZES } from '../banner/bannerSizes';
 
 // Cards above the fold load right away; the rest load as the visitor scrolls
 const EAGER_CARDS = 4;
-const BANNER_CARD_SIZES = '(max-width: 1000px) 100vw, 50vw';
-const BACKGROUND_CARD_SIZES = '(max-width: 768px) 100vw, 33vw';
+// Displayed image widths: page padding, card padding and the 90% image width included,
+// so phones don't download images twice as wide as they are shown
+const BANNER_CARD_SIZES = '(max-width: 1000px) calc(90vw - 92px), calc(45vw - 83px)';
+const BACKGROUND_CARD_SIZES =
+  '(max-width: 768px) calc(90vw - 92px), (max-width: 1300px) calc(45vw - 83px), calc(30vw - 75px)';
 
 const GalleryCard = ({ src, alt, caption, credit, sizes, eager, onOpen }) => (
   <div className='example-card'>
