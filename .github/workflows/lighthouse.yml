@@ -1,0 +1,93 @@
+---
+name: Lighthouse
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'next.config.mjs'
+      - 'postcss.config.mjs'
+      - 'jsconfig.json'
+      - '.node-version'
+      - 'lighthouserc.json'
+      - '.github/workflows/lighthouse.yml'
+      - '.github/scripts/lighthouse/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Runs against a local production build (`next start`): Vercel previews sit behind
+    # SSO protection. No secrets needed: the generation counters fall back to null.
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Restore Next.js build cache
+        uses: actions/cache@v6
+        with:
+          path: .next/cache
+          key: nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**/*.js', 'src/**/*.ts', 'src/**/*.tsx') }}
+          restore-keys: |
+            nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      - name: Build
+        run: pnpm build
+
+      # Assertions are warnings for now: the job reports scores without blocking PRs
+      - name: Run Lighthouse CI
+        run: pnpm dlx @lhci/cli@0.16.1 autorun
+
+      - name: Write job summary
+        if: always()
+        env:
+          MANIFEST_PATH: .lighthouseci/reports/manifest.json
+        run: node .github/scripts/lighthouse/summary.mjs
+
+      # Small artifact for lighthouse-comment.yml, which only needs the scores
+      - name: Upload manifest
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-manifest
+          path: .lighthouseci/reports/manifest.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/reports
+          if-no-files-found: ignore
+          retention-days: 14
