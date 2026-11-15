@@ -99,7 +99,7 @@ class GraphQLUtils {
         const cacheKey = RedisCacheUtils.generateCacheKey(username, query.query, query.variables);
 
         try {
-          const cached = await RedisCacheUtils.getSlidingCachedQuery(cacheKey, ttlSeconds);
+          const cached = await RedisCacheUtils.getSlidingCachedQuery(cacheKey);
           if (cached) {
             result = cached;
             cacheHit = true;

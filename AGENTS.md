@@ -17,7 +17,7 @@ pnpm build   # Production build
 - **Styling**: Tailwind CSS v4
 - **Canvas**: @napi-rs/canvas (for image generation)
 - **Deployment**: Vercel
-- **Caching**: Upstash Redis (15min TTL for GraphQL)
+- **Caching**: Upstash Redis (15min TTL for GraphQL, reset on hit up to 30min)
 - **Asset Cache**: Vercel Blob (certification logo images cached server-side)
 - **Analytics DB**: Supabase (tracks banner/rewind generations and errors)
 
@@ -51,7 +51,7 @@ graph TB
     G --> H{Redis Cache Hit?}
     H -->|Yes| I[Return Cached Data]
     H -->|No| J[Trailhead GraphQL API]
-    J --> K[Cache in Redis<br/>15min TTL]
+    J --> K[Cache in Redis<br/>15min TTL, max 30min]
     K --> I
     I --> L[generateImage.js]
     L --> M[drawUtils.js<br/>Canvas Operations]
@@ -65,7 +65,7 @@ graph TB
 
 **Key Points:**
 
-- All GraphQL queries cached for 15min to reduce Trailhead API load
+- All GraphQL queries cached for 15min to reduce Trailhead API load; each cache hit resets the TTL, but an entry never lives past 30min from its first write
 - Canvas rendering happens server-side using @napi-rs/canvas
 - API responses (`/api/banner/**`) return the generated banner as base64 for direct browser display
 - Vercel Blob is used internally as an asset cache for certification logo images (`src/utils/blobUtils.js`, `src/utils/cacheUtils.js`); it is not used to store or share generated banners
@@ -147,7 +147,7 @@ When **removing** a page, remove it from both files as well.
 
 - Queries: `src/graphql/queries/`
 - Processing: `src/utils/dataUtils.js`
-- Caching: `src/utils/redisCacheUtils.js` (15min TTL)
+- Caching: `src/utils/redisCacheUtils.js` (15min TTL, reset on hit, 30min max)
 
 ## Key External Dependencies
 

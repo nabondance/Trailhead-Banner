@@ -46,10 +46,10 @@ Badge queries accept: `count` (default 5), `after` (cursor), `filter` (null or '
 **File:** `src/utils/redisCacheUtils.js`
 **Client:** Upstash Redis via `@upstash/redis`
 **Env vars:** `thb_KV_REST_API_URL` and `thb_KV_REST_API_TOKEN` (note: custom prefix, not UPSTASH\_\*)
-**TTL:** 900 seconds (15 minutes)
-**Cache key format:** `graphql:{username}:{QueryName}:{variablesHash8chars}`
+**TTL:** 900 seconds (15 minutes), reset on each hit; an entry never lives past 1800 seconds (30 minutes) from its first write
+**Cache key format:** `graphql:v2:{username}:{QueryName}:{variablesHash8chars}`
 
-- Example: `graphql:nabondance:GetTrailblazerRank:a1b2c3d4`
+- Example: `graphql:v2:nabondance:GetTrailblazerRank:a1b2c3d4`
 
 **Fallback:** If Redis is unavailable, queries always hit the live API (graceful degradation)
 
@@ -97,6 +97,6 @@ curl -s -X POST https://profile.api.trailhead.com/graphql \
 
 **Null data:** If a field doesn't exist for a user (e.g. no MVP status), the API returns null — always use optional chaining (`?.`) and fallback to `{}` when extracting from responseMap.
 
-**Cache confusion during development:** If you change a query's fields, the old cached response (without the new field) will still be served for 15 minutes. Either wait for TTL or test with a username that hasn't been queried recently.
+**Cache confusion during development:** If you change a query's fields, the old cached response (without the new field) can still be served for up to 30 minutes. Either wait for TTL or test with a username that hasn't been queried recently.
 
 **community.api vs profile.api:** MVP and community stats use a different endpoint AND different variable names (`userSlug` not `slug`). This is a common source of confusion when copying query patterns.

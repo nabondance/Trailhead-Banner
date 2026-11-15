@@ -120,7 +120,7 @@ Users can also provide a custom background via URL or image upload.
 
 ${usageLine}- **Output format:** PNG, returned as base64 data URL
 - **Canvas size:** 1584×396px (standard LinkedIn banner dimensions)
-- **Data source:** Salesforce Trailhead GraphQL API (cached 15 minutes via Upstash Redis)
+- **Data source:** Salesforce Trailhead GraphQL API (cached up to 30 minutes via Upstash Redis)
 - **Rendering:** Server-side canvas via @napi-rs/canvas
 - **Generation time:** ~300–800ms end-to-end
 - **Framework:** Next.js 16, deployed on Vercel
