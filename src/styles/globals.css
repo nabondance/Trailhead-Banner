@@ -50,7 +50,7 @@ body {
   --text-faded: #a0a0a0;
   --text-header: #003e6b;
   --text-footer: #003e6b;
-  --text-nav: #009edb;
+  --text-nav: var(--secondary); /* brand purple: #009edb text fails contrast on --header-bg (2.76:1) */
   --text-form: #003e6b;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
