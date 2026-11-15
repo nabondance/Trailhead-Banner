@@ -184,7 +184,7 @@ const MainPage = ({ fallbackCount = null }) => {
           <Image src={fullscreenImage} alt='Full Screen Example' layout='fill' objectFit='contain' unoptimized />
         </div>
       )}
-      <Sponsors />
+      <Sponsors priority />
     </div>
   );
 };

@@ -25,11 +25,15 @@ const inter = Inter({
   preload: false,
 });
 
-// Announcement banner font: Iosevka (SIL OFL 1.1) subset to Latin. Only fetched when an announcement shows
+// Announcement banner font: Iosevka (SIL OFL 1.1) subset to Latin and Latin Extended-A, in the
+// weights the announcement styles use. Only fetched when an announcement shows
 const iosevka = localFont({
-  src: '../fonts/Iosevka-Regular-latin.woff2',
+  src: [
+    { path: '../fonts/Iosevka-Regular-latin.woff2', weight: '400', style: 'normal' },
+    { path: '../fonts/Iosevka-Medium-latin.woff2', weight: '500', style: 'normal' },
+    { path: '../fonts/Iosevka-Bold-latin.woff2', weight: '700', style: 'normal' },
+  ],
   variable: '--font-iosevka',
-  weight: '400',
   display: 'swap',
   preload: false,
 });
