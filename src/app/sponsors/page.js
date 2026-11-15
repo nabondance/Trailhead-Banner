@@ -37,7 +37,7 @@ export default function SponsorsPage() {
     <div className='container'>
       <JsonLd data={breadcrumbJsonLd('Sponsors', '/sponsors')} />
       <h1 className='sponsors-page-title'>Trailhead Banner Sponsors</h1>
-      <Sponsors />
+      <Sponsors aboveFold />
       <div className='sponsors-cta'>
         <p>Love Trailhead Banner? Put your name on it.</p>
         <a

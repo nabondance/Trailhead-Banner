@@ -12,8 +12,8 @@ const supporterList = sponsors.filter((s) => s.tier === 'supporter');
 const hasAnySponsor =
   poweredBy.length > 0 || hallOfFame.length > 0 || sponsorList.length > 0 || supporterList.length > 0;
 
-// `priority`: the card is the LCP element on mobile home, so load it eagerly at high priority there
-const PoweredByCard = ({ sponsor, priority = false }) => (
+// `aboveFold`: the card is the page's LCP element (mobile home, /sponsors), so load it eagerly at high priority
+const PoweredByCard = ({ sponsor, aboveFold = false }) => (
   <a href={sponsor.url} target='_blank' rel='noopener noreferrer' className='powered-by-card'>
     <Image
       src={sponsor.image}
@@ -21,8 +21,8 @@ const PoweredByCard = ({ sponsor, priority = false }) => (
       fill
       className='powered-by-bg'
       unoptimized
-      loading={priority ? 'eager' : undefined}
-      fetchPriority={priority ? 'high' : undefined}
+      loading={aboveFold ? 'eager' : undefined}
+      fetchPriority={aboveFold ? 'high' : undefined}
     />
     <div className='powered-by-overlay'>
       <span className='powered-by-name'>{sponsor.name}</span>
@@ -81,8 +81,8 @@ const MarqueeRow = ({ items = [], renderItem = () => null, keyFn = (s) => s } = 
   );
 };
 
-/** @param {{ priority?: boolean }} props - priority: first powered-by card is the page's LCP element */
-const Sponsors = ({ priority = false }) => {
+/** @param {{ aboveFold?: boolean }} props - aboveFold: the first powered-by card is the page's LCP element */
+const Sponsors = ({ aboveFold = false }) => {
   if (!hasAnySponsor) return null;
 
   return (
@@ -104,7 +104,7 @@ const Sponsors = ({ priority = false }) => {
           <span className='sponsors-tier-label'>Powered by</span>
           <div className='sponsors-row'>
             {poweredBy.map((s, i) => (
-              <PoweredByCard key={s.name} sponsor={s} priority={priority && i === 0} />
+              <PoweredByCard key={s.name} sponsor={s} aboveFold={aboveFold && i === 0} />
             ))}
           </div>
         </div>
