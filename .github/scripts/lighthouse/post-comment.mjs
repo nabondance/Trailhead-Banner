@@ -1,9 +1,8 @@
-import { join } from 'path';
 import { findArtifactUrl, findPullRequestNumber, upsertComment } from '../shared/github-pr.mjs';
-import { describeRuns, renderScores } from './scores.mjs';
+import { renderReport } from './report.mjs';
 
-// Runs from the default branch (workflow_run), with a write token. The manifest
-// was produced by a Lighthouse run on pull request code, possibly from a fork:
+// Runs from the default branch (workflow_run), with a write token. The results
+// (manifest.json, issues.json) were produced by a Lighthouse run on pull request code, possibly from a fork:
 // treat it as untrusted data (see scores.mjs).
 //
 // Also runs when the manifest is missing or unusable (for example the run
@@ -30,20 +29,20 @@ if (!headSha || !headOwner || !headBranch) {
   process.exit(1);
 }
 
-let scores = null;
+let report = null;
 try {
-  scores = renderScores(artifactDir ? join(artifactDir, 'manifest.json') : null);
+  report = renderReport(artifactDir);
 } catch (err) {
-  console.error(`Could not read the Lighthouse manifest: ${err.message}`);
+  console.error(`Could not read the Lighthouse results: ${err.message}`);
 }
 
 const runLink = runUrl ? ` · [workflow run](${runUrl})` : '';
-const reportsUrl = scores ? await findArtifactUrl({ repo, token, runId, name: 'lighthouse-reports' }) : undefined;
+const reportsUrl = report ? await findArtifactUrl({ repo, token, runId, name: 'lighthouse-reports' }) : undefined;
 const reportsLink = reportsUrl
   ? ` · [download full reports](${reportsUrl})`
   : ' (full reports in the `lighthouse-reports` artifact)';
-const content = scores
-  ? `${describeRuns(scores.runsPerPage)} · commit \`${sha}\`${runLink}${reportsLink}\n\n${scores.table}`
+const content = report
+  ? `${report.intro} · commit \`${sha}\`${runLink}${reportsLink}\n\n${report.body}`
   : `No Lighthouse scores for commit \`${sha}\`: the run produced no usable results${runLink}.`;
 const body = `${SENTINEL}\n## Lighthouse\n\n${content}\n`;
 

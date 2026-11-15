@@ -64,22 +64,35 @@ jobs:
         run: pnpm build
 
       # Assertions are warnings for now: the job reports scores without blocking PRs
-      - name: Run Lighthouse CI
-        run: pnpm dlx @lhci/cli@0.16.1 autorun
+      - name: Run Lighthouse CI (light theme)
+        run: |
+          pnpm dlx @lhci/cli@0.16.1 autorun
+          mkdir -p lighthouse-results
+          mv .lighthouseci/reports lighthouse-results/light
 
+      # Accessibility only, 1 run: colors are the only thing the theme changes
+      - name: Run Lighthouse CI (dark theme)
+        run: |
+          pnpm dlx @lhci/cli@0.16.1 collect --numberOfRuns=1 --settings.onlyCategories=accessibility \
+            --settings.chromeFlags="--no-sandbox --blink-settings=preferredColorScheme=0"
+          pnpm dlx @lhci/cli@0.16.1 upload --outputDir=lighthouse-results/dark
+
+      # Also writes issues.json (failing audits) for each theme
       - name: Write job summary
         if: always()
         env:
-          MANIFEST_PATH: .lighthouseci/reports/manifest.json
+          RESULTS_DIR: lighthouse-results
         run: node .github/scripts/lighthouse/summary.mjs
 
-      # Small artifact for lighthouse-comment.yml, which only needs the scores
-      - name: Upload manifest
+      # Small artifact for lighthouse-comment.yml: scores and failing audits only
+      - name: Upload scores
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: lighthouse-manifest
-          path: .lighthouseci/reports/manifest.json
+          path: |
+            lighthouse-results/*/manifest.json
+            lighthouse-results/*/issues.json
           if-no-files-found: ignore
           retention-days: 14
 
@@ -88,6 +101,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: lighthouse-reports
-          path: .lighthouseci/reports
+          path: lighthouse-results
           if-no-files-found: ignore
           retention-days: 14
