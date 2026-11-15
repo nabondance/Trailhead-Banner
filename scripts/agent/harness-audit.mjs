@@ -17,7 +17,7 @@ const warn = (file, msg) => warnings.push(`WARN  ${file}: ${msg}`);
 
 const exists = (p) => fs.existsSync(path.join(root, p));
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
-const list = (dir) => (exists(dir) ? fs.readdirSync(path.join(root, dir)) : []);
+const list = (dir) => (exists(dir) ? fs.readdirSync(path.join(root, dir)).filter((f) => !f.startsWith('.')) : []);
 
 function frontmatter(text) {
   const m = text.match(/^---\n([\s\S]*?)\n---/);
@@ -121,19 +121,22 @@ const harnessFiles = [
 
 const pathRoots = /^(src|scripts|docs|public|\.claude|\.agents|\.codex|\.github)\//;
 // Paths that are created on first use, not committed
-const createdLater = new Set(['docs/egm/']);
+const createdLater = new Set(['docs/egm']);
 const gitIgnored = (p) => spawnSync('git', ['check-ignore', '-q', p], { cwd: root }).status === 0;
 
 for (const file of harnessFiles) {
   const text = read(file);
 
   // Repo paths in backticks, e.g. `src/utils/drawUtils.js`
-  for (const m of text.matchAll(/`([^`\s]+)`/g)) {
-    const p = m[1].replace(/[),.:;]+$/, '');
-    if (!pathRoots.test(p) || /[*<>$]/.test(p) || createdLater.has(p)) continue;
+  // Every word of a code span, so `bash scripts/agent/x.sh [arg]` is checked too
+  for (const m of text.matchAll(/`([^`\n]+)`/g)) {
     // "Create `src/...`" describes a file to add, not one that should exist
     if (/\b(create|add)\s*$/i.test(text.slice(Math.max(0, m.index - 12), m.index))) continue;
-    if (!exists(p) && !gitIgnored(p)) err(file, `mentions \`${p}\`, which does not exist`);
+    for (const word of m[1].split(/\s+/)) {
+      const p = word.replace(/^["'(]+|["'),.:;]+$/g, '');
+      if (!pathRoots.test(p) || /[*<>$]/.test(p) || createdLater.has(p.replace(/\/$/, ''))) continue;
+      if (!exists(p) && !gitIgnored(p)) err(file, `mentions \`${p}\`, which does not exist`);
+    }
   }
 
   // Relative markdown links
@@ -192,7 +195,7 @@ if (fs.existsSync(egmCache)) {
     .readdirSync(egmCache)
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
     .pop();
-  for (const [name, file] of skills) {
+  for (const [, file] of newest ? skills : []) {
     for (const [, egmSkill] of read(file).matchAll(/skills\/(egm-[a-z-]+)\/SKILL\.md/g)) {
       if (!fs.existsSync(path.join(egmCache, newest, 'skills', egmSkill, 'SKILL.md'))) {
         err(file, `EGM ${newest} has no skills/${egmSkill}/SKILL.md (plugin layout changed?)`);

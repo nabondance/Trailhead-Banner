@@ -14,7 +14,8 @@ const SECTION = /#{2,3}[ \t]*(screenshots|visual check)\b/i;
 try {
   const input = JSON.parse(fs.readFileSync(0, 'utf8'));
   const command = input.tool_input?.command ?? '';
-  if (!/\bgh\s+pr\s+create\b/.test(command)) process.exit(0);
+  // Only where a command starts: a commit message that mentions it is not one
+  if (!/(?:^|[;&|(\n])\s*gh\s+pr\s+create\b/.test(command)) process.exit(0);
 
   // `cd <dir> && gh pr create ...` runs in <dir>
   let cwd = input.cwd || process.cwd();
@@ -23,7 +24,7 @@ try {
 
   // The body is either in the command (--body, heredoc) or in a --body-file
   let body = command;
-  const bodyFile = command.match(/--body-file[=\s]+(["']?)([^"'\s]+)\1/)?.[2];
+  const bodyFile = command.match(/(?:--body-file|-F)[=\s]+(["']?)([^"'\s]+)\1/)?.[2];
   if (bodyFile && bodyFile !== '-') body += fs.readFileSync(path.resolve(cwd, bodyFile), 'utf8');
   if (SECTION.test(body)) process.exit(0);
 

@@ -6,6 +6,7 @@ on:
     branches:
       - main
     paths:
+      - '.github/workflows/harness-audit.yml'
       - 'AGENTS.md'
       - 'CLAUDE.md'
       - '.claude/**'

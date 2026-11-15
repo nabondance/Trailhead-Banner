@@ -15,7 +15,7 @@ USERNAME="${1:-nabondance}"
 echo "Testing image generation for: $USERNAME"
 
 # Check if server is running
-if ! dev_running || ! curl -s "$BASE_URL" > /dev/null 2>&1; then
+if ! dev_server_exists || ! curl -s "$BASE_URL" > /dev/null 2>&1; then
   echo "ERROR: This worktree's dev server is not running"
   echo "Start with: bash scripts/agent/dev-start.sh"
   exit 1

@@ -12,7 +12,7 @@ USERNAMES=("$@")
 # 1. Stop this worktree's dev server (next build breaks a running dev server)
 # shellcheck source=lib/dev-server.sh
 source "$SCRIPTS_DIR/lib/dev-server.sh"
-if dev_running; then
+if dev_server_exists; then
   echo "Dev server running — stopping it before build"
   bash "$SCRIPTS_DIR/dev-stop.sh"
 fi
