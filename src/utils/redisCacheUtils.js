@@ -8,6 +8,9 @@ import { Redis } from '@upstash/redis';
  */
 class RedisCacheUtils {
   static CACHE_TTL_SECONDS = 900; // 15 minutes
+  static MAX_TTL_SECONDS = 1800; // 30 minutes: cap on a sliding entry's total lifetime
+  // Bump when the stored format changes, so deployments on another version never read it
+  static CACHE_KEY_VERSION = 'v2';
   static redisClient = null;
   static redisAvailable = null;
 
@@ -85,7 +88,7 @@ class RedisCacheUtils {
 
   /**
    * Generate cache key for a GraphQL query
-   * Format: graphql:{username}:{QueryName}:{variablesHash}
+   * Format: graphql:{version}:{username}:{QueryName}:{variablesHash}
    * Variables hash ensures different variable combinations get different cache keys
    */
   static generateCacheKey(username, queryString, variables) {
@@ -100,7 +103,7 @@ class RedisCacheUtils {
       .substring(0, 8);
 
     if (queryName) {
-      return `graphql:${username}:${queryName}:${variablesHash}`;
+      return `graphql:${this.CACHE_KEY_VERSION}:${username}:${queryName}:${variablesHash}`;
     }
 
     // Fallback: Create hash from query + variables
@@ -110,7 +113,7 @@ class RedisCacheUtils {
       .digest('hex')
       .substring(0, 8);
 
-    return `graphql:${username}:${fullHash}`;
+    return `graphql:${this.CACHE_KEY_VERSION}:${username}:${fullHash}`;
   }
 
   /**
@@ -154,6 +157,38 @@ class RedisCacheUtils {
       console.error(`[Redis Cache] Write failed for ${cacheKey}:`, error.message);
       // Don't throw - cache write failures should not break the request
     }
+  }
+
+  /**
+   * Store a sliding-TTL entry: the payload is wrapped with its write time and
+   * TTL so later hits can extend it without passing the max lifetime
+   */
+  static async setSlidingCachedQuery(cacheKey, data, ttlSeconds = this.CACHE_TTL_SECONDS) {
+    await this.setCachedQuery(cacheKey, { payload: data, cachedAt: Date.now(), ttl: ttlSeconds }, ttlSeconds);
+  }
+
+  /**
+   * Read a sliding-TTL entry. A hit resets its TTL to the one it was written
+   * with, capped so the entry never lives past MAX_TTL_SECONDS from its first
+   * write (data still gets refreshed from Trailhead). The TTL refresh runs in
+   * the background and its failure never breaks the read.
+   */
+  static async getSlidingCachedQuery(cacheKey) {
+    const cached = await this.getCachedQuery(cacheKey);
+    if (!cached || typeof cached.cachedAt !== 'number' || !('payload' in cached)) {
+      return null;
+    }
+
+    const ageSeconds = Math.floor((Date.now() - cached.cachedAt) / 1000);
+    const ttlSeconds = Number.isInteger(cached.ttl) ? cached.ttl : this.CACHE_TTL_SECONDS;
+    const nextTtl = Math.min(ttlSeconds, this.MAX_TTL_SECONDS - ageSeconds);
+    if (nextTtl > 0) {
+      this.getClient()
+        ?.expire(cacheKey, nextTtl)
+        .catch((error) => console.error(`[Redis Cache] TTL refresh failed for ${cacheKey}:`, error.message));
+    }
+
+    return cached.payload;
   }
 
   /**
