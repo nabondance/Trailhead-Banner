@@ -370,7 +370,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
                   <img
                     key={image.src}
                     src={image.src}
-                    alt={image.description}
+                    alt={image.alt}
                     width={200}
                     height={50}
                     className={`thumbnail ${options.backgroundLibraryUrl.endsWith(image.src) ? 'selected' : ''}`}

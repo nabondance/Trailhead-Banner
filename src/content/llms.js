@@ -27,8 +27,7 @@ their Trailhead username and receive a downloadable PNG banner.
 
 - [Home](https://thb.nabondance.me): Enter a Trailhead username to generate a banner.
 - [How-to](https://thb.nabondance.me/how-to): Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
-- [Examples](https://thb.nabondance.me/examples): Gallery of example banners showing different configurations.
-- [Background library](https://thb.nabondance.me/background-library): Browse the ${backgroundCount} available background images for the banner.
+- [Gallery](https://thb.nabondance.me/gallery): Example banners showing different configurations, and the ${backgroundCount} available background images.
 - [Company banner](https://thb.nabondance.me/company): Generate a company/team banner aggregating multiple Trailhead profiles.
 - [Trailhead Rewind](https://thb.nabondance.me/rewind): Generate a year-in-review banner (active December–January).
 - [Releases](https://thb.nabondance.me/releases): Changelog and release history.
@@ -71,8 +70,7 @@ their rank, certifications, superbadges, badge counts, and more.
 
 - [Home](https://thb.nabondance.me): Enter a Trailhead username to generate a banner.
 - [How-to](https://thb.nabondance.me/how-to): Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
-- [Examples](https://thb.nabondance.me/examples): Gallery of example banners showing different configurations.
-- [Background library](https://thb.nabondance.me/background-library): Browse all ${backgroundCount} available background images for the banner.
+- [Gallery](https://thb.nabondance.me/gallery): Example banners showing different configurations, and all ${backgroundCount} available background images with their credits.
 - [Company banner](https://thb.nabondance.me/company): Generate a company/team banner aggregating multiple Trailhead profiles into a single banner with collective certifications, badges, Agentblazer levels, and optional CSV team data export (skills matrix, certifications per product, upcoming maintenance).
 - [Trailhead Rewind](https://thb.nabondance.me/rewind): Generate a year-in-review banner (active December–January).
 - [Releases](https://thb.nabondance.me/releases): Changelog and release history.
@@ -111,7 +109,7 @@ A generated banner (1584×396px) includes the following elements:
 
 ${backgroundCount} backgrounds are available, themed around Salesforce events, locations, and Trailblazer.me imagery.
 Examples: Australia, Japan, France, Highland Waterfalls, Tropical Beach, and more.
-Full list visible at https://thb.nabondance.me/background-library.
+Full list visible at https://thb.nabondance.me/gallery#backgrounds.
 
 Users can also provide a custom background via URL or image upload.
 

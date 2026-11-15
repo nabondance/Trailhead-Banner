@@ -1001,6 +1001,40 @@ legend {
   z-index: 10;
 }
 
+.gallery-card-button {
+  display: block;
+  width: 90%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.gallery-card-button img {
+  width: 100%;
+}
+
+.gallery-card-button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.gallery-section {
+  margin-top: 40px;
+  scroll-margin-top: 20px;
+}
+
+.page-grid.gallery-grid-wide {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (width <= 1000px) {
+  .page-grid.gallery-grid-wide {
+    grid-template-columns: 1fr;
+  }
+}
+
 .example-card p {
   margin-top: 10px;
   font-size: 1em;
