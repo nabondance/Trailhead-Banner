@@ -196,8 +196,7 @@ class SupabaseUtils {
             title: cert.title,
             dateCompleted: cert.dateCompleted,
             dateExpired: cert.dateExpired,
-            status: cert.status.title,
-            logoUrl: cert.logoUrl,
+            status: cert.status?.title ?? null,
             product: cert.product,
           })) || [],
       },
@@ -206,12 +205,11 @@ class SupabaseUtils {
           edges:
             data.superbadgesData?.earnedAwards?.edges
               ?.map((edge) => {
-                if (edge.node.award) {
+                if (edge?.node?.award) {
                   return {
                     node: {
                       award: {
                         title: edge.node.award.title,
-                        icon: edge.node.award.icon,
                       },
                     },
                   };
