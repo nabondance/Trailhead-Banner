@@ -73,3 +73,24 @@ export async function upsertComment({ repo, token, prNumber, sentinel, body }) {
     console.log('Posted new comment');
   }
 }
+
+/**
+ * Direct download URL of a workflow run artifact (a zip; GitHub requires being
+ * signed in). Returns undefined when the artifact doesn't exist or can't be listed.
+ */
+export async function findArtifactUrl({ repo, token, runId, name }) {
+  if (!/^\d+$/.test(String(runId ?? ''))) return undefined;
+  try {
+    const res = await request(
+      `${API}/repos/${repo}/actions/runs/${runId}/artifacts?name=${encodeURIComponent(name)}`,
+      { headers: headers(token) },
+      'list artifacts'
+    );
+    const artifact = res?.artifacts?.find((a) => a.name === name && !a.expired);
+    if (!Number.isInteger(artifact?.id)) return undefined;
+    return `https://github.com/${repo}/actions/runs/${runId}/artifacts/${artifact.id}`;
+  } catch (err) {
+    console.log(`Could not find the ${name} artifact: ${err.message}`);
+    return undefined;
+  }
+}
