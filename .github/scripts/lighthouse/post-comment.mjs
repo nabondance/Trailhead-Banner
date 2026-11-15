@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { findPullRequestNumber, upsertComment } from '../shared/github-pr.mjs';
+import { findArtifactUrl, findPullRequestNumber, upsertComment } from '../shared/github-pr.mjs';
 import { describeRuns, renderScores } from './scores.mjs';
 
 // Runs from the default branch (workflow_run), with a write token. The manifest
@@ -13,6 +13,7 @@ const SENTINEL = '<!-- lighthouse-comment -->';
 
 const artifactDir = process.env.ARTIFACT_DIR;
 const runUrl = process.env.RUN_URL;
+const runId = process.env.RUN_ID;
 const headSha = process.env.HEAD_SHA;
 const headOwner = process.env.HEAD_OWNER;
 const headBranch = process.env.HEAD_BRANCH;
@@ -37,8 +38,12 @@ try {
 }
 
 const runLink = runUrl ? ` · [workflow run](${runUrl})` : '';
+const reportsUrl = scores ? await findArtifactUrl({ repo, token, runId, name: 'lighthouse-reports' }) : undefined;
+const reportsLink = reportsUrl
+  ? ` · [download full reports](${reportsUrl})`
+  : ' (full reports in the `lighthouse-reports` artifact)';
 const content = scores
-  ? `${describeRuns(scores.runsPerPage)} · commit \`${sha}\`${runLink} (full reports in the \`lighthouse-reports\` artifact)\n\n${scores.table}`
+  ? `${describeRuns(scores.runsPerPage)} · commit \`${sha}\`${runLink}${reportsLink}\n\n${scores.table}`
   : `No Lighthouse scores for commit \`${sha}\`: the run produced no usable results${runLink}.`;
 const body = `${SENTINEL}\n## Lighthouse\n\n${content}\n`;
 
