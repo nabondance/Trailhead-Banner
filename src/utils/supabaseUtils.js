@@ -222,17 +222,19 @@ class SupabaseUtils {
       stampsData: {
         totalCount: data.stampsData?.totalCount,
         edges:
-          data.stampsData?.edges?.map((edge) => ({
-            node: {
-              kind: edge.node.kind,
-              apiName: edge.node.apiName,
-              name: edge.node.name,
-              eventDate: edge.node.eventDate,
-              eventLocation: edge.node.eventLocation,
-              iconUrl: edge.node.iconUrl,
-              linkUrl: edge.node.linkUrl,
-            },
-          })) || [],
+          data.stampsData?.edges
+            ?.filter((edge) => edge?.node)
+            .map((edge) => ({
+              node: {
+                kind: edge.node.kind,
+                apiName: edge.node.apiName,
+                name: edge.node.name,
+                eventDate: edge.node.eventDate,
+                eventLocation: edge.node.eventLocation,
+                iconUrl: edge.node.iconUrl,
+                linkUrl: edge.node.linkUrl,
+              },
+            })) || [],
       },
       communityData: {
         answers: data.communityData?.questionAndAnswersStats?.answersCount ?? null,
