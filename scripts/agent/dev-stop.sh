@@ -1,40 +1,36 @@
 #!/bin/bash
-# Stop the background dev server
+# shellcheck source-path=SCRIPTDIR
+# Stop this checkout's dev servers
 # Usage: bash scripts/agent/dev-stop.sh
+# Stops the server recorded in .dev-server.pid and any `next dev` started by
+# hand in this checkout. Dev servers of other worktrees are left alone.
 
 set -e
 
+# shellcheck source=lib/dev-server.sh
+source "$(dirname "$0")/lib/dev-server.sh"
+
 echo "Stopping dev server..."
 
-# Check if PID file exists
-if [ -f .dev-server.pid ]; then
-  PID=$(cat .dev-server.pid)
+STOPPED=""
 
-  # Check if process is running
-  if ps -p $PID > /dev/null 2>&1; then
-    kill $PID 2> /dev/null || true
-    # Wait a bit for graceful shutdown
-    sleep 1
-
-    # Force kill if still running
-    if ps -p $PID > /dev/null 2>&1; then
-      kill -9 $PID 2> /dev/null || true
-    fi
-
-    echo "Dev server: Stopped (PID: $PID)"
-  else
-    echo "Dev server: Not running (stale PID file)"
+if [ -f "$DEV_PID_FILE" ]; then
+  PID=$(cat "$DEV_PID_FILE")
+  if ps -p "$PID" > /dev/null 2>&1; then
+    stop_tree "$PID"
+    STOPPED="$PID"
   fi
+fi
 
-  rm -f .dev-server.pid
+for PID in $(hand_started_pids); do
+  stop_tree "$PID"
+  STOPPED="$STOPPED $PID"
+done
+
+rm -f "$DEV_PID_FILE" "$DEV_PORT_FILE"
+
+if [ -n "$STOPPED" ]; then
+  echo "Dev server: Stopped (PID:${STOPPED# })"
 else
-  # Try to find and kill by process name
-  PIDS=$(pgrep -f "pnpm dev" || true)
-
-  if [ -n "$PIDS" ]; then
-    echo "$PIDS" | xargs kill 2> /dev/null || true
-    echo "Dev server: Stopped (found by name)"
-  else
-    echo "Dev server: Not running"
-  fi
+  echo "Dev server: Not running"
 fi

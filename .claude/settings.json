@@ -20,6 +20,17 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/scripts/agent/hooks/pr-screenshot-guard.sh"
+          }
+        ]
+      }
     ]
   },
   "permissions": {
@@ -33,8 +44,8 @@
       "Bash(pnpm format:prettier:fix)",
       "Bash(pnpm format:stylelint)",
       "Bash(pnpm format:stylelint:fix)",
-      "Bash(curl -s http://localhost:3000:*)",
-      "Bash(curl -s -X POST http://localhost:3000:*)"
+      "Bash(curl -s http://localhost:*)",
+      "Bash(curl -s -X POST http://localhost:*)"
     ],
     "deny": [
       "Read(./.env*)",
