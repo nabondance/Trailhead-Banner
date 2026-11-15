@@ -9,7 +9,7 @@ import { existsSync, lstatSync, readFileSync } from 'fs';
 const MAX_MANIFEST_BYTES = 1024 * 1024;
 const MAX_PAGES = 20;
 
-const CATEGORIES = [
+export const CATEGORIES = [
   { key: 'performance', label: 'Performance' },
   { key: 'accessibility', label: 'Accessibility' },
   { key: 'best-practices', label: 'Best practices' },
@@ -17,8 +17,11 @@ const CATEGORIES = [
   { key: 'agentic-browsing', label: 'Agentic browsing' },
 ];
 
-// Keep only a plain local path, so the page column cannot carry markdown or links
-function pagePath(url) {
+// A page path as shown in tables: plain, so it cannot carry markdown or links
+export const PAGE_PATH = /^\/[a-z0-9\-/]*$/i;
+
+// Keep only a plain local path
+export function pagePath(url) {
   const match = typeof url === 'string' && url.match(/^http:\/\/localhost:3000(\/[a-z0-9\-/]*)?$/i);
   return match ? match[1] || '/' : null;
 }
@@ -35,9 +38,10 @@ function formatScore(value) {
  * Reads the manifest and renders the scores of each page's representative run
  * (the run with the median performance score).
  * @param {string} manifestPath
+ * @param {Array<{ key: string, label: string }>} [categories] - columns to show, all categories by default
  * @returns {{ table: string, runsPerPage: { min: number, max: number } } | null} null when there is nothing usable
  */
-export function renderScores(manifestPath) {
+export function renderScores(manifestPath, categories = CATEGORIES) {
   if (!manifestPath || !existsSync(manifestPath) || !lstatSync(manifestPath).isFile()) return null;
   if (lstatSync(manifestPath).size > MAX_MANIFEST_BYTES) throw new Error('Lighthouse manifest is too large');
 
@@ -56,10 +60,10 @@ export function renderScores(manifestPath) {
   const runCounts = rows.map((row) => runs.filter((run) => run.path === row.path).length);
   const runsPerPage = { min: Math.min(...runCounts), max: Math.max(...runCounts) };
   const table = [
-    `| Page | ${CATEGORIES.map((c) => c.label).join(' | ')} |`,
-    `|---|${CATEGORIES.map(() => '---').join('|')}|`,
+    `| Page | ${categories.map((c) => c.label).join(' | ')} |`,
+    `|---|${categories.map(() => '---').join('|')}|`,
     ...rows.map(
-      (row) => `| \`${row.path}\` | ${CATEGORIES.map((c) => formatScore(row.summary?.[c.key])).join(' | ')} |`
+      (row) => `| \`${row.path}\` | ${categories.map((c) => formatScore(row.summary?.[c.key])).join(' | ')} |`
     ),
   ].join('\n');
 
@@ -71,9 +75,17 @@ export function renderScores(manifestPath) {
  * @param {{ min: number, max: number }} runsPerPage
  */
 export function describeRuns({ min, max }) {
-  const count = min === max ? `${max}` : `${min}–${max}`;
-  const runs = `${count} run${max > 1 ? 's' : ''} per page`;
+  const runs = formatRunCount({ min, max });
   return max > 1
-    ? `Mobile, local production build · ${runs}, scores from the run with the median performance`
-    : `Mobile, local production build · ${runs}`;
+    ? `Mobile, light theme, local production build · ${runs}, scores from the run with the median performance`
+    : `Mobile, light theme, local production build · ${runs}`;
+}
+
+/**
+ * "3 runs per page", "1–2 runs per page".
+ * @param {{ min: number, max: number }} runsPerPage
+ */
+export function formatRunCount({ min, max }) {
+  const count = min === max ? `${max}` : `${min}–${max}`;
+  return `${count} run${max > 1 ? 's' : ''} per page`;
 }

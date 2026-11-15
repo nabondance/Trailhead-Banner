@@ -55,3 +55,4 @@ megalinter-reports/
 
 # Lighthouse CI
 .lighthouseci/
+lighthouse-results/

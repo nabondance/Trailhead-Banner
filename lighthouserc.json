@@ -13,7 +13,7 @@
       ],
       "numberOfRuns": 3,
       "settings": {
-        "chromeFlags": "--no-sandbox",
+        "chromeFlags": "--no-sandbox --blink-settings=preferredColorScheme=1",
         "skipAudits": ["is-crawlable"]
       }
     },
