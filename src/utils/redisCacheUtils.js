@@ -8,6 +8,7 @@ import { Redis } from '@upstash/redis';
  */
 class RedisCacheUtils {
   static CACHE_TTL_SECONDS = 900; // 15 minutes
+  static MAX_TTL_SECONDS = 3600; // 1 hour: cap on a sliding entry's total lifetime
   static redisClient = null;
   static redisAvailable = null;
 
@@ -154,6 +155,38 @@ class RedisCacheUtils {
       console.error(`[Redis Cache] Write failed for ${cacheKey}:`, error.message);
       // Don't throw - cache write failures should not break the request
     }
+  }
+
+  /**
+   * Store a sliding-TTL entry: the payload is wrapped with its write time so
+   * later hits can extend the TTL without passing the max lifetime
+   */
+  static async setSlidingCachedQuery(cacheKey, data, ttlSeconds = this.CACHE_TTL_SECONDS) {
+    await this.setCachedQuery(cacheKey, { payload: data, cachedAt: Date.now() }, ttlSeconds);
+  }
+
+  /**
+   * Read a sliding-TTL entry. A hit resets its TTL to `ttlSeconds`, capped so the
+   * entry never lives past MAX_TTL_SECONDS from its first write (data still gets
+   * refreshed from Trailhead). The TTL refresh runs in the background and its
+   * failure never breaks the read.
+   */
+  static async getSlidingCachedQuery(cacheKey, ttlSeconds = this.CACHE_TTL_SECONDS) {
+    const cached = await this.getCachedQuery(cacheKey);
+    if (!cached || typeof cached.cachedAt !== 'number' || !('payload' in cached)) {
+      // Miss, or an entry written before sliding TTLs: served as-is until it expires
+      return cached;
+    }
+
+    const ageSeconds = Math.floor((Date.now() - cached.cachedAt) / 1000);
+    const nextTtl = Math.min(ttlSeconds, this.MAX_TTL_SECONDS - ageSeconds);
+    if (nextTtl > 0) {
+      this.getClient()
+        ?.expire(cacheKey, nextTtl)
+        .catch((error) => console.error(`[Redis Cache] TTL refresh failed for ${cacheKey}:`, error.message));
+    }
+
+    return cached.payload;
   }
 
   /**

@@ -71,7 +71,8 @@ class GraphQLUtils {
    *   is listed in `failedQueries`
    * @param {string} username - Username for cache key generation
    * @param {Object} [options]
-   * @param {number} [options.ttlSeconds] - Cache TTL override (defaults to RedisCacheUtils.CACHE_TTL_SECONDS)
+   * @param {number} [options.ttlSeconds] - Cache TTL override (defaults to RedisCacheUtils.CACHE_TTL_SECONDS),
+   *   reset on each cache hit up to RedisCacheUtils.MAX_TTL_SECONDS of total lifetime
    * @returns {Object} { responses, failedQueries, timingBreakdown, cacheSummary }
    */
   static async performQueriesWithCache(queries, username, { ttlSeconds } = {}) {
@@ -98,7 +99,7 @@ class GraphQLUtils {
         const cacheKey = RedisCacheUtils.generateCacheKey(username, query.query, query.variables);
 
         try {
-          const cached = await RedisCacheUtils.getCachedQuery(cacheKey);
+          const cached = await RedisCacheUtils.getSlidingCachedQuery(cacheKey, ttlSeconds);
           if (cached) {
             result = cached;
             cacheHit = true;
@@ -163,7 +164,7 @@ class GraphQLUtils {
               statusText: graphqlResponse.statusText,
               headers: graphqlResponse.headers,
             };
-            RedisCacheUtils.setCachedQuery(cacheKey, serializableResponse, ttlSeconds).catch((error) => {
+            RedisCacheUtils.setSlidingCachedQuery(cacheKey, serializableResponse, ttlSeconds).catch((error) => {
               cacheErrors.push(RedisCacheUtils.handleRedisError(error, 'write', queryName));
             });
           }
