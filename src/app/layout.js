@@ -11,16 +11,10 @@ import { getBannerCount } from '../utils/bannerCountUtils';
 
 import ThemeProvider from '../components/ThemeProvider';
 
-import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import { Geist_Mono, Inter } from 'next/font/google';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-  display: 'swap',
-});
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -160,7 +154,7 @@ export default async function RootLayout({ children }) {
         {process.env.VERCEL_ENV && <SpeedInsights />}
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistMono.variable} antialiased`}>
         <ThemeProvider>
           <header className='header'>
             <TrailheadBannerHeader />
