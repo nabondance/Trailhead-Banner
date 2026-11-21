@@ -83,6 +83,18 @@ function keepInFront(it, keepOut, ease) {
   if (it.vel.z < 0) it.vel.z = 0;
 }
 
+// items rest almost upright, so their text stays readable
+const MAX_REST_TILT = 0.16;
+
+/* Items tumble freely in the air and turn back upright as they near the
+   snow, by the shortest way round, ending on their own slight tilt */
+function settleRotation(rotation, it, d, height) {
+  const near = 1 - THREE.MathUtils.clamp(height / 1.2, 0, 1);
+  const tumble = it.spin * d * Math.min(it.vel.length(), 2.5) * (1 - near);
+  const off = Math.atan2(Math.sin(it.restTilt - rotation), Math.cos(it.restTilt - rotation));
+  return rotation + tumble + off * (1 - Math.exp(-d * (0.8 + 11 * near)));
+}
+
 function Achievements({ world, achievements, floor, keepOut = null }) {
   const [items, setItems] = useState(null);
   const spritesRef = useRef([]);
@@ -134,6 +146,7 @@ function Achievements({ world, achievements, floor, keepOut = null }) {
           pos,
           vel: new THREE.Vector3(0, 0, 0),
           spin: (Math.random() - 0.5) * 2,
+          restTilt: (Math.random() * 2 - 1) * MAX_REST_TILT,
           size,
           aspect,
           r: size / 2,
@@ -255,7 +268,8 @@ function Achievements({ world, achievements, floor, keepOut = null }) {
       const sprite = spritesRef.current[i];
       if (sprite) {
         sprite.position.copy(it.pos);
-        sprite.material.rotation += it.spin * d * Math.min(it.vel.length(), 2.5);
+        const height = it.pos.y - floor.surfaceY(it.pos.x, it.pos.z) - it.r * 0.45;
+        sprite.material.rotation = settleRotation(sprite.material.rotation, it, d, height);
       }
 
       // A soft contact shadow anchors a badge only as it reaches the mound.
