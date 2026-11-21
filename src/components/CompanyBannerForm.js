@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { zipSync, strToU8 } from 'fflate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
@@ -18,6 +18,7 @@ import {
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
 import BackgroundPreview from './BackgroundPreview';
+import OptionsToggle from './OptionsToggle';
 import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 import { extractUsernameFromUrl } from '../utils/usernameValidation';
@@ -204,6 +205,7 @@ const CompanyBannerForm = () => {
   const [uploadedLogoFile, setUploadedLogoFile] = useState(null);
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [showOptions, setShowOptions] = useState(false);
+  const optionsPanelId = useId();
   const [isGenerating, setIsGenerating] = useState(false);
   const [fetchProgress, setFetchProgress] = useState(null); // { phase: 'fetch'|'retry'|'render', done, total }
   const [resultImageUrl, setResultImageUrl] = useState(null);
@@ -443,13 +445,15 @@ const CompanyBannerForm = () => {
         </div>
 
         {!isGenerating && (
-          <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
-            {showOptions ? 'Hide Options' : 'More Options'}
-          </button>
+          <OptionsToggle
+            expanded={showOptions}
+            onToggle={() => setShowOptions((v) => !v)}
+            controlsId={optionsPanelId}
+          />
         )}
 
         {showOptions && (
-          <div className='options'>
+          <div className='options' id={optionsPanelId}>
             {/* Background Options */}
             <fieldset>
               <legend>Background Options</legend>
@@ -517,7 +521,7 @@ const CompanyBannerForm = () => {
                     <img
                       key={image.src}
                       src={image.src}
-                      alt={image.description}
+                      alt={image.alt}
                       width={200}
                       height={50}
                       className={`thumbnail ${options.backgroundLibraryUrl === `${typeof window !== 'undefined' ? window.location.origin : ''}${image.src}` ? 'selected' : ''}`}

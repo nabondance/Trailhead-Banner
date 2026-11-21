@@ -11,28 +11,31 @@ import { getBannerCount } from '../utils/bannerCountUtils';
 
 import ThemeProvider from '../components/ThemeProvider';
 
-import { Geist, Geist_Mono, Inter } from 'next/font/google';
+import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const InterFont = Inter({
+// Footer font. Not preloaded: the footer is below the fold, so it shouldn't compete with the LCP image
+const inter = Inter({
   variable: '--font-inter',
-  weights: [400, 500, 600, 700],
   subsets: ['latin'],
   display: 'swap',
+  preload: false,
+});
+
+// Announcement banner font: Iosevka (SIL OFL 1.1) subset to Latin and Latin Extended-A, in the
+// weights the announcement styles use. Only fetched when an announcement shows
+const iosevka = localFont({
+  src: [
+    { path: '../fonts/Iosevka-Regular-latin.woff2', weight: '400', style: 'normal' },
+    { path: '../fonts/Iosevka-Medium-latin.woff2', weight: '500', style: 'normal' },
+    { path: '../fonts/Iosevka-Bold-latin.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-iosevka',
+  display: 'swap',
+  preload: false,
 });
 
 const siteUrl = 'https://thb.nabondance.me';
@@ -156,31 +159,11 @@ export default async function RootLayout({ children }) {
           data-website-id='b540d5cc-247f-426e-87ec-0c1258767c22'
           strategy='afterInteractive'
         />
-        <SpeedInsights />
+        {/* Its script is served by Vercel only: elsewhere (local builds, Lighthouse CI) it 404s */}
+        {process.env.VERCEL_ENV && <SpeedInsights />}
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
-        <link
-          rel='preload'
-          href='/_next/static/media/569ce4b8f30dc480-s.p.woff2'
-          as='font'
-          type='font/woff2'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='preload'
-          href='/_next/static/media/93f479601ee12b01-s.p.woff2'
-          as='font'
-          type='font/woff2'
-          crossOrigin='anonymous'
-        />
-        <link
-          rel='preload'
-          href='/_next/static/media/a34f9d1faa5f3315-s.p.woff2'
-          as='font'
-          type='font/woff2'
-          crossOrigin='anonymous'
-        />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${inter.variable} ${iosevka.variable} antialiased`}>
         <ThemeProvider>
           <header className='header'>
             <TrailheadBannerHeader />

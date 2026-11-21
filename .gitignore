@@ -49,6 +49,11 @@ megalinter-reports/
 
 # agent dev server
 .dev-server.pid
+.dev-server.port
 
 # claude settings
 .claude/settings.local.json
+
+# Lighthouse CI
+.lighthouseci/
+lighthouse-results/

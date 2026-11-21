@@ -17,7 +17,7 @@ pnpm build   # Production build
 - **Styling**: Tailwind CSS v4
 - **Canvas**: @napi-rs/canvas (for image generation)
 - **Deployment**: Vercel
-- **Caching**: Upstash Redis (15min TTL for GraphQL)
+- **Caching**: Upstash Redis (15min TTL for GraphQL, reset on hit up to 30min)
 - **Asset Cache**: Vercel Blob (certification logo images cached server-side)
 - **Analytics DB**: Supabase (tracks banner/rewind generations and errors)
 
@@ -43,45 +43,48 @@ Generates LinkedIn banner images from Trailhead user data (badges, certification
 ```mermaid
 graph TB
     A[User Input] --> B[BannerForm Component]
-    B --> C[POST /api/validate-username]
+    B --> C[GET /api/validate-username]
     C --> D{Valid?}
     D -->|No| E[Show Error]
     D -->|Yes| F[POST /api/banner/standard]
-    F --> G[graphqlUtils.js]
-    G --> H{Redis Cache Hit?}
-    H -->|Yes| I[Return Cached Data]
-    H -->|No| J[Trailhead GraphQL API]
-    J --> K[Cache in Redis<br/>15min TTL]
-    K --> I
-    I --> L[generateImage.js]
-    L --> M[drawUtils.js<br/>Canvas Operations]
-    M --> N[Return Base64]
-    N --> O[Display in Browser]
+    F --> G[Rate limit + validators.js]
+    G --> H[queryBuilder.js → shared.js fetchUserData]
+    H --> I{Redis Cache Hit?}
+    I -->|Yes| J[Cached Data]
+    I -->|No| K[Trailhead GraphQL API]
+    K --> L[Cache in Redis<br/>15min TTL, max 30min]
+    L --> J
+    J --> M[renderers/standardBanner.js]
+    M --> N[components: prepare in parallel,<br/>render in order]
+    N --> O[PNG as base64 data URL]
+    O --> P[Display in Browser]
 
-    style H fill:#e1f5ff
-    style K fill:#ffe1e1
-    style M fill:#e1ffe1
+    style I fill:#e1f5ff
+    style L fill:#ffe1e1
+    style N fill:#e1ffe1
 ```
 
 **Key Points:**
 
-- All GraphQL queries cached for 15min to reduce Trailhead API load
+- All GraphQL queries cached for 15min to reduce Trailhead API load; each cache hit resets the TTL, but an entry never lives past 30min from its first write
 - Canvas rendering happens server-side using @napi-rs/canvas
 - API responses (`/api/banner/**`) return the generated banner as base64 for direct browser display
 - Vercel Blob is used internally as an asset cache for certification logo images (`src/utils/blobUtils.js`, `src/utils/cacheUtils.js`); it is not used to store or share generated banners
 
 ### GraphQL Queries
 
-- All queries in `src/graphql/queries/`
+- All queries in `src/graphql/queries/`; `src/banner/api/queryBuilder.js` picks which ones a banner needs
 - Cached via `redisCacheUtils.js`
 - Error handling in `graphqlUtils.js`
 
 ### Image Generation
 
-1. Fetch user data from Trailhead API
-2. Validate with `usernameValidation.js` and `imageValidation.js`
-3. Draw on canvas using `drawUtils.js`
-4. Return base64 and display in browser
+1. The API route (`src/pages/api/banner/*.js`) validates the request (`src/banner/api/validators.js`) and fetches the data (`src/banner/api/shared.js`)
+2. A renderer (`src/banner/renderers/standardBanner.js` or `companyBanner.js`) prepares every component in parallel, then renders them in order on one canvas
+3. Components (`src/banner/components/`) draw with helpers from `src/utils/drawUtils.js`; user-supplied image URLs go through `urlSafety.js`, `imageSafety.js` and `imageValidation.js`
+4. The canvas is encoded to a base64 PNG and shown in the browser
+
+The Rewind image is the exception: it is drawn by `src/utils/generateRewind.js`, not by a renderer.
 
 ### Directory Structure
 
@@ -89,6 +92,7 @@ graph TB
 src/
 ├── app/              # Next.js App Router pages
 ├── pages/api/        # API routes (Pages Router)
+├── banner/           # Banner generation: api/, components/, renderers/
 ├── components/       # React components
 ├── utils/            # Business logic & helpers
 ├── graphql/queries/  # GraphQL query definitions
@@ -102,6 +106,7 @@ src/
   - Common types: `feat, fix, docs, style, refactor, perf, build, chore`
   - Common scopes: `core, deps, ui, config, util, release`
 - **Format Code**: Run `bash scripts/agent/format.sh` to check or `bash scripts/agent/format-fix.sh` to auto-fix
+- **Claude Code output style**: the repo sets `Lean` (`.claude/output-styles/lean.md`) as the default; set `outputStyle` in `.claude/settings.local.json` to use your own
 
 ## Common Tasks
 
@@ -121,7 +126,7 @@ When creating a new page or editing an existing one, always add or update the `e
 
 > **Important:** page-level `openGraph` replaces (not merges) the layout default — always repeat the `images` array or the OG image will be lost.
 
-See any existing page (e.g. `src/app/examples/page.js`) as a reference.
+See any existing page (e.g. `src/app/gallery/page.js`) as a reference.
 
 When **adding** a new page, also update:
 
@@ -136,18 +141,29 @@ When **removing** a page, remove it from both files as well.
 1. Add to `public/assets/background-library/`
 2. Update `src/data/banners.json` with metadata (`src`, `alt`, `credit`), plus `focusY` when the subject isn't centered
    - `focusY` sets the vertical crop on the company banner (0 = keep top, 0.5 = center (default), 1 = keep bottom)
-3. Verify in background library page, and in the company form's Background Preview
+3. Verify in the Backgrounds section of `/gallery`, and in the company form's Background Preview
+
+### Update Gallery Examples
+
+The banners on `/gallery` are generated, not hand-made screenshots:
+
+1. Each example in `src/data/examples.json` is a `username` plus the `options` that differ from `defaultOptions` (the website defaults)
+2. Add, change, or remove entries there (removing an entry: also delete its `public/assets/examples/<id>.webp`)
+3. With the dev server running, run `bash scripts/agent/gallery-refresh.sh [id ...]` (no ids = all) to regenerate the WebP images
+4. Review the new images in the PR diff
 
 ### Modify Banner Layout
 
-- Edit `src/utils/drawUtils.js` for positioning
-- Edit `src/utils/generateImage.js` for overall logic
+- Edit the component in `src/banner/components/` for one element's position and look
+- Edit the renderer in `src/banner/renderers/` for overall layout and layering
+- Shared drawing helpers live in `src/utils/drawUtils.js`
+- Read `docs/banner-components.md` first
 
 ### Update Trailhead Data Fetching
 
-- Queries: `src/graphql/queries/`
-- Processing: `src/utils/dataUtils.js`
-- Caching: `src/utils/redisCacheUtils.js` (15min TTL)
+- Queries: `src/graphql/queries/`, selected per banner by `src/banner/api/queryBuilder.js`
+- Fetching: `src/banner/api/shared.js` → `src/utils/graphqlUtils.js`
+- Caching: `src/utils/redisCacheUtils.js` (15min TTL, reset on hit, 30min max)
 
 ## Key External Dependencies
 
@@ -174,14 +190,39 @@ Reusable skills and their direct commands:
 - **`format`** — `bash scripts/agent/format.sh`; check formatting without modifying files
 - **`format-fix`** — `bash scripts/agent/format-fix.sh`; run Prettier and Stylelint fixes
 - **`build`** — `bash scripts/agent/build.sh`; validate the production build
-- **`dev-start`** — `bash scripts/agent/dev-start.sh`; start the dev server in the background
+- **`dev-start`** — `bash scripts/agent/dev-start.sh`; start the dev server in the background, on the first free port from 3000 (written to `.dev-server.port`, so each worktree tests its own server)
 - **`dev-stop`** — `bash scripts/agent/dev-stop.sh`; stop the background dev server
 - **`img-test [username]`** — `bash scripts/agent/img-test.sh [username]`; test image generation
+- **`gallery-refresh [id...]`** — `bash scripts/agent/gallery-refresh.sh [id...]`; regenerate the `/gallery` example banners
 - **`verify [username...]`** — `bash scripts/agent/verify.sh [username...]`; run the full verification workflow
+- **`cold-review [pr]`** — zero-context review of a PR or the current branch by the `code-goldfish` agent, which sees only the diff, the code and the linked issue
+- **`check-dep-pins`** — audit the security-pinned `pnpm.overrides` in `package.json` and say which can be removed
+- **`context-budget`** — `bash scripts/agent/context-budget.sh`; token cost of the agent setup
+- **`harness-audit`** — `bash scripts/agent/harness-audit.sh`; check that skills, agents and the paths they mention all exist (also runs in CI)
+- **`ci-fix [pr]`** — watch a PR's checks, fix failures the PR caused, re-run flaky ones once, stop after 3 rounds
+- **`full-review [pr]`** — `cold-review` in the background, a review with full project context, and `security-reviewer` when API or URL code changes, merged into one report
+
+### Design work (EGM plugin)
+
+The [Elephant-Goldfish Model](https://github.com/google/elephant-goldfish-model) plugin (`egm@egm`) is enabled in `.claude/settings.json`.
+Codex users install it once: `codex plugin marketplace add google/elephant-goldfish-model && codex plugin add egm@egm`.
+
+Its skills are user-only, so the repo wraps them in skills agents can pick on their own:
+
+- `design-brainstorm` — rough idea → brief
+- `design-draft` — brief → design doc
+- `design-review` — zero-context review of a design doc
+- `design-drift` — design docs vs code
+
+Typing `/egm:egm-brainstorm` etc. still works.
+
+EGM artifact directory: docs/egm
 
 ## Verifying Changes
 
 Before committing non-trivial changes, run `bash scripts/agent/verify.sh`. It stops any running dev server (a production build breaks it), runs `pnpm build`, starts a fresh dev server, generates a banner via `POST /api/banner/standard` for each username, stops the server, and prints `Verify: PASS` or `FAIL`. For a quick iteration loop, use `bash scripts/agent/dev-start.sh` followed by `bash scripts/agent/img-test.sh`.
+
+A pull request that changes UI files (`src/app/`, `src/components/`, `src/styles/`, `public/`, CSS) needs a `## Screenshots` section in its body: screenshots, the pages to check on the Vercel preview, or `n/a — <why>`. A hook refuses `gh pr create` without it.
 
 ## Token-Saving References
 
@@ -206,7 +247,7 @@ Before starting work on an ongoing feature, look in `docs/` for an existing note
 
 ## Banner Component Architecture
 
-Banner code lives in `src/banner/`: `components/` holds reusable parts (background, rankLogo, counters, certifications, superbadges, agentblazer, mvpRibbon, watermark), `renderers/` holds banner implementations (standardBanner.js).
+Banner code lives in `src/banner/`: `components/` holds reusable parts (background, counters, certifications, superbadges, stamps, company and sfdx-hardis parts…; list the folder for the full set), `renderers/` holds banner implementations (standardBanner.js, companyBanner.js).
 
 Every component exports 4 functions: `prepare*` (async — load assets, compute layout), `render*` (draw to canvas), `get*Warnings`, `get*Timings`. Renderers follow 3 phases: **prepare** (components in parallel via `Promise.all`) → **render** (sequential, for correct layering) → **collect** warnings and encode to base64.
 

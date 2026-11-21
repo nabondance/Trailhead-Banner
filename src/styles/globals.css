@@ -21,18 +21,12 @@ body {
   outline-offset: 2px;
 }
 
-@font-face {
-  font-family: Iosevka;
-  src: url('/fonts/Iosevka.ttf') format('ttf');
-  font-weight: normal;
-  font-style: normal;
-}
-
+/* Not used by the page styles: the canvas registers Anta server-side (src/utils/fonts.js) */
 @font-face {
   font-family: Anta;
   font-style: normal;
   font-weight: 400;
-  src: url('/fonts/Anta.woff2') format('woff2');
+  src: url('/assets/fonts/Anta.woff2') format('woff2');
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
     U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
@@ -56,7 +50,7 @@ body {
   --text-faded: #a0a0a0;
   --text-header: #003e6b;
   --text-footer: #003e6b;
-  --text-nav: #009edb;
+  --text-nav: var(--secondary); /* brand purple: #009edb text fails contrast on --header-bg (2.76:1) */
   --text-form: #003e6b;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
@@ -375,7 +369,7 @@ main {
 .footer {
   background-color: var(--footer-bg);
   color: var(--text-footer);
-  font-family: Inter, sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-weight: 300;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -719,12 +713,41 @@ main {
   background-color: var(--secondary);
 }
 
-.more-options-button {
-  background-color: var(--primary-faded);
+/* Disclosure toggle for the options panel: outlined, not filled, so Generate Banner stays the only filled button */
+.options-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  font-size: 16px;
+  color: var(--text-form);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
 }
 
-.more-options-button:hover {
-  background-color: var(--primary);
+.options-toggle:hover {
+  background-color: var(--middleground);
+  border-color: var(--secondary);
+}
+
+.options-toggle-chevron {
+  transition: transform 0.2s ease-in-out;
+}
+
+.options-toggle[aria-expanded='true'] .options-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .options-toggle-chevron {
+    transition: none;
+  }
 }
 
 .submit-button {
@@ -976,6 +999,40 @@ legend {
 .example-card img:hover {
   transform: scale(1.1);
   z-index: 10;
+}
+
+.gallery-card-button {
+  display: block;
+  width: 90%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.gallery-card-button img {
+  width: 100%;
+}
+
+.gallery-card-button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.gallery-section {
+  margin-top: 40px;
+  scroll-margin-top: 20px;
+}
+
+.page-grid.gallery-grid-wide {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (width <= 1000px) {
+  .page-grid.gallery-grid-wide {
+    grid-template-columns: 1fr;
+  }
 }
 
 .example-card p {
@@ -1793,70 +1850,6 @@ select:focus {
   padding: 50px;
 }
 
-.think2-container {
-  position: relative;
-  width: 100%;
-  max-width: 800px;
-  height: 200px;
-  margin: 40px auto;
-  border-radius: 8px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-}
-
-.think2-container:hover {
-  transform: scale(1.02);
-}
-
-.think2-background {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.think2-pattern {
-  object-fit: cover;
-  object-position: center;
-}
-
-.think2-content {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  background: linear-gradient(to top, rgb(0 0 0 / 30%), rgb(0 0 0 / 0%) 30%);
-  padding: 10px;
-}
-
-.think2-description {
-  color: white;
-  font-size: 1.5em;
-  font-family: var(--font-geist-sans);
-  line-height: 1em;
-  text-align: center;
-  text-shadow: 2px 2px 4px rgb(0 0 0 / 80%);
-  margin-bottom: 0;
-}
-
-.think2-highlight {
-  color: var(--think2-yellow);
-  font-weight: 600;
-}
-
-@media (width <= 768px) {
-  .think2-container {
-    height: 150px;
-    margin: 20px auto;
-    width: calc(100% - 20px);
-  }
-
-  .think2-description {
-    font-size: 1.2em;
-  }
-}
-
 /* Announcement Banner Styles */
 .announcements-container {
   margin-bottom: 20px;
@@ -1868,7 +1861,7 @@ select:focus {
   padding: 12px 16px;
   margin-bottom: 8px;
   border-radius: 8px;
-  font-family: Iosevka, Arial, Helvetica, sans-serif;
+  font-family: var(--font-iosevka), Arial, Helvetica, sans-serif;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
   z-index: 0;
 }

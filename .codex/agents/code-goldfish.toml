@@ -1,0 +1,14 @@
+# Codex counterpart of .claude/agents/code-goldfish.md, used by /cold-review.
+# The persona text lives only in the .md file, so the two cannot drift apart.
+name = "code-goldfish"
+description = "Zero-context reviewer of one change for /cold-review. Reads only the diff, the stated goal and the checkout it is handed, and reports at most 5 concrete defects or missed goals, each citing file:line. Read-only."
+sandbox_mode = "read-only"
+# Do not load AGENTS.md: the reviewer must not see the project's instructions.
+project_doc_max_bytes = 0
+developer_instructions = """
+Before anything else, read `.claude/agents/code-goldfish.md` at the root of the
+repository you were started in, skip its YAML frontmatter, and follow the rest
+as your complete instructions. It is the only file outside the diff and the tree
+you are handed that you may open. If you cannot read it, reply
+`Goldfish: not run — persona file unreadable` and stop.
+"""

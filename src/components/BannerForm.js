@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useId, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -27,6 +27,7 @@ import {
 import DragAndDropCounterSelector from './DragAndDropCounterSelector';
 import ImageCropEditor from './ImageCropEditor';
 import BackgroundPreview from './BackgroundPreview';
+import OptionsToggle from './OptionsToggle';
 import { BANNER_SIZES } from '../banner/bannerSizes';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 
@@ -74,6 +75,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
   const [cropZoom, setCropZoom] = useState(1);
   const [showOptions, setShowOptions] = useState(false);
+  const optionsPanelId = useId();
   const [isGenerating, setIsGenerating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
@@ -308,12 +310,10 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
         </p>
       )}
       {!isGenerating && (
-        <button type='button' className='button more-options-button' onClick={() => setShowOptions(!showOptions)}>
-          {showOptions ? 'Hide Options' : 'More Options'}
-        </button>
+        <OptionsToggle expanded={showOptions} onToggle={() => setShowOptions((v) => !v)} controlsId={optionsPanelId} />
       )}
       {showOptions && (
-        <div className='options'>
+        <div className='options' id={optionsPanelId}>
           <fieldset>
             <legend>Background Options</legend>
             <label className='picklist'>
@@ -370,7 +370,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
                   <img
                     key={image.src}
                     src={image.src}
-                    alt={image.description}
+                    alt={image.alt}
                     width={200}
                     height={50}
                     className={`thumbnail ${options.backgroundLibraryUrl.endsWith(image.src) ? 'selected' : ''}`}

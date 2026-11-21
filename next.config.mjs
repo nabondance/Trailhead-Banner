@@ -7,6 +7,8 @@ const nextConfig = {
     return [
       // the snow globe launched as the 2026 Trailhead Rewind
       { source: '/snowglobe', destination: '/rewind', permanent: true },
+      { source: '/examples', destination: '/gallery#banners', permanent: true },
+      { source: '/background-library', destination: '/gallery#backgrounds', permanent: true },
     ];
   },
 };

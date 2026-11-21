@@ -54,8 +54,7 @@ const TrailheadBannerHeader = () => {
         <nav className='header-nav'>
           <NavDropdown label='Generators' options={generatorsOptions} defaultUrl='/' />
           <Link href='/how-to'>How-To</Link>
-          <Link href='/examples'>Examples</Link>
-          <Link href='/background-library'>Background Library</Link>
+          <Link href='/gallery'>Gallery</Link>
           <NavDropdown label='About' options={aboutOptions} />
         </nav>
       </div>

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck source-path=SCRIPTDIR
 # End-to-end verification: production build + banner generation
 # Usage: bash scripts/agent/verify.sh [username ...]
 # Stops any running dev server (build clobbers .next), runs a production build,
@@ -8,8 +9,10 @@ SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
 USERNAMES=("$@")
 [ ${#USERNAMES[@]} -eq 0 ] && USERNAMES=(nabondance)
 
-# 1. Ensure no dev server is running (next build breaks a running dev server)
-if curl -s http://localhost:3000 > /dev/null 2>&1; then
+# 1. Stop this worktree's dev server (next build breaks a running dev server)
+# shellcheck source=lib/dev-server.sh
+source "$SCRIPTS_DIR/lib/dev-server.sh"
+if dev_server_exists; then
   echo "Dev server running — stopping it before build"
   bash "$SCRIPTS_DIR/dev-stop.sh"
 fi

@@ -11,7 +11,7 @@ const RewindWaitingPage = () => {
         <p>Your year of achievements, in a snow globe you can shake and share ❄️</p>
         <p>In the meantime, keep learning and connecting with the Trailblazer community!</p>
         <p>
-          You can still generate your banner 👉 <Link href='https://thb.nabondance.me'>here</Link>
+          You can still <Link href='/'>generate your banner</Link> 👈
         </p>
         <p>🫶</p>
       </div>

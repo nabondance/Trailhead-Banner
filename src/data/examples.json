@@ -1,82 +1,143 @@
-[
-  {
-    "number": 1,
-    "description": "Default Banner Generated"
+{
+  "_description": "Gallery examples. Each example is a username plus the options that differ from defaultOptions (the website defaults). Images live in public/assets/examples/<id>.webp; regenerate them with `bash scripts/agent/gallery-refresh.sh`.",
+  "defaultOptions": {
+    "backgroundKind": "library",
+    "backgroundLibraryUrl": "/assets/background-library/NYC_dreamforce_1.png",
+    "backgroundColor": "#5badd6",
+    "backgroundImageUrl": "",
+    "customBackgroundImageUrl": "",
+    "displayRankLogo": true,
+    "displaySalesforceCertifications": true,
+    "displayAccreditedProfessionalCertifications": true,
+    "displaySuperbadges": true,
+    "displayLastXCertifications": false,
+    "lastXCertifications": "",
+    "displayLastXSuperbadges": false,
+    "lastXSuperbadges": "",
+    "displayAgentblazerRank": true,
+    "agentblazerRankDisplay": "current",
+    "displaySfdxHardisBadge": true,
+    "includeExpiredCertifications": false,
+    "includeRetiredCertifications": false,
+    "certificationSort": "date",
+    "certificationSortOrder": "descendant",
+    "certificationAlignment": "center",
+    "superbadgeAlignment": "left",
+    "textColor": "#000000",
+    "badgeLabelColor": "#555555",
+    "badgeMessageColor": "#1F80C0",
+    "counterOrder": ["badge", "superbadge", "certification"],
+    "displayStamps": false,
+    "stampCategories": [],
+    "maxStampsToDisplay": ""
   },
-  {
-    "number": 2,
-    "description": "Banner with custom monochromatic background"
-  },
-  {
-    "number": 3,
-    "description": "Banner with custom background image from the library"
-  },
-  {
-    "number": 4,
-    "description": "Banner with custom background image from the internet"
-  },
-  {
-    "number": 5,
-    "description": "Banner without superbadges displayed"
-  },
-  {
-    "number": 6,
-    "description": "Banner displaying expired certifications (grey) and retired certifications (faded)"
-  },
-  {
-    "number": 7,
-    "description": "Banner of a 10x certified"
-  },
-  {
-    "number": 8,
-    "description": "Banner of a 15x certified"
-  },
-  {
-    "number": 9,
-    "description": "Banner with many superbadges"
-  },
-  {
-    "number": 10,
-    "description": "Banner of a MVP"
-  },
-  {
-    "number": 11,
-    "description": "Banner with counters as text"
-  },
-  {
-    "number": 12,
-    "description": "Banner without counters"
-  },
-  {
-    "number": 13,
-    "description": "Banner with limited number of superbadges and certifications displayed"
-  },
-  {
-    "number": 14,
-    "description": "Banner with certifications sorted by difficulty"
-  },
-  {
-    "number": 15,
-    "description": "Banner with certifications sorted by category"
-  },
-  {
-    "number": 16,
-    "description": "Banner with only accredited professional certifications displayed"
-  },
-  {
-    "number": 17,
-    "description": "Banner of an Agentblazer Champion"
-  },
-  {
-    "number": 18,
-    "description": "Banner with the number of trails displayed"
-  },
-  {
-    "number": 19,
-    "description": "Banner with Certifications aligned on the right"
-  },
-  {
-    "number": 20,
-    "description": "Banner with custom uploaded background image"
-  }
-]
+  "examples": [
+    {
+      "id": "default",
+      "description": "Default banner",
+      "username": "nabondance",
+      "options": {}
+    },
+    {
+      "id": "retired",
+      "description": "Retired certifications faded, sorted by difficulty",
+      "username": "anna",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/sf_france.png",
+        "includeRetiredCertifications": true,
+        "certificationSort": "difficulty",
+        "certificationSortOrder": "ascendant",
+        "counterOrder": ["certification", "superbadge", "badge"]
+      }
+    },
+    {
+      "id": "many-certifications",
+      "description": "Many certifications, sorted by product",
+      "username": "gauravkheterpal",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/NYC_dreamforce_3.png",
+        "certificationSort": "product",
+        "counterOrder": ["certification", "superbadge", "badge", "point", "trail"]
+      }
+    },
+    {
+      "id": "superbadges",
+      "description": "Many superbadges",
+      "username": "emilieng",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/highland-waterfalls.png",
+        "superbadgeAlignment": "center",
+        "counterOrder": ["superbadge", "badge", "certification"]
+      }
+    },
+    {
+      "id": "community",
+      "description": "MVP ribbon, community counters, certifications aligned right",
+      "username": "stevemo",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/sf_meetup.png",
+        "agentblazerRankDisplay": "allTimeHigh",
+        "certificationAlignment": "right",
+        "counterOrder": ["answer", "best-answer", "question", "follower", "following"]
+      }
+    },
+    {
+      "id": "stamps",
+      "description": "Stamps with their counters",
+      "username": "mrousseaux",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/sf_event.png",
+        "certificationAlignment": "left",
+        "superbadgeAlignment": "center",
+        "counterOrder": ["certification", "badge", "stamp", "fde-level", "implementation-ready"],
+        "displayLastXCertifications": true,
+        "lastXCertifications": 3,
+        "displayStamps": true,
+        "stampCategories": ["fde", "ir", "event"],
+        "maxStampsToDisplay": 3
+      }
+    },
+    {
+      "id": "sfdx-hardis",
+      "description": "sfdx-hardis badge, expired certification in grey",
+      "username": "nvuillamy",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/salesforce_canyon_2.png",
+        "includeExpiredCertifications": true
+      }
+    },
+    {
+      "id": "solid-color",
+      "description": "Solid color background, last 5 certifications only",
+      "username": "babup",
+      "options": {
+        "backgroundKind": "monochromatic",
+        "backgroundColor": "#8A01C4",
+        "textColor": "#FFFFFF",
+        "displayLastXCertifications": true,
+        "lastXCertifications": 5,
+        "displayLastXSuperbadges": true,
+        "lastXSuperbadges": 3,
+        "counterOrder": ["badge", "trail", "point"]
+      }
+    },
+    {
+      "id": "procedural",
+      "description": "Procedural background, unique to each username",
+      "username": "nabondance",
+      "options": {
+        "backgroundKind": "procedural",
+        "textColor": "#FFFFFF"
+      }
+    },
+    {
+      "id": "accredited-professional",
+      "description": "Accredited Professional certifications only",
+      "username": "gauravkheterpal",
+      "options": {
+        "backgroundLibraryUrl": "/assets/background-library/clouds_mongo.jpg",
+        "displaySalesforceCertifications": false
+      }
+    }
+  ]
+}

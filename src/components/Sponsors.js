@@ -12,9 +12,18 @@ const supporterList = sponsors.filter((s) => s.tier === 'supporter');
 const hasAnySponsor =
   poweredBy.length > 0 || hallOfFame.length > 0 || sponsorList.length > 0 || supporterList.length > 0;
 
-const PoweredByCard = ({ sponsor }) => (
+// `aboveFold`: the card is the page's LCP element (mobile home, /sponsors), so load it eagerly at high priority
+const PoweredByCard = ({ sponsor, aboveFold = false }) => (
   <a href={sponsor.url} target='_blank' rel='noopener noreferrer' className='powered-by-card'>
-    <Image src={sponsor.image} alt={sponsor.name} fill className='powered-by-bg' unoptimized />
+    <Image
+      src={sponsor.image}
+      alt={sponsor.name}
+      fill
+      className='powered-by-bg'
+      unoptimized
+      loading={aboveFold ? 'eager' : undefined}
+      fetchPriority={aboveFold ? 'high' : undefined}
+    />
     <div className='powered-by-overlay'>
       <span className='powered-by-name'>{sponsor.name}</span>
       {sponsor.badge && <span className='powered-by-badge'>{sponsor.badge}</span>}
@@ -72,7 +81,8 @@ const MarqueeRow = ({ items = [], renderItem = () => null, keyFn = (s) => s } = 
   );
 };
 
-const Sponsors = () => {
+/** @param {{ aboveFold?: boolean }} props - aboveFold: the first powered-by card is the page's LCP element */
+const Sponsors = ({ aboveFold = false }) => {
   if (!hasAnySponsor) return null;
 
   return (
@@ -93,8 +103,8 @@ const Sponsors = () => {
         <div className='sponsors-tier'>
           <span className='sponsors-tier-label'>Powered by</span>
           <div className='sponsors-row'>
-            {poweredBy.map((s) => (
-              <PoweredByCard key={s.name} sponsor={s} />
+            {poweredBy.map((s, i) => (
+              <PoweredByCard key={s.name} sponsor={s} aboveFold={aboveFold && i === 0} />
             ))}
           </div>
         </div>
