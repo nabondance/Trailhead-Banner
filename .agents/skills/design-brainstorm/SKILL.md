@@ -1,6 +1,6 @@
 ---
 name: design-brainstorm
-description: Turn a rough feature idea into a structured brief: clarifying questions, then zero-context Goldfish reviewers stress-test it. Wraps the EGM plugin's /egm:egm-brainstorm so it can be picked automatically. Use when the user wants to brainstorm, shape or challenge a new feature idea before any design or code.
+description: "Turn a rough feature idea into a structured brief: clarifying questions, then zero-context Goldfish reviewers stress-test it. Wraps the EGM plugin's /egm:egm-brainstorm so it can be picked automatically. Use when the user wants to brainstorm, shape or challenge a new feature idea before any design or code."
 ---
 
 # Brainstorm (EGM wrapper)
