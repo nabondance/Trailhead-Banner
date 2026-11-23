@@ -68,7 +68,9 @@ jobs:
 
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/latest/flavors/
-        uses: nabondance/megalinter-custom-flavor-trailhead-banner@main
+        # Dependabot skips docker:// references, so update the tag and digest
+        # by hand.
+        uses: docker://ghcr.io/nabondance/megalinter-custom-flavor-trailhead-banner/megalinter-custom-flavor:v10.2.0@sha256:762ff9e0b5457ffe289081f4728aa0ee967fb9ccb67b0a57deddb615b7407b11
 
         id: ml
 
