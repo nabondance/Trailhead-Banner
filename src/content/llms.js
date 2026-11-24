@@ -29,7 +29,7 @@ their Trailhead username and receive a downloadable PNG banner.
 - [How-to](https://thb.nabondance.me/how-to): Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
 - [Gallery](https://thb.nabondance.me/gallery): Example banners showing different configurations, and the ${backgroundCount} available background images.
 - [Company banner](https://thb.nabondance.me/company): Generate a company/team banner aggregating multiple Trailhead profiles.
-- [Trailhead Rewind](https://thb.nabondance.me/rewind): Generate a year-in-review banner (active December–January).
+- [Trailhead Rewind](https://thb.nabondance.me/rewind): Shake a 3D snow globe filled with your 2026 achievements and share it as an image or video (active December–January). Each globe gets a personal link, https://thb.nabondance.me/rewind/2026/<username>.
 - [Releases](https://thb.nabondance.me/releases): Changelog and release history.
 - [Sponsors](https://thb.nabondance.me/sponsors): Sponsors and supporters who help keep the project running.
 - [Legal](https://thb.nabondance.me/legal): Terms of use and privacy information.
@@ -72,7 +72,7 @@ their rank, certifications, superbadges, badge counts, and more.
 - [How-to](https://thb.nabondance.me/how-to): Step-by-step instructions for using the tool and uploading the banner to LinkedIn, plus an FAQ.
 - [Gallery](https://thb.nabondance.me/gallery): Example banners showing different configurations, and all ${backgroundCount} available background images with their credits.
 - [Company banner](https://thb.nabondance.me/company): Generate a company/team banner aggregating multiple Trailhead profiles into a single banner with collective certifications, badges, Agentblazer levels, and optional CSV team data export (skills matrix, certifications per product, upcoming maintenance).
-- [Trailhead Rewind](https://thb.nabondance.me/rewind): Generate a year-in-review banner (active December–January).
+- [Trailhead Rewind](https://thb.nabondance.me/rewind): Shake a 3D snow globe filled with your 2026 achievements and share it as an image or video (active December–January). Each globe gets a personal link, https://thb.nabondance.me/rewind/2026/<username>.
 - [Releases](https://thb.nabondance.me/releases): Changelog and release history.
 - [Sponsors](https://thb.nabondance.me/sponsors): Sponsors and supporters who help keep the project running.
 - [Legal](https://thb.nabondance.me/legal): Terms of use and privacy information.

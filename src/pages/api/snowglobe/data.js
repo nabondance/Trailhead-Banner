@@ -1,0 +1,212 @@
+import { buildRewindQueries, QUERY_MAP } from '../../../banner/api/queryBuilder';
+import { fetchUserData, handleBannerError } from '../../../banner/api/shared';
+import { validateUsername } from '../../../banner/api/validators';
+import {
+  filterDataByYear,
+  getCombinedAchievements,
+  getAgentblazerRankForYear,
+  getMonthlyBreakdown,
+} from '../../../utils/rewindUtils';
+import { waitUntil } from '@vercel/functions';
+import { enforceRateLimit } from '../../../utils/rateLimit';
+import SupabaseUtils from '../../../utils/supabaseUtils';
+import { REWIND_YEAR as YEAR, isRewindOpen } from '../../../utils/rewindPeriod';
+
+const MAX_ITEMS = 24;
+
+/* Progress (0..1) from the current Trailhead rank toward the next one. A rank
+   needs both its points and its badges, so progress is the lesser of the two.
+   null when there is no next rank (All Star Ranger). */
+function rankProgress(stats) {
+  const current = stats.rank;
+  const next = stats.nextRank;
+  if (!next) return null;
+  const part = (earned, from, to) => {
+    if (!Number.isFinite(earned) || !Number.isFinite(to) || to <= (from || 0)) return 1;
+    return Math.min(Math.max((earned - (from || 0)) / (to - (from || 0)), 0), 1);
+  };
+  return Math.min(
+    part(stats.earnedPointsSum, current?.requiredPointsSum, next.requiredPointsSum),
+    part(stats.earnedBadgesCount, current?.requiredBadgesCount, next.requiredBadgesCount)
+  );
+}
+const RANK_NAME_PATTERN = /^[a-z0-9-]+\.png$/;
+
+/**
+ * Lightweight data endpoint for the snow globe: returns the year's
+ * certifications + stamps and the current rank, without any image generation.
+ */
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed', message: 'Only POST requests are supported' });
+  }
+
+  // the page closes outside the Rewind period, and so does building: no new
+  // 2026 globe can be saved with next year's rank and stats
+  if (!isRewindOpen()) {
+    return res
+      .status(403)
+      .json({ error: 'Rewind closed', message: 'Trailhead Rewind is open in December and January.' });
+  }
+
+  if (!(await enforceRateLimit(req, res, 'snowglobe'))) return;
+
+  const { username: rawUsername } = req.body || {};
+  const year = YEAR;
+
+  if (!rawUsername || typeof rawUsername !== 'string' || rawUsername.length > 100) {
+    return res.status(400).json({ error: 'Username is required', validationError: true });
+  }
+  // lowercase, like the form sends it: the personal link looks globes up by it
+  const username = rawUsername.trim().toLowerCase();
+
+  const usernameValidation = await validateUsername(username);
+  if (!usernameValidation.valid) {
+    return res.status(400).json({ error: usernameValidation.message, validationError: true });
+  }
+
+  const startedAt = Date.now();
+  try {
+    const mvp = QUERY_MAP.GET_MVP_STATUS;
+    const superbadges = QUERY_MAP.GET_TRAILHEAD_BADGES_SUPERBADGE;
+    const queries = [
+      ...buildRewindQueries(username),
+      // superbadge count (one big snowflake each); optional: without it the
+      // globe just has no big flakes
+      {
+        name: 'GET_TRAILHEAD_BADGES_SUPERBADGE',
+        query: superbadges.query,
+        variables: superbadges.buildVariables(username, {}),
+        url: superbadges.url,
+        optional: true,
+      },
+      // optional: the community API is read-only since Oct 30, 2026 and may go
+      // away; if it fails the globe just has no MVP ribbon
+      {
+        name: 'GET_MVP_STATUS',
+        query: mvp.query,
+        variables: mvp.buildVariables(username, {}),
+        url: mvp.url,
+        optional: true,
+      },
+    ];
+    const { responseMap } = await fetchUserData(queries, username);
+
+    const rankResponse = responseMap.GET_TRAILBLAZER_RANK;
+    if (!rankResponse?.data?.data?.profile) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: `No Trailhead profile found for username: ${username}`,
+      });
+    }
+
+    const rankData = rankResponse.data?.data?.profile?.trailheadStats || {};
+    const certificationsData = responseMap.GET_USER_CERTIFICATIONS?.data?.data?.profile?.credential || {};
+    const stampsData = responseMap.GET_STAMPS?.data?.data?.earnedStamps || {};
+
+    const yearlyData = filterDataByYear({ certificationsData, stampsData }, year);
+
+    // Years on Trailhead set how many growth rings the wooden base shows.
+    // Public profiles expose no join date, so use the earliest dated
+    // achievement: any certification (expired ones included) or stamp.
+    const achievementYears = [
+      ...(certificationsData.certifications || []).map((cert) => cert.dateCompleted),
+      ...(stampsData.edges || []).map((edge) => edge.node?.eventDate),
+    ]
+      .map((date) => new Date(date).getUTCFullYear())
+      .filter((y) => Number.isFinite(y) && y >= 2010 && y <= year);
+    const firstAchievementYear = achievementYears.length ? Math.min(...achievementYears) : null;
+    const achievements = getCombinedAchievements(yearlyData)
+      .slice(0, MAX_ITEMS)
+      .map((a) => ({
+        type: a.type,
+        name: a.name,
+        logoUrl: a.logoUrl,
+        folder: a.folder,
+      }));
+
+    // Agentblazer rank earned that year tumbles with the rest — artwork comes
+    // from the repo (the API's imageUrl is an HTML page, not an image)
+    const agentblazerData = responseMap.GET_AGENTBLAZER_RANK?.data?.data?.profile?.trailheadStats || {};
+    const agentblazer = getAgentblazerRankForYear(agentblazerData.learnerStatusLevels, year);
+    if (agentblazer?.title) {
+      achievements.unshift({
+        type: 'agentblazer',
+        name: `Agentblazer ${agentblazer.title}`,
+        logoUrl: `/api/snowglobe/local-image?type=Agentblazer&name=${encodeURIComponent(agentblazer.title)}.png&year=${year}`,
+        folder: 'images',
+      });
+    }
+
+    // Rank artwork: repo-stored high-res PNG, filename derived from the API
+    // imageUrl the same way rankLogo.js does; remote URL as fallback
+    const rankFileName = rankData.rank?.imageUrl?.split('/').pop();
+    const rankLogoUrl =
+      rankFileName && RANK_NAME_PATTERN.test(rankFileName)
+        ? `/api/snowglobe/local-image?type=Rank&name=${encodeURIComponent(rankFileName)}`
+        : rankData.rank?.imageUrl || null;
+
+    const globe = {
+      username,
+      year,
+      rank: {
+        title: rankData.rank?.title || null,
+        logoUrl: rankLogoUrl,
+      },
+      achievements,
+      firstAchievementYear,
+      // snow depth: progress toward the next rank (All Star Ranger = full)
+      rankProgress: rankProgress(rankData),
+      nextRankTitle: rankData.nextRank?.title || null,
+      topRank: !!rankData.rank && !rankData.nextRank,
+      // engraved plaque on the foot of the base (all-time)
+      stats: {
+        badges: rankData.earnedBadgesCount ?? null,
+        points: rankData.earnedPointsSum ?? null,
+        trails: rankData.completedTrailCount ?? null,
+        // not on the plaque: one big falling snowflake per superbadge
+        superbadges:
+          responseMap.GET_TRAILHEAD_BADGES_SUPERBADGE?.data?.data?.profile?.trailheadStats?.superbadgeCount ?? null,
+      },
+      // MVP ribbon around the base
+      isMvp: responseMap.GET_MVP_STATUS?.data?.data?.profileData?.isMvp === true,
+      // aurora: achievements per month of the Rewind year (Jan..Dec)
+      activity: {
+        certifications: getMonthlyBreakdown(yearlyData.certifications, 'dateCompleted'),
+        stamps: getMonthlyBreakdown(yearlyData.stamps, 'eventDate'),
+      },
+      // snow kind: the Agentblazer rank earned in the Rewind year
+      agentblazerTitle: agentblazer?.title || null,
+      totals: {
+        certifications: yearlyData.certifications.length,
+        stamps: yearlyData.stamps.length,
+      },
+    };
+
+    // Each globe counts as one 2026 Rewind and is saved for the personal link
+    // (non-blocking: waitUntil keeps the function alive after the response so
+    // the insert can finish)
+    waitUntil(
+      SupabaseUtils.recordSnowglobeRewind({
+        th_username: username,
+        year,
+        processing_time_ms: Date.now() - startedAt,
+        rank_title: rankData.rank?.title || null,
+        yearly_stamps_count: yearlyData.stamps.length,
+        yearly_certifications_count: yearlyData.certifications.length,
+        achievements: achievements.map(({ type, name }) => ({ type, name: name || null })),
+        agentblazer: agentblazer || null,
+        globe,
+      }).catch((error) => {
+        console.error('Error recording snow globe rewind:', error.message);
+      })
+    );
+
+    return res.status(200).json(globe);
+  } catch (error) {
+    return handleBannerError(error, res, 'snowglobe-data', {
+      username: username ?? 'unknown',
+      year,
+    });
+  }
+}

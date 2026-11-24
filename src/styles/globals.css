@@ -2441,3 +2441,243 @@ select:focus {
   white-space: nowrap;
   border: 0;
 }
+
+/* Snow globe page (the 2026 Rewind); form, counter and inputs reuse the
+   home page styles (.form, .input, .submit-button, .rewind-count) */
+.snowglobe-header,
+.snowglobe-result {
+  text-align: center;
+}
+
+.snowglobe-header h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  color: var(--text-contrast);
+}
+
+.snowglobe-tagline {
+  font-size: 1.15em;
+  color: var(--text-contrast);
+  margin: 0 auto 10px;
+}
+
+.snowglobe-input {
+  /* no inline icon here, so no right padding reserved for one */
+  padding-right: 12px;
+}
+
+.snowglobe-page .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.snowglobe-error {
+  margin: -20px 0 30px;
+}
+
+.snowglobe-result {
+  scroll-margin-top: 16px;
+}
+
+.snowglobe-box {
+  /* 4:5 portrait, LinkedIn's vertical feed format (downloads are 2160×2700) */
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 4 / 5;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* round Shake button on the globe's bottom-left corner (the watermark pill
+   holds the bottom-right) */
+.snowglobe-shake-button {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 40%);
+}
+
+.snowglobe-shake-button:hover {
+  background: var(--secondary);
+}
+
+.snowglobe-placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faded);
+}
+
+.snowglobe-hint {
+  color: var(--text-faded);
+  font-size: 0.95em;
+  margin: 12px 0;
+}
+
+.snowglobe-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.snowglobe-make-own {
+  margin-top: 2rem;
+}
+
+.snowglobe-make-own a {
+  text-decoration: none;
+}
+
+/* room around the label: the shared submit button only has 10px */
+.snowglobe-make-own .submit-button {
+  padding: 12px 36px;
+}
+
+/* image / video / link actions under the globe: one rounded bar split
+   into equal parts */
+.snowglobe-segments {
+  display: inline-flex;
+  max-width: 100%;
+  margin-top: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--primary);
+}
+
+.snowglobe-segments button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 112px;
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.snowglobe-segments button + button {
+  border-left: 1px solid rgb(255 255 255 / 35%);
+}
+
+.snowglobe-segments button:hover:not(:disabled) {
+  background: var(--secondary);
+}
+
+.snowglobe-segments button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* small phones: all three actions still fit on one line */
+@media (width <= 400px) {
+  .snowglobe-segments button {
+    flex: 1 1 auto;
+    gap: 6px;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+}
+
+.snowglobe-status {
+  margin-top: 12px;
+  color: var(--text-contrast);
+}
+
+.snowglobe-webgl-help {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-contrast);
+}
+
+.snowglobe-webgl-help p {
+  margin: 0;
+}
+
+.snowglobe-webgl-help ol {
+  margin: 0;
+  text-align: left;
+  line-height: 1.8;
+}
+
+.snowglobe-small-button {
+  padding: 2px 10px;
+  font-size: 0.85rem;
+}
+
+.snowglobe-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--primary);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* "Your globe, decoded" under the snow globe */
+.globe-legend {
+  max-width: 560px;
+  margin: 28px auto 0;
+  text-align: left;
+  color: var(--text-contrast);
+}
+
+.globe-legend h2 {
+  font-size: 1.3em;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.globe-legend ul {
+  list-style: none;
+  margin: 0;
+  padding: 10px 16px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--middleground);
+}
+
+.globe-legend li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+
+.globe-legend-icon {
+  font-size: 1.15em;
+  line-height: 1;
+}

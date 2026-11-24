@@ -15,11 +15,13 @@ const isTransientStatus = (status) => status === 0 || status === 408 || status =
  * Never throws: failures come back as `error`, with `retryable` telling whether trying again could help.
  * @param {import('@supabase/supabase-js').SupabaseClient} client
  * @param {string} table - 'banners', 'rewinds' or 'company_banners'
- * @param {{ signal?: AbortSignal }} [options]
+ * @param {{ signal?: AbortSignal, year?: number }} [options] - `year` counts only that Rewind edition (rewinds only)
  * @returns {Promise<{ count: number|null, error: object|null, status: number, retryable: boolean }>}
  */
-export const fetchGenerationCount = async (client, table, { signal } = {}) => {
-  let query = client.rpc('generation_count', { p_table: table, p_env: APP_ENV });
+export const fetchGenerationCount = async (client, table, { signal, year } = {}) => {
+  const params = { p_table: table, p_env: APP_ENV };
+  if (year) params.p_year = year;
+  let query = client.rpc('generation_count', params);
   if (signal) query = query.abortSignal(signal);
   const { data, error, status } = await query;
 

@@ -17,6 +17,7 @@ import { SERVER_ENV } from './envUtils.js';
 const LIMITS = {
   standard: { tokens: 30, window: '1 m' },
   rewind: { tokens: 30, window: '1 m' },
+  snowglobe: { tokens: 30, window: '1 m' },
   validateUsername: { tokens: 60, window: '1 m' },
   // Counted per username, not per request (a fetch chunk holds up to 25, the
   // direct company flow up to 50). Room for a few full 500-user runs with
