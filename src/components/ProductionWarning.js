@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { APP_ENV } from '../utils/envUtils';
 
+// Decided at build time, not from window.location after hydration: showing it late shifts the form (CLS)
 const ProductionWarning = () => {
-  const [isProduction, setIsProduction] = useState(true);
-
-  useEffect(() => {
-    const hostname = window.location.hostname;
-    if (hostname !== 'thb.nabondance.me') {
-      setIsProduction(false);
-    }
-  }, []);
-
-  if (isProduction) {
+  if (APP_ENV === 'production') {
     return null;
   }
 
