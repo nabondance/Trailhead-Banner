@@ -55,7 +55,10 @@ body {
   --text-form: #003e6b;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
-  --warning-text: #8a4500; /* --warning-color text fails contrast on the #fff3cd warning box (2.76:1) */
+  --warning-text: #4a3200; /* --warning-color as text fails contrast on --warning-bg (2.89:1) */
+  --warning-bg: #fff8e6;
+  --warning-border: #f0c674;
+  --warning-icon: #b35c00;
   --error-color: #ba0517;
   --think2-yellow: #f2eb0a;
   --tooltip-bg: #1f1f1f;
@@ -84,7 +87,10 @@ body {
   --text-form: #fff;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
-  --warning-text: #8a4500;
+  --warning-text: #ffcf8a;
+  --warning-bg: #261b0d;
+  --warning-border: #7a5216;
+  --warning-icon: #ffb84d;
   --error-color: #ba0517;
   --think2-yellow: #f2eb0a;
   --tooltip-bg: #1f1f1f;
@@ -1114,18 +1120,22 @@ legend {
   color: var(--warning-text);
   font-size: 16px;
   text-align: center;
-  background-color: #fff3cd;
-  padding: 15px;
-  border: 1px solid var(--warning-color);
-  border-radius: 4px;
+  background-color: var(--warning-bg);
+  padding: 14px 18px;
+  border: 1px solid var(--warning-border);
+  border-radius: 8px;
   margin-top: 20px;
-  box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
   margin-bottom: 10px;
 }
 
 .warning-message p {
   margin: 0;
   font-weight: bold;
+}
+
+.warning-message p:first-child::before {
+  content: '⚠  ';
+  color: var(--warning-icon);
 }
 
 .warning-message ul {
@@ -1141,7 +1151,6 @@ legend {
 }
 
 .warning-message a:hover {
-  color: var(--secondary);
   text-decoration: none;
 }
 
