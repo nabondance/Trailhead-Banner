@@ -48,12 +48,14 @@ body {
   --text-color: #fff;
   --text-contrast: #003e6b;
   --text-faded: #a0a0a0;
+  --text-subtle: #666;
   --text-header: #003e6b;
   --text-footer: #003e6b;
   --text-nav: var(--secondary); /* brand purple: #009edb text fails contrast on --header-bg (2.76:1) */
   --text-form: #003e6b;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
+  --warning-text: #8a4500; /* --warning-color text fails contrast on the #fff3cd warning box (2.76:1) */
   --error-color: #ba0517;
   --think2-yellow: #f2eb0a;
   --tooltip-bg: #1f1f1f;
@@ -75,12 +77,14 @@ body {
   --text-color: #fff;
   --text-contrast: #fff;
   --text-faded: #a0a0a0;
+  --text-subtle: #a0a0a0;
   --text-header: #fff;
   --text-footer: #fff;
-  --text-nav: #9b51e0;
+  --text-nav: #bb86fc; /* #9b51e0 fails contrast on --header-bg (3.65:1) */
   --text-form: #fff;
   --valid-color: #2e844a;
   --warning-color: #dd7a01;
+  --warning-text: #8a4500;
   --error-color: #ba0517;
   --think2-yellow: #f2eb0a;
   --tooltip-bg: #1f1f1f;
@@ -1107,7 +1111,7 @@ legend {
 }
 
 .warning-message {
-  color: var(--warning-color);
+  color: var(--warning-text);
   font-size: 16px;
   text-align: center;
   background-color: #fff3cd;
@@ -1132,7 +1136,7 @@ legend {
 }
 
 .warning-message a {
-  color: var(--primary);
+  color: var(--warning-text);
   text-decoration: underline;
 }
 
@@ -2054,7 +2058,7 @@ select:focus {
   font-weight: normal;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-faded);
+  color: var(--text-subtle);
   margin-bottom: 3px;
 }
 
