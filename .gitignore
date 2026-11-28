@@ -57,3 +57,7 @@ megalinter-reports/
 # Lighthouse CI
 .lighthouseci/
 lighthouse-results/
+
+# Salesforce CLI local caches, at any depth
+.sf/
+.sfdx/
