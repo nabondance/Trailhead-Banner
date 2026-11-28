@@ -98,7 +98,12 @@ export function drawMountains(ctx, d) {
       let last = null;
       for (let x = p.x0; x < p.x0 + p.span; x += 6) {
         const t = (x - p.x0) / p.span;
-        const y = ridge(i, x) + 6 + 34 * (1 - t) + 5 * Math.sin(t * Math.PI * 2 * p.freq);
+        // Stay on the visible face of this row: a dot below the next row's ridge would be covered,
+        // and the leftover dots look like they sit on the foreground mountain
+        const top = ridge(i, x) + 4;
+        const bottom = i < layers - 1 ? ridge(i + 1, x) - 4 : H;
+        if (bottom - top < 3) continue;
+        const y = Math.min(top + 2 + 34 * (1 - t) + 5 * Math.sin(t * Math.PI * 2 * p.freq), bottom);
         ctx.globalAlpha = 0.9 * Math.max(calm(x, y), 0.5);
         ctx.beginPath();
         ctx.arc(x, y, 1.5, 0, Math.PI * 2);
