@@ -64,9 +64,10 @@ function buildSuperbadgeData(companySuperbadges, options) {
  *
  * @param {Object} aggregated - Output from companyDataUtils.aggregateCompanyData()
  * @param {Object} options - Generation options
+ * @param {string} [teamHash] - Stable team identifier, seeds the procedural background
  * @returns {Promise<Object>} { bannerUrl, warnings, hash, timings }
  */
-async function generateCompanyBanner(aggregated, options = {}) {
+async function generateCompanyBanner(aggregated, options = {}, teamHash) {
   const startTime = Date.now();
   const warnings = [];
   const timings = {};
@@ -97,7 +98,7 @@ async function generateCompanyBanner(aggregated, options = {}) {
   const [backgroundPrep, companyLogoPrep, companyAgentblazerPrep, companySfdxHardisPrep, watermarkPrep] =
     await Promise.all([
       Background.prepareBackground(options, {
-        proceduralArt: buildCompanyProceduralData(aggregated, options.backgroundColor),
+        proceduralArt: buildCompanyProceduralData(aggregated, teamHash),
       }),
       CompanyLogo.prepareCompanyLogo(options, certifYPosition, LOGO_SLOT_WIDTH),
       CompanyAgentblazer.prepareCompanyAgentblazer(aggregated.agentblazer, options, AGENTBLAZER_LOGO_HEIGHT),

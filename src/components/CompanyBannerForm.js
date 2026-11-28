@@ -491,13 +491,9 @@ const CompanyBannerForm = () => {
                       ))}
                     </select>
                   </label>
-                  <label>
-                    Accent Color:
-                    <input type='color' value={options.backgroundColor} onChange={handleColorChange} />
-                  </label>
                   <p className='helper-text'>
-                    Generated from your team&apos;s badges, superbadges and certifications, in your accent color: the
-                    same team always gets the same background.
+                    Generated from your team&apos;s badges, superbadges and certifications, in the color of the rank
+                    most of your team holds: the same team always gets the same background.
                   </p>
                   <Image
                     src={`/assets/procedural/${options.proceduralStyle}.webp`}

@@ -1,6 +1,6 @@
 import { drawProceduralBannerBackground, getRankAccentColor } from '../../utils/drawUtils.js';
 import { BANNER_SIZES } from '../bannerSizes.js';
-import { certFamilies, setFrame } from './core.js';
+import { certFamilies, rankTier, setFrame } from './core.js';
 import { drawMountains } from './mountains.js';
 import { drawTopo } from './topographic.js';
 import { drawBauhaus } from './bauhaus.js';
@@ -44,17 +44,23 @@ export function buildProceduralData(username, data = {}) {
   };
 }
 
-// A company has no rank: the team's usernames seed the art and the chosen color replaces the rank color
-export function buildCompanyProceduralData(aggregated = {}, accentColor) {
-  const usernames = (aggregated.perUserData ?? []).map((u) => u.username).sort();
+// A team has no rank of its own: the art takes the rank most teammates hold (ties go to the higher rank)
+// and is seeded by the team hash, so the same team always gets the same background
+export function buildCompanyProceduralData(aggregated = {}, teamHash = 'company') {
+  const members = aggregated.perUserData ?? [];
+  const rankCounts = new Map();
+  for (const { rank } of members) {
+    if (rank) rankCounts.set(rank, (rankCounts.get(rank) || 0) + 1);
+  }
+  const [rank = null] = [...rankCounts].sort((a, b) => b[1] - a[1] || rankTier(b[0]) - rankTier(a[0]))[0] ?? [];
   return {
-    username: usernames.join(',') || 'company',
-    rank: null,
-    rankColor: /^#[0-9a-f]{6}$/i.test(accentColor ?? '') ? accentColor : getRankAccentColor(null),
+    username: teamHash,
+    rank,
+    rankColor: getRankAccentColor(rank),
     badges: aggregated.counters?.badge ?? 0,
     superbadges: aggregated.counters?.superbadge ?? 0,
     // Mountains adds a row per 20 trails; for a team, one row per teammate reads better
-    trails: usernames.length * 20,
+    trails: members.length * 20,
     certs: certFamilies(aggregated.certificationsData?.certifications ?? []),
   };
 }
