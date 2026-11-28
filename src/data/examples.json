@@ -2,6 +2,7 @@
   "_description": "Gallery examples. Each example is a username plus the options that differ from defaultOptions (the website defaults). Images live in public/assets/examples/<id>.webp; regenerate them with `bash scripts/agent/gallery-refresh.sh`.",
   "defaultOptions": {
     "backgroundKind": "library",
+    "proceduralStyle": "classic",
     "backgroundLibraryUrl": "/assets/background-library/NYC_dreamforce_1.png",
     "backgroundColor": "#5badd6",
     "backgroundImageUrl": "",
@@ -123,11 +124,40 @@
     },
     {
       "id": "procedural",
-      "description": "Procedural background, unique to each username",
+      "description": "Procedural background (Trailhead Banner Classic), unique to each username",
       "username": "nabondance",
       "options": {
         "backgroundKind": "procedural",
         "textColor": "#FFFFFF"
+      }
+    },
+    {
+      "id": "procedural-sky",
+      "description": "Badge Sky procedural background, last 2 certifications aligned left",
+      "username": "babup",
+      "options": {
+        "backgroundKind": "procedural",
+        "proceduralStyle": "sky",
+        "textColor": "#FFFFFF",
+        "badgeMessageColor": "#9234A8",
+        "counterOrder": ["certification", "superbadge", "badge"],
+        "displayLastXCertifications": true,
+        "lastXCertifications": 2,
+        "certificationAlignment": "left",
+        "superbadgeAlignment": "right"
+      }
+    },
+    {
+      "id": "procedural-mountains",
+      "description": "Mountains procedural background for a lower rank, fewer trails give fewer mountain rows",
+      "username": "nvuillamy",
+      "options": {
+        "backgroundKind": "procedural",
+        "proceduralStyle": "mountains",
+        "textColor": "#FFFFFF",
+        "badgeMessageColor": "#D93B4A",
+        "counterOrder": ["badge", "trail", "point"],
+        "certificationAlignment": "right"
       }
     },
     {
