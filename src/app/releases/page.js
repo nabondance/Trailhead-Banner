@@ -30,6 +30,7 @@ export const metadata = {
 };
 
 export default async function ReleasesPage() {
+  let releases;
   try {
     const res = await fetch('https://api.github.com/repos/nabondance/trailhead-banner/releases', {
       headers: {
@@ -44,37 +45,37 @@ export default async function ReleasesPage() {
       throw new Error('API response is not an array');
     }
 
-    const releases = filterReleases(releasesData);
-
-    return (
-      <div className='releases-container'>
-        <JsonLd data={breadcrumbJsonLd('Releases', '/releases')} />
-        <h1>Trailhead Banner Releases</h1>
-        <ul className='releases-list'>
-          {releases.length > 0 ? (
-            releases.map((release, index) => (
-              <li key={`${release.id}-${index}`}>
-                <a href={release.url} target='_blank' rel='noopener noreferrer'>
-                  {release.name || release.tag_name}
-                  {index === 0 && <span className='release-tag'>Latest</span>}
-                </a>
-                <p>Published on: {new Date(release.publishedAt).toLocaleDateString()}</p>
-                {release.body && (
-                  <div className='release-tags'>
-                    {' '}
-                    <pre style={{ whiteSpace: 'pre-wrap' }}>{extractDisplayContent(release.body)}</pre>
-                  </div>
-                )}
-              </li>
-            ))
-          ) : (
-            <p>No releases found.</p>
-          )}
-        </ul>
-      </div>
-    );
+    releases = filterReleases(releasesData);
   } catch (error) {
     console.error('Error fetching releases:', error);
     return <p>Error fetching releases. Please try again later.</p>;
   }
+
+  return (
+    <div className='releases-container'>
+      <JsonLd data={breadcrumbJsonLd('Releases', '/releases')} />
+      <h1>Trailhead Banner Releases</h1>
+      <ul className='releases-list'>
+        {releases.length > 0 ? (
+          releases.map((release, index) => (
+            <li key={`${release.id}-${index}`}>
+              <a href={release.url} target='_blank' rel='noopener noreferrer'>
+                {release.name || release.tag_name}
+                {index === 0 && <span className='release-tag'>Latest</span>}
+              </a>
+              <p>Published on: {new Date(release.publishedAt).toLocaleDateString()}</p>
+              {release.body && (
+                <div className='release-tags'>
+                  {' '}
+                  <pre style={{ whiteSpace: 'pre-wrap' }}>{extractDisplayContent(release.body)}</pre>
+                </div>
+              )}
+            </li>
+          ))
+        ) : (
+          <p>No releases found.</p>
+        )}
+      </ul>
+    </div>
+  );
 }

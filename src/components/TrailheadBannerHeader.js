@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import NavDropdown from './NavDropdown';
+import { useIsClient } from '../utils/useIsClient';
 
 const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
 
@@ -13,13 +13,10 @@ const TrailheadBannerHeader = () => {
   const pathname = usePathname();
   // Each page renders its own <h1>; the site name is only the <h1> on the home page
   const TitleTag = pathname === '/' ? 'h1' : 'p';
-  const [isRewindActive, setIsRewindActive] = useState(false);
-
-  // Checked after mount: the server HTML is built at deploy time, so its month can differ from the visitor's
-  useEffect(() => {
-    const currentMonth = new Date().getMonth(); // 0 = January, 11 = December
-    setIsRewindActive(currentMonth === 11 || currentMonth === 0);
-  }, []);
+  // Checked on the client only: the server HTML is built at deploy time, so its month can differ from the visitor's
+  const isClient = useIsClient();
+  const currentMonth = new Date().getMonth(); // 0 = January, 11 = December
+  const isRewindActive = isClient && (currentMonth === 11 || currentMonth === 0);
 
   const generatorsOptions = [
     { value: '/', label: 'Banner Generator' },
