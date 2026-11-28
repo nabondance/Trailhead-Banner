@@ -466,8 +466,8 @@ const CompanyBannerForm = () => {
                   <option value='library'>Background Library</option>
                   <option value='upload'>Upload Image</option>
                   <option value='customUrl'>Custom URL</option>
-                  <option value='monochromatic'>Solid Color</option>
                   <option value='procedural'>Procedural</option>
+                  <option value='monochromatic'>Solid Color</option>
                 </select>
               </label>
               {options.backgroundKind === 'monochromatic' && (
