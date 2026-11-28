@@ -21,13 +21,11 @@ const AnnouncementBanner = () => {
 
         if (error) {
           console.error('Error fetching announcements:', error);
-          setAnnouncements([]);
         } else if (data) {
           setAnnouncements(data);
         }
       } catch (error) {
         console.error('Error fetching announcements:', error);
-        setAnnouncements([]);
       }
     };
 
