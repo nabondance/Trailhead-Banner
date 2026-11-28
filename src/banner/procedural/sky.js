@@ -1,6 +1,7 @@
 import {
-  W,
   H,
+  W,
+  cap,
   clamp,
   gauss,
   glowDot,
@@ -67,7 +68,7 @@ export function drawSky(ctx, d) {
     ctx.fillRect(x - r, y - r, r * 2, r * 2);
   }
 
-  for (let i = 0; i < d.badges; i++) {
+  for (let i = 0; i < Math.min(d.badges, cap(4000)); i++) {
     const x = rng() * W;
     const y = rng() < 0.6 ? bandY(x) + gauss(rng) * 45 : rng() * H;
     const mag = rng() ** 3;
@@ -105,12 +106,15 @@ export function drawSky(ctx, d) {
 
   const place = makePlacer(rng, free, { spreadWeight: 1.2 });
 
-  for (const cert of d.certs) {
+  // Personal: one constellation per certification family. Company: one per certification (see constellations)
+  const groups = d.constellations ? d.constellations.slice(0, cap(40)) : d.certs;
+  for (const cert of groups) {
     const c = place(90, W - 90);
-    const count = Math.min(10, 3 + (cert.count ?? 2) + Math.floor(rng() * 2));
+    const count = cert.stars ? Math.min(cert.stars, 12) : Math.min(10, 3 + (cert.count ?? 2) + Math.floor(rng() * 2));
+    const spread = cert.stars ? Math.min(1, 0.35 + count * 0.1) : 1;
     const stars = Array.from({ length: count }, () => ({
-      x: clamp(c.x + (rng() - 0.5) * 170, 8, W - 8),
-      y: clamp(c.y + (rng() - 0.5) * 110, 8, H - 8),
+      x: clamp(c.x + (rng() - 0.5) * 170 * spread, 8, W - 8),
+      y: clamp(c.y + (rng() - 0.5) * 110 * spread, 8, H - 8),
     }));
     ctx.strokeStyle = rgba(cert.color, 0.6);
     ctx.lineWidth = 1.2;
@@ -133,7 +137,7 @@ export function drawSky(ctx, d) {
     }
   }
 
-  for (let i = 0; i < Math.min(d.superbadges, 30); i++) {
+  for (let i = 0; i < Math.min(d.superbadges, cap(30)); i++) {
     const { x, y } = place();
     const k = Math.max(calm(x, y), 0.3);
     const size = 6 + rng() * 8;

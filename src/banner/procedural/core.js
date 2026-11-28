@@ -1,9 +1,5 @@
-import { BANNER_SIZES } from '../bannerSizes.js';
-
 // Shared helpers for the procedural background styles: seeded randomness, noise, colors, layout.
 // Plain Canvas 2D only, no getImageData/putImageData, so every style runs as-is on @napi-rs/canvas.
-
-export const { width: W, height: H } = BANNER_SIZES.standard;
 
 const RANK_ORDER = [
   'Scout',
@@ -20,13 +16,24 @@ const RANK_ORDER = [
   'All Star Ranger',
 ];
 
-// Banner areas where the art fades so the rank logo, counters, top badge row and watermark stay readable.
-// Matches the default standard layout; the certification row is left out on purpose so the art fills the banner.
-const ZONES = [
-  { x0: 0, y0: 0, x1: 470, y1: 112, w: 0.75 },
-  { x0: 470, y0: 0, x1: 1584, y1: 102, w: 0.75 },
-  { x0: 1425, y0: 368, x1: 1584, y1: 396, w: 0.6 },
-];
+// Canvas size and the areas where the art fades (logo, counters, top badge row, watermark) for the
+// banner being drawn. Module-level so every helper can read them; set by setFrame() right before a
+// style draws, which is safe because drawing is synchronous.
+export let W = 0;
+export let H = 0;
+let ZONES = [];
+let CAP_GROWTH = 1;
+
+export function setFrame(width, height, zones, capGrowth = 1) {
+  W = width;
+  H = height;
+  ZONES = zones;
+  CAP_GROWTH = capGrowth;
+}
+
+// Element limits are tuned for one person on the 1584×396 banner: they shrink with a smaller
+// canvas and grow with team size, so bigger teams still look busier
+export const cap = (n) => Math.round(n * ((W * H) / (1584 * 396)) * CAP_GROWTH);
 
 const FEATHER = 60;
 
@@ -320,6 +327,10 @@ export function certFamilies(certs) {
   return [...byProduct].map(([product, count]) => ({
     product,
     count,
-    color: PRODUCT_COLORS[product] || EXTRA_CERT_COLORS[cyrb128(product)[0] % EXTRA_CERT_COLORS.length],
+    color: familyColor(product),
   }));
+}
+
+export function familyColor(product) {
+  return PRODUCT_COLORS[product] || EXTRA_CERT_COLORS[cyrb128(product)[0] % EXTRA_CERT_COLORS.length];
 }

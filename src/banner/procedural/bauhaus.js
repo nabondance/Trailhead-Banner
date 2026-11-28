@@ -1,4 +1,4 @@
-import { W, H, clamp, familyPicker, makeCalm, palette, resetCtx, rgba, seeded } from './core.js';
+import { H, W, cap, clamp, familyPicker, makeCalm, palette, resetCtx, rgba, seeded } from './core.js';
 
 // Bauhaus blocks: a poster grid of flat geometric shapes in rank and certification colors.
 export function drawBauhaus(ctx, d) {
@@ -70,7 +70,7 @@ export function drawBauhaus(ctx, d) {
     }
   }
   ctx.globalAlpha = 1;
-  for (let i = 0; i < Math.min(d.superbadges, 30); i++) {
+  for (let i = 0; i < Math.min(d.superbadges, cap(30)); i++) {
     const x = rng() * W;
     const y = rng() * H;
     ctx.fillStyle = `rgba(255,255,255,${(0.85 * calm(x, y)).toFixed(3)})`;

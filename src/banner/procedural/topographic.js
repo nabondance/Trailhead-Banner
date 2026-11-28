@@ -1,6 +1,7 @@
 import {
-  W,
   H,
+  W,
+  cap,
   clamp,
   makeCalm,
   makeNoise,
@@ -38,7 +39,7 @@ export function drawTopo(ctx, d) {
         noise(x * sc * 5, y * sc * 5 - 4) * 0.05;
     }
   }
-  const levels = clamp(Math.round(12 + d.badges / 60), 12, 30);
+  const levels = clamp(Math.round(12 + d.badges / 60), 12, cap(30));
   for (let l = 0; l < levels; l++) {
     const level = -0.8 + (1.6 * (l + 0.5)) / levels;
     const index = l % 5 === 0;
@@ -86,7 +87,7 @@ export function drawTopo(ctx, d) {
   ctx.setLineDash([]);
   ctx.shadowBlur = 0;
 
-  for (const pk of peaks.slice(0, Math.min(d.superbadges, 30))) {
+  for (const pk of peaks.slice(0, Math.min(d.superbadges, cap(30)))) {
     const k = Math.max(calm(pk.x, pk.y), 0.5);
     ctx.fillStyle = pal.c(30, 90, 80, 0.9 * k);
     ctx.shadowColor = pal.c(30, 90, 70, 0.8);

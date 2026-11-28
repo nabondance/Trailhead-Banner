@@ -201,7 +201,7 @@ export default async function handler(req, res) {
 
     // Generate banner
     timings.start('image_generation');
-    const result = await generateCompanyBanner(aggregated, options);
+    const result = await generateCompanyBanner(aggregated, options, teamHash);
     timings.end('image_generation');
     timings.add('image_generation_breakdown', result.timings);
 

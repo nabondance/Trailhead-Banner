@@ -636,13 +636,10 @@ function drawGeometricShapes(ctx, rankColors, random) {
 
 // Draw procedural banner background - seeded by username for consistent, unique patterns
 // Optimized for banner dimensions (1584 × 396px)
-function drawProceduralBannerBackground(ctx, width, height, username, rank) {
+function drawProceduralBannerBackground(ctx, width, height, username, rankColor) {
   // Create seeded random based on username for consistent patterns
   const seed = username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const random = (index) => (Math.sin(seed + index * 1.414) + 1) / 2;
-
-  // Get rank accent color
-  const rankColor = getRankAccentColor(rank);
 
   // Create a gradient base background with rank color influence
   const baseGradient = ctx.createLinearGradient(0, 0, width, height);

@@ -1,6 +1,7 @@
 import {
-  W,
   H,
+  W,
+  cap,
   clamp,
   glowDot,
   makeCalm,
@@ -41,7 +42,7 @@ export function drawMountains(ctx, d) {
   ctx.beginPath();
   ctx.arc(sunX, sunY, 26, 0, Math.PI * 2);
   ctx.fill();
-  for (let i = 0; i < Math.min(d.superbadges, 40); i++) {
+  for (let i = 0; i < Math.min(d.superbadges, cap(40)); i++) {
     const x = rng() * W;
     const y = rng() * H * 0.4;
     glowDot(ctx, x, y, 5, '#FFFFFF', 0.6 * calm(x, y));

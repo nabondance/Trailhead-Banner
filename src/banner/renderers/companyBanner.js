@@ -5,6 +5,7 @@ import * as CompanyLogo from '../components/companyLogo.js';
 import * as CompanyAgentblazer from '../components/companyAgentblazer.js';
 import * as CompanySfdxHardisBadge from '../components/companySfdxHardisBadge.js';
 import { BANNER_SIZES } from '../bannerSizes.js';
+import { buildCompanyProceduralData } from '../procedural/index.js';
 
 /**
  * Company Banner Renderer
@@ -63,9 +64,10 @@ function buildSuperbadgeData(companySuperbadges, options) {
  *
  * @param {Object} aggregated - Output from companyDataUtils.aggregateCompanyData()
  * @param {Object} options - Generation options
+ * @param {string} [teamHash] - Stable team identifier, seeds the procedural background
  * @returns {Promise<Object>} { bannerUrl, warnings, hash, timings }
  */
-async function generateCompanyBanner(aggregated, options = {}) {
+async function generateCompanyBanner(aggregated, options = {}, teamHash) {
   const startTime = Date.now();
   const warnings = [];
   const timings = {};
@@ -95,7 +97,9 @@ async function generateCompanyBanner(aggregated, options = {}) {
   const certifYPosition = CERT_TOP_Y; // where the cert grid starts (= logo slot bottom)
   const [backgroundPrep, companyLogoPrep, companyAgentblazerPrep, companySfdxHardisPrep, watermarkPrep] =
     await Promise.all([
-      Background.prepareBackground(options),
+      Background.prepareBackground(options, {
+        proceduralArt: buildCompanyProceduralData(aggregated, teamHash),
+      }),
       CompanyLogo.prepareCompanyLogo(options, certifYPosition, LOGO_SLOT_WIDTH),
       CompanyAgentblazer.prepareCompanyAgentblazer(aggregated.agentblazer, options, AGENTBLAZER_LOGO_HEIGHT),
       CompanySfdxHardisBadge.prepareCompanySfdxHardisBadge(aggregated.sfdxHardis, options, AGENTBLAZER_LOGO_HEIGHT),
