@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.29.3",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.22.2"
   },
   "author": "nabondance",
   "homepage": "https://thb.nabondance.me/",
@@ -35,8 +35,8 @@
     "start": "next start",
     "lint-staged": "lint-staged",
     "format:all:fix": "pnpm format:prettier:fix && pnpm format:stylelint:fix",
-    "format:prettier": "prettier --check --ignore-path .gitignore . !pnpm-lock.yaml",
-    "format:prettier:fix": "prettier --write --ignore-path .gitignore . !pnpm-lock.yaml",
+    "format:prettier": "prettier --check --ignore-path .gitignore --ignore-path .prettierignore . !pnpm-lock.yaml",
+    "format:prettier:fix": "prettier --write --ignore-path .gitignore --ignore-path .prettierignore . !pnpm-lock.yaml",
     "format:stylelint": "stylelint '**/*.{css,scss}'",
     "format:stylelint:fix": "stylelint '**/*.{css,scss}' --fix"
   },
@@ -76,7 +76,6 @@
     "react-tooltip": "^6.0.13"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "eslint": "^10.15.0",
     "eslint-config-next": "16.4.6",
     "eslint-config-prettier": "^10.1.8",
