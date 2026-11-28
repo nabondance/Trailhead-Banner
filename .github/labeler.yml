@@ -8,7 +8,6 @@ config:
       - any-glob-to-any-file: 'config/*'
       - any-glob-to-any-file: 'next.config.mjs'
       - any-glob-to-any-file: 'eslint.config.mjs'
-      - any-glob-to-any-file: 'tailwind.config.mjs'
       - any-glob-to-any-file: 'postcss.config.mjs'
       - any-glob-to-any-file: 'jsconfig.json'
       - any-glob-to-any-file: '.env*'

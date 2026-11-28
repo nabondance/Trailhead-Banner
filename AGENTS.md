@@ -14,7 +14,7 @@ pnpm build   # Production build
 
 - **Framework**: Next.js 16 (App Router + Pages API hybrid)
 - **React**: v19
-- **Styling**: Tailwind CSS v4
+- **Styling**: plain CSS (custom classes in `src/styles/globals.css`), no Tailwind
 - **Canvas**: @napi-rs/canvas (for image generation)
 - **Deployment**: Vercel
 - **Caching**: Upstash Redis (15min TTL for GraphQL, reset on hit up to 30min)
