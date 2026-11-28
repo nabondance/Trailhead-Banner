@@ -107,6 +107,7 @@ const GenerationCount = forwardRef(
 
       return () => {
         // Marks in-flight responses as stale so they're dropped after unmount
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- a request counter, not a DOM node: the latest value is the one to bump
         latestUpdate.current++;
         clearTimeout(retryTimer.current);
         supabase.removeChannel(channel);

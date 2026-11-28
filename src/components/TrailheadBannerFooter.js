@@ -1,29 +1,27 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useSyncExternalStore } from 'react';
 import GitHubButton from 'react-github-btn';
 import { useTheme } from 'next-themes';
+import { useIsClient } from '../utils/useIsClient';
+
+const subscribeResize = (onChange) => {
+  window.addEventListener('resize', onChange);
+  return () => window.removeEventListener('resize', onChange);
+};
 
 const TrailheadBannerFooter = () => {
-  const [buttonSize, setButtonSize] = useState('large');
-  const [mounted, setMounted] = useState(false);
+  const buttonSize = useSyncExternalStore(
+    subscribeResize,
+    () => (window.innerWidth <= 768 ? 'small' : 'large'),
+    () => 'large'
+  );
+  const mounted = useIsClient();
   const { resolvedTheme } = useTheme();
   // resolvedTheme is unknown during server render; use light until mounted to avoid a hydration mismatch
   const colorScheme = mounted && resolvedTheme === 'dark' ? 'dark_dimmed' : 'light';
   // The static HTML is built at deploy time; use the visitor's year only once mounted
   const year = mounted ? new Date().getFullYear() : 2025;
-
-  useEffect(() => {
-    const handleResize = () => {
-      setButtonSize(window.innerWidth <= 768 ? 'small' : 'large');
-    };
-
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Set initial size
-    setMounted(true);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   return (
     <footer className='footer'>

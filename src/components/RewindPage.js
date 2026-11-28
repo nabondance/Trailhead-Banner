@@ -379,8 +379,8 @@ const RewindPage = ({ fallbackCount = null }) => {
       )}
 
       <p className='disclaimer'>
-        Some yearly details (badges, points, rank changes) aren't available yet via Trailhead APIs, but I'm tracking API
-        updates. 🫶
+        Some yearly details (badges, points, rank changes) aren&apos;t available yet via Trailhead APIs, but I&apos;m
+        tracking API updates. 🫶
       </p>
     </div>
   );

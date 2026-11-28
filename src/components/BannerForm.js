@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useId, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -50,7 +51,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
     badgeLabelColor: '#555555',
     badgeMessageColor: '#1F80C0',
     backgroundKind: 'library', // Default to library
-    backgroundLibraryUrl: bannerBackground[5].src, // Default library background; made absolute on mount (window is unavailable during SSR)
+    backgroundLibraryUrl: bannerBackground[5].src, // Default library background; made absolute on submit (window is unavailable during SSR)
     customBackgroundImageUrl: '',
     displayLastXCertifications: false,
     lastXCertifications: '',
@@ -81,14 +82,6 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
   const [backgroundImageUrlError, setBackgroundImageUrlError] = useState('');
   const [validationResult, setValidationResult] = useState(null);
   const usernameInputRef = useRef(null);
-
-  React.useEffect(() => {
-    setOptions((prev) =>
-      prev.backgroundLibraryUrl.startsWith('/')
-        ? { ...prev, backgroundLibraryUrl: `${window.location.origin}${prev.backgroundLibraryUrl}` }
-        : prev
-    );
-  }, []);
 
   const handleUsernameBlur = async () => {
     if (!options.username) {
@@ -213,7 +206,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
       return;
     }
 
-    let backgroundImageUrl = getBackgroundPreviewSrc(options);
+    const backgroundLibraryUrl = new URL(options.backgroundLibraryUrl, window.location.origin).href;
+    let backgroundImageUrl = getBackgroundPreviewSrc({ ...options, backgroundLibraryUrl });
 
     if (options.backgroundKind === 'upload' && options.backgroundImageUrl) {
       try {
@@ -237,6 +231,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
 
     await onSubmit({
       ...options,
+      backgroundLibraryUrl,
       counterOrder,
       stampCategories,
       backgroundImageUrl,
@@ -367,7 +362,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
             {options.backgroundKind === 'library' && (
               <div className='predefined-background'>
                 {bannerBackground.map((image) => (
-                  <img
+                  <Image
                     key={image.src}
                     src={image.src}
                     alt={image.alt}

@@ -6,33 +6,31 @@ const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [dismissedIds, setDismissedIds] = useState(new Set());
 
-  const fetchAnnouncement = async () => {
-    if (!supabase) return;
-    try {
-      // Fetch all active announcements for the current environment
-      const { data, error } = await supabase
-        .from('announcement')
-        .select('*')
-        .eq('is_active', true)
-        .eq('environment', APP_ENV)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching announcements:', error);
-        setAnnouncements([]);
-      } else if (data) {
-        setAnnouncements(data);
-      }
-    } catch (error) {
-      console.error('Error fetching announcements:', error);
-      setAnnouncements([]);
-    }
-  };
-
   useEffect(() => {
     if (!supabase) return;
 
-    // Fetch initial announcements
+    const fetchAnnouncement = async () => {
+      try {
+        // Fetch all active announcements for the current environment
+        const { data, error } = await supabase
+          .from('announcement')
+          .select('*')
+          .eq('is_active', true)
+          .eq('environment', APP_ENV)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching announcements:', error);
+          setAnnouncements([]);
+        } else if (data) {
+          setAnnouncements(data);
+        }
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+        setAnnouncements([]);
+      }
+    };
+
     fetchAnnouncement();
 
     // Subscribe to changes in the 'announcement' table
@@ -46,7 +44,7 @@ const AnnouncementBanner = () => {
           table: 'announcement',
         },
         () => {
-          fetchAnnouncements(); // Update the announcements when a change is detected
+          fetchAnnouncement();
         }
       )
       .subscribe();

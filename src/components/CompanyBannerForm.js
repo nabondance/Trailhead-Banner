@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useId } from 'react';
+import Image from 'next/image';
 import { zipSync, strToU8 } from 'fflate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
@@ -518,7 +519,7 @@ const CompanyBannerForm = () => {
               {options.backgroundKind === 'library' && (
                 <div className='predefined-background'>
                   {bannerBackground.map((image) => (
-                    <img
+                    <Image
                       key={image.src}
                       src={image.src}
                       alt={image.alt}
@@ -939,6 +940,7 @@ const CompanyBannerForm = () => {
       {/* Result */}
       {resultImageUrl && (
         <div className='image-container'>
+          {/* eslint-disable-next-line @next/next/no-img-element -- data URL, next/image cannot optimize it */}
           <img
             src={resultImageUrl}
             alt='Company Banner'
@@ -994,6 +996,7 @@ const CompanyBannerForm = () => {
 
       {fullscreenImage && (
         <div className='fullscreen-overlay visible' onClick={() => setFullscreenImage(null)}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- data URL, next/image cannot optimize it */}
           <img src={fullscreenImage} alt='Company Banner Full Screen' />
         </div>
       )}

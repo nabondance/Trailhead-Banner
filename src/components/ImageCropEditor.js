@@ -28,7 +28,9 @@ const ImageCropEditor = ({
   const [maxZoom, setMaxZoom] = useState(3);
 
   // Keep ref in sync so the image-load effect can read current zoom without re-running
-  cropZoomRef.current = cropZoom;
+  useEffect(() => {
+    cropZoomRef.current = cropZoom;
+  }, [cropZoom]);
 
   // Measure container to give react-easy-crop explicit pixel dimensions
   useEffect(() => {
@@ -89,6 +91,7 @@ const ImageCropEditor = ({
         <div ref={containerRef} className='crop-container' style={{ height: containerSize.height || undefined }}>
           {containerSize.width > 0 &&
             (isCropSkipped ? (
+              // eslint-disable-next-line @next/next/no-img-element -- data URL, next/image cannot optimize it
               <img
                 src={imageSrc}
                 alt={skipCover ? 'Preview (center-cropped)' : 'Preview (distorted)'}
