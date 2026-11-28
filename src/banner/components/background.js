@@ -1,7 +1,7 @@
 import { loadImage } from '@napi-rs/canvas';
 import path from 'path';
 import fs from 'fs';
-import { drawProceduralBannerBackground } from '../../utils/drawUtils.js';
+import { buildProceduralData, drawProceduralBackground } from '../procedural/index.js';
 import { getImage } from '../../utils/cacheUtils.js';
 import {
   decodeImageDataUrl,
@@ -45,10 +45,11 @@ function decodeUploadedImage(dataUrl) {
  * @param {string} options.backgroundImageUrl - URL for custom/upload background
  * @param {string} options.backgroundColor - Color for monochromatic background
  * @param {string} options.username - Username for procedural background seeding
- * @param {Object} options.rankData - Rank data for procedural background color
+ * @param {string} options.proceduralStyle - Procedural style id (see src/banner/procedural/styles.js)
+ * @param {Object} [data] - Trailhead data (rankData, badgesData, superbadgesData, certificationsData) for procedural backgrounds
  * @returns {Promise<Object>} Prepared background data
  */
-async function prepareBackground(options) {
+async function prepareBackground(options, data = {}) {
   const timer = new Timer();
   timer.start('load');
   const warnings = [];
@@ -93,8 +94,8 @@ async function prepareBackground(options) {
       case 'procedural':
         backgroundData = {
           type: 'procedural',
-          username: options.username || 'default',
-          rank: options.rankData?.rank?.title || 'Scout',
+          style: options.proceduralStyle,
+          art: buildProceduralData(options.username, data),
         };
         break;
 
@@ -157,7 +158,7 @@ async function renderBackground(ctx, prepared, canvasWidth, canvasHeight, option
       break;
 
     case 'procedural':
-      drawProceduralBannerBackground(ctx, canvasWidth, canvasHeight, data.username, data.rank);
+      drawProceduralBackground(ctx, canvasWidth, canvasHeight, data.style, data.art);
       break;
 
     default:

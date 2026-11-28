@@ -1378,6 +1378,15 @@ legend {
   box-shadow: 0 0 10px var(--primary);
 }
 
+.procedural-sample {
+  display: block;
+  width: 100%;
+  max-width: 792px;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
 @media (width <= 768px) {
   .options {
     padding: 10px;

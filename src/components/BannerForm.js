@@ -30,6 +30,7 @@ import ImageCropEditor from './ImageCropEditor';
 import BackgroundPreview from './BackgroundPreview';
 import OptionsToggle from './OptionsToggle';
 import { BANNER_SIZES } from '../banner/bannerSizes';
+import { PROCEDURAL_STYLES, DEFAULT_PROCEDURAL_STYLE } from '../banner/procedural/styles';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 
 // Counters without allowedIn are standard-only (stamp variants); company-only ones are excluded
@@ -51,6 +52,7 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
     badgeLabelColor: '#555555',
     badgeMessageColor: '#1F80C0',
     backgroundKind: 'library', // Default to library
+    proceduralStyle: DEFAULT_PROCEDURAL_STYLE,
     backgroundLibraryUrl: bannerBackground[5].src, // Default library background; made absolute on submit (window is unavailable during SSR)
     customBackgroundImageUrl: '',
     displayLastXCertifications: false,
@@ -317,8 +319,8 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
                 <option value='library'>Background Library</option>
                 <option value='upload'>Upload Image</option>
                 <option value='customUrl'>Custom URL</option>
-                <option value='monochromatic'>Solid Color</option>
                 <option value='procedural'>Procedural</option>
+                <option value='monochromatic'>Solid Color</option>
               </select>
             </label>
             {options.backgroundKind === 'monochromatic' && (
@@ -328,10 +330,32 @@ const BannerForm = ({ onSubmit, setMainError, onValidationError, onGenerateStart
               </label>
             )}
             {options.backgroundKind === 'procedural' && (
-              <p className='helper-text'>
-                Generates a unique background based on your username and rank. Same username always produces the same
-                pattern.
-              </p>
+              <div className='procedural-style'>
+                <label className='picklist'>
+                  Style:
+                  <select
+                    value={options.proceduralStyle}
+                    onChange={(e) => setOptions({ ...options, proceduralStyle: e.target.value })}
+                  >
+                    {PROCEDURAL_STYLES.map((style) => (
+                      <option key={style.id} value={style.id}>
+                        {style.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <p className='helper-text'>
+                  {PROCEDURAL_STYLES.find((style) => style.id === options.proceduralStyle)?.description} Generated from
+                  your username and Trailhead data: the same profile always gets the same background.
+                </p>
+                <Image
+                  src={`/assets/procedural/${options.proceduralStyle}.webp`}
+                  alt={`Sample of the ${PROCEDURAL_STYLES.find((style) => style.id === options.proceduralStyle)?.name} style`}
+                  width={792}
+                  height={198}
+                  className='procedural-sample'
+                />
+              </div>
             )}
             {options.backgroundKind === 'upload' && (
               <label>
