@@ -6,6 +6,8 @@
  * data that will actually be used in the banner.
  */
 
+import { proceduralUsesTrailheadStats } from '../banner/procedural/styles.js';
+
 /**
  * Query dependency map for banner generation
  *
@@ -36,12 +38,15 @@ const QUERY_DEPENDENCIES = {
       'displayLastXCertifications',
     ],
     requiredWhenCounter: ['certification'],
+    requiredWhenBackgroundKind: ['proceduralStats'],
     params: { count: 100 },
   },
 
   GET_TRAILHEAD_BADGES: {
     // Fetch general badges (non-superbadge)
+    // Also carries the superbadge count used by procedural backgrounds
     requiredWhenCounter: ['badge'],
+    requiredWhenBackgroundKind: ['proceduralStats'],
     params: { count: 5, filter: null },
   },
 
@@ -158,7 +163,11 @@ function isQueryRequired(config, options) {
 
   // Check backgroundKind-based dependencies (e.g., procedural background needs rank data)
   if (config.requiredWhenBackgroundKind && Array.isArray(config.requiredWhenBackgroundKind)) {
-    if (config.requiredWhenBackgroundKind.includes(options.backgroundKind)) {
+    const kinds = [options.backgroundKind];
+    if (options.backgroundKind === 'procedural' && proceduralUsesTrailheadStats(options.proceduralStyle)) {
+      kinds.push('proceduralStats');
+    }
+    if (kinds.some((kind) => config.requiredWhenBackgroundKind.includes(kind))) {
       return true;
     }
   }

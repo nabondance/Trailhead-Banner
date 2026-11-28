@@ -57,7 +57,7 @@ async function generateStandardBanner(data, options = {}) {
 
   const [backgroundPrep, rankLogoPrep, agentblazerPrep, mvpRibbonPrep, watermarkPrep, stampsPrep, sfdxHardisPrep] =
     await Promise.all([
-      Background.prepareBackground(options),
+      Background.prepareBackground(options, data),
       RankLogo.prepareRankLogo(data.rankData, options, CANVAS_HEIGHT),
       Agentblazer.prepareAgentblazer(data.agentblazerData, options),
       MvpRibbon.prepareMvpRibbon(data.mvpData),
