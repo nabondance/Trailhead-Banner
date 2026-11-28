@@ -1,6 +1,6 @@
 import { drawProceduralBannerBackground, getRankAccentColor } from '../../utils/drawUtils.js';
 import { BANNER_SIZES } from '../bannerSizes.js';
-import { certFamilies, rankTier, setFrame } from './core.js';
+import { certFamilies, familyColor, rankTier, setFrame } from './core.js';
 import { drawMountains } from './mountains.js';
 import { drawTopo } from './topographic.js';
 import { drawBauhaus } from './bauhaus.js';
@@ -61,6 +61,12 @@ export function buildCompanyProceduralData(aggregated = {}, teamHash = 'company'
     superbadges: aggregated.counters?.superbadge ?? 0,
     // Mountains adds a row per 20 trails; for a team, one row per teammate reads better
     trails: members.length * 20,
+    teamSize: members.length,
+    // Badge Sky: one constellation per certification, one star per teammate holding it active
+    constellations: (aggregated.certificationsData?.certifications ?? [])
+      .filter((c) => !c.isRetired && c.activeHolderCount > 0)
+      .map((c) => ({ color: familyColor(c.product || 'Other'), stars: c.activeHolderCount }))
+      .sort((a, b) => b.stars - a.stars),
     certs: certFamilies(aggregated.certificationsData?.certifications ?? []),
   };
 }
@@ -74,6 +80,6 @@ export function drawProceduralBackground(ctx, width, height, style, art) {
   const bannerType = Object.keys(BANNER_SIZES).find(
     (type) => BANNER_SIZES[type].width === width && BANNER_SIZES[type].height === height
   );
-  setFrame(width, height, FADE_ZONES[bannerType] ?? []);
+  setFrame(width, height, FADE_ZONES[bannerType] ?? [], 1 + Math.log2(art.teamSize ?? 1));
   draw(ctx, art);
 }

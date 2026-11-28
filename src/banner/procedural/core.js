@@ -22,15 +22,18 @@ const RANK_ORDER = [
 export let W = 0;
 export let H = 0;
 let ZONES = [];
+let CAP_GROWTH = 1;
 
-export function setFrame(width, height, zones) {
+export function setFrame(width, height, zones, capGrowth = 1) {
   W = width;
   H = height;
   ZONES = zones;
+  CAP_GROWTH = capGrowth;
 }
 
-// Caps are tuned for the 1584×396 personal banner; smaller canvases get proportionally fewer elements
-export const areaScale = () => (W * H) / (1584 * 396);
+// Element limits are tuned for one person on the 1584×396 banner: they shrink with a smaller
+// canvas and grow with team size, so bigger teams still look busier
+export const cap = (n) => Math.round(n * ((W * H) / (1584 * 396)) * CAP_GROWTH);
 
 const FEATHER = 60;
 
@@ -324,6 +327,10 @@ export function certFamilies(certs) {
   return [...byProduct].map(([product, count]) => ({
     product,
     count,
-    color: PRODUCT_COLORS[product] || EXTRA_CERT_COLORS[cyrb128(product)[0] % EXTRA_CERT_COLORS.length],
+    color: familyColor(product),
   }));
+}
+
+export function familyColor(product) {
+  return PRODUCT_COLORS[product] || EXTRA_CERT_COLORS[cyrb128(product)[0] % EXTRA_CERT_COLORS.length];
 }

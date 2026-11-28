@@ -1,7 +1,7 @@
 import {
-  W,
   H,
-  areaScale,
+  W,
+  cap,
   clamp,
   makeCalm,
   makeNoise,
@@ -80,7 +80,7 @@ export function drawCurrents(ctx, d) {
   ctx.globalCompositeOperation = 'lighter';
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  const count = Math.round(Math.min(3200, 350 + d.badges * 2) * areaScale());
+  const count = Math.min(cap(3200), 350 + d.badges * 2);
   for (let i = 0; i < count; i++) {
     const x = rng() * (W + 100) - 50;
     const y = rng() * H;
@@ -96,7 +96,7 @@ export function drawCurrents(ctx, d) {
 
   ctx.shadowColor = pal.c(0, 90, 70, 0.9);
   ctx.shadowBlur = 10;
-  for (let i = 0; i < Math.min(d.superbadges, Math.round(40 * areaScale())); i++) {
+  for (let i = 0; i < Math.min(d.superbadges, cap(40)); i++) {
     trace(rng() * W * 0.35 - 40, rng() * H, 220 + rng() * 140, 3, 1.4 + rng(), 0.55, pal.c(10, 90, 82));
   }
   resetCtx(ctx);

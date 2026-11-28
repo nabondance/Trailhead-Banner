@@ -1,4 +1,4 @@
-import { W, H, clamp, makeCalm, makeNoise, paintBase, palette, resetCtx, rgba, seeded, vignette } from './core.js';
+import { H, W, cap, clamp, makeCalm, makeNoise, paintBase, palette, resetCtx, rgba, seeded, vignette } from './core.js';
 
 function clipPoly(poly, nx, ny, c) {
   const out = [];
@@ -95,7 +95,7 @@ export function drawCells(ctx, d) {
   resetCtx(ctx);
   paintBase(ctx, pal, rng, 0.1);
 
-  const n = Math.round(Math.min(260, 50 + Math.sqrt(d.badges) * 5));
+  const n = Math.round(Math.min(cap(260), 50 + Math.sqrt(d.badges) * 5));
   let sites = [];
   for (let i = 0; i < n; i++) {
     let best = null;
@@ -189,7 +189,7 @@ export function drawCells(ctx, d) {
     }
   }
 
-  for (let i = 0; i < Math.min(d.superbadges, 30); i++) {
+  for (let i = 0; i < Math.min(d.superbadges, cap(30)); i++) {
     const j = pick();
     if (j < 0) break;
     const { c, poly } = cells[j];
