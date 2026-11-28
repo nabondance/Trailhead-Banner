@@ -21,6 +21,7 @@ import ImageCropEditor from './ImageCropEditor';
 import BackgroundPreview from './BackgroundPreview';
 import OptionsToggle from './OptionsToggle';
 import { BANNER_SIZES } from '../banner/bannerSizes';
+import { PROCEDURAL_STYLES, DEFAULT_PROCEDURAL_STYLE } from '../banner/procedural/styles';
 import { getCroppedImage, resizeImageForPayload } from '../utils/cropUtils';
 import { extractUsernameFromUrl } from '../utils/usernameValidation';
 
@@ -162,6 +163,7 @@ const CompanyBannerForm = () => {
     backgroundColor: '#5badd6',
     backgroundImageUrl: '',
     backgroundKind: 'library',
+    proceduralStyle: DEFAULT_PROCEDURAL_STYLE,
     backgroundLibraryUrl:
       typeof window !== 'undefined' ? `${window.location.origin}${bannerBackground[5].src}` : bannerBackground[5].src,
     customBackgroundImageUrl: '',
@@ -465,6 +467,7 @@ const CompanyBannerForm = () => {
                   <option value='upload'>Upload Image</option>
                   <option value='customUrl'>Custom URL</option>
                   <option value='monochromatic'>Solid Color</option>
+                  <option value='procedural'>Procedural</option>
                 </select>
               </label>
               {options.backgroundKind === 'monochromatic' && (
@@ -472,6 +475,38 @@ const CompanyBannerForm = () => {
                   Background Color:
                   <input type='color' value={options.backgroundColor} onChange={handleColorChange} />
                 </label>
+              )}
+              {options.backgroundKind === 'procedural' && (
+                <div className='procedural-style'>
+                  <label className='picklist'>
+                    Style:
+                    <select
+                      value={options.proceduralStyle}
+                      onChange={(e) => setOptions({ ...options, proceduralStyle: e.target.value })}
+                    >
+                      {PROCEDURAL_STYLES.map((style) => (
+                        <option key={style.id} value={style.id}>
+                          {style.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Accent Color:
+                    <input type='color' value={options.backgroundColor} onChange={handleColorChange} />
+                  </label>
+                  <p className='helper-text'>
+                    Generated from your team&apos;s badges, superbadges and certifications, in your accent color: the
+                    same team always gets the same background.
+                  </p>
+                  <Image
+                    src={`/assets/procedural/${options.proceduralStyle}.webp`}
+                    alt={`Sample of the ${PROCEDURAL_STYLES.find((style) => style.id === options.proceduralStyle)?.name} style`}
+                    width={792}
+                    height={198}
+                    className='procedural-sample'
+                  />
+                </div>
               )}
               {options.backgroundKind === 'upload' && (
                 <label>
@@ -531,7 +566,7 @@ const CompanyBannerForm = () => {
                   ))}
                 </div>
               )}
-              {options.backgroundKind !== 'upload' && (
+              {options.backgroundKind !== 'upload' && options.backgroundKind !== 'procedural' && (
                 <BackgroundPreview options={options} size={BANNER_SIZES.company} />
               )}
             </fieldset>

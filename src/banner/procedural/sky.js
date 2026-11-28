@@ -1,6 +1,7 @@
 import {
   W,
   H,
+  areaScale,
   clamp,
   gauss,
   glowDot,
@@ -67,7 +68,7 @@ export function drawSky(ctx, d) {
     ctx.fillRect(x - r, y - r, r * 2, r * 2);
   }
 
-  for (let i = 0; i < d.badges; i++) {
+  for (let i = 0; i < Math.min(d.badges, Math.round(4000 * areaScale())); i++) {
     const x = rng() * W;
     const y = rng() < 0.6 ? bandY(x) + gauss(rng) * 45 : rng() * H;
     const mag = rng() ** 3;

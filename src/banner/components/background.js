@@ -46,7 +46,8 @@ function decodeUploadedImage(dataUrl) {
  * @param {string} options.backgroundColor - Color for monochromatic background
  * @param {string} options.username - Username for procedural background seeding
  * @param {string} options.proceduralStyle - Procedural style id (see src/banner/procedural/styles.js)
- * @param {Object} [data] - Trailhead data (rankData, badgesData, superbadgesData, certificationsData) for procedural backgrounds
+ * @param {Object} [data] - Trailhead data (rankData, badgesData, superbadgesData, certificationsData) for procedural backgrounds,
+ *   or a ready-made `proceduralArt` (company banners)
  * @returns {Promise<Object>} Prepared background data
  */
 async function prepareBackground(options, data = {}) {
@@ -95,7 +96,7 @@ async function prepareBackground(options, data = {}) {
         backgroundData = {
           type: 'procedural',
           style: options.proceduralStyle,
-          art: buildProceduralData(options.username, data),
+          art: data.proceduralArt ?? buildProceduralData(options.username, data),
         };
         break;
 

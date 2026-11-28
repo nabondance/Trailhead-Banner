@@ -5,6 +5,7 @@ import * as CompanyLogo from '../components/companyLogo.js';
 import * as CompanyAgentblazer from '../components/companyAgentblazer.js';
 import * as CompanySfdxHardisBadge from '../components/companySfdxHardisBadge.js';
 import { BANNER_SIZES } from '../bannerSizes.js';
+import { buildCompanyProceduralData } from '../procedural/index.js';
 
 /**
  * Company Banner Renderer
@@ -95,7 +96,9 @@ async function generateCompanyBanner(aggregated, options = {}) {
   const certifYPosition = CERT_TOP_Y; // where the cert grid starts (= logo slot bottom)
   const [backgroundPrep, companyLogoPrep, companyAgentblazerPrep, companySfdxHardisPrep, watermarkPrep] =
     await Promise.all([
-      Background.prepareBackground(options),
+      Background.prepareBackground(options, {
+        proceduralArt: buildCompanyProceduralData(aggregated, options.backgroundColor),
+      }),
       CompanyLogo.prepareCompanyLogo(options, certifYPosition, LOGO_SLOT_WIDTH),
       CompanyAgentblazer.prepareCompanyAgentblazer(aggregated.agentblazer, options, AGENTBLAZER_LOGO_HEIGHT),
       CompanySfdxHardisBadge.prepareCompanySfdxHardisBadge(aggregated.sfdxHardis, options, AGENTBLAZER_LOGO_HEIGHT),
