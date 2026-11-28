@@ -12,7 +12,6 @@ import { getBannerCount } from '../utils/bannerCountUtils';
 import ThemeProvider from '../components/ThemeProvider';
 
 import { Inter } from 'next/font/google';
-import localFont from 'next/font/local';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
@@ -21,19 +20,6 @@ config.autoAddCss = false;
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
-  display: 'swap',
-  preload: false,
-});
-
-// Announcement banner font: Iosevka (SIL OFL 1.1) subset to Latin and Latin Extended-A, in the
-// weights the announcement styles use. Only fetched when an announcement shows
-const iosevka = localFont({
-  src: [
-    { path: '../fonts/Iosevka-Regular-latin.woff2', weight: '400', style: 'normal' },
-    { path: '../fonts/Iosevka-Medium-latin.woff2', weight: '500', style: 'normal' },
-    { path: '../fonts/Iosevka-Bold-latin.woff2', weight: '700', style: 'normal' },
-  ],
-  variable: '--font-iosevka',
   display: 'swap',
   preload: false,
 });
@@ -163,7 +149,7 @@ export default async function RootLayout({ children }) {
         {process.env.VERCEL_ENV && <SpeedInsights />}
         <link rel='preload' as='image' href='/assets/logos/trailhead-banner-logo.svg'></link>
       </head>
-      <body className={`${inter.variable} ${iosevka.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
         <ThemeProvider>
           <header className='header'>
             <TrailheadBannerHeader />
